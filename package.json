@@ -12,12 +12,15 @@
     "lint:prettier": "prettier --check \"{src,tests}/**/*.{ts,tsx}\" \"*.{js,json}\"",
     "lint:prettier:fix": "prettier --write \"{src,tests}/**/*.{ts,tsx}\" *.js",
     "lint:unused-exports": "ts-unused-exports tsconfig.json --ignoreFiles=leather-styles --ignoreFiles=tests",
+    "test:unit": "vitest",
+    "test:integration": "npx playwright test",
     "preview": "vite preview"
   },
   "dependencies": {
     "@chakra-ui/react": "^2.8.1",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
+    "@fontsource/poppins": "^5.0.8",
     "@ls-lint/ls-lint": "^2.2.2",
     "@reduxjs/toolkit": "^1.9.7",
     "@trivago/prettier-plugin-sort-imports": "^4.2.1",
@@ -35,9 +38,12 @@
     "react-redux": "^8.1.3",
     "redux": "^4.2.1",
     "redux-persist": "^6.0.0",
-    "ts-unused-exports": "^10.0.1"
+    "ts-unused-exports": "^10.0.1",
+    "vitest": "^0.34.6"
   },
   "devDependencies": {
+    "@playwright/test": "^1.39.0",
+    "@types/node": "^20.8.10",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
     "@typescript-eslint/eslint-plugin": "^6.9.1",
