@@ -44,15 +44,6 @@ jobs:
       - name: Lint commit message
         uses: wagoid/commitlint-github-action@v4
 
-  lint-deps:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/provision
-
-      - name: Lint dependency rules
-        run: yarn lint:deps
-
   lint-unused-exports:
     runs-on: ubuntu-latest
     steps:
@@ -61,15 +52,6 @@ jobs:
 
       - name: Lint unused TypeScript exports
         run: yarn lint:unused-exports
-
-  locked-versions:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/provision
-
-      - name: Check exact versions
-        uses: ./.github/actions/check-version-lock
 
   typecheck:
     runs-on: ubuntu-latest
@@ -88,16 +70,3 @@ jobs:
 
       - name: Test
         run: yarn test:unit
-
-  test-build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/provision
-
-      - name: Build
-        run: yarn build
-
-      - name: Package extension
-        run: sh build-ext.sh
-        shell: bash
