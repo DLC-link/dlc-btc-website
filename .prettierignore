@@ -4,4 +4,5 @@ dist/
 .eslintrc.js
 tsconfig.json
 vite.config.ts
+vitest.config.ts
 env.d.ts
