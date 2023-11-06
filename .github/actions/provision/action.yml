@@ -1,0 +1,24 @@
+name: Provision
+description: Set up job with tasks needed to run a code check
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up node
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+
+    - uses: actions/cache@v3
+      id: cache
+      with:
+        path: '**/node_modules'
+        key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('**/package.json') }}
+
+    - uses: nick-fields/retry@v2
+      if: steps.cache.outputs.cache-hit != 'true'
+      env:
+        PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+      with:
+        timeout_minutes: 5
+        max_attempts: 3
+        command: yarn --frozen-lockfile
