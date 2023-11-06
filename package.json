@@ -13,7 +13,7 @@
     "lint:prettier:fix": "prettier --write \"{src,tests}/**/*.{ts,tsx}\" *.js",
     "lint:unused-exports": "ts-unused-exports tsconfig.json --ignoreFiles=tests",
     "typecheck": "tsc --noEmit",
-    "test:unit": "vitest run",
+    "test:unit": "vitest unit",
     "test:integration": "npx playwright test",
     "preview": "vite preview"
   },
