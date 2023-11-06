@@ -5,18 +5,19 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "lint": "concurrently -g 'npm run lint:prettier' 'npm run lint:unused-exports' 'npm run lint:eslint' 'npm run lint:filename'",
+    "lint": "concurrently -g 'yarn lint:prettier' 'yarn lint:unused-exports' 'yarn run lint:eslint' 'yarn run lint:filename'",
     "lint:eslint": "eslint \"src/**/*.{ts,tsx}\"",
     "lint:filename": "ls-lint",
     "lint:fix": "eslint \"src/**/*.{ts,tsx}\" --fix",
     "lint:prettier": "prettier --check \"{src,tests}/**/*.{ts,tsx}\" \"*.{js,json}\"",
     "lint:prettier:fix": "prettier --write \"{src,tests}/**/*.{ts,tsx}\" *.js",
-    "lint:unused-exports": "ts-unused-exports tsconfig.json --ignoreFiles=leather-styles --ignoreFiles=tests",
+    "lint:unused-exports": "ts-unused-exports tsconfig.json --ignoreFiles=tests",
     "test:unit": "vitest",
     "test:integration": "npx playwright test",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@chakra-ui/icons": "^2.1.1",
     "@chakra-ui/react": "^2.8.1",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
@@ -52,6 +53,7 @@
     "eslint": "^8.52.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
+    "react-router-dom": "^6.18.0",
     "typescript": "^5.2.2",
     "vite": "^4.4.5"
   }

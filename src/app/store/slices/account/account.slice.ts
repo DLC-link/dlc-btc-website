@@ -1,12 +1,12 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
-import { AllNetwork } from '../../../../shared/models/network';
-import { WalletType } from '../../../../shared/models/wallet';
+import { Network } from "@models/network";
+import { WalletType } from "@models/wallet";
 
-interface AccountState {
+export interface AccountState {
   address: string | undefined;
   walletType: WalletType | undefined;
-  network: AllNetwork | undefined;
+  network: Network | undefined;
 }
 
 const initialState: AccountState = {
@@ -14,13 +14,20 @@ const initialState: AccountState = {
   walletType: undefined,
   network: undefined,
 };
-  
+
 export const accountSlice = createSlice({
-  name: 'account',
+  name: "account",
   initialState: initialState,
   reducers: {
-    setNetwork: (state, action) => {
-      state.network = action.payload;
-    }
+    login: (state, action) => {
+      state.address = action.payload.address;
+      state.walletType = action.payload.walletType;
+      state.network = action.payload.network;
+    },
+    logout: (state) => {
+      state.address = undefined;
+      state.walletType = undefined;
+      state.network = undefined;
+    },
   },
 });

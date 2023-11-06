@@ -1,3 +1,3 @@
-import { vaultSlice } from "./vault.slice";
+// import { vaultSlice } from "@store/slices/vault/vault.slice";
 
-export const vaultActions = vaultSlice.actions;
+// export const vaultActions = vaultSlice.actions;

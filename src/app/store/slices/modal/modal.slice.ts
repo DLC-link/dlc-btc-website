@@ -1,6 +1,6 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
-export interface ModalState {
+interface ModalState {
   isSelectWalletModalOpen: boolean;
 }
 
@@ -9,11 +9,11 @@ const initialState: ModalState = {
 };
 
 export const modalSlice = createSlice({
-  name: 'modal',
+  name: "modal",
   initialState: initialState,
   reducers: {
-    toggleSelectWalletModalVisibility: (state, action) => {
-      state.isSelectWalletModalOpen = action.payload;
+    toggleSelectWalletModalVisibility: (state) => {
+      state.isSelectWalletModalOpen = !state.isSelectWalletModalOpen;
     },
   },
 });

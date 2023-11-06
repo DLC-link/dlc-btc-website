@@ -1,21 +1,22 @@
-import { modalAnatomy as parts } from '@chakra-ui/anatomy';
-import { createMultiStyleConfigHelpers } from '@chakra-ui/styled-system';
+import { modalAnatomy as parts } from "@chakra-ui/anatomy";
+import { createMultiStyleConfigHelpers } from "@chakra-ui/styled-system";
 
-const { definePartsStyle, defineMultiStyleConfig } = createMultiStyleConfigHelpers(parts.keys);
+const { definePartsStyle, defineMultiStyleConfig } =
+  createMultiStyleConfigHelpers(parts.keys);
 
 const baseStyle = definePartsStyle({
   dialogContainer: {
-    top: '25%',
+    top: "25%",
   },
   dialog: {
-    padding: '15px',
-    width: '350px',
-    border: '1.5px solid',
-    borderColor: 'secondary.01',
-    borderRadius: 'md',
-    backgroundColor: 'background.02',
-    color: 'white',
-    alignItems: 'center',
+    padding: "15px",
+    width: "350px",
+    border: "1.5px solid",
+    borderColor: "secondary.01",
+    borderRadius: "md",
+    backgroundColor: "background.02",
+    color: "white",
+    alignItems: "center",
   },
 });
 

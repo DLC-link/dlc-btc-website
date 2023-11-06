@@ -8,12 +8,12 @@ interface VaultState {
 
 const initialState: VaultState = {
   vaults: [],
-  status: 'idle',
+  status: "idle",
   error: null,
 };
 
 export const vaultSlice = createSlice({
-  name: 'vault',
+  name: "vault",
   initialState: initialState,
   reducers: {},
 });
