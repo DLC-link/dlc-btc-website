@@ -23,7 +23,7 @@ export function ModalContainer(): React.JSX.Element {
 
   return (
     <>
-      <SelectWalletModal 
+      <SelectWalletModal
         isOpen={isSelectWalletModalOpen}
         handleClose={() =>
           handleClosingModal(modalActions.toggleSelectWalletModalVisibility)
