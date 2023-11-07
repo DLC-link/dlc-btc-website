@@ -6,7 +6,7 @@ interface VaultState {
   error: string | null;
 }
 
-const initialState: VaultState = {
+const initialVaultState: VaultState = {
   vaults: [],
   status: "idle",
   error: null,
@@ -14,6 +14,6 @@ const initialState: VaultState = {
 
 export const vaultSlice = createSlice({
   name: "vault",
-  initialState: initialState,
+  initialState: initialVaultState,
   reducers: {},
 });
