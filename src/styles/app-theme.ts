@@ -4,6 +4,7 @@ import { buttonTheme } from "./button-theme";
 import { modalTheme } from "./modal-theme";
 import { selectTheme } from "./select-theme";
 import { textTheme } from "./text-theme";
+import { tabsTheme } from "./tabs-theme";
 
 export const appTheme = extendTheme({
   components: {
@@ -12,6 +13,14 @@ export const appTheme = extendTheme({
     Modal: modalTheme,
     Select: selectTheme,
     Text: textTheme,
+    Tabs: tabsTheme,
+    Progress: {
+      baseStyle: {
+        filledTrack: {
+          bg: "secondary.01",
+        },
+      },
+    },
   },
   styles: {
     global: () => ({
@@ -22,13 +31,15 @@ export const appTheme = extendTheme({
   },
   colors: {
     "primary.01": "#93009E",
-    "primary.02": "#001FBA",
-    "secondary.01": "#04BAB2",
-    "secondary.02": "#2C039E",
-    "background.01": "#500056",
+    "primary.02": "#93009E",
+    "secondary.01": "#07E8D8",
+    "secondary.02": "#001FBA",
+    "background.01": "#3a0248",
     "background.02": "#000933",
     "background.03": "#80000000",
+    "background.04": "#350058",
     "accent.01": "#07E8D8",
+    "accent.02": "#FFA800",
     "warning.01": "#FF4500",
   },
 

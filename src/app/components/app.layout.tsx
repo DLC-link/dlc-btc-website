@@ -1,17 +1,16 @@
 import { BrowserRouter as Router, Routes } from "react-router-dom";
 
-import { Stack } from "@chakra-ui/react";
-
-import { HasChildren } from "@models/has-children";
+import { VStack } from "@chakra-ui/react";
 import { Header } from "@components/header/header";
+import { HasChildren } from "@models/has-children";
 
 export function AppLayout({ children }: HasChildren): React.JSX.Element {
   return (
     <Router>
-      <Stack py={["5%", "1.5%"]}>
+      <VStack py={"25px"}>
         <Header />
         <Routes>{children}</Routes>
-      </Stack>
+      </VStack>
     </Router>
   );
 }

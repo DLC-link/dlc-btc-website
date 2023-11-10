@@ -18,17 +18,22 @@ export function Header(): React.JSX.Element {
 
   return (
     <HeaderLayout>
-      <HStack width={"50%"} spacing={"7.5%"} alignItems={"flex-end"}>
-        <CompanyWebsiteButton />
+      <CompanyWebsiteButton />
+      <HStack spacing={"25px"} marginRight={"150px"}>
         <TabButton
           title={"Mint/Unmint dlcBTC"}
           isActive={activeTab === "/"}
           handleClick={() => handleTabClick("/")}
         />
         <TabButton
+          title={"My dlcBTC"}
+          isActive={activeTab === "/my-dlc-btc"}
+          handleClick={() => handleTabClick("/my-dlc-btc")}
+        />
+        <TabButton
           title={"How It Works"}
-          isActive={activeTab === "/about"}
-          handleClick={() => handleTabClick("/about")}
+          isActive={activeTab === "/how-it-works"}
+          handleClick={() => handleTabClick("/how-it-works")}
         />
       </HStack>
       <Account />
