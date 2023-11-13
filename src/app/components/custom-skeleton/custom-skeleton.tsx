@@ -13,8 +13,8 @@ export function CustomSkeleton({
 }: CustomSkeletonProps): React.JSX.Element {
   return (
     <Skeleton
-      startColor="primary.01"
-      endColor="secondary.01"
+      startColor="accent.01"
+      endColor="accent.02"
       isLoaded={isLoaded}
       w={"100%"}
     >

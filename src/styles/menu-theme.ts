@@ -17,9 +17,9 @@ const account = defineStyle({
     bgColor: "none",
     border: "1px solid",
     borderRadius: "md",
-    borderColor: "secondary.01",
+    borderColor: "accent.01",
     _hover: {
-      bg: "secondary.01",
+      bg: "accent.01",
     },
   },
   list: {
@@ -30,7 +30,7 @@ const account = defineStyle({
     bgColor: "background.02",
     border: "1px solid",
     borderRadius: "md",
-    borderColor: "secondary.01",
+    borderColor: "accent.01",
   },
   item: {
     justifyContent: "center",
@@ -43,7 +43,7 @@ const account = defineStyle({
     bgColor: "inherit",
     borderRadius: "md",
     _hover: {
-      bgColor: "secondary.01",
+      bgColor: "accent.01",
     },
   },
 });
@@ -55,7 +55,7 @@ const network = definePartsStyle({
     width: "275px",
     shadow: "xl",
     border: "1.5px solid",
-    borderColor: "secondary.01",
+    borderColor: "accent.01",
     borderRadius: "md",
     background: "background.02",
     color: "white",
@@ -63,7 +63,7 @@ const network = definePartsStyle({
     fontWeight: "extrabold",
     justifyContent: "center",
     _hover: {
-      background: "secondary.01",
+      background: "accent.01",
     },
   },
   list: {
@@ -73,7 +73,7 @@ const network = definePartsStyle({
     borderLeft: "1.5px solid",
     borderRight: "1.5px solid",
     borderBottom: "1.5px solid",
-    borderColor: "secondary.01",
+    borderColor: "accent.01",
     borderRadius: "md",
     width: "275px",
     background: "background.02",
@@ -88,7 +88,7 @@ const network = definePartsStyle({
     padding: "10px",
     justifyContent: "center",
     _hover: {
-      background: "secondary.01",
+      background: "accent.01",
     },
     transition: "all 0.05s ease-in-out",
   },

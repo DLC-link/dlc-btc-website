@@ -12,7 +12,7 @@ const baseStyle = definePartsStyle({
     padding: "15px",
     width: "350px",
     border: "1.5px solid",
-    borderColor: "secondary.01",
+    borderColor: "accent.01",
     borderRadius: "md",
     backgroundColor: "background.02",
     color: "white",

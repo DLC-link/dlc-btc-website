@@ -5,7 +5,7 @@ import { ProtocolHistory } from "@components/protocol-history/protocol-history";
 export function ProtocolSummaryStack(): React.JSX.Element {
   return (
     <ProtocolSummaryStackLayout>
-      <VStack alignItems={"start"} h={"250px"} w={"50%"} spacing={"25px"}>
+      <VStack alignItems={"start"} h={"250px"} w={"50%"} spacing={"15px"}>
         <Text alignContent={"start"} color={"white"} fontSize={"lg"}>
           TVL
         </Text>

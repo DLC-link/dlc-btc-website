@@ -1,10 +1,11 @@
 import { extendTheme } from "@chakra-ui/react";
-import { menuTheme } from "./menu-theme";
+
 import { buttonTheme } from "./button-theme";
+import { menuTheme } from "./menu-theme";
 import { modalTheme } from "./modal-theme";
 import { selectTheme } from "./select-theme";
-import { textTheme } from "./text-theme";
 import { tabsTheme } from "./tabs-theme";
+import { textTheme } from "./text-theme";
 
 export const appTheme = extendTheme({
   components: {
@@ -17,7 +18,7 @@ export const appTheme = extendTheme({
     Progress: {
       baseStyle: {
         filledTrack: {
-          bg: "secondary.01",
+          bg: "accent.01",
         },
       },
     },
@@ -30,19 +31,20 @@ export const appTheme = extendTheme({
     }),
   },
   colors: {
-    "primary.01": "#93009E",
-    "primary.02": "#93009E",
-    "secondary.01": "#07E8D8",
-    "secondary.02": "#001FBA",
-    "background.01": "#3a0248",
-    "background.02": "#000933",
-    "background.03": "#80000000",
-    "background.04": "#350058",
-    "accent.01": "#07E8D8",
-    "accent.02": "#FFA800",
-    "warning.01": "#FF4500",
+    "background.01": "rgba(50,3,69,1)",
+    "background.02": "rgba(0,9,51,1)",
+    "background.03": "rgba(40,7,78,1)",
+    "background.04": "rgba(31,9,78,0.25)",
+    "background.05": "rgba(4,13,72,0.25)",
+    "accent.01": "rgba(7,232,216,1)",
+    "accent.02": "rgba(0,40,187,1)",
+    "accent.03": "rgba(7,232,216,0.75)",
+    "accent.04": "rgba(247,147,26,1)",
+    "white.01": "rgba(255,255,255,1)",
+    "white.02": "rgba(255,255,255,0.75)",
+    "white.03": "rgba(255,255,255,0.35)",
+    "white.04": "rgba(255,255,255,0.25)",
   },
-
   fonts: {
     body: "'Poppins', poppins",
   },

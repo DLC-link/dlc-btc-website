@@ -13,7 +13,7 @@ const welcome = defineStyle({
 });
 
 const navigate = defineStyle({
-  color: "secondary.01",
+  color: "accent.01",
   fontSize: "lg",
   fontWeight: "regular",
   textDecoration: "underline",

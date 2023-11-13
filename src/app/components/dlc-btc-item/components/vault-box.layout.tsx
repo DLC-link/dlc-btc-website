@@ -1,30 +1,33 @@
 import { ReactNode } from "react";
 
-import { HStack } from "@chakra-ui/react";
+import { VStack } from "@chakra-ui/react";
 import { CustomSkeleton } from "@components/custom-skeleton/custom-skeleton";
 
-interface DlcBtcItemLayoutProps {
+interface VaultBoxLayoutProps {
   children: ReactNode;
   isLoaded: boolean;
 }
 
-export function DlcBtcItemLayout({
+export function VaultBoxLayout({
   children,
   isLoaded,
-}: DlcBtcItemLayoutProps): React.JSX.Element {
+}: VaultBoxLayoutProps): React.JSX.Element {
   return (
     <CustomSkeleton isLoaded={isLoaded}>
-      <HStack
+      <VStack
         alignContent={"start"}
-        p={"15px"}
+        p={"7.5px"}
         h={"auto"}
         w={"100%"}
+        spacing={"15px"}
+        bgGradient={"linear(to-r, background.04, background.05)"}
+        blendMode={"screen"}
         border={"1px solid"}
-        borderColor={"secondary.01"}
+        borderColor={"white.04"}
         borderRadius={"md"}
       >
         {children}
-      </HStack>
+      </VStack>
     </CustomSkeleton>
   );
 }

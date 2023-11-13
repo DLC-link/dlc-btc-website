@@ -17,7 +17,7 @@ const baseStyle = definePartsStyle({
     fontSize: "lg",
     fontWeight: "semibold",
     _selected: {
-      color: "secondary.01",
+      color: "accent.01",
     },
   },
   tabpanel: {
