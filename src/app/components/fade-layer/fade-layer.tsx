@@ -18,7 +18,7 @@ export function FadeLayer({
     left: 0,
     right: 0,
     height: fadeHeight,
-    backgroundImage: "linear-gradient(to top, background.03, transparent)",
+    backgroundImage: "linear-gradient(to top, background.container.01, transparent)",
   };
 
   return (

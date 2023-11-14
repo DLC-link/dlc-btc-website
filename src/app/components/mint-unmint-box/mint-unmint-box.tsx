@@ -19,7 +19,7 @@ export function MintUnmintBox(): React.JSX.Element {
           <Tab>Mint</Tab>
           <Tab>Unmint</Tab>
         </TabList>
-        <TabIndicator mt="5px" h="3.5px" bg="accent.01" />
+        <TabIndicator mt="5px" h="3.5px" bg="accent.cyan.01" />
         <TabPanels>
           <TabPanel>
             <SetupInformationStack />

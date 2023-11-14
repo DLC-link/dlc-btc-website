@@ -1,12 +1,21 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
-import { useLoadingDelay } from "@hooks/use-loading-delay";
-import { Vault } from "@models/vault";
+import { useLoadingDelay } from '@hooks/use-loading-delay';
+import { Vault, VaultStatus } from '@models/vault';
 
-import { VaultBoxExpandedInformationStack } from "./components/vault-box-expanded-information-stack/vault-box-expanded-information-stack";
-import { VaultBoxInformationStack } from "./components/vault-box-information-stack";
-import { VaultBoxProgressBar } from "./components/vault-box-progress-bar";
-import { VaultBoxLayout } from "./components/vault-box.layout";
+import { VaultBoxExpandedInformationStack } from './components/vault-box-expanded-information-stack/vault-box-expanded-information-stack';
+import { VaultBoxInformationStack } from './components/vault-box-information-stack';
+import { VaultBoxProgressBar } from './components/vault-box-progress-bar';
+import { VaultBoxLayout } from './components/vault-box.layout';
+
+interface VaultBoxProps {
+  uuid: string;
+  collateral: number;
+  state: VaultStatus;
+  fundingTX: string;
+  closingTX: string;
+  preventLoad?: boolean;
+}
 
 export function VaultBox({
   uuid,
@@ -14,13 +23,14 @@ export function VaultBox({
   state,
   fundingTX,
   closingTX,
-}: Vault): React.JSX.Element {
+  preventLoad,
+}: VaultBoxProps): React.JSX.Element {
   const isLoaded = useLoadingDelay(3000);
   const confirmedBlocks = 3;
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <VaultBoxLayout isLoaded={isLoaded}>
+    <VaultBoxLayout isLoaded={preventLoad ? false : isLoaded}>
       <VaultBoxInformationStack
         collateral={collateral}
         state={state}

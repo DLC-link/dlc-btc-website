@@ -21,11 +21,11 @@ export function ProtocolHistoryItem(
         p={"10px"}
         w={"300px"}
         h={"35px"}
-        bgGradient={"linear(to-r, background.04, background.05)"}
+        bgGradient={"linear(to-r, background.content.01, background.content.02)"}
         blendMode={"screen"}
         border={"1px solid"}
         borderRadius={"md"}
-        borderColor={"white.04"}
+        borderColor={"border.white.01"}
       >
         <HStack spacing={"15px"}>
           <Image

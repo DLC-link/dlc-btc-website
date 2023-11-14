@@ -1,20 +1,22 @@
-import React from "react";
+import React from 'react';
+import { useSelector } from 'react-redux';
 
-import { HStack } from "@chakra-ui/react";
-import { MintUnmintBox } from "@components/mint-unmint-box/mint-unmint-box";
-import { VaultList } from "@components/my-dlc-btc/vault-list";
+import { HStack, ScaleFade } from '@chakra-ui/react';
+import { MintUnmintBox } from '@components/mint-unmint-box/mint-unmint-box';
+import { MyVaultsSmallContainer } from '@components/my-vaults-small-container/my-vaults-small-container';
+import { PageLayout } from '@pages/components/page.layout';
+import { RootState } from '@store/index';
 
 export function Dashboard(): React.JSX.Element {
+  const { address } = useSelector((state: RootState) => state.account);
   return (
-    <HStack
-      justifyContent={"center"}
-      w={"1280px"}
-      pt={"50px"}
-      pb={"0px"}
-      spacing={"20px"}
-    >
-      <MintUnmintBox />
-      <VaultList />
-    </HStack>
+    <PageLayout>
+      <HStack transition={'all 2.5s ease-in-out'} w={'auto'}>
+        <MintUnmintBox />
+        <ScaleFade in={address !== undefined} unmountOnExit>
+          <MyVaultsSmallContainer />
+        </ScaleFade>
+      </HStack>
+    </PageLayout>
   );
 }

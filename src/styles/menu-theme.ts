@@ -1,105 +1,95 @@
-import { menuAnatomy } from "@chakra-ui/anatomy";
-import { createMultiStyleConfigHelpers, defineStyle } from "@chakra-ui/react";
+import { menuAnatomy } from '@chakra-ui/anatomy';
+import { createMultiStyleConfigHelpers, defineStyle } from '@chakra-ui/react';
 
-const { definePartsStyle, defineMultiStyleConfig } =
-  createMultiStyleConfigHelpers(menuAnatomy.keys);
+const { definePartsStyle, defineMultiStyleConfig } = createMultiStyleConfigHelpers(
+  menuAnatomy.keys
+);
 
 const account = defineStyle({
   button: {
-    justifyContent: "center",
-    py: "10px",
-    px: "0px",
-    h: "50px",
-    w: "100%",
-    fontSize: "lg",
-    fontWeight: "extrabold",
-    color: "white",
-    bgColor: "none",
-    border: "1px solid",
-    borderRadius: "md",
-    borderColor: "accent.01",
+    justifyContent: 'center',
+    py: '10px',
+    px: '0px',
+    h: '50px',
+    w: '275px',
+    fontSize: 'lg',
+    fontWeight: 'extrabold',
+    color: 'white',
+    bgGradient: 'linear(to-b, background.content.01, background.content.02)',
+    border: '1px solid',
+    borderRadius: 'md',
+    borderColor: 'border.cyan.01',
     _hover: {
-      bg: "accent.01",
+      bg: 'accent.cyan.01',
     },
   },
   list: {
-    py: "10px",
-    px: "5px",
-    h: "auto",
-    w: "275px",
-    bgColor: "background.02",
-    border: "1px solid",
-    borderRadius: "md",
-    borderColor: "accent.01",
+    p: '10px',
+    w: '275px',
+    bgColor: 'background.container.01',
+    border: '1.5px solid',
+    borderColor: 'border.white.01',
+    borderRadius: 'md',
   },
   item: {
-    justifyContent: "center",
-    p: "10px",
-    h: "50px",
-    w: "100%",
-    fontSize: "sm",
-    fontWeight: "extrabold",
-    color: "white",
-    bgColor: "inherit",
-    borderRadius: "md",
+    justifyContent: 'center',
+    bgColor: 'inherit',
+    borderRadius: 'md',
+    color: 'white',
+    fontSize: 'xs',
+    fontWeight: 'extrabold',
     _hover: {
-      bgColor: "accent.01",
+      background: 'white.03',
     },
+    transition: 'all 0.05s ease-in-out',
   },
 });
 
 const network = definePartsStyle({
   button: {
-    padding: "10px",
-    height: "50px",
-    width: "275px",
-    shadow: "xl",
-    border: "1.5px solid",
-    borderColor: "accent.01",
-    borderRadius: "md",
-    background: "background.02",
-    color: "white",
-    fontSize: "sm",
-    fontWeight: "extrabold",
-    justifyContent: "center",
+    justifyContent: 'center',
+    p: '10px',
+    h: '50px',
+    w: '275px',
+    bgGradient: 'linear(to-b, background.content.01, background.content.02)',
+    border: '1.5px solid',
+    borderColor: 'border.white.01',
+    borderRadius: 'md',
+    color: 'white',
+    fontSize: 'sm',
+    fontWeight: 'extrabold',
     _hover: {
-      background: "accent.01",
+      background: 'white.03',
     },
   },
   list: {
-    padding: "10px",
-    borderTop: "0px",
-    borderTopRadius: "0px",
-    borderLeft: "1.5px solid",
-    borderRight: "1.5px solid",
-    borderBottom: "1.5px solid",
-    borderColor: "accent.01",
-    borderRadius: "md",
-    width: "275px",
-    background: "background.02",
-    shadow: "none",
+    p: '10px',
+    w: '275px',
+    bgColor: 'background.container.01',
+    border: '1.5px solid',
+    borderColor: 'border.white.01',
+    borderRadius: 'md',
   },
   item: {
-    backgroundColor: "inherit",
-    color: "white",
-    borderRadius: "md",
-    fontSize: "xs",
-    fontWeight: "extrabold",
-    padding: "10px",
-    justifyContent: "center",
+    justifyContent: 'center',
+    bgColor: 'inherit',
+    borderRadius: 'md',
+    color: 'white',
+    fontSize: 'xs',
+    fontWeight: 'extrabold',
     _hover: {
-      background: "accent.01",
+      background: 'white.03',
     },
-    transition: "all 0.05s ease-in-out",
+    transition: 'all 0.05s ease-in-out',
   },
 });
 
 const lg = defineStyle({
-  width: "200px",
+  width: '200px',
 });
 
 const xl = defineStyle({
-  width: "350px",
+  width: '350px',
 });
 
 // define custom sizes

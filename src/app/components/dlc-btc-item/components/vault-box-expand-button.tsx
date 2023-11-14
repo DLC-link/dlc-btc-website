@@ -11,7 +11,7 @@ export function VaultBoxExpandButton({
   handleClick,
 }: VaultBoxExpandButtonProps): React.JSX.Element {
   return (
-    <Button variant={"action"} onClick={() => handleClick()} w={"85px"}>
+    <Button variant={"action"} w={"85px"} onClick={() => handleClick()}>
       <Text color={"white"} fontSize={"sm"}>
         {isExpanded ? "Less" : "More"}
       </Text>

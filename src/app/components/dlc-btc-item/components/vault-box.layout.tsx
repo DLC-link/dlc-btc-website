@@ -20,10 +20,10 @@ export function VaultBoxLayout({
         h={"auto"}
         w={"100%"}
         spacing={"15px"}
-        bgGradient={"linear(to-r, background.04, background.05)"}
+        bgGradient={"linear(to-r, background.content.01, background.content.02)"}
         blendMode={"screen"}
         border={"1px solid"}
-        borderColor={"white.04"}
+        borderColor={"border.white.01"}
         borderRadius={"md"}
       >
         {children}

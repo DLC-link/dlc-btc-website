@@ -16,6 +16,7 @@ export function SetupInformationStack(): React.JSX.Element {
   function onConnectWalletClick(): void {
     dispatch(modalActions.toggleSelectWalletModalVisibility());
   }
+  
   return (
     <SetupInformationStackLayout>
       <HStack width={"100%"} spacing={"25px"}>
@@ -41,7 +42,7 @@ export function SetupInformationStack(): React.JSX.Element {
             <HStack alignContent={"start"} w={"100%"}>
               <Image src={"/images/logos/ethereum-logo.svg"} h={"15px"}></Image>
               <Text
-                color={"accent.01"}
+                color={"accent.cyan.01"}
                 fontWeight={"regular"}
                 textDecoration={"underline"}
               >
@@ -56,7 +57,7 @@ export function SetupInformationStack(): React.JSX.Element {
             <HStack alignContent={"start"} w={"100%"}>
               <Image src={"/images/logos/bitcoin-logo.svg"} h={"15px"}></Image>
               <Text
-                color={"accent.04"}
+                color={"accent.orange.01"}
                 fontWeight={"regular"}
                 textDecoration={"underline"}
               >

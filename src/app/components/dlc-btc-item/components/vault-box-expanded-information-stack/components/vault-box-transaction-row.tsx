@@ -17,7 +17,7 @@ export function TransactionRow({
       <Text
         textAlign={"right"}
         w={"75%"}
-        color={"accent.01"}
+        color={"accent.cyan.01"}
         fontSize={"xs"}
         textDecoration={"underline"}
         onClick={() => window.open(value, "_blank")}

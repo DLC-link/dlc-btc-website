@@ -9,10 +9,10 @@ export function MintUnmintBoxLayout({
       px={"15px"}
       w={"650px"}
       h={"625px"}
-      bg={"background.03"}
+      bg={"background.container.01"}
       border={"1px solid"}
       borderRadius={"md"}
-      borderColor={"accent.03"}
+      borderColor={"border.cyan.01"}
     >
       {children}
     </VStack>

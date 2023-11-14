@@ -6,6 +6,7 @@ import { modalTheme } from "./modal-theme";
 import { selectTheme } from "./select-theme";
 import { tabsTheme } from "./tabs-theme";
 import { textTheme } from "./text-theme";
+import { dividerTheme } from "./divider-theme";
 
 export const appTheme = extendTheme({
   components: {
@@ -15,10 +16,11 @@ export const appTheme = extendTheme({
     Select: selectTheme,
     Text: textTheme,
     Tabs: tabsTheme,
+    Divider: dividerTheme,
     Progress: {
       baseStyle: {
         filledTrack: {
-          bg: "accent.01",
+          bg: "accent.cyan.01",
         },
       },
     },
@@ -26,24 +28,24 @@ export const appTheme = extendTheme({
   styles: {
     global: () => ({
       body: {
-        bgGradient: "linear(to-r, background.01, background.02)",
+        bgGradient: "linear(to-r, background.website.01, background.website.02)",
       },
     }),
   },
   colors: {
-    "background.01": "rgba(50,3,69,1)",
-    "background.02": "rgba(0,9,51,1)",
-    "background.03": "rgba(40,7,78,1)",
-    "background.04": "rgba(31,9,78,0.25)",
-    "background.05": "rgba(4,13,72,0.25)",
-    "accent.01": "rgba(7,232,216,1)",
-    "accent.02": "rgba(0,40,187,1)",
-    "accent.03": "rgba(7,232,216,0.75)",
-    "accent.04": "rgba(247,147,26,1)",
+    "background.website.01": "rgba(50,3,69,1)",
+    "background.website.02": "rgba(0,9,51,1)",
+    "background.container.01": "rgba(40,7,78,1)",
+    "background.content.01": "rgba(31,9,78,0.25)",
+    "background.content.02": "rgba(4,13,72,0.25)",
+    "border.cyan.01": "rgba(7,232,216,0.75)",
+    "border.white.01": "rgba(255,255,255,0.25)",
+    "accent.cyan.01": "rgba(7,232,216,1)",
+    "accent.blue.01": "rgba(0,40,187,1)",
+    "accent.orange.01": "rgba(247,147,26,1)",
     "white.01": "rgba(255,255,255,1)",
     "white.02": "rgba(255,255,255,0.75)",
     "white.03": "rgba(255,255,255,0.35)",
-    "white.04": "rgba(255,255,255,0.25)",
   },
   fonts: {
     body: "'Poppins', poppins",
