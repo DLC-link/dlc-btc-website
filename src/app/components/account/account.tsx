@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { Button } from "@chakra-ui/react";
+import { Button, HStack } from "@chakra-ui/react";
 import { AccountMenu } from "@components/account/components/account-menu";
 import { Wallet, WalletType, ethereumWallets } from "@models/wallet";
 import { RootState } from "@store/index";
@@ -35,7 +35,7 @@ export function Account(): React.JSX.Element {
   }
 
   return (
-    <>
+    <HStack width={"275px"}>
       {address && wallet ? (
         <AccountMenu
           address={address}
@@ -44,9 +44,9 @@ export function Account(): React.JSX.Element {
         />
       ) : (
         <Button variant={"account"} onClick={() => onConnectWalletClick()}>
-          CONNECT WALLET
+          Connect Wallet
         </Button>
       )}
-    </>
+    </HStack>
   );
 }

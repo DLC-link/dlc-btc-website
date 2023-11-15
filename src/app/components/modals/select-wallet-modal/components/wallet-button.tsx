@@ -18,7 +18,7 @@ export function WalletMenu({
       onClick={() => handleClick("123456789123456789", wallet.id)}
     >
       <HStack justifyContent={"space-evenly"} width={"250px"}>
-        <Image src={logo} alt={name} boxSize={"35px"} />
+        <Image src={logo} alt={name} boxSize={"25px"} />
         <Text width={"150px"}>{name}</Text>
       </HStack>
     </Button>

@@ -10,10 +10,9 @@ export function CompanyWebsiteButton(): React.JSX.Element {
       as={"a"}
       href={companyWebsiteURL}
       variant={"company"}
-      padding={"0"}
-      boxSize={["75px", "100px"]}
+      boxSize={"65px"}
     >
-      <Image src={logoPath} alt={altText} boxSize={["50px", "75px"]} />
+      <Image src={logoPath} alt={altText} boxSize={"65px"} />
     </Button>
   );
 }

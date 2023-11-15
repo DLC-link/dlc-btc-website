@@ -1,10 +1,27 @@
 import { defineStyle, defineStyleConfig } from "@chakra-ui/react";
 
 const header = defineStyle({
-  padding: "10px",
-  fontWeight: "extrabold",
-  fontSize: "sm",
   color: "white",
+  fontSize: "sm",
+  fontWeight: "extrabold",
 });
 
-export const textTheme = defineStyleConfig({ variants: { header } });
+const welcome = defineStyle({
+  color: "white",
+  fontSize: "4xl",
+  whiteSpace: "pre-line",
+});
+
+const navigate = defineStyle({
+  color: "accent.cyan.01",
+  fontSize: "lg",
+  fontWeight: "regular",
+  textDecoration: "underline",
+  _hover: {
+    cursor: "pointer",
+  },
+});
+
+export const textTheme = defineStyleConfig({
+  variants: { header, welcome, navigate },
+});

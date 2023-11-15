@@ -25,6 +25,14 @@ export default defineConfig({
     { 
       find: "@pages", 
       replacement: resolve(__dirname, './src/app/pages') 
+    },
+    { 
+      find: "@shared", 
+      replacement: resolve(__dirname, './src/shared') 
+    },
+    { 
+      find: "@hooks", 
+      replacement: resolve(__dirname, './src/app/hooks') 
     }]
   }
 })

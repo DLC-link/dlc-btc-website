@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 
-import { ScaleFade, Text, VStack } from "@chakra-ui/react";
+import { CheckIcon } from "@chakra-ui/icons";
+import { HStack, ScaleFade, Text, VStack } from "@chakra-ui/react";
 import { ModalComponentProps } from "@components/modals/components/modal-container";
 import { ModalLayout } from "@components/modals/components/modal.layout";
 import { WalletMenu } from "@components/modals/select-wallet-modal/components/wallet-button";
@@ -25,6 +26,8 @@ export function SelectWalletModal({
       accountActions.login({
         address: address,
         walletType: walletType,
+        dlcBTCBalance: 0.54321,
+        lockedBTCBalance: 0.54321,
         network: currentNetwork?.id,
       } as AccountState),
     );
@@ -42,10 +45,15 @@ export function SelectWalletModal({
       isOpen={isOpen}
       onClose={() => handleClose()}
     >
-      <VStack>
-        <ScaleFade in={!currentNetwork} unmountOnExit>
-          <Text variant={"header"}>Choose Network</Text>
-        </ScaleFade>
+      <VStack alignItems={"start"} spacing={"25px"}>
+        {!currentNetwork ? (
+          <Text variant={"header"}>Select Network</Text>
+        ) : (
+          <HStack>
+            <Text variant={"header"}>Network Selected</Text>
+            <CheckIcon color={"accent.cyan.01"} />
+          </HStack>
+        )}
         <SelectNetworkButton
           handleClick={handleNetworkChange}
           currentNetwork={currentNetwork}
@@ -55,7 +63,7 @@ export function SelectWalletModal({
           transition={{ enter: { delay: 0.15 } }}
           unmountOnExit
         >
-          <VStack>
+          <VStack alignItems={"start"} spacing={"25px"}>
             <Text variant={"header"}>Select Wallet</Text>
             {ethereumWallets.map((wallet) => (
               <WalletMenu

@@ -26,9 +26,14 @@ export function AccountMenu({
     <Menu variant={"account"}>
       <MenuButton>
         <HStack justifyContent={"space-evenly"}>
-          <Image src={wallet?.logo} alt={wallet?.name} boxSize={"35px"} />
+          <Image
+            p={"2.5px"}
+            src={wallet?.logo}
+            alt={wallet?.name}
+            boxSize={"35px"}
+          />
           <Text>{easyTruncateAddress(address)}</Text>
-          <ChevronDownIcon color={"white"} />
+          <ChevronDownIcon boxSize={"35px"} color={"white"} />
         </HStack>
       </MenuButton>
       <MenuList>

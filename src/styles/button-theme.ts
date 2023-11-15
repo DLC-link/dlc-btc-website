@@ -1,61 +1,87 @@
 import { defineStyle, defineStyleConfig } from "@chakra-ui/react";
 
-const tab = defineStyle({
-  paddingX: "0px",
-  paddingY: "10px",
-  height: "50px",
-  width: "auto",
-  background: "none",
+const basestyle = defineStyle({
+  justifyContent: "center",
   color: "white",
-  fontSize: "lg",
-  fontWeight: "normal",
-  borderBottom: "3.5px solid",
-  borderColor: "secondary.01",
 });
 
-const company = defineStyle({
-  padding: "0px",
-  height: "50px",
-  width: "50px",
-  background: "none",
-});
-
-const wallet = defineStyle({
-  padding: "10px",
-  height: "50px",
-  width: "275px",
-  shadow: "xl",
-  border: "1.5px solid",
-  borderColor: "secondary.01",
-  borderRadius: "md",
-  background: "background.02",
-  color: "white",
+const action = defineStyle({
+  py: "10px",
+  px: "25px",
+  h: "35px",
+  w: "100%",
   fontSize: "sm",
   fontWeight: "extrabold",
-  justifyContent: "center",
+  bg: "none",
+  border: "1px solid",
+  borderColor: "accent.cyan.01",
   _hover: {
-    background: "secondary.01",
+    bg: "accent.cyan.01",
+  },
+});
+
+const navigate = defineStyle({
+  py: "10px",
+  px: "25px",
+  h: "50px",
+  w: "100%",
+  fontSize: "sm",
+  fontWeight: "extrabold",
+  bg: "none",
+  border: "1px solid",
+  borderColor: "accent.cyan.01",
+  _hover: {
+    bg: "accent.cyan.01",
   },
 });
 
 const account = defineStyle({
-  padding: "10px",
-  height: "50px",
-  width: "200px",
-  shadow: "xl",
-  border: "1.5px solid",
-  borderColor: "secondary.01",
-  borderRadius: "md",
-  background: "none",
-  color: "white",
-  fontSize: "sm",
+  py: "10px",
+  px: "50px",
+  h: "50px",
+  w: "100%",
+  fontSize: "lg",
   fontWeight: "extrabold",
-  justifyContent: "center",
+  bgSize: "400%",
+  bgPosition: "left",
+  bgGradient:
+    "linear(to-r, accent.cyan.01, accent.blue.01, accent.blue.01, accent.cyan.01)",
+  transition: "background-position 500ms ease, color 500ms ease",
   _hover: {
-    background: "secondary.01",
+    bgPosition: "right",
+  },
+});
+
+const tab = defineStyle({
+  py: "25px",
+  px: "0px",
+  h: "50px",
+  w: "auto",
+  fontSize: "lg",
+  fontWeight: "normal",
+  bgColor: "none",
+  borderBottom: "3.5px solid",
+  borderRadius: "none",
+  borderColor: "accent.cyan.01",
+});
+
+const company = defineStyle({
+  p: "0px",
+  h: "50px",
+  w: "auto",
+  bgColor: "none",
+});
+
+const wallet = defineStyle({
+  bgGradient: "linear(to-b, background.content.01, background.content.02)",
+  border: "0.5px solid",
+  borderColor: "border.white.01",
+  _hover: {
+    bgColor: "white.03",
   },
 });
 
 export const buttonTheme = defineStyleConfig({
-  variants: { tab, company, wallet, account },
+  baseStyle: basestyle,
+  variants: { tab, company, wallet, account, action, navigate },
 });
