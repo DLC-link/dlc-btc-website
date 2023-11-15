@@ -8,6 +8,21 @@ const basestyle = defineStyle({
 const action = defineStyle({
   py: "10px",
   px: "25px",
+  h: "35px",
+  w: "100%",
+  fontSize: "sm",
+  fontWeight: "extrabold",
+  bg: "none",
+  border: "1px solid",
+  borderColor: "accent.cyan.01",
+  _hover: {
+    bg: "accent.cyan.01",
+  },
+});
+
+const navigate = defineStyle({
+  py: "10px",
+  px: "25px",
   h: "50px",
   w: "100%",
   fontSize: "sm",
@@ -29,7 +44,8 @@ const account = defineStyle({
   fontWeight: "extrabold",
   bgSize: "400%",
   bgPosition: "left",
-  bgGradient: "linear(to-r, accent.cyan.01, accent.blue.01, accent.blue.01, accent.cyan.01)",
+  bgGradient:
+    "linear(to-r, accent.cyan.01, accent.blue.01, accent.blue.01, accent.cyan.01)",
   transition: "background-position 500ms ease, color 500ms ease",
   _hover: {
     bgPosition: "right",
@@ -57,7 +73,7 @@ const company = defineStyle({
 });
 
 const wallet = defineStyle({
-  bgGradient: 'linear(to-b, background.content.01, background.content.02)',
+  bgGradient: "linear(to-b, background.content.01, background.content.02)",
   border: "0.5px solid",
   borderColor: "border.white.01",
   _hover: {
@@ -67,5 +83,5 @@ const wallet = defineStyle({
 
 export const buttonTheme = defineStyleConfig({
   baseStyle: basestyle,
-  variants: { tab, company, wallet, account, action },
+  variants: { tab, company, wallet, account, action, navigate },
 });

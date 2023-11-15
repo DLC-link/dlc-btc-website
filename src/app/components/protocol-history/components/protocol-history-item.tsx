@@ -21,7 +21,9 @@ export function ProtocolHistoryItem(
         p={"10px"}
         w={"300px"}
         h={"35px"}
-        bgGradient={"linear(to-r, background.content.01, background.content.02)"}
+        bgGradient={
+          "linear(to-r, background.content.01, background.content.02)"
+        }
         blendMode={"screen"}
         border={"1px solid"}
         borderRadius={"md"}
@@ -31,7 +33,7 @@ export function ProtocolHistoryItem(
           <Image
             src={"/images/logos/dlc-btc-logo.svg"}
             alt={"dlcBTC Logo"}
-            boxSize={"25px"}
+            boxSize={"20px"}
           />
           <Text color={"white"} fontWeight={"extrabold"}>
             {protocolHistoryItem.value}

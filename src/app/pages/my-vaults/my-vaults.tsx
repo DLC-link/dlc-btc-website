@@ -1,10 +1,10 @@
-import { MyVaultsBox } from '@components/my-vaults-large-container/my-vaults-large-container';
-import { PageLayout } from '@pages/components/page.layout';
+import { MyVaultsLarge } from "@components/my-vaults-large/my-vaults-large";
+import { PageLayout } from "@pages/components/page.layout";
 
 export function MyVaults(): React.JSX.Element {
   return (
     <PageLayout>
-      <MyVaultsBox />
+      <MyVaultsLarge />
     </PageLayout>
   );
 }

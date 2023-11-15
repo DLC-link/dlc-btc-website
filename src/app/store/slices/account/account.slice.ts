@@ -15,8 +15,8 @@ export const initialAccountState: AccountState = {
   address: undefined,
   walletType: undefined,
   network: undefined,
-  dlcBTCBalance: undefined,
-  lockedBTCBalance: undefined,
+  dlcBTCBalance: 0,
+  lockedBTCBalance: 0,
   loadedAt: undefined,
 };
 
@@ -35,8 +35,8 @@ export const accountSlice = createSlice({
     logout: (state) => {
       state.address = undefined;
       state.walletType = undefined;
-      state.dlcBTCBalance = undefined;
-      state.lockedBTCBalance = undefined;
+      state.dlcBTCBalance = 0;
+      state.lockedBTCBalance = 0;
       state.network = undefined;
     },
   },

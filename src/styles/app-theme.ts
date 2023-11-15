@@ -28,7 +28,8 @@ export const appTheme = extendTheme({
   styles: {
     global: () => ({
       body: {
-        bgGradient: "linear(to-r, background.website.01, background.website.02)",
+        bgGradient:
+          "linear(to-r, background.website.01, background.website.02)",
       },
     }),
   },
