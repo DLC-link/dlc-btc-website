@@ -44,12 +44,14 @@ export function SetupInformationStack(): React.JSX.Element {
             color={"accent.cyan.01"}
             walletName={"Metamask Wallet"}
             requirement={"+ETH (for fee)"}
+            url={"https://metamask.io/"}
           />
           <WalletRequirement
             logo={"/images/logos/bitcoin-logo.svg"}
             color={"accent.orange.01"}
             walletName={"Leather Wallet"}
             requirement={"+BTC (for lock)"}
+            url={"https://leather.io/"}
           />
         </VStack>
       </HStack>
