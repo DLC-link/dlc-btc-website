@@ -6,6 +6,12 @@ const thick = defineStyle({
   borderColor: "border.white.01",
 });
 
+const thickDotted = defineStyle({
+  borderWidth: "3.5px",
+  borderStyle: "dotted",
+  borderColor: "border.white.01",
+});
+
 export const dividerTheme = defineStyleConfig({
-  variants: { thick },
+  variants: { thick, thickDotted },
 });
