@@ -25,7 +25,7 @@ export function BlockchainTag({
         alt={"Ethereum"}
         boxSize={"15px"}
       />
-      <Text color={"white.01"} fontSize={"2xs"} fontWeight={"bold"}>
+      <Text color={"white.01"} fontSize={"2xs"} fontWeight={800}>
         {blockchainTagPropertyMap[blockchain].text}
       </Text>
     </HStack>

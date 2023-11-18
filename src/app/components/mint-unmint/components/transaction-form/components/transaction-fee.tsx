@@ -35,7 +35,7 @@ export function TransactionFee({
         <Text color={"white.02"} fontSize={"sm"}>
           Protocol Fee
         </Text>
-        <Text color={"white.01"} fontSize={"sm"} fontWeight={"bold"}>
+        <Text color={"white.01"} fontSize={"sm"} fontWeight={800}>
           {calculateProtocolFee(amount, 0.0001)} BTC
         </Text>{" "}
       </HStack>

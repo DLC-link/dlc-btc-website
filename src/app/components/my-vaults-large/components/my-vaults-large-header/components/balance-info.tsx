@@ -18,13 +18,13 @@ export function BalanceInfo({
 }: BalanceInfoProps): React.JSX.Element {
   return (
     <VStack justifyContent={"center"} alignItems={"start"} w={"35%"} h={"100%"}>
-      <Text color={"accent.cyan.01"} fontWeight={"bold"} fontSize={"md"}>
+      <Text color={"accent.cyan.01"} fontWeight={600} fontSize={"md"}>
         {title}
       </Text>
       <CustomSkeleton isLoaded={number !== undefined}>
         <HStack>
           <Image src={imageSrc} alt={altText} boxSize={"25px"} />
-          <Text color={"white"} fontWeight={"extrabold"} fontSize={"xl"}>
+          <Text color={"white"} fontWeight={800} fontSize={"xl"}>
             {showNone ? "-" : number}
           </Text>
         </HStack>

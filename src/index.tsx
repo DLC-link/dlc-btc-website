@@ -3,6 +3,8 @@ import { Provider as ReduxProvider } from "react-redux";
 
 import { ChakraProvider } from "@chakra-ui/react";
 import "@fontsource/poppins";
+import "@fontsource/poppins/600.css";
+import "@fontsource/poppins/800.css";
 import { PersistGate } from "redux-persist/integration/react";
 
 import { App } from "./app/app";

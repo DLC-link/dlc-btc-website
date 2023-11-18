@@ -1,21 +1,28 @@
 import { HStack, Link, Text } from "@chakra-ui/react";
 
-export function Warning(): React.JSX.Element {
+interface WarningProps {
+  blockchain: "ethereum" | "bitcoin";
+}
+
+export function Warning({
+  blockchain,
+}: WarningProps): React.JSX.Element | boolean {
+  if (blockchain === "bitcoin") return false;
   return (
-    <HStack bgColor={"white.03"} p={"15px"} borderRadius={"md"}>
+    <HStack p={"15px"} bgColor={"white.03"} borderRadius={"md"}>
       <Text color={"white.01"} fontSize={"sm"}>
-        <span style={{ fontWeight: "bold" }}>
+        <span style={{ fontWeight: 800 }}>
           Make sure you have 10.00 BTC + (fees){" "}
         </span>
         in your{" "}
         <Link
-          color={"accent.cyan.01"}
-          href="https://ethereum.org/"
           isExternal
+          href={"https://leather.io/"}
+          color={"accent.orange.01"}
           textDecoration={"underline"}
         >
-          Leather Wallet{" "}
-        </Link>
+          Leather Wallet
+        </Link>{" "}
         before proceeding to the next step.
       </Text>
     </HStack>

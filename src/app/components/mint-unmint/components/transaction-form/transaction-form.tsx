@@ -3,28 +3,27 @@ import {
   FormControl,
   FormErrorMessage,
   HStack,
-  Image,
-  Input,
   Text,
   VStack,
 } from "@chakra-ui/react";
-import { Field, Form, Formik } from "formik";
+import { Form, Formik } from "formik";
 
 import { TransactionFee } from "./components/transaction-fee";
+import { TransactionInput } from "./components/transaction-input";
 import { Warning } from "./components/warning";
 
-interface TransactionFormValues {
+interface TransactionFormProps {
+  currentStep: number;
+}
+
+export interface TransactionFormValues {
   amount: number;
 }
 
-interface TransactionFormProps {
-  blockchain: "ethereum" | "bitcoin";
-}
-
-const blockchainFormPropertyMap = {
+export const blockchainFormPropertyMap = {
   ethereum: {
     title: "Amount of dlcBTC you want to mint",
-    validateFn: validateDlcBtcAmount,
+    validateFn: validateTokenAmount,
     buttonText: "Create Vault",
     logo: "/images/logos/dlc-btc-logo.svg",
     alt: "dlcBTC",
@@ -33,7 +32,7 @@ const blockchainFormPropertyMap = {
   },
   bitcoin: {
     title: "Amount of BTC you want to lock",
-    validateFn: validateBtcAmount,
+    validateFn: validateBitcoinAmount,
     buttonText: "Lock Bitcoin",
     logo: "/images/logos/bitcoin-logo.svg",
     alt: "Bitcoin",
@@ -42,7 +41,7 @@ const blockchainFormPropertyMap = {
   },
 };
 
-function validateDlcBtcAmount(value: number) {
+function validateTokenAmount(value: number): string | undefined {
   let error;
   if (!value) {
     error = "Please enter an amount of dlcBTC you would like to mint";
@@ -52,7 +51,7 @@ function validateDlcBtcAmount(value: number) {
   return error;
 }
 
-function validateBtcAmount(value: number) {
+function validateBitcoinAmount(value: number): string | undefined {
   let error;
   if (!value) {
     error = "Please enter an amount of BTC you would like to lock";
@@ -62,10 +61,23 @@ function validateBtcAmount(value: number) {
   return error;
 }
 
+const initialValues: TransactionFormValues = { amount: 0.001 };
+
 export function TransactionForm({
-  blockchain,
-}: TransactionFormProps): React.JSX.Element {
-  const initialValues: TransactionFormValues = { amount: 0.001 };
+  currentStep,
+}: TransactionFormProps): React.JSX.Element | boolean {
+  let blockchain: "ethereum" | "bitcoin";
+
+  switch (currentStep) {
+    case 0:
+      blockchain = "ethereum";
+      break;
+    case 1:
+      blockchain = "bitcoin";
+      break;
+    default:
+      return false;
+  }
 
   return (
     <VStack w={"300px"}>
@@ -82,50 +94,13 @@ export function TransactionForm({
                 <Text w={"100%"} color={"accent.cyan.01"}>
                   {blockchainFormPropertyMap[blockchain].title}
                 </Text>
-                <VStack
-                  alignItems={"start"}
-                  py={"5px"}
-                  px={"15px"}
-                  w={"100%"}
-                  bgColor={"white.01"}
-                  border={"2.5px solid"}
-                  borderRadius={"md"}
-                  borderColor={"border.cyan.01"}
-                >
-                  <HStack>
-                    <Image
-                      src={blockchainFormPropertyMap[blockchain].logo}
-                      alt={blockchainFormPropertyMap[blockchain].alt}
-                      boxSize={"20px"}
-                    />
-                    <Field
-                      autoFocus
-                      as={Input}
-                      id="amount"
-                      name="amount"
-                      type="number"
-                      px={"1.5px"}
-                      h={"25px"}
-                      w={"80px"}
-                      focusBorderColor="rgba(7,232,216,1)"
-                      fontSize={"xl"}
-                      fontWeight={"bold"}
-                      validate={
-                        blockchainFormPropertyMap[blockchain].validateFn
-                      }
-                    />
-                    <Text fontSize={"xl"}>dlcBTC</Text>
-                  </HStack>
-                  <Text pl={"30px"} color={"gray"} fontSize={"sm"}>
-                    = ~{(values.amount * 36131.1).toFixed(4)}$
-                  </Text>
-                </VStack>
+                <TransactionInput blockchain={blockchain} values={values} />
                 <HStack alignItems={"start"} w={"100%"}>
                   <FormErrorMessage fontSize={"xs"}>
                     {errors.amount}
                   </FormErrorMessage>
                 </HStack>
-                {blockchain === "ethereum" && <Warning />}
+                <Warning blockchain={blockchain} />
                 {blockchain === "bitcoin" && (
                   <TransactionFee amount={values.amount} />
                 )}

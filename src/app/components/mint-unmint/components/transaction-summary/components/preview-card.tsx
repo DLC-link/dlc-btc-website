@@ -1,6 +1,6 @@
 import { HStack, Image, Text, VStack } from "@chakra-ui/react";
 
-export function DlcBtcCard(): React.JSX.Element {
+export function PreviewCard(): React.JSX.Element {
   return (
     <VStack
       justifyContent={"center"}
@@ -18,9 +18,9 @@ export function DlcBtcCard(): React.JSX.Element {
         <Image
           src={"/images/logos/dlc-btc-logo.svg"}
           alt={"dlcBTC"}
-          boxSize={"20px"}
+          boxSize={"25px"}
         />
-        <Text color={"white"} fontWeight={"extrabold"}>
+        <Text color={"white"} fontWeight={800}>
           10.00 dlcBTC
         </Text>
       </HStack>

@@ -18,7 +18,7 @@ export function VaultsList({
 }: VaultsListProps): React.JSX.Element {
   return (
     <FadeLayer height={height} fadeHeight={"35px"}>
-      <Text py={"15px"} color={"white"} fontWeight={"bold"}>
+      <Text py={"15px"} color={"white"} fontWeight={600}>
         {title}
       </Text>
       <VStack

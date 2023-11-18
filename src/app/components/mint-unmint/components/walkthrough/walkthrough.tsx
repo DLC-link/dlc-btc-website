@@ -32,7 +32,7 @@ export function Walkthrough({
         </Text>
         <BlockchainTag blockchain={blockchain} />
       </HStack>
-      <Text color={"white.01"} fontSize={"lg"} fontWeight={"bold"}>
+      <Text color={"white.01"} fontSize={"lg"} fontWeight={800}>
         {title}
       </Text>
       {primaryBody}

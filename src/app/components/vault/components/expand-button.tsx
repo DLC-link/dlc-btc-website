@@ -1,17 +1,17 @@
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import { Button, Text } from "@chakra-ui/react";
 
-interface VaultCardButtonProps {
+interface ExpandButtonProps {
   isExpanded: boolean;
   handleClick: () => void;
 }
 
-export function VaultCardButton({
+export function ExpandButton({
   isExpanded,
   handleClick,
-}: VaultCardButtonProps): React.JSX.Element {
+}: ExpandButtonProps): React.JSX.Element {
   return (
-    <Button variant={"action"} w={"85px"} onClick={() => handleClick()}>
+    <Button variant={"vault"} w={"85px"} onClick={() => handleClick()}>
       <Text color={"white"} fontSize={"sm"}>
         {isExpanded ? "Less" : "More"}
       </Text>

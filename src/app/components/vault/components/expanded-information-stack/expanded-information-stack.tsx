@@ -4,19 +4,19 @@ import { easyTruncateAddress } from "@common/utilities";
 import { InformationRow } from "./components/asset-row";
 import { TransactionRow } from "./components/transaction-row";
 
-interface VaultCardExpandedInformationStackProps {
+interface ExpandedInformationStackProps {
   uuid: string;
   fundingTX: string;
   closingTX: string;
   isExpanded: boolean;
 }
 
-export function VaultCardExpandedInformationStack({
+export function ExpandedInformationStack({
   uuid,
   fundingTX,
   closingTX,
   isExpanded,
-}: VaultCardExpandedInformationStackProps): React.JSX.Element | boolean {
+}: ExpandedInformationStackProps): React.JSX.Element | boolean {
   if (!isExpanded) return false;
 
   return (

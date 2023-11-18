@@ -36,7 +36,7 @@ export function SetupInformationStack(): React.JSX.Element {
           ></Image>
         </VStack>
         <VStack h={"150px"} spacing={"6.5px"}>
-          <Text color={"white"} fontSize={"lg"} fontWeight={"bold"}>
+          <Text color={"white"} fontSize={"lg"} fontWeight={600}>
             What you will need:
           </Text>
           <WalletRequirement

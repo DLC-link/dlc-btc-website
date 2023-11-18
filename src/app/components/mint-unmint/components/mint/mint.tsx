@@ -17,18 +17,9 @@ export function Mint(): React.JSX.Element {
   return (
     <MintLayout>
       <ProgressTimeline variant={"mint"} currentStep={currentStep} />
-      <HStack
-        w={"100%"}
-        alignContent={"start"}
-        alignItems={"start"}
-        justifyContent={"space-between"}
-      >
+      <HStack w={"100%"} alignItems={"start"} justifyContent={"space-between"}>
         <Walkthrough step={currentStep} {...mintStepsContent[currentStep]} />
-        {[0, 1].includes(currentStep) && (
-          <TransactionForm
-            blockchain={currentStep === 0 ? "ethereum" : "bitcoin"}
-          />
-        )}
+        <TransactionForm currentStep={currentStep} />
         {currentStep === 2 && <TransactionSummary />}
       </HStack>
       <StepButton handleClick={() => setCurrentStep((currentStep + 1) % 3)} />

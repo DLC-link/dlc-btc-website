@@ -21,7 +21,7 @@ export function MyVaultsLargeHeader({
         justifyContent={"space-between"}
         pr={"25px"}
       >
-        <Text color={"white"} fontSize={"4xl"} fontWeight={"extrabold"}>
+        <Text color={"white"} fontSize={"4xl"} fontWeight={600}>
           My Vaults
         </Text>
         <HStack w={"450px"} h={"75%"} justifyContent={"space-between"}>

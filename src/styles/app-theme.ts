@@ -19,8 +19,11 @@ export const appTheme = extendTheme({
     Divider: dividerTheme,
     Progress: {
       baseStyle: {
+        track: {
+          bg: "white.03",
+        },
         filledTrack: {
-          bg: "accent.cyan.01",
+          bg: "border.cyan.01",
         },
       },
     },

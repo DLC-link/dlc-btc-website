@@ -65,7 +65,7 @@ export function StepText({
     <Text
       color={currentStep >= stepIndex ? "accent.cyan.01" : "white.01"}
       fontSize={"xs"}
-      fontWeight={currentStep === stepIndex ? "extrabold" : "regular"}
+      fontWeight={currentStep === stepIndex ? 800 : 400}
       opacity={currentStep > stepIndex ? "50%" : "100%"}
     >
       {title}

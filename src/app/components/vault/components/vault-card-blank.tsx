@@ -11,7 +11,7 @@ export function VaultCardBlank(): React.JSX.Element {
       borderColor={"border.white.01"}
       borderRadius={"md"}
     >
-      <Text color={"white.03"} fontSize={"sm"} fontWeight={"extrabold"}>
+      <Text color={"white.03"} fontSize={"sm"} fontWeight={800}>
         Connect Your Ethereum Wallet
       </Text>
     </VStack>

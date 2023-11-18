@@ -3,9 +3,9 @@ import React, { useState } from "react";
 import { useLoadingDelay } from "@hooks/use-loading-delay";
 import { VaultStatus } from "@models/vault";
 
-import { VaultCardExpandedInformationStack } from "./components/vault-box-expanded-information-stack/vault-box-expanded-information-stack";
-import { VaultCardInformationStack } from "./components/vault-card-connect-wallet-stack";
-import { VaultCardProgressBar } from "./components/vault-card-progress-bar";
+import { ExpandedInformationStack } from "./components/expanded-information-stack/expanded-information-stack";
+import { InformationStack } from "./components/information-stack";
+import { ProgressBar } from "./components/progress-bar";
 import { VaultCardLayout } from "./components/vault-card.layout";
 
 interface VaultBoxProps {
@@ -30,19 +30,19 @@ export function VaultCard({
 
   return (
     <VaultCardLayout isLoaded={isLoaded}>
-      <VaultCardInformationStack
+      <InformationStack
         collateral={collateral}
         state={state}
         isExpanded={isExpanded}
         handleClick={() => setIsExpanded(!isExpanded)}
       />
-      <VaultCardExpandedInformationStack
+      <ExpandedInformationStack
         uuid={uuid}
         fundingTX={fundingTX}
         closingTX={closingTX}
         isExpanded={isExpanded}
       />
-      <VaultCardProgressBar state={state} confirmedBlocks={confirmedBlocks} />
+      <ProgressBar state={state} confirmedBlocks={confirmedBlocks} />
     </VaultCardLayout>
   );
 }

@@ -12,7 +12,7 @@ const account = defineStyle({
     h: "50px",
     w: "275px",
     fontSize: "lg",
-    fontWeight: "extrabold",
+    fontWeight: 800,
     color: "white",
     bgGradient: "linear(to-b, background.content.01, background.content.02)",
     border: "1px solid",
@@ -36,7 +36,7 @@ const account = defineStyle({
     borderRadius: "md",
     color: "white",
     fontSize: "xs",
-    fontWeight: "extrabold",
+    fontWeight: 400,
     _hover: {
       background: "white.03",
     },
@@ -56,7 +56,7 @@ const network = definePartsStyle({
     borderRadius: "md",
     color: "white",
     fontSize: "sm",
-    fontWeight: "extrabold",
+    fontWeight: 600,
     _hover: {
       background: "white.03",
     },
@@ -75,7 +75,7 @@ const network = definePartsStyle({
     borderRadius: "md",
     color: "white",
     fontSize: "xs",
-    fontWeight: "extrabold",
+    fontWeight: 400,
     _hover: {
       background: "white.03",
     },

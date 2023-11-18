@@ -8,7 +8,7 @@ export function StepButton({
 }: StepButtonProps): React.JSX.Element {
   return (
     <Button
-      variant={"action"}
+      variant={"vault"}
       h={"5px"}
       w={"15px"}
       borderColor={"white.03"}

@@ -5,13 +5,13 @@ const basestyle = defineStyle({
   color: "white",
 });
 
-const action = defineStyle({
+const vault = defineStyle({
   py: "10px",
   px: "25px",
   h: "35px",
   w: "100%",
   fontSize: "sm",
-  fontWeight: "extrabold",
+  fontWeight: "normal",
   bg: "none",
   border: "1px solid",
   borderColor: "accent.cyan.01",
@@ -26,7 +26,7 @@ const navigate = defineStyle({
   h: "50px",
   w: "100%",
   fontSize: "sm",
-  fontWeight: "extrabold",
+  fontWeight: 600,
   bg: "none",
   border: "1px solid",
   borderColor: "accent.cyan.01",
@@ -41,7 +41,7 @@ const account = defineStyle({
   h: "50px",
   w: "100%",
   fontSize: "lg",
-  fontWeight: "extrabold",
+  fontWeight: 600,
   bgSize: "400%",
   bgPosition: "left",
   bgGradient:
@@ -58,7 +58,7 @@ const tab = defineStyle({
   h: "50px",
   w: "auto",
   fontSize: "lg",
-  fontWeight: "normal",
+  fontWeight: 400,
   bgColor: "none",
   borderBottom: "3.5px solid",
   borderRadius: "none",
@@ -83,5 +83,5 @@ const wallet = defineStyle({
 
 export const buttonTheme = defineStyleConfig({
   baseStyle: basestyle,
-  variants: { tab, company, wallet, account, action, navigate },
+  variants: { tab, company, wallet, account, vault, navigate },
 });

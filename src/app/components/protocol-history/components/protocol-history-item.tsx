@@ -35,7 +35,7 @@ export function ProtocolHistoryItem(
             alt={"dlcBTC Logo"}
             boxSize={"20px"}
           />
-          <Text color={"white"} fontWeight={"extrabold"}>
+          <Text color={"white"} fontWeight={800}>
             {protocolHistoryItem.value}
           </Text>
           <Text color={"white"} fontSize={"sm"}>

@@ -28,7 +28,7 @@ const stepOne: StepContent = {
     </Text>
   ),
   secondaryBody: (
-    <Text color={"white.01"} fontSize={"md"} fontWeight={"bold"}>
+    <Text color={"white.01"} fontSize={"md"} fontWeight={800}>
       1 BTC = 1 dlcBTC
     </Text>
   ),
@@ -74,14 +74,14 @@ const stepThree: StepContent = {
   ),
   secondaryBody: (
     <Text color={"white.01"} fontSize={"sm"}>
-      To ensure your <span style={{ fontWeight: "bold" }}>dlcBTC tokens </span>
-      are <span style={{ fontWeight: "bold" }}>visible </span>
-      simply <span style={{ fontWeight: "bold" }}>add them </span>
+      To ensure your <span style={{ fontWeight: 800 }}>dlcBTC tokens </span>
+      are <span style={{ fontWeight: 800 }}>visible </span>
+      simply <span style={{ fontWeight: 800 }}>add them </span>
       to your Ethereum Wallet.
     </Text>
   ),
   button: (
-    <Button variant={"action"}>
+    <Button variant={"vault"}>
       <HStack>
         <Image
           src={"/images/logos/dlc-btc-logo.svg"}

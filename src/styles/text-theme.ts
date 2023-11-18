@@ -3,7 +3,7 @@ import { defineStyle, defineStyleConfig } from "@chakra-ui/react";
 const header = defineStyle({
   color: "white",
   fontSize: "sm",
-  fontWeight: "extrabold",
+  fontWeight: 400,
 });
 
 const welcome = defineStyle({

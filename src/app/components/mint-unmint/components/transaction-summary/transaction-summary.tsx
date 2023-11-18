@@ -6,7 +6,7 @@ import { VaultStatus } from "@models/vault";
 
 import { exampleVaults } from "@shared/examples/example-vaults";
 
-import { DlcBtcCard } from "./components/dlc-btc-card";
+import { PreviewCard } from "./components/preview-card";
 
 export function TransactionSummary(): React.JSX.Element {
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ export function TransactionSummary(): React.JSX.Element {
       </HStack>
       {exampleVault && <VaultCard {...exampleVault} />}
       <Text color={"white.01"}>b) Minting dlcBTC:</Text>
-      <DlcBtcCard />
+      <PreviewCard />
       <Text color={"white.01"}>
         You can follow the status of the mint under{" "}
         <Link
