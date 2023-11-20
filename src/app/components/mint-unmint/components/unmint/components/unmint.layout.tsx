@@ -5,10 +5,12 @@ export function UnmintLayout({ children }: HasChildren): React.JSX.Element {
   return (
     <VStack
       alignContent={"start"}
-      pt={"50px"}
-      h={"100%"}
+      alignItems={"start"}
+      justifyContent={"space-between"}
+      pt={"25px"}
+      h={"auto"}
       w={"100%"}
-      spacing={"15px"}
+      spacing={"25px"}
     >
       {children}
     </VStack>

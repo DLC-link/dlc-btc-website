@@ -1,14 +1,14 @@
 import { HStack, Text } from "@chakra-ui/react";
 
-interface TransactionRowProps {
+interface VaultExpandedInformationTransactionRowProps {
   label: string;
   value: string;
 }
 
-export function TransactionRow({
+export function VaultExpandedInformationTransactionRow({
   label,
   value,
-}: TransactionRowProps): React.JSX.Element {
+}: VaultExpandedInformationTransactionRowProps): React.JSX.Element {
   return (
     <HStack pl={"35px"} w={"100%"} alignItems={"start"}>
       <Text w={"50%"} color={"white"} fontSize={"xs"}>

@@ -1,6 +1,6 @@
 import { HStack, Image, Text, VStack } from "@chakra-ui/react";
 
-interface WalletRequirementProps {
+interface SetupInformationWalletRequirementProps {
   logo: string;
   color: string;
   walletName: string;
@@ -8,13 +8,13 @@ interface WalletRequirementProps {
   url: string;
 }
 
-export function WalletRequirement({
+export function SetupInformationWalletRequirement({
   logo,
   color,
   walletName,
   requirement,
   url,
-}: WalletRequirementProps): React.JSX.Element {
+}: SetupInformationWalletRequirementProps): React.JSX.Element {
   return (
     <VStack w={"100%"} spacing={"0.5px"}>
       <HStack alignContent={"start"} w={"100%"}>

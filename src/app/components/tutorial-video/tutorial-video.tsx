@@ -1,19 +1,18 @@
 import { useState } from "react";
 import YouTube, { YouTubeProps } from "react-youtube";
 
-import { Stack, Text, VStack } from "@chakra-ui/react";
-import { CustomSkeleton } from "@components/custom-skeleton/custom-skeleton";
+import { Skeleton, Text, VStack } from "@chakra-ui/react";
 
 export function TutorialVideo(): React.JSX.Element {
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const onPlayerReady: YouTubeProps["onReady"] = (event) => {
     event.target.pauseVideo();
-    setLoading(false);
+    setIsLoading(false);
   };
 
   const opts: YouTubeProps["opts"] = {
     height: "150",
-    width: "250",
+    width: "245",
     playerVars: {
       autoplay: 0,
       controls: 1,
@@ -25,15 +24,23 @@ export function TutorialVideo(): React.JSX.Element {
       <Text color={"accent.cyan.01"} fontSize={"lg"}>
         Watch explainer video:
       </Text>
-      <Stack
-        border={"2.5px solid"}
-        borderColor={"border.white.01"}
-        borderRadius={"lg"}
+      <Skeleton
+        isLoaded={!isLoading}
+        startColor={"white.02"}
+        endColor={"white.03"}
+        w={"250px"}
+        h={"150px"}
       >
-        <CustomSkeleton isLoaded={!loading}>
+        <VStack
+          justifyContent={"center"}
+          w={"250px"}
+          border={"2.5px solid"}
+          borderColor={"border.white.01"}
+          borderRadius={"lg"}
+        >
           <YouTube videoId="x9D1owU1tB8" opts={opts} onReady={onPlayerReady} />
-        </CustomSkeleton>
-      </Stack>
+        </VStack>
+      </Skeleton>
     </VStack>
   );
 }

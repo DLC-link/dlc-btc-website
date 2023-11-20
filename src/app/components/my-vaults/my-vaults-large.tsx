@@ -1,15 +1,15 @@
 import { useSelector } from "react-redux";
 
 import { HStack } from "@chakra-ui/react";
-import { VaultGroupBlankContainer } from "@components/vaults-list/components/vault-group-blank-container";
-import { VaultGroupContainer } from "@components/vaults-list/components/vault-group-container";
+import { VaultsListGroupBlankContainer } from "@components/vaults-list/components/vaults-list-group-blank-container";
+import { VaultsListGroupContainer } from "@components/vaults-list/components/vaults-list-group-container";
 import { VaultsList } from "@components/vaults-list/vaults-list";
 import { useVaults } from "@hooks/use-vaults";
 import { RootState } from "@store/index";
 
-import { DisconnectedInfoStack } from "./components/disconnected-info-stack";
-import { MyVaultsLargeHeader } from "./components/my-vaults-large-header/my-vaults-large-header";
+import { MyVaultsLargeHeader } from "./components/my-vaults-header/my-vaults-header";
 import { MyVaultsLargeLayout } from "./components/my-vaults-large.layout";
+import { MyVaultsSetupInformationStack } from "./components/my-vaults-setup-information-stack";
 
 export function MyVaultsLarge(): React.JSX.Element {
   const { address, dlcBTCBalance, lockedBTCBalance } = useSelector(
@@ -37,18 +37,18 @@ export function MyVaultsLarge(): React.JSX.Element {
             height={"475px"}
             isScrollable={!address}
           >
-            <VaultGroupContainer label="Lock BTC" vaults={readyVaults} />
-            <VaultGroupContainer
+            <VaultsListGroupContainer label="Lock BTC" vaults={readyVaults} />
+            <VaultsListGroupContainer
               label="Locking BTC in Progress"
               vaults={fundingVaults}
             />
-            <VaultGroupContainer
+            <VaultsListGroupContainer
               label="Unlocking BTC in Progress"
               vaults={closingVaults}
             />
           </VaultsList>
         ) : (
-          <DisconnectedInfoStack />
+          <MyVaultsSetupInformationStack />
         )}
         <VaultsList
           title={"Minted dlcBTC"}
@@ -56,9 +56,9 @@ export function MyVaultsLarge(): React.JSX.Element {
           isScrollable={!address}
         >
           {address ? (
-            <VaultGroupContainer vaults={fundedVaults} />
+            <VaultsListGroupContainer vaults={fundedVaults} />
           ) : (
-            <VaultGroupBlankContainer />
+            <VaultsListGroupBlankContainer />
           )}
         </VaultsList>
         <VaultsList
@@ -67,9 +67,9 @@ export function MyVaultsLarge(): React.JSX.Element {
           isScrollable={!address}
         >
           {address ? (
-            <VaultGroupContainer vaults={closedVaults} />
+            <VaultsListGroupContainer vaults={closedVaults} />
           ) : (
-            <VaultGroupBlankContainer />
+            <VaultsListGroupBlankContainer />
           )}
         </VaultsList>
       </HStack>

@@ -1,6 +1,25 @@
 import { HStack, Image, Text, VStack } from "@chakra-ui/react";
 
-export function PreviewCard(): React.JSX.Element {
+const blockchainPreviewCardMap = {
+  ethereum: {
+    tokenName: "dlcBTC",
+    path: "/images/logos/dlc-btc-logo.svg",
+  },
+  bitcoin: {
+    tokenName: "BTC",
+    path: "/images/logos/bitcoin-logo.svg",
+  },
+};
+
+interface TransactionSummaryPreviewCardProps {
+  blockchain: "ethereum" | "bitcoin";
+  assetAmount?: number;
+}
+
+export function TransactionSummaryPreviewCard({
+  blockchain,
+  assetAmount,
+}: TransactionSummaryPreviewCardProps): React.JSX.Element {
   return (
     <VStack
       justifyContent={"center"}
@@ -16,12 +35,12 @@ export function PreviewCard(): React.JSX.Element {
     >
       <HStack spacing={"15px"}>
         <Image
-          src={"/images/logos/dlc-btc-logo.svg"}
+          src={blockchainPreviewCardMap[blockchain].path}
           alt={"dlcBTC"}
           boxSize={"25px"}
         />
         <Text color={"white"} fontWeight={800}>
-          10.00 dlcBTC
+          {assetAmount} {blockchainPreviewCardMap[blockchain].tokenName}
         </Text>
       </HStack>
     </VStack>

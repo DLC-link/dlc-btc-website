@@ -5,7 +5,7 @@ import { CheckIcon } from "@chakra-ui/icons";
 import { HStack, ScaleFade, Text, VStack } from "@chakra-ui/react";
 import { ModalComponentProps } from "@components/modals/components/modal-container";
 import { ModalLayout } from "@components/modals/components/modal.layout";
-import { WalletMenu } from "@components/modals/select-wallet-modal/components/wallet-button";
+import { SelectWalletMenu } from "@components/modals/select-wallet-modal/components/select-wallet-menu";
 import { SelectNetworkButton } from "@components/select-network-button/select-network-button";
 import { Network } from "@models/network";
 import { WalletType, ethereumWallets } from "@models/wallet";
@@ -66,7 +66,7 @@ export function SelectWalletModal({
           <VStack alignItems={"start"} spacing={"25px"}>
             <Text variant={"header"}>Select Wallet</Text>
             {ethereumWallets.map((wallet) => (
-              <WalletMenu
+              <SelectWalletMenu
                 key={wallet.name}
                 wallet={wallet}
                 handleClick={handleLogin}

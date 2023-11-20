@@ -1,18 +1,17 @@
 import { HStack, Link, Text } from "@chakra-ui/react";
 
-interface WarningProps {
-  blockchain: "ethereum" | "bitcoin";
+interface TransactionFormWarningProps {
+  assetAmount: number;
 }
 
-export function Warning({
-  blockchain,
-}: WarningProps): React.JSX.Element | boolean {
-  if (blockchain === "bitcoin") return false;
+export function TransactionFormWarning({
+  assetAmount,
+}: TransactionFormWarningProps): React.JSX.Element {
   return (
     <HStack p={"15px"} bgColor={"white.03"} borderRadius={"md"}>
       <Text color={"white.01"} fontSize={"sm"}>
         <span style={{ fontWeight: 800 }}>
-          Make sure you have 10.00 BTC + (fees){" "}
+          Make sure you have {assetAmount} BTC + (fees){" "}
         </span>
         in your{" "}
         <Link

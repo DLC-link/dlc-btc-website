@@ -1,6 +1,6 @@
 import { HStack, VStack } from "@chakra-ui/react";
 
-import { StepGraphics, StepText } from "./components/step";
+import { StepGraphics, StepText } from "./components/progress-timeline-step";
 
 interface ProgressTimelineProps {
   variant: "mint" | "unmint";

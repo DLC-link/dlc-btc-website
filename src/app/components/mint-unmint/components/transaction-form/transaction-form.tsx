@@ -2,15 +2,16 @@ import {
   Button,
   FormControl,
   FormErrorMessage,
-  HStack,
   Text,
   VStack,
 } from "@chakra-ui/react";
+import { VaultCard } from "@components/vault/vault-card";
+import { useVaults } from "@hooks/use-vaults";
 import { Form, Formik } from "formik";
 
-import { TransactionFee } from "./components/transaction-fee";
-import { TransactionInput } from "./components/transaction-input";
-import { Warning } from "./components/warning";
+import { TransactionFormFee } from "./components/transaction-form-fee";
+import { TransactionFormInput } from "./components/transaction-form-input";
+import { TransactionFormWarning } from "./components/transaction-form-warning";
 
 interface TransactionFormProps {
   currentStep: number;
@@ -20,10 +21,9 @@ export interface TransactionFormValues {
   amount: number;
 }
 
-export const blockchainFormPropertyMap = {
+const blockchainFormPropertyMap = {
   ethereum: {
     title: "Amount of dlcBTC you want to mint",
-    validateFn: validateTokenAmount,
     buttonText: "Create Vault",
     logo: "/images/logos/dlc-btc-logo.svg",
     alt: "dlcBTC",
@@ -31,8 +31,7 @@ export const blockchainFormPropertyMap = {
       "In production your Ethereum Wallet would now open to confirm the transaction",
   },
   bitcoin: {
-    title: "Amount of BTC you want to lock",
-    validateFn: validateBitcoinAmount,
+    title: "Amount of BTC you will lock",
     buttonText: "Lock Bitcoin",
     logo: "/images/logos/bitcoin-logo.svg",
     alt: "Bitcoin",
@@ -41,31 +40,14 @@ export const blockchainFormPropertyMap = {
   },
 };
 
-function validateTokenAmount(value: number): string | undefined {
-  let error;
-  if (!value) {
-    error = "Please enter an amount of dlcBTC you would like to mint";
-  } else if (value < 0.0001) {
-    error = "You can't mint less than 0.0001 dlcBTC";
-  }
-  return error;
-}
-
-function validateBitcoinAmount(value: number): string | undefined {
-  let error;
-  if (!value) {
-    error = "Please enter an amount of BTC you would like to lock";
-  } else if (value < 0.001) {
-    error = "You can't lock less than 0.0001 BTC";
-  }
-  return error;
-}
-
 const initialValues: TransactionFormValues = { amount: 0.001 };
 
 export function TransactionForm({
   currentStep,
-}: TransactionFormProps): React.JSX.Element | boolean {
+}: TransactionFormProps): React.JSX.Element {
+  const { readyVaults } = useVaults();
+  const exampleVault = readyVaults[0];
+
   let blockchain: "ethereum" | "bitcoin";
 
   switch (currentStep) {
@@ -76,8 +58,10 @@ export function TransactionForm({
       blockchain = "bitcoin";
       break;
     default:
-      return false;
+      return <></>;
   }
+
+  //TODO: Separate the bitcoin and ethereum cases into two separate functions
 
   return (
     <VStack w={"300px"}>
@@ -94,15 +78,21 @@ export function TransactionForm({
                 <Text w={"100%"} color={"accent.cyan.01"}>
                   {blockchainFormPropertyMap[blockchain].title}
                 </Text>
-                <TransactionInput blockchain={blockchain} values={values} />
-                <HStack alignItems={"start"} w={"100%"}>
+                {blockchain === "ethereum" ? (
+                  <TransactionFormInput values={values} />
+                ) : (
+                  <VaultCard vault={exampleVault} isSelectable isSelected />
+                )}
+                {["ethereum"].includes(blockchain) && (
                   <FormErrorMessage fontSize={"xs"}>
                     {errors.amount}
                   </FormErrorMessage>
-                </HStack>
-                <Warning blockchain={blockchain} />
-                {blockchain === "bitcoin" && (
-                  <TransactionFee amount={values.amount} />
+                )}
+                {["ethereum"].includes(blockchain) && (
+                  <TransactionFormWarning assetAmount={values.amount} />
+                )}
+                {["bitcoin"].includes(blockchain) && (
+                  <TransactionFormFee assetAmount={values.amount} />
                 )}
                 <Button
                   variant={"account"}
