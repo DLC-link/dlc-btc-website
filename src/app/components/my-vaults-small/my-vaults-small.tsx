@@ -1,11 +1,11 @@
 import { useNavigate } from "react-router-dom";
 
 import { Button } from "@chakra-ui/react";
-import { VaultGroupBlankContainer } from "@components/vaults-list/components/vault-group-blank-container";
+import { VaultsListGroupBlankContainer } from "@components/vaults-list/components/vaults-list-group-blank-container";
 import { VaultsList } from "@components/vaults-list/vaults-list";
 import { useVaults } from "@hooks/use-vaults";
 
-import { VaultGroupContainer } from "../vaults-list/components/vault-group-container";
+import { VaultsListGroupContainer } from "../vaults-list/components/vaults-list-group-container";
 import { MyVaultsSmallLayout } from "./components/my-vaults-small.layout";
 
 interface MyVaultsSmallProps {
@@ -26,23 +26,29 @@ export function MyVaultsSmall({
 
   return (
     <MyVaultsSmallLayout>
-      <VaultsList title={"My Vaults"} height={"525px"} isScrollable={!address}>
+      <VaultsList title={"My Vaults"} height={"545px"} isScrollable={!address}>
         {address ? (
           <>
-            <VaultGroupContainer label="Lock BTC" vaults={readyVaults} />
-            <VaultGroupContainer
+            <VaultsListGroupContainer label="Lock BTC" vaults={readyVaults} />
+            <VaultsListGroupContainer
               label="Locking BTC in Progress"
               vaults={fundingVaults}
             />
-            <VaultGroupContainer
+            <VaultsListGroupContainer
               label="Unlocking BTC in Progress"
               vaults={closingVaults}
             />
-            <VaultGroupContainer label="Minted dlcBTC" vaults={fundedVaults} />
-            <VaultGroupContainer label="Closed Vaults" vaults={closedVaults} />
+            <VaultsListGroupContainer
+              label="Minted dlcBTC"
+              vaults={fundedVaults}
+            />
+            <VaultsListGroupContainer
+              label="Closed Vaults"
+              vaults={closedVaults}
+            />
           </>
         ) : (
-          <VaultGroupBlankContainer />
+          <VaultsListGroupBlankContainer />
         )}
       </VaultsList>
       <Button variant={"navigate"} onClick={() => navigate("/my-vaults")}>

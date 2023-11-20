@@ -1,48 +1,55 @@
 import React, { useState } from "react";
 
-import { useLoadingDelay } from "@hooks/use-loading-delay";
-import { VaultStatus } from "@models/vault";
+import { CustomSkeleton } from "@components/custom-skeleton/custom-skeleton";
+import { Vault, VaultStatus } from "@models/vault";
 
-import { ExpandedInformationStack } from "./components/expanded-information-stack/expanded-information-stack";
-import { InformationStack } from "./components/information-stack";
-import { ProgressBar } from "./components/progress-bar";
 import { VaultCardLayout } from "./components/vault-card.layout";
+import { VaultExpandedInformation } from "./components/vault-expanded-information/vault-expanded-information";
+import { VaultInformation } from "./components/vault-information";
+import { VaultProgressBar } from "./components/vault-progress-bar";
 
 interface VaultBoxProps {
-  uuid: string;
-  collateral: number;
-  state: VaultStatus;
-  fundingTX: string;
-  closingTX: string;
-  preventLoad?: boolean;
+  vault?: Vault;
+  isSelected?: boolean;
+  isSelectable?: boolean;
+  handleSelect?: () => void;
 }
 
 export function VaultCard({
-  uuid,
-  collateral,
-  state,
-  fundingTX,
-  closingTX,
+  vault,
+  isSelected = false,
+  isSelectable = false,
+  handleSelect,
 }: VaultBoxProps): React.JSX.Element {
-  const isLoaded = useLoadingDelay(3000);
   const confirmedBlocks = 3;
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(isSelected ? true : false);
+
+  if (!vault) return <CustomSkeleton height={"65px"} />;
 
   return (
-    <VaultCardLayout isLoaded={isLoaded}>
-      <InformationStack
-        collateral={collateral}
-        state={state}
+    <VaultCardLayout
+      isSelectable={isSelectable}
+      handleClick={() => handleSelect && handleSelect()}
+    >
+      <VaultInformation
+        collateral={vault.collateral}
+        state={vault.state}
         isExpanded={isExpanded}
+        isSelected={isSelected}
+        isSelectable={isSelectable}
         handleClick={() => setIsExpanded(!isExpanded)}
       />
-      <ExpandedInformationStack
-        uuid={uuid}
-        fundingTX={fundingTX}
-        closingTX={closingTX}
-        isExpanded={isExpanded}
-      />
-      <ProgressBar state={state} confirmedBlocks={confirmedBlocks} />
+      {isExpanded && (
+        <VaultExpandedInformation
+          uuid={vault.uuid}
+          fundingTX={vault.fundingTX}
+          closingTX={vault.closingTX}
+          isExpanded={isExpanded}
+        />
+      )}
+      {[VaultStatus.FUNDING, VaultStatus.CLOSING].includes(vault.state) && (
+        <VaultProgressBar confirmedBlocks={confirmedBlocks} />
+      )}
     </VaultCardLayout>
   );
 }

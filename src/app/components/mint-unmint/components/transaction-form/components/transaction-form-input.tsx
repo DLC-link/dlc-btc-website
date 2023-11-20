@@ -1,19 +1,25 @@
 import { HStack, Image, Input, Text, VStack } from "@chakra-ui/react";
 import { Field } from "formik";
-import {
-  TransactionFormValues,
-  blockchainFormPropertyMap,
-} from "../transaction-form";
 
-interface TransactionInputProps {
-  blockchain: "ethereum" | "bitcoin";
+import { TransactionFormValues } from "../transaction-form";
+
+function validateTokenAmount(value: number): string | undefined {
+  let error;
+  if (!value) {
+    error = "Please enter an amount of dlcBTC you would like to mint";
+  } else if (value < 0.0001) {
+    error = "You can't mint less than 0.0001 dlcBTC";
+  }
+  return error;
+}
+
+interface TransactionFormInputProps {
   values: TransactionFormValues;
 }
 
-export function TransactionInput({
-  blockchain,
+export function TransactionFormInput({
   values,
-}: TransactionInputProps): React.JSX.Element {
+}: TransactionFormInputProps): React.JSX.Element {
   return (
     <VStack
       alignItems={"start"}
@@ -27,8 +33,8 @@ export function TransactionInput({
     >
       <HStack>
         <Image
-          src={blockchainFormPropertyMap[blockchain].logo}
-          alt={blockchainFormPropertyMap[blockchain].alt}
+          src={"/images/logos/dlc-btc-logo.svg"}
+          alt={"dlcBTC"}
           boxSize={"20px"}
         />
         <Field
@@ -39,10 +45,11 @@ export function TransactionInput({
           px={"1.5px"}
           h={"25px"}
           w={"75px"}
-          focusBorderColor="rgba(7,232,216,1)"
+          borderColor={"white.01"}
+          focusBorderColor={"white.01"}
           fontSize={"xl"}
           fontWeight={800}
-          validate={blockchainFormPropertyMap[blockchain].validateFn}
+          validate={validateTokenAmount}
         />
         <Text fontSize={"xl"}>dlcBTC</Text>
       </HStack>

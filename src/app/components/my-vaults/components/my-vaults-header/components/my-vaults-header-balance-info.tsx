@@ -1,34 +1,36 @@
 import { HStack, Image, Text, VStack } from "@chakra-ui/react";
 import { CustomSkeleton } from "@components/custom-skeleton/custom-skeleton";
 
-interface BalanceInfoProps {
+interface MyVaultsHeaderBalanceInfoProps {
   title: string;
   imageSrc: string;
   altText: string;
-  number?: number;
+  assetAmount?: number;
   showNone?: boolean;
 }
 
-export function BalanceInfo({
+export function MyVaultsHeaderBalanceInfo({
   title,
   imageSrc,
   altText,
-  number,
+  assetAmount,
   showNone,
-}: BalanceInfoProps): React.JSX.Element {
+}: MyVaultsHeaderBalanceInfoProps): React.JSX.Element {
   return (
     <VStack justifyContent={"center"} alignItems={"start"} w={"35%"} h={"100%"}>
       <Text color={"accent.cyan.01"} fontWeight={600} fontSize={"md"}>
         {title}
       </Text>
-      <CustomSkeleton isLoaded={number !== undefined}>
-        <HStack>
-          <Image src={imageSrc} alt={altText} boxSize={"25px"} />
+      <HStack>
+        <Image src={imageSrc} alt={altText} boxSize={"25px"} />
+        {assetAmount ? (
           <Text color={"white"} fontWeight={800} fontSize={"xl"}>
-            {showNone ? "-" : number}
+            {showNone ? "-" : assetAmount}
           </Text>
-        </HStack>
-      </CustomSkeleton>
+        ) : (
+          <CustomSkeleton height={"25px"} />
+        )}
+      </HStack>
     </VStack>
   );
 }

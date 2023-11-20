@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Button, Text, VStack } from "@chakra-ui/react";
 import { modalActions } from "@store/slices/modal/modal.actions";
 
-export function DisconnectedInfoStack(): React.JSX.Element {
+export function MyVaultsSetupInformationStack(): React.JSX.Element {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 

@@ -2,15 +2,21 @@ import { HStack, Spinner, Text, VStack } from "@chakra-ui/react";
 import { VaultCard } from "@components/vault/vault-card";
 import { Vault } from "@models/vault";
 
-interface VaultGroupContainerProps {
+interface VaultsListGroupContainerProps {
   label?: string;
   vaults: Vault[];
+  selectedVaultUUID?: string;
+  isSelectable?: boolean;
+  handleSelect?: (uuid: string) => void;
 }
 
-export function VaultGroupContainer({
+export function VaultsListGroupContainer({
   label,
   vaults,
-}: VaultGroupContainerProps): React.JSX.Element | boolean {
+  selectedVaultUUID,
+  isSelectable = false,
+  handleSelect,
+}: VaultsListGroupContainerProps): React.JSX.Element | boolean {
   if (vaults.length === 0) return false;
 
   return (
@@ -24,7 +30,13 @@ export function VaultGroupContainer({
         </HStack>
       )}
       {vaults.map((vault, index) => (
-        <VaultCard key={index} {...vault} />
+        <VaultCard
+          key={index}
+          vault={vault}
+          isSelected={selectedVaultUUID === vault.uuid}
+          isSelectable={isSelectable}
+          handleSelect={() => handleSelect && handleSelect(vault.uuid)}
+        />
       ))}
     </VStack>
   );

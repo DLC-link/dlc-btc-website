@@ -1,6 +1,6 @@
 import { Divider, HStack, Text, VStack } from "@chakra-ui/react";
 
-import { BalanceInfo } from "./components/balance-info";
+import { MyVaultsHeaderBalanceInfo } from "./components/my-vaults-header-balance-info";
 
 interface MyVaultsLargeHeaderProps {
   address?: string;
@@ -26,19 +26,19 @@ export function MyVaultsLargeHeader({
         </Text>
         <HStack w={"450px"} h={"75%"} justifyContent={"space-between"}>
           <Divider orientation={"vertical"} h={"35px"} variant={"thick"} />
-          <BalanceInfo
+          <MyVaultsHeaderBalanceInfo
             title={"Available dlcBTC"}
             imageSrc={"/images/logos/dlc-btc-logo.svg"}
             altText={"dlcBTC Logo"}
-            number={dlcBTCBalance}
+            assetAmount={dlcBTCBalance}
             showNone={!address}
           />
           <Divider orientation={"vertical"} h={"35px"} variant={"thick"} />
-          <BalanceInfo
+          <MyVaultsHeaderBalanceInfo
             title={"Locked BTC"}
             imageSrc={"/images/logos/bitcoin-logo.svg"}
             altText={"Bitcoin Logo"}
-            number={lockedBTCBalance}
+            assetAmount={lockedBTCBalance}
             showNone={!address}
           />
         </HStack>

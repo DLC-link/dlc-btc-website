@@ -1,7 +1,7 @@
 import { HStack, Text, VStack } from "@chakra-ui/react";
 
-interface TransactionFeeProps {
-  amount: number;
+interface LockScreenProtocolFeeProps {
+  assetAmount?: number;
 }
 
 function calculateProtocolFee(
@@ -12,23 +12,23 @@ function calculateProtocolFee(
 }
 
 function calculateProtocolFeeInUSD(
-  amount: number,
+  assetAmount: number,
   usdPrice: number,
   protocolFeePercentage: number,
 ): string {
-  return (amount * protocolFeePercentage * usdPrice).toFixed(8);
+  return (assetAmount * protocolFeePercentage * usdPrice).toFixed(8);
 }
 
-export function TransactionFee({
-  amount,
-}: TransactionFeeProps): React.JSX.Element {
+export function LockScreenProtocolFee({
+  assetAmount,
+}: LockScreenProtocolFeeProps): React.JSX.Element {
   return (
     <VStack
       alignItems={"end"}
       p={"15px"}
-      borderRadius={"md"}
       w={"100%"}
       border={"1px solid"}
+      borderRadius={"md"}
       borderColor={"border.cyan.01"}
     >
       <HStack justifyContent={"space-between"} w={"100%"}>
@@ -36,11 +36,13 @@ export function TransactionFee({
           Protocol Fee
         </Text>
         <Text color={"white.01"} fontSize={"sm"} fontWeight={800}>
-          {calculateProtocolFee(amount, 0.0001)} BTC
+          {assetAmount && calculateProtocolFee(assetAmount, 0.0001)} BTC
         </Text>{" "}
       </HStack>
       <Text color={"white.01"} fontSize={"sm"}>
-        = {calculateProtocolFeeInUSD(amount, 36.142, 0.0001)} $
+        ={" "}
+        {assetAmount && calculateProtocolFeeInUSD(assetAmount, 36.142, 0.0001)}{" "}
+        $
       </Text>
     </VStack>
   );

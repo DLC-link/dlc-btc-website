@@ -1,15 +1,15 @@
 import { Button, HStack, Image, Text } from "@chakra-ui/react";
 import { Wallet, WalletType } from "@models/wallet";
 
-interface WalletMenuProps {
+interface SelectWalletMenuProps {
   wallet: Wallet;
   handleClick: (address: string, walletType: WalletType) => void;
 }
 
-export function WalletMenu({
+export function SelectWalletMenu({
   wallet,
   handleClick,
-}: WalletMenuProps): React.JSX.Element {
+}: SelectWalletMenuProps): React.JSX.Element {
   const { logo, name } = wallet;
 
   return (

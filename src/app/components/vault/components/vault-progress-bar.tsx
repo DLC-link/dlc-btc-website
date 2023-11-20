@@ -1,18 +1,12 @@
 import { Box, Progress, Text, VStack } from "@chakra-ui/react";
-import { VaultStatus } from "@models/vault";
 
-interface ProgressBarProps {
-  state: VaultStatus;
+interface VaultProgressBarProps {
   confirmedBlocks: number;
 }
 
-export function ProgressBar({
-  state,
+export function VaultProgressBar({
   confirmedBlocks,
-}: ProgressBarProps): React.JSX.Element | boolean {
-  if (state !== VaultStatus.FUNDING && state !== VaultStatus.CLOSING)
-    return false;
-
+}: VaultProgressBarProps): React.JSX.Element {
   return (
     <VStack w={"100%"} alignItems={"end"} position="relative">
       <Progress value={50} w={"100%"} h={"25px"} borderRadius={"md"} />

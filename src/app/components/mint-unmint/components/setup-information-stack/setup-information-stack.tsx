@@ -6,7 +6,7 @@ import { Button, HStack, Image, Text, VStack } from "@chakra-ui/react";
 import { modalActions } from "@store/slices/modal/modal.actions";
 
 import { SetupInformationStackLayout } from "./components/setup-information-stack.layout";
-import { WalletRequirement } from "./components/wallet-requirement";
+import { SetupInformationWalletRequirement } from "./components/setup-information-wallet-requirement";
 
 export function SetupInformationStack(): React.JSX.Element {
   const navigate = useNavigate();
@@ -39,14 +39,14 @@ export function SetupInformationStack(): React.JSX.Element {
           <Text color={"white"} fontSize={"lg"} fontWeight={600}>
             What you will need:
           </Text>
-          <WalletRequirement
+          <SetupInformationWalletRequirement
             logo={"/images/logos/ethereum-logo.svg"}
             color={"accent.cyan.01"}
             walletName={"Metamask Wallet"}
             requirement={"+ETH (for fee)"}
             url={"https://metamask.io/"}
           />
-          <WalletRequirement
+          <SetupInformationWalletRequirement
             logo={"/images/logos/bitcoin-logo.svg"}
             color={"accent.orange.01"}
             walletName={"Leather Wallet"}

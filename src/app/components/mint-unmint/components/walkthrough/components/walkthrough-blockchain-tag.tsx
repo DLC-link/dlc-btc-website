@@ -11,13 +11,13 @@ const blockchainTagPropertyMap = {
   },
 };
 
-interface BlockchainTagProps {
+interface WalkthroughBlockchainTagProps {
   blockchain: "ethereum" | "bitcoin";
 }
 
-export function BlockchainTag({
+export function WalkthroughBlockchainTag({
   blockchain,
-}: BlockchainTagProps): React.JSX.Element {
+}: WalkthroughBlockchainTagProps): React.JSX.Element {
   return (
     <HStack pr={"15px"} py={"0px"} bgColor={"white.03"} borderRadius={"xl"}>
       <Image
