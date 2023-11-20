@@ -58,7 +58,15 @@ export function UnmintVaultSelector(): React.JSX.Element {
           />
         </VaultsList>
       )}
-      <Button variant={"account"} isDisabled={!selectedVault}>
+      <Button
+        variant={"account"}
+        isDisabled={!selectedVault}
+        onClick={() =>
+          alert(
+            "In production your Ethereum Wallet would now open to confirm the transaction",
+          )
+        }
+      >
         Unmint dlcBTC
       </Button>
     </VStack>
