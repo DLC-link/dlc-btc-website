@@ -1,5 +1,5 @@
 export enum WalletType {
-  Metamask,
+  Metamask = "metamask",
 }
 
 export interface Wallet {

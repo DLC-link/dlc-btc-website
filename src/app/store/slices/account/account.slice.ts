@@ -28,8 +28,6 @@ export const accountSlice = createSlice({
       state.address = action.payload.address;
       state.walletType = action.payload.walletType;
       state.network = action.payload.network;
-      state.dlcBTCBalance = action.payload.dlcBTCBalance;
-      state.lockedBTCBalance = action.payload.lockedBTCBalance;
       state.loadedAt = new Date().toJSON();
     },
     logout: (state) => {

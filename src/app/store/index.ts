@@ -1,10 +1,7 @@
-import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import {
-  accountSlice,
-  initialAccountState,
-} from "@store/slices/account/account.slice";
-import { modalSlice } from "@store/slices/modal/modal.slice";
-import { vaultSlice } from "@store/slices/vault/vault.slice";
+import { combineReducers, configureStore } from '@reduxjs/toolkit';
+import { accountSlice, initialAccountState } from '@store/slices/account/account.slice';
+import { modalSlice } from '@store/slices/modal/modal.slice';
+import { vaultSlice } from '@store/slices/vault/vault.slice';
 import {
   FLUSH,
   PAUSE,
@@ -15,29 +12,33 @@ import {
   REHYDRATE,
   persistReducer,
   persistStore,
-} from "redux-persist";
-import expireReducer from "redux-persist-expire";
-import storage from "redux-persist/lib/storage";
+} from 'redux-persist';
+import expireReducer from 'redux-persist-expire';
+import storage from 'redux-persist/lib/storage';
+
+import { mintUnmintSlice } from './slices/mintunmint/mintunmint.slice';
 
 export interface RootState {
   account: ReturnType<typeof accountSlice.reducer>;
   vault: ReturnType<typeof vaultSlice.reducer>;
   modal: ReturnType<typeof modalSlice.reducer>;
+  mintunmint: ReturnType<typeof mintUnmintSlice.reducer>;
 }
 
 const rootReducer = combineReducers({
   account: accountSlice.reducer,
   vault: vaultSlice.reducer,
   modal: modalSlice.reducer,
+  mintunmint: mintUnmintSlice.reducer,
 });
 
 const persistConfig: PersistConfig<RootState> = {
-  key: "root",
+  key: 'root',
   storage: storage,
-  whitelist: ["account", "vault"],
+  whitelist: ['account', 'vault', 'mintunmint'],
   transforms: [
-    expireReducer("account", {
-      persistedAtKey: "loadedAt",
+    expireReducer('account', {
+      persistedAtKey: 'loadedAt',
       expireSeconds: 3600,
       expiredState: initialAccountState,
     }),
@@ -48,7 +49,7 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
   reducer: persistedReducer,
-  middleware: (getDefaultMiddleware) =>
+  middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],

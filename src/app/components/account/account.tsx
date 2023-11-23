@@ -36,7 +36,7 @@ export function Account(): React.JSX.Element {
 
   return (
     <HStack width={"275px"}>
-      {address && wallet ? (
+      {address !== undefined && wallet !== undefined ? (
         <AccountMenu
           address={address}
           wallet={wallet}

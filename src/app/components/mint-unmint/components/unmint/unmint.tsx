@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { HStack } from "@chakra-ui/react";
 import { StepButton } from "@components/step-button/step-button";
-import { VaultStatus } from "@models/vault";
+import { VaultState } from "@models/vault";
 
 import { exampleVaults } from "@shared/examples/example-vaults";
 
@@ -15,7 +15,7 @@ import { UnmintLayout } from "./components/unmint.layout";
 export function Unmint(): React.JSX.Element {
   const [currentStep, setCurrentStep] = useState(0);
   const exampleVault = exampleVaults.find(
-    (vault) => vault.state === VaultStatus.CLOSING,
+    (vault) => vault.state === VaultState.CLOSING,
   );
 
   return (

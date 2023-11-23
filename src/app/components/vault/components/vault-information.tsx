@@ -1,20 +1,19 @@
-import { CheckIcon } from "@chakra-ui/icons";
-import { Button, HStack, Image, Text, VStack } from "@chakra-ui/react";
-import { VaultStatus } from "@models/vault";
+import { CheckIcon } from '@chakra-ui/icons';
+import { Button, HStack, Image, Text, VStack } from '@chakra-ui/react';
+import { VaultState } from '@models/vault';
 
-import { VaultExpandButton } from "./vault-expand-button";
+import { VaultExpandButton } from './vault-expand-button';
 
-const getAssetLogo = (state: VaultStatus) => {
-  return [VaultStatus.FUNDED, VaultStatus.CLOSING, VaultStatus.CLOSED].includes(
-    state,
-  )
-    ? "/images/logos/dlc-btc-logo.svg"
-    : "/images/logos/bitcoin-logo.svg";
+const getAssetLogo = (state: VaultState) => {
+  return [VaultState.FUNDED, VaultState.CLOSING, VaultState.CLOSED].includes(state)
+    ? '/images/logos/dlc-btc-logo.svg'
+    : '/images/logos/bitcoin-logo.svg';
 };
 
 interface VaultInformationProps {
   collateral: number;
-  state: VaultStatus;
+  state: VaultState;
+  timestamp: number;
   isExpanded: boolean;
   isSelectable?: boolean;
   isSelected?: boolean;
@@ -24,46 +23,44 @@ interface VaultInformationProps {
 export function VaultInformation({
   state,
   collateral,
+  timestamp,
   isExpanded,
   isSelectable,
   isSelected,
   handleClick,
 }: VaultInformationProps): React.JSX.Element {
+  const date = new Date(timestamp * 1000).toLocaleDateString('en-US');
+
   return (
-    <HStack justifyContent={"space-between"} w={"100%"} h={"50px"}>
-      <VStack alignItems={"start"} spacing={"0.5"} h={"45px"}>
-        <HStack spacing={"15px"} h={"21.25px"}>
-          <Image src={getAssetLogo(state)} alt={"Icon"} boxSize={"25px"} />
-          <Text color={"white"} fontWeight={800}>
+    <HStack justifyContent={'space-between'} w={'100%'} h={'50px'}>
+      <VStack alignItems={'start'} spacing={'0.5'} h={'45px'}>
+        <HStack spacing={'15px'} h={'21.25px'}>
+          <Image src={getAssetLogo(state)} alt={'Icon'} boxSize={'25px'} />
+          <Text color={'white'} fontWeight={800}>
             {collateral}
           </Text>
         </HStack>
-        <Text px={"40px"} py={"0px"} color={"white.02"} fontSize={"xs"}>
-          10/10/2023
+        <Text px={'40px'} py={'0px'} color={'white.02'} fontSize={'xs'}>
+          {date}
         </Text>
       </VStack>
       {isSelectable ? (
         <VStack
-          justifyContent={"center"}
-          boxSize={"25px"}
-          bgColor={"white.03"}
-          border={"1px solid"}
-          borderRadius={"full"}
-          borderColor={"border.cyan.01"}
+          justifyContent={'center'}
+          boxSize={'25px'}
+          bgColor={'white.03'}
+          border={'1px solid'}
+          borderRadius={'full'}
+          borderColor={'border.cyan.01'}
         >
-          {isSelected && (
-            <CheckIcon color={"accent.cyan.01"} boxSize={"15px"} />
-          )}
+          {isSelected && <CheckIcon color={'accent.cyan.01'} boxSize={'15px'} />}
         </VStack>
-      ) : state === VaultStatus.READY ? (
-        <Button variant={"vault"} w={"85px"}>
+      ) : state === VaultState.READY ? (
+        <Button variant={'vault'} w={'85px'}>
           Lock BTC
         </Button>
       ) : (
-        <VaultExpandButton
-          isExpanded={isExpanded}
-          handleClick={() => handleClick()}
-        />
+        <VaultExpandButton isExpanded={isExpanded} handleClick={() => handleClick()} />
       )}
     </HStack>
   );
