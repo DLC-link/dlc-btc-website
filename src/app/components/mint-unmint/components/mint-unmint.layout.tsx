@@ -5,7 +5,7 @@ export function MintUnmintLayout({ children }: HasChildren): React.JSX.Element {
   return (
     <VStack
       px={"15px"}
-      w={"650px"}
+      w={"1020px"}
       h={"625px"}
       bg={"background.container.01"}
       border={"1px solid"}

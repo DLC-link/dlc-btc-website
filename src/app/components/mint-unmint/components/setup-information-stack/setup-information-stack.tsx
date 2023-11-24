@@ -20,7 +20,7 @@ export function SetupInformationStack(): React.JSX.Element {
 
   return (
     <SetupInformationStackLayout>
-      <HStack width={"100%"} spacing={"25px"}>
+      <HStack justifyContent={"space-between"} w={"100%"}>
         <VStack alignItems={"start"} h={"150px"}>
           <Text variant={"welcome"} alignContent={"start"}>
             {setupText}
@@ -29,7 +29,7 @@ export function SetupInformationStack(): React.JSX.Element {
             How it works?
           </Text>
         </VStack>
-        <VStack py={"15px"} h={"150px"}>
+        <VStack py={"15px"} h={"150px"} pr={"50px"}>
           <Image
             src={"/images/dlc-btc-mint-visualization.png"}
             h={"150px"}
