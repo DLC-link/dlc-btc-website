@@ -10,7 +10,8 @@ export function VaultProgressBar({
   confirmedBlocks,
   vaultState,
 }: VaultProgressBarProps): React.JSX.Element | boolean {
-  const shouldBeIndeterminate = confirmedBlocks > 6;
+  const shouldBeIndeterminate =
+    confirmedBlocks > 6 || Number.isNaN(confirmedBlocks);
 
   if (vaultState === VaultState.CLOSED && confirmedBlocks > 6) return false;
   return (
