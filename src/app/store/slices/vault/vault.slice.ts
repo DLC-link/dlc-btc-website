@@ -1,6 +1,6 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
-import { exampleVaults } from '@shared/examples/example-vaults';
+import { exampleVaults } from "@shared/examples/example-vaults";
 
 interface VaultState {
   vaults: any[];
@@ -10,12 +10,12 @@ interface VaultState {
 
 const initialVaultState: VaultState = {
   vaults: exampleVaults,
-  status: 'idle',
+  status: "idle",
   error: null,
 };
 
 export const vaultSlice = createSlice({
-  name: 'vault',
+  name: "vault",
   initialState: initialVaultState,
   reducers: {
     setVaults: (state, action) => {
@@ -24,7 +24,9 @@ export const vaultSlice = createSlice({
     swapVault: (state, action) => {
       const { vaultUUID, updatedVault } = action.payload;
 
-      const vaultIndex = state.vaults.findIndex(vault => vault.uuid === vaultUUID);
+      const vaultIndex = state.vaults.findIndex(
+        (vault) => vault.uuid === vaultUUID,
+      );
 
       if (vaultIndex === -1) {
         state.vaults.push(updatedVault);

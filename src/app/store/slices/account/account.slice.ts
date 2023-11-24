@@ -2,7 +2,7 @@ import { Network } from "@models/network";
 import { WalletType } from "@models/wallet";
 import { createSlice } from "@reduxjs/toolkit";
 
-export interface AccountState {
+interface AccountState {
   address: string | undefined;
   walletType: WalletType | undefined;
   network: Network | undefined;
@@ -11,7 +11,7 @@ export interface AccountState {
   loadedAt: string | undefined;
 }
 
-export const initialAccountState: AccountState = {
+const initialAccountState: AccountState = {
   address: undefined,
   walletType: undefined,
   network: undefined,

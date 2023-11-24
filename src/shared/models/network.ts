@@ -4,14 +4,14 @@ export interface Network {
 }
 
 export enum EthereumNetwork {
-  Mainnet = '1',
-  Goerli = '5',
-  Sepolia = '6',
-  X1Testnet = '195',
+  Mainnet = "1",
+  Goerli = "5",
+  Sepolia = "6",
+  X1Testnet = "195",
 }
 
 const EthreumOKXTestnet: Network = {
-  name: 'X1test',
+  name: "X1test",
   id: EthereumNetwork.X1Testnet,
 };
 

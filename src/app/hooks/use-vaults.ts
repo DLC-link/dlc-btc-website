@@ -1,8 +1,8 @@
-import { useMemo } from 'react';
-import { useSelector } from 'react-redux';
+import { useMemo } from "react";
+import { useSelector } from "react-redux";
 
-import { Vault, VaultState } from '@models/vault';
-import { RootState } from '@store/index';
+import { Vault, VaultState } from "@models/vault";
+import { RootState } from "@store/index";
 
 export function useVaults(): {
   readyVaults: Vault[];
@@ -16,37 +16,37 @@ export function useVaults(): {
   const readyVaults = useMemo(
     () =>
       vaults
-        .filter(vault => vault.state === VaultState.READY)
+        .filter((vault) => vault.state === VaultState.READY)
         .sort((a, b) => b.timestamp - a.timestamp),
-    [vaults]
+    [vaults],
   );
   const fundedVaults = useMemo(
     () =>
       vaults
-        .filter(vault => vault.state === VaultState.FUNDED)
+        .filter((vault) => vault.state === VaultState.FUNDED)
         .sort((a, b) => a.timestamp - b.timestamp),
-    [vaults]
+    [vaults],
   );
   const fundingVaults = useMemo(
     () =>
       vaults
-        .filter(vault => vault.state === VaultState.FUNDING)
+        .filter((vault) => vault.state === VaultState.FUNDING)
         .sort((a, b) => a.timestamp - b.timestamp),
-    [vaults]
+    [vaults],
   );
   const closingVaults = useMemo(
     () =>
       vaults
-        .filter(vault => vault.state === VaultState.CLOSING)
+        .filter((vault) => vault.state === VaultState.CLOSING)
         .sort((a, b) => a.timestamp - b.timestamp),
-    [vaults]
+    [vaults],
   );
   const closedVaults = useMemo(
     () =>
       vaults
-        .filter(vault => vault.state === VaultState.CLOSED)
+        .filter((vault) => vault.state === VaultState.CLOSED)
         .sort((a, b) => a.timestamp - b.timestamp),
-    [vaults]
+    [vaults],
   );
 
   return {

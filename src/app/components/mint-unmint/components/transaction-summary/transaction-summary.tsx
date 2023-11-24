@@ -2,8 +2,8 @@ import { useNavigate } from "react-router-dom";
 
 import { HStack, Link, Spinner, Stack, Text, VStack } from "@chakra-ui/react";
 import { VaultCard } from "@components/vault/vault-card";
-import { Vault } from "@models/vault";
 
+import { useVaults } from "@hooks/use-vaults";
 import { TransactionSummaryPreviewCard } from "./components/transaction-summary-preview-card";
 
 const flowPropertyMap = {
@@ -20,15 +20,14 @@ const flowPropertyMap = {
 interface TransactionSummaryProps {
   flow: "mint" | "unmint";
   blockchain: "ethereum" | "bitcoin";
-  vault?: Vault;
 }
 
 export function TransactionSummary({
   flow,
   blockchain,
-  vault,
 }: TransactionSummaryProps): React.JSX.Element {
   const navigate = useNavigate();
+  const { fundingVaults } = useVaults();
 
   return (
     <VStack alignItems={"start"} w={"300px"} spacing={"15px"}>
@@ -36,11 +35,11 @@ export function TransactionSummary({
         <Spinner color={"accent.cyan.01"} size={"md"} />
         <Text color={"accent.cyan.01"}>a) {flowPropertyMap[flow].title}:</Text>
       </HStack>
-      <VaultCard vault={vault} />
+      <VaultCard vault={fundingVaults[0]} />
       <Text color={"white.01"}>b) {flowPropertyMap[flow].subtitle}:</Text>
       <TransactionSummaryPreviewCard
         blockchain={blockchain}
-        assetAmount={vault?.collateral}
+        assetAmount={fundingVaults[0]?.collateral}
       />
       <Stack
         p={"15px"}

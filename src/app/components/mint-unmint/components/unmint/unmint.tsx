@@ -32,7 +32,6 @@ export function Unmint(): React.JSX.Element {
           <TransactionSummary
             flow={"unmint"}
             blockchain={"bitcoin"}
-            vault={exampleVault}
           />
         )}
       </HStack>

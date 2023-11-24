@@ -1,17 +1,17 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
-export interface MintUnmintState {
+interface MintUnmintState {
   mintStep: number;
   unmintStep: number;
 }
 
-export const initialMintUnmintState: MintUnmintState = {
+const initialMintUnmintState: MintUnmintState = {
   mintStep: 0,
   unmintStep: 0,
 };
 
 export const mintUnmintSlice = createSlice({
-  name: 'mintunmint',
+  name: "mintunmint",
   initialState: initialMintUnmintState,
   reducers: {
     setMintStep: (state, action) => {

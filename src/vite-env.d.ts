@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 
 interface Window {
-    ethereum: any
-    btc: any
+  ethereum: any;
+  btc: any;
 }
