@@ -19,7 +19,9 @@ interface VaultInformationProps {
   isExpanded: boolean;
   isSelectable?: boolean;
   isSelected?: boolean;
+  isSubmitting: boolean;
   handleClick: () => void;
+  handleLock: () => void;
 }
 
 export function VaultInformation({
@@ -29,7 +31,9 @@ export function VaultInformation({
   isExpanded,
   isSelectable,
   isSelected,
+  isSubmitting,
   handleClick,
+  handleLock,
 }: VaultInformationProps): React.JSX.Element {
   const date = new Date(timestamp * 1000).toLocaleDateString("en-US");
 
@@ -60,7 +64,12 @@ export function VaultInformation({
           )}
         </VStack>
       ) : state === VaultState.READY ? (
-        <Button variant={"vault"} w={"85px"}>
+        <Button
+          isLoading={isSubmitting}
+          onClick={() => handleLock()}
+          variant={"vault"}
+          w={"85px"}
+        >
           Lock BTC
         </Button>
       ) : (

@@ -24,28 +24,28 @@ export function useVaults(): {
     () =>
       vaults
         .filter((vault) => vault.state === VaultState.FUNDED)
-        .sort((a, b) => a.timestamp - b.timestamp),
+        .sort((a, b) => b.timestamp - a.timestamp),
     [vaults],
   );
   const fundingVaults = useMemo(
     () =>
       vaults
         .filter((vault) => vault.state === VaultState.FUNDING)
-        .sort((a, b) => a.timestamp - b.timestamp),
+        .sort((a, b) => b.timestamp - a.timestamp),
     [vaults],
   );
   const closingVaults = useMemo(
     () =>
       vaults
         .filter((vault) => vault.state === VaultState.CLOSING)
-        .sort((a, b) => a.timestamp - b.timestamp),
+        .sort((a, b) => b.timestamp - a.timestamp),
     [vaults],
   );
   const closedVaults = useMemo(
     () =>
       vaults
         .filter((vault) => vault.state === VaultState.CLOSED)
-        .sort((a, b) => a.timestamp - b.timestamp),
+        .sort((a, b) => b.timestamp - a.timestamp),
     [vaults],
   );
 

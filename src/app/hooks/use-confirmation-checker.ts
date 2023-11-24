@@ -68,7 +68,7 @@ export function useConfirmationChecker(
       10000,
     ) as unknown as number; // Cleanup the interval when the component unmounts
     return () => clearInterval(fetchInterval.current);
-  }, []);
+  }, [vaultState, txID]);
 
   return memoizedTransactionProgress;
 }

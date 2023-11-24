@@ -37,7 +37,6 @@ export function useObserver(
     });
 
     protocolContract.on("CloseVault", async (...args) => {
-      console.log("CloseVault", args);
       const vaultOwner: string = args[2];
 
       if (vaultOwner.toLowerCase() !== address) return;
@@ -45,14 +44,11 @@ export function useObserver(
       const vaultUUID = args[0];
 
       console.log(`Vault ${vaultUUID} is closing`);
-
-      await getVault(vaultUUID).then(() => {
-        dispatch(mintUnmintActions.setUnmintStep(1));
-      });
+      await getVault(vaultUUID);
+      dispatch(mintUnmintActions.setUnmintStep(1));
     });
 
     protocolContract.on("SetStatusFunded", async (...args) => {
-      console.log("SetStatusFunded", args);
       const vaultOwner = args[2];
 
       if (vaultOwner.toLowerCase() !== address) return;
@@ -67,7 +63,6 @@ export function useObserver(
     });
 
     protocolContract.on("PostCloseDLCHandler", async (...args) => {
-      console.log("PostCloseDLCHandler", args);
       const vaultOwner = args[2];
 
       if (vaultOwner.toLowerCase() !== address) return;
