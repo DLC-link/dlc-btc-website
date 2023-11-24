@@ -1,8 +1,6 @@
 import { Vault, VaultState } from "@models/vault";
 import { createSlice } from "@reduxjs/toolkit";
 
-import { exampleVaults } from "@shared/examples/example-vaults";
-
 interface VaultSliceState {
   vaults: any[];
   status: string;
@@ -10,7 +8,7 @@ interface VaultSliceState {
 }
 
 const initialVaultState: VaultSliceState = {
-  vaults: exampleVaults,
+  vaults: [],
   status: "idle",
   error: null,
 };
