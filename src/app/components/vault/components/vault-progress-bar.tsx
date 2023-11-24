@@ -1,15 +1,28 @@
 import { Box, Progress, Text, VStack } from "@chakra-ui/react";
+import { VaultState } from "@models/vault";
 
 interface VaultProgressBarProps {
   confirmedBlocks: number;
+  vaultState: VaultState;
 }
 
 export function VaultProgressBar({
   confirmedBlocks,
-}: VaultProgressBarProps): React.JSX.Element {
+  vaultState,
+}: VaultProgressBarProps): React.JSX.Element | boolean {
+  const shouldBeIndeterminate = confirmedBlocks > 6;
+
+  if (vaultState === VaultState.CLOSED && confirmedBlocks > 6) return false;
   return (
     <VStack w={"100%"} alignItems={"end"} position="relative">
-      <Progress value={50} w={"100%"} h={"25px"} borderRadius={"md"} />
+      <Progress
+        isIndeterminate={shouldBeIndeterminate}
+        value={confirmedBlocks}
+        max={6}
+        w={"100%"}
+        h={"25px"}
+        borderRadius={"md"}
+      />
       <Box
         display="flex"
         position="absolute"
@@ -21,7 +34,9 @@ export function VaultProgressBar({
         h="100%"
       >
         <Text color={"white"} fontSize={"xs"} fontWeight={800}>
-          WAITING FOR CONFIRMATIONS: {confirmedBlocks}/6
+          {shouldBeIndeterminate
+            ? "PROCESSING"
+            : `WAITING FOR CONFIRMATIONS: ${confirmedBlocks}/6`}
         </Text>
       </Box>
     </VStack>

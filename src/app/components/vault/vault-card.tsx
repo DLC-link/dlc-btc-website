@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 
 import { CustomSkeleton } from "@components/custom-skeleton/custom-skeleton";
+import { useConfirmationChecker } from "@hooks/use-confirmation-checker";
 import { Vault, VaultState } from "@models/vault";
 
 import { VaultCardLayout } from "./components/vault-card.layout";
@@ -21,7 +22,11 @@ export function VaultCard({
   isSelectable = false,
   handleSelect,
 }: VaultBoxProps): React.JSX.Element {
-  const confirmedBlocks = 3;
+  const confirmations = useConfirmationChecker(
+    vault?.state === VaultState.FUNDING ? vault?.fundingTX : vault?.closingTX,
+    vault?.state,
+  );
+
   const [isExpanded, setIsExpanded] = useState(isSelected ? true : false);
 
   if (!vault) return <CustomSkeleton height={"65px"} />;
@@ -48,8 +53,11 @@ export function VaultCard({
           isExpanded={isExpanded}
         />
       )}
-      {[VaultState.FUNDING, VaultState.CLOSING].includes(vault.state) && (
-        <VaultProgressBar confirmedBlocks={confirmedBlocks} />
+      {[VaultState.FUNDING, VaultState.CLOSED].includes(vault.state) && (
+        <VaultProgressBar
+          confirmedBlocks={confirmations}
+          vaultState={vault.state}
+        />
       )}
     </VaultCardLayout>
   );
