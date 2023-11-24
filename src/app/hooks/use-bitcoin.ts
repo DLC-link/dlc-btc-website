@@ -1,22 +1,20 @@
 // import { Dispatch } from 'react';
+import { useDispatch } from "react-redux";
 
 import { Vault } from "@models/vault";
-
-import { UseEthereumReturn } from "./use-ethereum";
+import { vaultActions } from "@store/slices/vault/vault.actions";
+import { mintUnmintActions } from "@store/slices/mintunmint/mintunmint.actions";
 
 export interface UseBitcoinReturn {
   fetchBitcoinContractOfferAndSendToUserWallet: (vault: Vault) => Promise<void>;
 }
 
-export function useBitcoin(
-  ethereum: UseEthereumReturn,
-): UseBitcoinReturn {
+export function useBitcoin(): UseBitcoinReturn {
   // const { getVault } = ethereum;
+  const dispatch = useDispatch();
   const routerWalletURL = "https://devnet.dlc.link/okx-wallet";
 
   function createURLParams(bitcoinContractOffer: any) {
-    const routerWalletURL = ethereum.getEthereumNetworkConfig().walletURL;
-
     if (!routerWalletURL) {
       console.error("Wallet type or blockchain not supported");
     }
@@ -29,19 +27,26 @@ export function useBitcoin(
     };
     const urlParams = {
       bitcoinContractOffer: JSON.stringify(bitcoinContractOffer),
-      bitcoinNetwork: JSON.stringify(process.env.REACT_APP_BITCOIN_NETWORK),
+      bitcoinNetwork: JSON.stringify("regtest"),
       counterpartyWalletDetails: JSON.stringify(counterPartyWalletDetails),
     };
     return urlParams;
   }
 
-  async function sendOfferForSigning(urlParams: any) {
+  async function sendOfferForSigning(urlParams: any, vaultUUID: string) {
     try {
       const response = await window.btc.request(
         "acceptBitcoinContractOffer",
         urlParams,
       );
-      console.log(response);
+      console.log("response", response);
+      dispatch(
+        vaultActions.setVaultToFunding({
+          vaultUUID,
+          fundingTX: response.result.txId,
+        }),
+      );
+      dispatch(mintUnmintActions.setMintStep(2));
     } catch (error) {
       console.error(`Could not send contract offer for signing: ${error}`);
     }
@@ -73,8 +78,7 @@ export function useBitcoin(
       await fetchBitcoinContractOfferFromCounterpartyWallet(vault);
     if (!bitcoinContractOffer) return;
     const urlParams = createURLParams(bitcoinContractOffer);
-    console.log(urlParams);
-    await sendOfferForSigning(urlParams);
+    await sendOfferForSigning(urlParams, vault.uuid);
   }
 
   return {

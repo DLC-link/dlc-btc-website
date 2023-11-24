@@ -21,7 +21,7 @@ export function BlockchainContextProvider({
 }: HasChildren): React.JSX.Element {
   const dispatch = useDispatch();
   const ethereum = useEthereum();
-  const bitcoin = useBitcoin(ethereum);
+  const bitcoin = useBitcoin();
 
   useObserver(ethereum, dispatch);
 

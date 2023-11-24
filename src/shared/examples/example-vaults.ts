@@ -16,7 +16,6 @@ export const exampleVaults: Vault[] = [
     fundingTX: "",
     closingTX: "",
     timestamp: 1620000000,
-
   },
   {
     uuid: "0x123456uio",
@@ -26,7 +25,6 @@ export const exampleVaults: Vault[] = [
       "https://etherscan.io/tx/0xbaf374be66066812e30e428ac5a3bc8d76f8cbc9ed66e3afce68905c183d22b6",
     closingTX: "",
     timestamp: 1620000000,
-
   },
   {
     uuid: "0x123456pas",
@@ -36,7 +34,6 @@ export const exampleVaults: Vault[] = [
       "https://etherscan.io/tx/0xbaf374be66066812e30e428ac5a3bc8d76f8cbc9ed66e3afce68905c183d22b6",
     closingTX: "",
     timestamp: 1620000000,
-
   },
   {
     uuid: "0x123456dfg",
@@ -46,7 +43,6 @@ export const exampleVaults: Vault[] = [
       "https://etherscan.io/tx/0xbaf374be66066812e30e428ac5a3bc8d76f8cbc9ed66e3afce68905c183d22b6",
     closingTX: "",
     timestamp: 1620000000,
-
   },
   {
     uuid: "0x123456hjk",
@@ -56,7 +52,6 @@ export const exampleVaults: Vault[] = [
       "https://etherscan.io/tx/0xbaf374be66066812e30e428ac5a3bc8d76f8cbc9ed66e3afce68905c183d22b6",
     closingTX: "",
     timestamp: 1620000000,
-
   },
   {
     uuid: "0x123456dfe",
@@ -66,7 +61,6 @@ export const exampleVaults: Vault[] = [
       "https://etherscan.io/tx/0xbaf374be66066812e30e428ac5a3bc8d76f8cbc9ed66e3afce68905c183d22b6",
     closingTX: "",
     timestamp: 1620000000,
-
   },
   {
     uuid: "0x123456hjq",
@@ -76,7 +70,6 @@ export const exampleVaults: Vault[] = [
       "https://etherscan.io/tx/0xbaf374be66066812e30e428ac5a3bc8d76f8cbc9ed66e3afce68905c183d22b6",
     closingTX: "",
     timestamp: 1620000000,
-
   },
   {
     uuid: "0x123456dfh",
@@ -86,7 +79,6 @@ export const exampleVaults: Vault[] = [
       "https://etherscan.io/tx/0xbaf374be66066812e30e428ac5a3bc8d76f8cbc9ed66e3afce68905c183d22b6",
     closingTX: "",
     timestamp: 1620000000,
-
   },
   {
     uuid: "0x123456hjl",
@@ -96,7 +88,6 @@ export const exampleVaults: Vault[] = [
       "https://etherscan.io/tx/0xbaf374be66066812e30e428ac5a3bc8d76f8cbc9ed66e3afce68905c183d22b6",
     closingTX: "",
     timestamp: 1620000000,
-
   },
   {
     uuid: "0x123456lzc",
@@ -106,8 +97,7 @@ export const exampleVaults: Vault[] = [
       "https://etherscan.io/tx/0xbaf374be66066812e30e428ac5a3bc8d76f8cbc9ed66e3afce68905c183d22b6",
     closingTX:
       "https://etherscan.io/tx/0xbaf374be66066812e30e428ac5a3bc8d76f8cbc9ed66e3afce68905c183d22b6",
-      timestamp: 1620000000,
-
+    timestamp: 1620000000,
   },
   {
     uuid: "0x123456cvb",
@@ -117,8 +107,7 @@ export const exampleVaults: Vault[] = [
       "https://etherscan.io/tx/0xbaf374be66066812e30e428ac5a3bc8d76f8cbc9ed66e3afce68905c183d22b6",
     closingTX:
       "https://etherscan.io/tx/0xbaf374be66066812e30e428ac5a3bc8d76f8cbc9ed66e3afce68905c183d22b6",
-      timestamp: 1620000000,
-
+    timestamp: 1620000000,
   },
   {
     uuid: "0x123456nmq",
@@ -128,8 +117,7 @@ export const exampleVaults: Vault[] = [
       "https://etherscan.io/tx/0xbaf374be66066812e30e428ac5a3bc8d76f8cbc9ed66e3afce68905c183d22b6",
     closingTX:
       "https://etherscan.io/tx/0xbaf374be66066812e30e428ac5a3bc8d76f8cbc9ed66e3afce68905c183d22b6",
-      timestamp: 1620000000,
-
+    timestamp: 1620000000,
   },
   {
     uuid: "0x123456pgh",
@@ -139,8 +127,7 @@ export const exampleVaults: Vault[] = [
       "https://etherscan.io/tx/0xbaf374be66066812e30e428ac5a3bc8d76f8cbc9ed66e3afce68905c183d22b6",
     closingTX:
       "https://etherscan.io/tx/0xbaf374be66066812e30e428ac5a3bc8d76f8cbc9ed66e3afce68905c183d22b6",
-      timestamp: 1620000000,
-
+    timestamp: 1620000000,
   },
   {
     uuid: "0x123456skf",
@@ -150,8 +137,7 @@ export const exampleVaults: Vault[] = [
       "https://etherscan.io/tx/0xbaf374be66066812e30e428ac5a3bc8d76f8cbc9ed66e3afce68905c183d22b6",
     closingTX:
       "https://etherscan.io/tx/0xbaf374be66066812e30e428ac5a3bc8d76f8cbc9ed66e3afce68905c183d22b6",
-      timestamp: 1620000000,
-
+    timestamp: 1620000000,
   },
   {
     uuid: "0x123456lkh",
@@ -161,7 +147,6 @@ export const exampleVaults: Vault[] = [
       "https://etherscan.io/tx/0xbaf374be66066812e30e428ac5a3bc8d76f8cbc9ed66e3afce68905c183d22b6",
     closingTX:
       "https://etherscan.io/tx/0xbaf374be66066812e30e428ac5a3bc8d76f8cbc9ed66e3afce68905c183d22b6",
-      timestamp: 1620000000,
-
+    timestamp: 1620000000,
   },
 ];

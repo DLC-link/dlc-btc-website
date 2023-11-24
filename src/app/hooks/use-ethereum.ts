@@ -50,7 +50,16 @@ export function useEthereum(): UseEthereumReturn {
   );
 
   useEffect(() => {
-    if (!address) return;
+    if (!address || !network) return;
+
+    if (!protocolContract || !dlcManagerContract || !dlcBTCContract) {
+      setupEthereumConfiguration(network);
+    }
+  }, [address, network]);
+
+  useEffect(() => {
+    if (!address || !protocolContract || !dlcManagerContract || !dlcBTCContract)
+      return;
 
     const fetchBalance = async () => {
       try {
@@ -62,15 +71,15 @@ export function useEthereum(): UseEthereumReturn {
     };
 
     fetchBalance();
-  }, [address, fundedVaults, getDLCBTCBalance, getLockedBTCBalance]);
+  }, [address, fundedVaults]);
 
   function formatVault(vault: any): Vault {
     return {
       uuid: vault.uuid,
       collateral: customShiftValue(parseInt(vault.valueLocked), 8, true),
       state: vault.status,
-      fundingTX: vault.fundingTransaction,
-      closingTX: vault.closingTransaction,
+      fundingTX: vault.fundingTxId,
+      closingTX: vault.closingTxId,
       timestamp: parseInt(vault.timestamp),
     };
   }
@@ -241,6 +250,7 @@ export function useEthereum(): UseEthereumReturn {
         throw new Error("Protocol contract not initialized");
       const vaults: RawVault[] =
         await protocolContract.getAllVaultsForAddress(address);
+      console.log("vaults", vaults);
       const formattedVaults: Vault[] = vaults.map(formatVault);
       store.dispatch(vaultActions.setVaults(formattedVaults));
     } catch (error) {

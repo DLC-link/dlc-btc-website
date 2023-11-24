@@ -1,11 +1,9 @@
-import { useState } from "react";
-
 import { HStack } from "@chakra-ui/react";
 import { StepButton } from "@components/step-button/step-button";
-import { VaultState } from "@models/vault";
 
-import { exampleVaults } from "@shared/examples/example-vaults";
-
+import { RootState } from "@store/index";
+import { mintUnmintActions } from "@store/slices/mintunmint/mintunmint.actions";
+import { useDispatch, useSelector } from "react-redux";
 import { ProgressTimeline } from "../progress-timeline/progress-timeline";
 import { TransactionSummary } from "../transaction-summary/transaction-summary";
 import { Walkthrough } from "../walkthrough/walkthrough";
@@ -13,29 +11,28 @@ import { UnmintVaultSelector } from "./components/unmint-vault-selector";
 import { UnmintLayout } from "./components/unmint.layout";
 
 export function Unmint(): React.JSX.Element {
-  const [currentStep, setCurrentStep] = useState(0);
-  const exampleVault = exampleVaults.find(
-    (vault) => vault.state === VaultState.CLOSING,
-  );
+  const dispatch = useDispatch();
+  const { unmintStep } = useSelector((state: RootState) => state.mintunmint);
+
+  function handleRestart() {
+    dispatch(mintUnmintActions.setUnmintStep(0));
+  }
 
   return (
     <UnmintLayout>
-      <ProgressTimeline variant={"unmint"} currentStep={currentStep} />
+      <ProgressTimeline variant={"unmint"} currentStep={unmintStep} />
       <HStack w={"100%"} alignItems={"start"} justifyContent={"space-between"}>
-        <Walkthrough
-          flow={"unmint"}
-          bitcoinAmount={exampleVault?.collateral}
-          currentStep={currentStep}
-        />
-        {[0].includes(currentStep) && <UnmintVaultSelector />}
-        {[1].includes(currentStep) && (
+        <Walkthrough flow={"unmint"} currentStep={unmintStep} />
+        {[0].includes(unmintStep) && <UnmintVaultSelector />}
+        {[1, 2].includes(unmintStep) && (
           <TransactionSummary
+            currentStep={unmintStep}
             flow={"unmint"}
             blockchain={"bitcoin"}
           />
         )}
       </HStack>
-      <StepButton handleClick={() => setCurrentStep((currentStep + 1) % 2)} />
+      <StepButton handleClick={handleRestart} />
     </UnmintLayout>
   );
 }

@@ -20,7 +20,9 @@ export function VaultExpandedInformationTransactionRow({
         color={"accent.cyan.01"}
         fontSize={"xs"}
         textDecoration={"underline"}
-        onClick={() => window.open(value, "_blank")}
+        onClick={() =>
+          window.open(`http://stx-btc1.dlc.link:8001/tx/${value}`, "_blank")
+        }
         _hover={{ cursor: "pointer" }}
       >
         View in TX explorer
