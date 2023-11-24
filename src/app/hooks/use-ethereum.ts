@@ -72,7 +72,13 @@ export function useEthereum(): UseEthereumReturn {
     };
 
     fetchBalance();
-  }, [address, fundedVaults]);
+  }, [
+    address,
+    fundedVaults,
+    protocolContract,
+    dlcManagerContract,
+    dlcBTCContract,
+  ]);
 
   function formatVault(vault: any): Vault {
     return {
@@ -230,7 +236,7 @@ export function useEthereum(): UseEthereumReturn {
         (sum: number, vault: Vault) => sum + vault.collateral,
         0,
       );
-      setLockedBTCBalance(totalCollateral);
+      setLockedBTCBalance(Number(totalCollateral.toFixed(4)));
     } catch (error) {
       throw new Error(`Could not fetch BTC balance: ${error}`);
     }
@@ -239,7 +245,12 @@ export function useEthereum(): UseEthereumReturn {
   async function getDLCBTCBalance(): Promise<void> {
     try {
       if (!dlcBTCContract) throw new Error("Protocol contract not initialized");
-      setDLCBTCBalance(parseInt(await dlcBTCContract.balanceOf(address)));
+      const dlcBTCBalance = customShiftValue(
+        parseInt(await dlcBTCContract.balanceOf(address)),
+        8,
+        true,
+      );
+      setDLCBTCBalance(dlcBTCBalance);
     } catch (error) {
       throw new Error(`Could not fetch BTC balance: ${error}`);
     }

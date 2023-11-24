@@ -51,8 +51,10 @@ export function TransactionSummary({
 
   function getVault(flow: "mint" | "unmint", currentStep: number) {
     if (flow === "mint") {
+      console.log("fundedVaults", fundedVaults[0]);
       return currentStep === 2 ? fundingVaults[0] : fundedVaults[0];
     } else {
+      console.log("closedVaults", closedVaults[0]);
       return currentStep === 1 ? closingVaults[0] : closedVaults[0];
     }
   }

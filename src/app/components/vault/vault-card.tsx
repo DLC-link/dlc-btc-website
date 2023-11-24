@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 
 import { CustomSkeleton } from "@components/custom-skeleton/custom-skeleton";
 import { useConfirmationChecker } from "@hooks/use-confirmation-checker";
 import { Vault, VaultState } from "@models/vault";
 
+import { BlockchainContext } from "../../providers/blockchain-context-provider";
 import { VaultCardLayout } from "./components/vault-card.layout";
 import { VaultExpandedInformation } from "./components/vault-expanded-information/vault-expanded-information";
 import { VaultInformation } from "./components/vault-information";
@@ -22,12 +23,28 @@ export function VaultCard({
   isSelectable = false,
   handleSelect,
 }: VaultBoxProps): React.JSX.Element {
+  const blockchainContext = useContext(BlockchainContext);
+  const bitcoin = blockchainContext?.bitcoin;
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(isSelected ? true : false);
+
+  async function handleLock(): Promise<void> {
+    if (!vault) return;
+    setIsSubmitting(true);
+    console.log("vault", vault);
+    try {
+      await bitcoin?.fetchBitcoinContractOfferAndSendToUserWallet(vault);
+    } catch (error) {
+      setIsSubmitting(false);
+      throw new Error("Error locking vault");
+    }
+  }
+
   const confirmations = useConfirmationChecker(
     vault?.state === VaultState.FUNDING ? vault?.fundingTX : vault?.closingTX,
     vault?.state,
   );
-
-  const [isExpanded, setIsExpanded] = useState(isSelected ? true : false);
 
   if (!vault) return <CustomSkeleton height={"65px"} />;
 
@@ -43,7 +60,9 @@ export function VaultCard({
         isExpanded={isExpanded}
         isSelected={isSelected}
         isSelectable={isSelectable}
+        isSubmitting={isSubmitting}
         handleClick={() => setIsExpanded(!isExpanded)}
+        handleLock={handleLock}
       />
       {isExpanded && (
         <VaultExpandedInformation
