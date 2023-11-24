@@ -1,39 +1,74 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+
+import { VaultState } from "@models/vault";
 
 export function useConfirmationChecker(
   txID: string | undefined,
-): number | boolean {
-  const bitcoinExplorerTXURL = `http://stx-btc1.dlc.link:8001/tx/${txID}`;
-  const bitcoinExplorerHeightURL = `http://stx-btc1.dlc.link:8001//blocks/tip/height`;
+  vaultState: VaultState | undefined,
+): number {
+  const bitcoinExplorerTXURL = `https://devnet.dlc.link/electrs/tx/${txID}`;
+  const bitcoinExplorerHeightURL = `https://devnet.dlc.link/electrs/blocks/tip/height`;
+  const fetchInterval = useRef<number | undefined>(undefined);
 
-  const [confirmations, setConfirmations] = useState<number | boolean>(0);
+  const [transactionProgress, setTransactionProgress] = useState(0);
+
+  const memoizedTransactionProgress = useMemo(
+    () => transactionProgress,
+    [transactionProgress],
+  );
+
+  const fetchTransactionDetails = async () => {
+    if (
+      !txID ||
+      (vaultState &&
+        ![VaultState.FUNDING, VaultState.CLOSED].includes(vaultState))
+    ) {
+      clearInterval(fetchInterval.current);
+      return;
+    }
+
+    let bitcoinCurrentBlockHeight;
+    try {
+      const response = await fetch(bitcoinExplorerHeightURL, {
+        headers: { Accept: "application/json" },
+      });
+      bitcoinCurrentBlockHeight = await response.json();
+    } catch (error) {
+      console.error(error);
+    }
+
+    let bitcoinTransactionBlockHeight;
+
+    try {
+      const response = await fetch(bitcoinExplorerTXURL, {
+        headers: { Accept: "application/json" },
+      });
+      const bitcoinTransactionDetails = await response.json();
+      bitcoinTransactionBlockHeight =
+        bitcoinTransactionDetails.status.block_height;
+    } catch (error) {
+      console.error(error);
+    }
+
+    const difference =
+      bitcoinCurrentBlockHeight - bitcoinTransactionBlockHeight;
+
+    setTransactionProgress(difference);
+
+    if (difference > 6) {
+      clearInterval(fetchInterval.current);
+    }
+  };
+
+  fetchTransactionDetails();
 
   useEffect(() => {
-    if (!txID) return;
-    const interval = setInterval(async () => {
-      try {
-        const txResponse = await fetch(bitcoinExplorerTXURL);
-        const txData = await txResponse.json();
+    fetchInterval.current = setInterval(
+      fetchTransactionDetails,
+      10000,
+    ) as unknown as number; // Cleanup the interval when the component unmounts
+    return () => clearInterval(fetchInterval.current);
+  }, []);
 
-        const heightResponse = await fetch(bitcoinExplorerHeightURL);
-        const heightData = await heightResponse.json();
-
-        const currentConfirmations = heightData - txData.status.block_height;
-        setConfirmations(currentConfirmations);
-
-        if (currentConfirmations >= 6) {
-          clearInterval(interval);
-          setConfirmations(true);
-        }
-      } catch (error) {
-        console.error(error);
-        clearInterval(interval);
-        setConfirmations(false);
-      }
-    }, 15000);
-
-    return () => clearInterval(interval);
-  }, [txID]);
-
-  return confirmations;
+  return memoizedTransactionProgress;
 }
