@@ -1,11 +1,11 @@
 import { CheckIcon } from "@chakra-ui/icons";
 import { Button, HStack, Image, Text, VStack } from "@chakra-ui/react";
-import { VaultStatus } from "@models/vault";
+import { VaultState } from "@models/vault";
 
 import { VaultExpandButton } from "./vault-expand-button";
 
-const getAssetLogo = (state: VaultStatus) => {
-  return [VaultStatus.FUNDED, VaultStatus.CLOSING, VaultStatus.CLOSED].includes(
+const getAssetLogo = (state: VaultState) => {
+  return [VaultState.FUNDED, VaultState.CLOSING, VaultState.CLOSED].includes(
     state,
   )
     ? "/images/logos/dlc-btc-logo.svg"
@@ -14,7 +14,8 @@ const getAssetLogo = (state: VaultStatus) => {
 
 interface VaultInformationProps {
   collateral: number;
-  state: VaultStatus;
+  state: VaultState;
+  timestamp: number;
   isExpanded: boolean;
   isSelectable?: boolean;
   isSelected?: boolean;
@@ -24,11 +25,14 @@ interface VaultInformationProps {
 export function VaultInformation({
   state,
   collateral,
+  timestamp,
   isExpanded,
   isSelectable,
   isSelected,
   handleClick,
 }: VaultInformationProps): React.JSX.Element {
+  const date = new Date(timestamp * 1000).toLocaleDateString("en-US");
+
   return (
     <HStack justifyContent={"space-between"} w={"100%"} h={"50px"}>
       <VStack alignItems={"start"} spacing={"0.5"} h={"45px"}>
@@ -39,7 +43,7 @@ export function VaultInformation({
           </Text>
         </HStack>
         <Text px={"40px"} py={"0px"} color={"white.02"} fontSize={"xs"}>
-          10/10/2023
+          {date}
         </Text>
       </VStack>
       {isSelectable ? (
@@ -55,7 +59,7 @@ export function VaultInformation({
             <CheckIcon color={"accent.cyan.01"} boxSize={"15px"} />
           )}
         </VStack>
-      ) : state === VaultStatus.READY ? (
+      ) : state === VaultState.READY ? (
         <Button variant={"vault"} w={"85px"}>
           Lock BTC
         </Button>

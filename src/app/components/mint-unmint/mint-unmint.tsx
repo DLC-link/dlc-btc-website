@@ -27,7 +27,7 @@ export function MintUnmint({
       <Tabs variant="unstyled">
         <TabList>
           <Tab>Mint</Tab>
-          <Tab>Unmint</Tab>
+          <Tab isDisabled={!address}>Unmint</Tab>
         </TabList>
         <TabIndicator mt="5px" h="3.5px" bg={"accent.cyan.01"} />
         <Spacer />

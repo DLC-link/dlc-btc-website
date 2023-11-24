@@ -23,7 +23,7 @@ export function MyVaultsHeaderBalanceInfo({
       </Text>
       <HStack>
         <Image src={imageSrc} alt={altText} boxSize={"25px"} />
-        {assetAmount ? (
+        {assetAmount !== undefined ? (
           <Text color={"white"} fontWeight={800} fontSize={"xl"}>
             {showNone ? "-" : assetAmount}
           </Text>

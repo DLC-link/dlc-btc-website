@@ -1,3 +1,5 @@
+import { useContext, useState } from "react";
+
 import {
   Button,
   FormControl,
@@ -5,8 +7,10 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
+import { customShiftValue } from "@common/utilities";
 import { Form, Formik } from "formik";
 
+import { BlockchainContext } from "../../../../providers/blockchain-context-provider";
 import { TransactionFormInput } from "./components/transaction-form-input";
 import { TransactionFormWarning } from "./components/transaction-form-warning";
 
@@ -17,14 +21,31 @@ export interface TransactionFormValues {
 const initialValues: TransactionFormValues = { amount: 0.001 };
 
 export function TransactionForm(): React.JSX.Element {
+  const blockchainContext = useContext(BlockchainContext);
+  const ethereum = blockchainContext?.ethereum;
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  async function handleSetup(btcDepositAmount: number) {
+    try {
+      setIsSubmitting(true);
+      const shiftedBTCDepositAmount = customShiftValue(
+        btcDepositAmount,
+        8,
+        false,
+      );
+      await ethereum?.setupVault(shiftedBTCDepositAmount);
+    } catch (error) {
+      setIsSubmitting(false);
+      throw new Error("Error setting up vault");
+    }
+  }
+
   return (
     <VStack w={"300px"}>
       <Formik
         initialValues={initialValues}
-        onSubmit={() => {
-          alert(
-            "In production your Ethereum Wallet would now open to confirm the transaction",
-          );
+        onSubmit={async (values) => {
+          await handleSetup(values.amount);
         }}
       >
         {({ handleSubmit, errors, touched, values }) => (
@@ -40,6 +61,7 @@ export function TransactionForm(): React.JSX.Element {
                 </FormErrorMessage>
                 <TransactionFormWarning assetAmount={values.amount} />
                 <Button
+                  isLoading={isSubmitting}
                   variant={"account"}
                   type={"submit"}
                   isDisabled={Boolean(errors.amount)}

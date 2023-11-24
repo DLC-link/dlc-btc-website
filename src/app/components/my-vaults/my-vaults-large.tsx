@@ -1,3 +1,4 @@
+import { useContext } from "react";
 import { useSelector } from "react-redux";
 
 import { HStack } from "@chakra-ui/react";
@@ -7,14 +8,13 @@ import { VaultsList } from "@components/vaults-list/vaults-list";
 import { useVaults } from "@hooks/use-vaults";
 import { RootState } from "@store/index";
 
+import { BlockchainContext } from "../../providers/blockchain-context-provider";
 import { MyVaultsLargeHeader } from "./components/my-vaults-header/my-vaults-header";
 import { MyVaultsLargeLayout } from "./components/my-vaults-large.layout";
 import { MyVaultsSetupInformationStack } from "./components/my-vaults-setup-information-stack";
 
 export function MyVaultsLarge(): React.JSX.Element {
-  const { address, dlcBTCBalance, lockedBTCBalance } = useSelector(
-    (state: RootState) => state.account,
-  );
+  const { address } = useSelector((state: RootState) => state.account);
   const {
     readyVaults,
     fundingVaults,
@@ -23,12 +23,15 @@ export function MyVaultsLarge(): React.JSX.Element {
     closedVaults,
   } = useVaults();
 
+  const blockchainContext = useContext(BlockchainContext);
+  const ethereum = blockchainContext?.ethereum;
+
   return (
     <MyVaultsLargeLayout>
       <MyVaultsLargeHeader
         address={address}
-        dlcBTCBalance={dlcBTCBalance}
-        lockedBTCBalance={lockedBTCBalance}
+        dlcBTCBalance={ethereum?.dlcBTCBalance}
+        lockedBTCBalance={ethereum?.lockedBTCBalance}
       />
       <HStack spacing={"35px"} w={"100%"}>
         {address ? (

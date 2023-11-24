@@ -7,13 +7,11 @@ import { WalkthroughLayout } from "./components/walkthrough.layout";
 interface WalkthroughProps {
   flow: "mint" | "unmint";
   currentStep: number;
-  bitcoinAmount?: number;
 }
 
 export function Walkthrough({
   flow,
   currentStep,
-  bitcoinAmount,
 }: WalkthroughProps): React.JSX.Element {
   switch (flow) {
     case "mint":
@@ -108,7 +106,25 @@ export function Walkthrough({
             </WalkthroughLayout>
           );
         default:
-          return <></>;
+          return (
+            <WalkthroughLayout>
+              <WalkthroughHeader
+                currentStep={undefined}
+                title={"Minted dlcBTC"}
+                blockchain={"ethereum"}
+              />
+              <Button variant={"vault"}>
+                <HStack>
+                  <Image
+                    src={"/images/logos/dlc-btc-logo.svg"}
+                    alt={"dlcBTC"}
+                    boxSize={"25px"}
+                  />
+                  <Text> Add Token to Wallet</Text>
+                </HStack>
+              </Button>
+            </WalkthroughLayout>
+          );
       }
     case "unmint":
       switch (currentStep) {
@@ -138,14 +154,20 @@ export function Walkthrough({
               <Text color={"white.01"} fontSize={"md"}>
                 After a successful unmint (
                 <span style={{ color: "accent.cyan.01" }}>~1 hour</span>) your
-                will receive{" "}
-                <span style={{ fontWeight: 800 }}>{bitcoinAmount}BTC</span> in
-                your bitcoin wallet.
+                will receive BTC in your bitcoin wallet.
               </Text>
             </WalkthroughLayout>
           );
         default:
-          return <></>;
+          return (
+            <WalkthroughLayout>
+              <WalkthroughHeader
+                currentStep={undefined}
+                title={"Unminted dlcBTC"}
+                blockchain={"ethereum"}
+              />
+            </WalkthroughLayout>
+          );
       }
   }
 }

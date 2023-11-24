@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 import { CustomSkeleton } from "@components/custom-skeleton/custom-skeleton";
-import { Vault, VaultStatus } from "@models/vault";
+import { Vault, VaultState } from "@models/vault";
 
 import { VaultCardLayout } from "./components/vault-card.layout";
 import { VaultExpandedInformation } from "./components/vault-expanded-information/vault-expanded-information";
@@ -34,6 +34,7 @@ export function VaultCard({
       <VaultInformation
         collateral={vault.collateral}
         state={vault.state}
+        timestamp={vault.timestamp}
         isExpanded={isExpanded}
         isSelected={isSelected}
         isSelectable={isSelectable}
@@ -47,7 +48,7 @@ export function VaultCard({
           isExpanded={isExpanded}
         />
       )}
-      {[VaultStatus.FUNDING, VaultStatus.CLOSING].includes(vault.state) && (
+      {[VaultState.FUNDING, VaultState.CLOSING].includes(vault.state) && (
         <VaultProgressBar confirmedBlocks={confirmedBlocks} />
       )}
     </VaultCardLayout>

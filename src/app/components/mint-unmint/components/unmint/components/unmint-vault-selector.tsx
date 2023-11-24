@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 
 import { Button, Text, VStack } from "@chakra-ui/react";
 import { VaultCard } from "@components/vault/vault-card";
@@ -6,6 +6,7 @@ import { VaultsListGroupContainer } from "@components/vaults-list/components/vau
 import { VaultsList } from "@components/vaults-list/vaults-list";
 import { useVaults } from "@hooks/use-vaults";
 import { Vault } from "@models/vault";
+import { BlockchainContext } from "../../../../../providers/blockchain-context-provider";
 
 import { scrollBarCSS } from "../../../../../../styles/css-styles";
 
@@ -13,11 +14,26 @@ export function UnmintVaultSelector(): React.JSX.Element {
   const [selectedVault, setSelectedVault] = useState<Vault | undefined>(
     undefined,
   );
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { fundedVaults } = useVaults();
+  const blockchainContext = useContext(BlockchainContext);
+  const ethereum = blockchainContext?.ethereum;
 
   function handleSelect(uuid: string): void {
     const vault = fundedVaults.find((vault) => vault.uuid === uuid);
     if (vault) setSelectedVault(vault);
+  }
+
+  async function handleUnmint(): Promise<void> {
+    if (selectedVault) {
+      try {
+        setIsSubmitting(true);
+        await ethereum?.closeVault(selectedVault.uuid);
+      } catch (error) {
+        setIsSubmitting(false);
+        throw new Error("Error closing vault");
+      }
+    }
   }
 
   return (
@@ -59,13 +75,10 @@ export function UnmintVaultSelector(): React.JSX.Element {
         </VaultsList>
       )}
       <Button
+        isLoading={isSubmitting}
         variant={"account"}
         isDisabled={!selectedVault}
-        onClick={() =>
-          alert(
-            "In production your Ethereum Wallet would now open to confirm the transaction",
-          )
-        }
+        onClick={() => handleUnmint()}
       >
         Unmint dlcBTC
       </Button>

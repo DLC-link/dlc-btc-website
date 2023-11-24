@@ -1,26 +1,24 @@
 import { Button, VStack } from "@chakra-ui/react";
 import { VaultCard } from "@components/vault/vault-card";
-import { VaultStatus } from "@models/vault";
-
-import { exampleVaults } from "@shared/examples/example-vaults";
+import { useVaults } from "@hooks/use-vaults";
 
 import { LockScreenProtocolFee } from "./components/protocol-fee";
+import { useContext } from "react";
+import { BlockchainContext } from "../../../../providers/blockchain-context-provider";
 
 export function LockScreen(): React.JSX.Element {
-  const exampleVault = exampleVaults.find(
-    (vault) => vault.state === VaultStatus.READY,
-  );
+  const { readyVaults } = useVaults();
+  const blockchainContext = useContext(BlockchainContext);
+  const bitcoin = blockchainContext?.bitcoin;
 
   return (
     <VStack w={"300px"} spacing={"15px"}>
-      <VaultCard vault={exampleVault} isSelected />
-      <LockScreenProtocolFee assetAmount={exampleVault?.collateral} />
+      <VaultCard vault={readyVaults[0]} isSelected />
+      <LockScreenProtocolFee assetAmount={readyVaults[0].collateral} />
       <Button
         variant={"account"}
         onClick={() =>
-          alert(
-            "In production your Bitcoin Wallet would now open to confirm the transaction",
-          )
+          bitcoin?.fetchBitcoinContractOfferAndSendToUserWallet(readyVaults[0])
         }
       >
         Lock BTC

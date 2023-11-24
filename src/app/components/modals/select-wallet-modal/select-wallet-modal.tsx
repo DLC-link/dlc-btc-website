@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useContext, useState } from "react";
 
 import { CheckIcon } from "@chakra-ui/icons";
 import { HStack, ScaleFade, Text, VStack } from "@chakra-ui/react";
@@ -8,32 +7,27 @@ import { ModalLayout } from "@components/modals/components/modal.layout";
 import { SelectWalletMenu } from "@components/modals/select-wallet-modal/components/select-wallet-menu";
 import { SelectNetworkButton } from "@components/select-network-button/select-network-button";
 import { Network } from "@models/network";
-import { WalletType, ethereumWallets } from "@models/wallet";
-import { accountActions } from "@store/slices/account/account.actions";
-import { AccountState } from "@store/slices/account/account.slice";
+import { ethereumWallets } from "@models/wallet";
+
+import { BlockchainContext } from "../../../providers/blockchain-context-provider";
 
 export function SelectWalletModal({
   isOpen,
   handleClose,
 }: ModalComponentProps): React.JSX.Element {
-  const dispatch = useDispatch();
+  const blockchainContext = useContext(BlockchainContext);
+  const ethereum = blockchainContext?.ethereum;
+
   const [currentNetwork, setCurrentNetwork] = useState<Network | undefined>(
     undefined,
   );
 
-  const handleLogin = (address: string, walletType: WalletType) => {
-    dispatch(
-      accountActions.login({
-        address: address,
-        walletType: walletType,
-        dlcBTCBalance: 0.54321,
-        lockedBTCBalance: 0.54321,
-        network: currentNetwork?.id,
-      } as AccountState),
-    );
+  async function handleLogin() {
+    if (!currentNetwork) throw new Error("No network selected");
+    await ethereum?.requestEthereumAccount(currentNetwork);
     setCurrentNetwork(undefined);
     handleClose();
-  };
+  }
 
   const handleNetworkChange = (currentNetwork: Network) => {
     setCurrentNetwork(currentNetwork);
