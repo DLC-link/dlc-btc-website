@@ -1,8 +1,10 @@
 import { Button, HStack, Image, Link, Text } from "@chakra-ui/react";
 import { TutorialVideo } from "@components/tutorial-video/tutorial-video";
+import { BlockchainContext } from "../../../../providers/blockchain-context-provider";
 
 import { WalkthroughHeader } from "./components/walkthrough-header";
 import { WalkthroughLayout } from "./components/walkthrough.layout";
+import { useContext } from "react";
 
 interface WalkthroughProps {
   flow: "mint" | "unmint";
@@ -13,6 +15,9 @@ export function Walkthrough({
   flow,
   currentStep,
 }: WalkthroughProps): React.JSX.Element {
+  const blockchainContext = useContext(BlockchainContext);
+  const ethereum = blockchainContext?.ethereum;
+
   switch (flow) {
     case "mint":
       switch (currentStep) {
@@ -93,7 +98,10 @@ export function Walkthrough({
                 simply <span style={{ fontWeight: 800 }}>add them </span>
                 to your Ethereum Wallet.
               </Text>
-              <Button variant={"vault"}>
+              <Button
+                variant={"vault"}
+                onClick={() => ethereum?.recommendDlcBtcTokenToMetamask()}
+              >
                 <HStack>
                   <Image
                     src={"/images/logos/dlc-btc-logo.svg"}
@@ -113,16 +121,6 @@ export function Walkthrough({
                 title={"Minted dlcBTC"}
                 blockchain={"ethereum"}
               />
-              <Button variant={"vault"}>
-                <HStack>
-                  <Image
-                    src={"/images/logos/dlc-btc-logo.svg"}
-                    alt={"dlcBTC"}
-                    boxSize={"25px"}
-                  />
-                  <Text> Add Token to Wallet</Text>
-                </HStack>
-              </Button>
             </WalkthroughLayout>
           );
       }
