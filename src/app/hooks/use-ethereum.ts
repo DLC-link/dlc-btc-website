@@ -26,6 +26,7 @@ export interface UseEthereumReturn {
   getVault: (vaultUUID: string) => Promise<void>;
   setupVault: (btcDepositAmount: number) => Promise<void>;
   closeVault: (vaultUUID: string) => Promise<void>;
+  recommendDlcBtcTokenToMetamask: () => Promise<boolean>;
 }
 
 export function useEthereum(): UseEthereumReturn {
@@ -294,6 +295,30 @@ export function useEthereum(): UseEthereumReturn {
     }
   }
 
+  async function recommendDlcBtcTokenToMetamask(): Promise<boolean> {
+    try {
+      const { ethereum } = window;
+      if (!ethereum) return false;
+      const added = await ethereum.request({
+        method: "wallet_watchAsset",
+        params: {
+          type: "ERC20",
+          options: {
+            address: dlcBTCContract?.address,
+            symbol: "dlcBTC",
+            decimals: 8,
+            image:
+              "https://cdn.discordapp.com/attachments/994505799902691348/1035507437748367360/DLC.Link_Emoji.png",
+          },
+        },
+      });
+      return added;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  }
+
   return {
     protocolContract,
     dlcManagerContract,
@@ -306,5 +331,6 @@ export function useEthereum(): UseEthereumReturn {
     getVault,
     setupVault,
     closeVault,
+    recommendDlcBtcTokenToMetamask,
   };
 }
