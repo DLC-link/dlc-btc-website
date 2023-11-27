@@ -2,21 +2,22 @@
 import { useDispatch } from "react-redux";
 
 import { Vault } from "@models/vault";
-import { vaultActions } from "@store/slices/vault/vault.actions";
 import { mintUnmintActions } from "@store/slices/mintunmint/mintunmint.actions";
+import { vaultActions } from "@store/slices/vault/vault.actions";
 
-export interface UseBitcoinReturn {
+import { useEndpoints } from "./use-endpoints";
+
+export interface UseBitcoinReturnType {
   fetchBitcoinContractOfferAndSendToUserWallet: (vault: Vault) => Promise<void>;
 }
 
-export function useBitcoin(): UseBitcoinReturn {
-  // const { getVault } = ethereum;
+export function useBitcoin(): UseBitcoinReturnType {
   const dispatch = useDispatch();
-  const routerWalletURL = "https://devnet.dlc.link/okx-wallet";
+  const { routerWalletURL } = useEndpoints();
 
   function createURLParams(bitcoinContractOffer: any) {
     if (!routerWalletURL) {
-      console.error("Wallet type or blockchain not supported");
+      throw new Error("Router wallet URL is undefined");
     }
 
     const counterPartyWalletDetails = {
@@ -39,7 +40,6 @@ export function useBitcoin(): UseBitcoinReturn {
         "acceptBitcoinContractOffer",
         urlParams,
       );
-      console.log("response", response);
       dispatch(
         vaultActions.setVaultToFunding({
           vaultUUID,
@@ -48,7 +48,7 @@ export function useBitcoin(): UseBitcoinReturn {
       );
       dispatch(mintUnmintActions.setMintStep(2));
     } catch (error) {
-      console.error(`Could not send contract offer for signing: ${error}`);
+      throw new Error(`Could not send contract offer for signing: ${error}`);
     }
   }
 

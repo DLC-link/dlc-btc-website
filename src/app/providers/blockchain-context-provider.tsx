@@ -1,15 +1,14 @@
 import React, { createContext } from "react";
 import { useDispatch } from "react-redux";
 
-import { UseBitcoinReturn } from "@hooks/use-bitcoin";
-import { useBitcoin } from "@hooks/use-bitcoin";
-import { UseEthereumReturn, useEthereum } from "@hooks/use-ethereum";
+import { UseBitcoinReturnType, useBitcoin } from "@hooks/use-bitcoin";
+import { UseEthereumReturnType, useEthereum } from "@hooks/use-ethereum";
 import { useObserver } from "@hooks/use-observer";
 import { HasChildren } from "@models/has-children";
 
 interface BlockchainContextType {
-  ethereum: UseEthereumReturn;
-  bitcoin: UseBitcoinReturn;
+  ethereum: UseEthereumReturnType;
+  bitcoin: UseBitcoinReturnType;
 }
 
 export const BlockchainContext = createContext<BlockchainContextType | null>(

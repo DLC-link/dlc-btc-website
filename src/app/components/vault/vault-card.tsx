@@ -10,8 +10,8 @@ import { VaultExpandedInformation } from "./components/vault-expanded-informatio
 import { VaultInformation } from "./components/vault-information";
 import { VaultProgressBar } from "./components/vault-progress-bar";
 
-interface VaultBoxProps {
-  vault?: Vault;
+interface VaultCardProps {
+  vault: Vault;
   isSelected?: boolean;
   isSelectable?: boolean;
   handleSelect?: () => void;
@@ -22,7 +22,7 @@ export function VaultCard({
   isSelected = false,
   isSelectable = false,
   handleSelect,
-}: VaultBoxProps): React.JSX.Element {
+}: VaultCardProps): React.JSX.Element {
   const blockchainContext = useContext(BlockchainContext);
   const bitcoin = blockchainContext?.bitcoin;
 
@@ -32,7 +32,6 @@ export function VaultCard({
   async function handleLock(): Promise<void> {
     if (!vault) return;
     setIsSubmitting(true);
-    console.log("vault", vault);
     try {
       await bitcoin?.fetchBitcoinContractOfferAndSendToUserWallet(vault);
     } catch (error) {

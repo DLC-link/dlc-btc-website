@@ -18,28 +18,28 @@ export const vaultSlice = createSlice({
   initialState: initialVaultState,
   reducers: {
     setVaults: (state, action) => {
-      const { payload: newVaults } = action;
-      console.log("newVaults", newVaults);
-      newVaults.forEach((newVault: Vault) => {
-        const existingVault = state.vaults.find(
-          (vault) => vault.uuid === newVault.uuid,
-        );
+      const newVaults = action.payload;
+      const vaultMap = new Map(
+        state.vaults.map((vault) => [vault.uuid, vault]),
+      );
+
+      state.vaults = newVaults.map((newVault: Vault) => {
+        const existingVault = vaultMap.get(newVault.uuid);
 
         if (!existingVault) {
-          state.vaults.push(newVault);
+          return newVault;
         } else {
           const shouldUpdate =
             existingVault.state !== VaultState.FUNDING ||
             newVault.state === VaultState.FUNDED;
-          if (shouldUpdate) {
-            Object.assign(existingVault, newVault);
-          }
+          return shouldUpdate
+            ? { ...existingVault, ...newVault }
+            : existingVault;
         }
       });
     },
     swapVault: (state, action) => {
       const { vaultUUID, updatedVault } = action.payload;
-
       const vaultIndex = state.vaults.findIndex(
         (vault) => vault.uuid === vaultUUID,
       );
