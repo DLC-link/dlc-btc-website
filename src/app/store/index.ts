@@ -1,5 +1,8 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import { accountSlice } from "@store/slices/account/account.slice";
+import {
+  accountSlice,
+  initialAccountState,
+} from "@store/slices/account/account.slice";
 import { modalSlice } from "@store/slices/modal/modal.slice";
 import { vaultSlice } from "@store/slices/vault/vault.slice";
 import {
@@ -13,7 +16,7 @@ import {
   persistReducer,
   persistStore,
 } from "redux-persist";
-// import expireReducer from 'redux-persist-expire';
+import expireReducer from "redux-persist-expire";
 import storage from "redux-persist/lib/storage";
 
 import { mintUnmintSlice } from "./slices/mintunmint/mintunmint.slice";
@@ -35,14 +38,14 @@ const rootReducer = combineReducers({
 const persistConfig: PersistConfig<RootState> = {
   key: "root",
   storage: storage,
-  whitelist: ["vault", "mintunmint"],
-  // transforms: [
-  //   expireReducer('account', {
-  //     persistedAtKey: 'loadedAt',
-  //     expireSeconds: 3600,
-  //     expiredState: initialAccountState,
-  //   }),
-  // ],
+  whitelist: ["account", "vault", "mintunmint"],
+  transforms: [
+    expireReducer("account", {
+      persistedAtKey: "loadedAt",
+      expireSeconds: 3600,
+      expiredState: initialAccountState,
+    }),
+  ],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

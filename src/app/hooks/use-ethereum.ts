@@ -1,8 +1,9 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 import { customShiftValue } from "@common/utilities";
-import { EthereumNetwork, Network, ethereumNetworks } from "@models/network";
+import { Network, ethereumNetworks } from "@models/network";
 import { RawVault, Vault } from "@models/vault";
 import { RootState, store } from "@store/index";
 import { accountActions } from "@store/slices/account/account.actions";
@@ -11,25 +12,21 @@ import { Contract, Signer, ethers } from "ethers";
 
 import { useVaults } from "./use-vaults";
 
-export interface UseEthereumReturn {
+export interface UseEthereumReturnType {
   protocolContract: Contract | undefined;
   dlcManagerContract: Contract | undefined;
   dlcBTCContract: Contract | undefined;
   dlcBTCBalance: number | undefined;
   lockedBTCBalance: number | undefined;
-  getEthereumNetworkConfig: () => {
-    walletURL: string;
-    explorerAPIURL: string;
-  };
   requestEthereumAccount: (network: Network) => Promise<void>;
   getAllVaults: () => Promise<void>;
   getVault: (vaultUUID: string) => Promise<void>;
   setupVault: (btcDepositAmount: number) => Promise<void>;
   closeVault: (vaultUUID: string) => Promise<void>;
-  recommendDlcBtcTokenToMetamask: () => Promise<boolean>;
+  recommendTokenToMetamask: () => Promise<boolean>;
 }
 
-export function useEthereum(): UseEthereumReturn {
+export function useEthereum(): UseEthereumReturnType {
   const { fundedVaults } = useVaults();
   const { address, network } = useSelector((state: RootState) => state.account);
 
@@ -53,10 +50,16 @@ export function useEthereum(): UseEthereumReturn {
   useEffect(() => {
     if (!address || !network) return;
 
-    if (!protocolContract || !dlcManagerContract || !dlcBTCContract) {
+    if (!protocolContract && !dlcManagerContract && !dlcBTCContract) {
       setupEthereumConfiguration(network);
     }
-  }, [address, network]);
+  }, [address, network, protocolContract, dlcManagerContract, dlcBTCContract]);
+
+  useEffect(() => {
+    if (!address || !network || !protocolContract) return;
+
+    getAllVaults();
+  }, [address, network, protocolContract]);
 
   useEffect(() => {
     if (!address || !protocolContract || !dlcManagerContract || !dlcBTCContract)
@@ -67,7 +70,7 @@ export function useEthereum(): UseEthereumReturn {
         await getDLCBTCBalance();
         await getLockedBTCBalance();
       } catch (error) {
-        console.error(error);
+        throw new Error(`Could not fetch balance: ${error}`);
       }
     };
 
@@ -210,33 +213,13 @@ export function useEthereum(): UseEthereumReturn {
     }
   }
 
-  function getEthereumNetworkConfig(): {
-    walletURL: string;
-    explorerAPIURL: string;
-  } {
-    switch (network?.id) {
-      case EthereumNetwork.Sepolia:
-        return {
-          walletURL: "https://devnet.dlc.link/eth-wallet",
-          explorerAPIURL: "https://sepolia.etherscan.io/tx/",
-        };
-      case EthereumNetwork.Goerli:
-        return {
-          walletURL: "https://testnet.dlc.link/eth-wallet",
-          explorerAPIURL: "https://goerli.etherscan.io/tx/",
-        };
-      default:
-        throw new Error(`Unsupported network: ${network?.name}`);
-    }
-  }
-
   async function getLockedBTCBalance(): Promise<void> {
     try {
       const totalCollateral = fundedVaults.reduce(
         (sum: number, vault: Vault) => sum + vault.collateral,
         0,
       );
-      setLockedBTCBalance(Number(totalCollateral.toFixed(4)));
+      setLockedBTCBalance(Number(totalCollateral.toFixed(5)));
     } catch (error) {
       throw new Error(`Could not fetch BTC balance: ${error}`);
     }
@@ -262,7 +245,6 @@ export function useEthereum(): UseEthereumReturn {
         throw new Error("Protocol contract not initialized");
       const vaults: RawVault[] =
         await protocolContract.getAllVaultsForAddress(address);
-      console.log("vaults", vaults);
       const formattedVaults: Vault[] = vaults.map(formatVault);
       store.dispatch(vaultActions.setVaults(formattedVaults));
     } catch (error) {
@@ -270,26 +252,37 @@ export function useEthereum(): UseEthereumReturn {
     }
   }
 
-  async function getVault(vaultUUID: string): Promise<void> {
-    try {
-      if (!protocolContract)
-        throw new Error("Protocol contract not initialized");
-      const vault: RawVault = await protocolContract.getVault(vaultUUID);
-      const formattedVault: Vault = formatVault(vault);
-      store.dispatch(
-        vaultActions.swapVault({ vaultUUID, updatedVault: formattedVault }),
-      );
-    } catch (error) {
-      throw new Error(`Could not fetch vault: ${error}`);
+  async function getVault(
+    vaultUUID: string,
+    retryInterval = 5000,
+    maxRetries = 5,
+  ): Promise<void> {
+    for (let i = 0; i < maxRetries; i++) {
+      try {
+        if (!protocolContract)
+          throw new Error("Protocol contract not initialized");
+        const vault: RawVault = await protocolContract.getVault(vaultUUID);
+        if (!vault) throw new Error("Vault is undefined");
+        const formattedVault: Vault = formatVault(vault);
+        store.dispatch(
+          vaultActions.swapVault({ vaultUUID, updatedVault: formattedVault }),
+        );
+        return;
+      } catch (error) {
+        console.log(`Error fetching vault ${vaultUUID}. Retrying...`);
+      }
+      await new Promise((resolve) => setTimeout(resolve, retryInterval));
     }
+    throw new Error(
+      `Failed to fetch vault ${vaultUUID} after ${maxRetries} retries`,
+    );
   }
 
   async function setupVault(btcDepositAmount: number): Promise<void> {
     try {
       if (!protocolContract)
         throw new Error("Protocol contract not initialized");
-      const response = await protocolContract.setupVault(btcDepositAmount);
-      console.log(response);
+      await protocolContract.setupVault(btcDepositAmount);
     } catch (error) {
       throw new Error(`Could not setup vault: ${error}`);
     }
@@ -299,14 +292,13 @@ export function useEthereum(): UseEthereumReturn {
     try {
       if (!protocolContract)
         throw new Error("Protocol contract not initialized");
-      const response = await protocolContract.closeVault(vaultUUID);
-      console.log(response);
+      await protocolContract.closeVault(vaultUUID);
     } catch (error) {
       throw new Error(`Could not close vault: ${error}`);
     }
   }
 
-  async function recommendDlcBtcTokenToMetamask(): Promise<boolean> {
+  async function recommendTokenToMetamask(): Promise<boolean> {
     try {
       const { ethereum } = window;
       if (!ethereum) return false;
@@ -325,8 +317,7 @@ export function useEthereum(): UseEthereumReturn {
       });
       return added;
     } catch (error) {
-      console.error(error);
-      return false;
+      throw new Error(`Could not recommend dlcBTC token to MetaMask: ${error}`);
     }
   }
 
@@ -337,11 +328,10 @@ export function useEthereum(): UseEthereumReturn {
     dlcBTCBalance,
     lockedBTCBalance,
     requestEthereumAccount,
-    getEthereumNetworkConfig,
     getAllVaults,
     getVault,
     setupVault,
     closeVault,
-    recommendDlcBtcTokenToMetamask,
+    recommendTokenToMetamask,
   };
 }

@@ -7,6 +7,7 @@ import { Wallet, WalletType, ethereumWallets } from "@models/wallet";
 import { RootState } from "@store/index";
 import { accountActions } from "@store/slices/account/account.actions";
 import { modalActions } from "@store/slices/modal/modal.actions";
+import { mintUnmintActions } from "@store/slices/mintunmint/mintunmint.actions";
 
 function findWalletById(walletType: WalletType): Wallet | undefined {
   const wallet = ethereumWallets.find((wallet) => wallet.id === walletType);
@@ -32,6 +33,7 @@ export function Account(): React.JSX.Element {
 
   function onDisconnectWalletClick(): void {
     dispatch(accountActions.logout());
+    dispatch(mintUnmintActions.resetMintUnmintState());
   }
 
   return (

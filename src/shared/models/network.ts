@@ -15,24 +15,24 @@ const EthreumOKXTestnet: Network = {
   id: EthereumNetwork.X1Testnet,
 };
 
-// const EthereumMainnet: Network = {
-//   name: "Mainnet",
-//   id: EthereumNetwork.Mainnet,
-// };
+const EthereumMainnet: Network = {
+  name: "Mainnet",
+  id: EthereumNetwork.Mainnet,
+};
 
-// const EthereumGoerli: Network = {
-//   name: "Goerli",
-//   id: EthereumNetwork.Goerli,
-// };
+const EthereumGoerli: Network = {
+  name: "Goerli",
+  id: EthereumNetwork.Goerli,
+};
 
-// const EthereumSepolia: Network = {
-//   name: "Sepolia",
-//   id: EthereumNetwork.Sepolia,
-// };
+const EthereumSepolia: Network = {
+  name: "Sepolia",
+  id: EthereumNetwork.Sepolia,
+};
 
 export const ethereumNetworks: Network[] = [
-  // EthereumMainnet,
-  // EthereumGoerli,
-  // EthereumSepolia,
+  EthereumMainnet,
+  EthereumGoerli,
+  EthereumSepolia,
   EthreumOKXTestnet,
 ];

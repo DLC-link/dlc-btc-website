@@ -4,11 +4,10 @@ import { useSelector } from "react-redux";
 import { RootState } from "@store/index";
 import { mintUnmintActions } from "@store/slices/mintunmint/mintunmint.actions";
 import { AnyAction } from "redux";
-
-import { UseEthereumReturn } from "./use-ethereum";
+import { UseEthereumReturnType } from "./use-ethereum";
 
 export function useObserver(
-  ethereum: UseEthereumReturn,
+  ethereum: UseEthereumReturnType,
   dispatch: Dispatch<AnyAction>,
 ) {
   const { address, network } = useSelector((state: RootState) => state.account);
@@ -22,7 +21,6 @@ export function useObserver(
     console.log(`Listening to [${dlcBTCContract.address}]`);
 
     protocolContract.on("SetupVault", async (...args) => {
-      console.log("SetupVault", args);
       const vaultOwner: string = args[2];
 
       if (vaultOwner.toLowerCase() !== address) return;
@@ -44,6 +42,7 @@ export function useObserver(
       const vaultUUID = args[0];
 
       console.log(`Vault ${vaultUUID} is closing`);
+
       await getVault(vaultUUID);
       dispatch(mintUnmintActions.setUnmintStep(1));
     });
@@ -69,7 +68,7 @@ export function useObserver(
 
       const vaultUUID = args[0];
 
-      console.log(`Vault ${vaultUUID} is minted`);
+      console.log(`Vault ${vaultUUID} is closed`);
 
       await getVault(vaultUUID).then(() => {
         dispatch(mintUnmintActions.setUnmintStep(2));

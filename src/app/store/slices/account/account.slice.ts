@@ -11,7 +11,7 @@ interface AccountState {
   loadedAt: string | undefined;
 }
 
-const initialAccountState: AccountState = {
+export const initialAccountState: AccountState = {
   address: undefined,
   walletType: undefined,
   network: undefined,
