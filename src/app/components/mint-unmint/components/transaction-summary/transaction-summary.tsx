@@ -12,7 +12,7 @@ interface FlowPropertyMap {
   [key: string]: {
     [key: number]: {
       title: string;
-      subtitle: string;
+      subtitle?: string;
     };
   };
 }
@@ -20,14 +20,14 @@ interface FlowPropertyMap {
 const flowPropertyMap: FlowPropertyMap = {
   mint: {
     2: { title: "a) Locking BTC in progress", subtitle: "Minting dlcBTC" },
-    3: { title: "Minted dlcBTC", subtitle: "Minting dlcBTC" },
+    3: { title: "Minted dlcBTC" },
   },
   unmint: {
     1: {
       title: "a) Closing vault in progress",
       subtitle: "Your BTC is being unlocked",
     },
-    2: { title: "Vault closed", subtitle: "Your BTC is unlocked" },
+    2: { title: "Vault closed" },
   },
 };
 
@@ -51,10 +51,8 @@ export function TransactionSummary({
 
   function getVault(flow: "mint" | "unmint", currentStep: number) {
     if (flow === "mint") {
-      console.log("fundedVaults", fundedVaults[0]);
       return currentStep === 2 ? fundingVaults[0] : fundedVaults[0];
     } else {
-      console.log("closedVaults", closedVaults[0]);
       return currentStep === 1 ? closingVaults[0] : closedVaults[0];
     }
   }
@@ -86,7 +84,9 @@ export function TransactionSummary({
             assetAmount={currentVault?.collateral}
           />
         </>
-      ) : null}
+      ) : (
+        false
+      )}
       <Stack
         p={"15px"}
         w={"100%"}

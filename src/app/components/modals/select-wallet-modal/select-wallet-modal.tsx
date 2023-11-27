@@ -17,7 +17,6 @@ export function SelectWalletModal({
 }: ModalComponentProps): React.JSX.Element {
   const blockchainContext = useContext(BlockchainContext);
   const ethereum = blockchainContext?.ethereum;
-
   const [currentNetwork, setCurrentNetwork] = useState<Network | undefined>(
     undefined,
   );

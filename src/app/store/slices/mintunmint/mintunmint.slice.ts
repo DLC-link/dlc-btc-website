@@ -20,5 +20,9 @@ export const mintUnmintSlice = createSlice({
     setUnmintStep: (state, action) => {
       state.unmintStep = action.payload;
     },
+    resetMintUnmintState: (state) => {
+      state.mintStep = 0;
+      state.unmintStep = 0;
+    },
   },
 });

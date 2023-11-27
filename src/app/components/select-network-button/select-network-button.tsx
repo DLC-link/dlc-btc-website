@@ -18,6 +18,12 @@ export function SelectNetworkButton({
   handleClick,
   currentNetwork,
 }: SelectNetworkButtonProps): React.JSX.Element {
+  const enabledEthereumNetworkIDs =
+    import.meta.env.VITE_ENABLED_ETHEREUM_NETWORKS.split(",");
+  const enabledEthereumNetworks = ethereumNetworks.filter((network) =>
+    enabledEthereumNetworkIDs.includes(network.id),
+  );
+
   return (
     <Menu variant={"network"}>
       <MenuButton>
@@ -27,7 +33,7 @@ export function SelectNetworkButton({
         </HStack>
       </MenuButton>
       <MenuList>
-        {ethereumNetworks.map((network, id) => {
+        {enabledEthereumNetworks.map((network, id) => {
           return (
             <MenuItem
               key={id}

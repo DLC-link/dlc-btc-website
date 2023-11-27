@@ -100,7 +100,7 @@ export function Walkthrough({
               </Text>
               <Button
                 variant={"vault"}
-                onClick={() => ethereum?.recommendDlcBtcTokenToMetamask()}
+                onClick={() => ethereum?.recommendTokenToMetamask()}
               >
                 <HStack>
                   <Image
