@@ -1,7 +1,6 @@
 import { Route } from "react-router-dom";
 
 import { AppLayout } from "@components/app.layout";
-import { ModalContainer } from "@components/modals/components/modal-container";
 import { MyVaults } from "@pages/my-vaults/my-vaults";
 
 import { About } from "./pages/about/about";
@@ -16,7 +15,6 @@ export function App(): React.JSX.Element {
         <Route path="/my-vaults" element={<MyVaults />} />
         <Route path="/how-it-works" element={<About />} />
       </AppLayout>
-      <ModalContainer />
     </BlockchainContextProvider>
   );
 }
