@@ -6,6 +6,7 @@ import {
   FormErrorMessage,
   Text,
   VStack,
+  useToast,
 } from "@chakra-ui/react";
 import { customShiftValue } from "@common/utilities";
 import { Form, Formik } from "formik";
@@ -13,6 +14,7 @@ import { Form, Formik } from "formik";
 import { BlockchainContext } from "../../../../providers/blockchain-context-provider";
 import { TransactionFormInput } from "./components/transaction-form-input";
 import { TransactionFormWarning } from "./components/transaction-form-warning";
+import { EthereumError } from "@models/error-types";
 
 export interface TransactionFormValues {
   amount: number;
@@ -21,6 +23,7 @@ export interface TransactionFormValues {
 const initialValues: TransactionFormValues = { amount: 0.001 };
 
 export function TransactionForm(): React.JSX.Element {
+  const toast = useToast();
   const blockchainContext = useContext(BlockchainContext);
   const ethereum = blockchainContext?.ethereum;
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -36,7 +39,13 @@ export function TransactionForm(): React.JSX.Element {
       await ethereum?.setupVault(shiftedBTCDepositAmount);
     } catch (error) {
       setIsSubmitting(false);
-      throw new Error("Error setting up vault");
+      toast({
+        title: "Failed to create vault",
+        description: error instanceof EthereumError ? error.message : "",
+        status: "error",
+        duration: 9000,
+        isClosable: true,
+      });
     }
   }
 

@@ -3,12 +3,14 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 import { customShiftValue } from "@common/utilities";
+import { EthereumError } from "@models/error-types";
 import { Network, ethereumNetworks } from "@models/network";
 import { RawVault, Vault } from "@models/vault";
 import { RootState, store } from "@store/index";
 import { accountActions } from "@store/slices/account/account.actions";
 import { vaultActions } from "@store/slices/vault/vault.actions";
 import { Contract, Signer, ethers } from "ethers";
+import { Logger } from "ethers/lib/utils";
 
 import { useVaults } from "./use-vaults";
 
@@ -24,6 +26,18 @@ export interface UseEthereumReturnType {
   setupVault: (btcDepositAmount: number) => Promise<void>;
   closeVault: (vaultUUID: string) => Promise<void>;
   recommendTokenToMetamask: () => Promise<boolean>;
+}
+
+function throwEthereumError(message: string, error: any): void {
+  if (error.code === Logger.errors.CALL_EXCEPTION) {
+    throw new EthereumError(
+      `${message}${
+        error instanceof Error && "errorName" in error ? error.errorName : error
+      }`,
+    );
+  } else {
+    throw new EthereumError(`${message}${error.code}`);
+  }
 }
 
 export function useEthereum(): UseEthereumReturnType {
@@ -70,7 +84,7 @@ export function useEthereum(): UseEthereumReturnType {
         await getDLCBTCBalance();
         await getLockedBTCBalance();
       } catch (error) {
-        throw new Error(`Could not fetch balance: ${error}`);
+        throwEthereumError(`Could not fetch balance: `, error);
       }
     };
 
@@ -95,7 +109,11 @@ export function useEthereum(): UseEthereumReturnType {
   }
 
   async function setupEthereumConfiguration(network: Network): Promise<void> {
-    const { walletNetworkChainID, signer } = await getEthereumProvider(network);
+    const ethereumProvider = await getEthereumProvider(network);
+    if (!ethereumProvider) {
+      throw new EthereumError("Failed to get Ethereum provider");
+    }
+    const { walletNetworkChainID, signer } = ethereumProvider;
     await getEthereumContracts(walletNetworkChainID, signer);
   }
 
@@ -113,7 +131,7 @@ export function useEthereum(): UseEthereumReturnType {
       }
       return { walletNetworkChainID, signer };
     } catch (error) {
-      throw new Error(`Could not connect to Ethereum: ${error}`);
+      throwEthereumError(`Could not connect to Ethereum: `, error);
     }
   }
 
@@ -184,7 +202,7 @@ export function useEthereum(): UseEthereumReturnType {
 
       store.dispatch(accountActions.login(accountInformation));
     } catch (error) {
-      throw new Error(`Could not connect to Ethereum: ${error}`);
+      throwEthereumError(`Could not connect to Ethereum: `, error);
     }
   }
 
@@ -207,7 +225,7 @@ export function useEthereum(): UseEthereumReturnType {
       const contractData = await response.json();
       return contractData;
     } catch (error) {
-      throw new Error(
+      throw new EthereumError(
         `Could not fetch deployment info for ${contractName} on ${network?.name}`,
       );
     }
@@ -221,13 +239,14 @@ export function useEthereum(): UseEthereumReturnType {
       );
       setLockedBTCBalance(Number(totalCollateral.toFixed(5)));
     } catch (error) {
-      throw new Error(`Could not fetch BTC balance: ${error}`);
+      throwEthereumError(`Could not fetch locked BTC balance: `, error);
     }
   }
 
   async function getDLCBTCBalance(): Promise<void> {
     try {
       if (!dlcBTCContract) throw new Error("Protocol contract not initialized");
+      await dlcBTCContract.callStatic.balanceOf(address);
       const dlcBTCBalance = customShiftValue(
         parseInt(await dlcBTCContract.balanceOf(address)),
         8,
@@ -235,7 +254,7 @@ export function useEthereum(): UseEthereumReturnType {
       );
       setDLCBTCBalance(dlcBTCBalance);
     } catch (error) {
-      throw new Error(`Could not fetch BTC balance: ${error}`);
+      throwEthereumError(`Could not fetch dlcBTC balance: `, error);
     }
   }
 
@@ -243,12 +262,13 @@ export function useEthereum(): UseEthereumReturnType {
     try {
       if (!protocolContract)
         throw new Error("Protocol contract not initialized");
+      await protocolContract.callStatic.getAllVaultsForAddress(address);
       const vaults: RawVault[] =
         await protocolContract.getAllVaultsForAddress(address);
       const formattedVaults: Vault[] = vaults.map(formatVault);
       store.dispatch(vaultActions.setVaults(formattedVaults));
     } catch (error) {
-      throw new Error(`Could not fetch vaults: ${error}`);
+      throwEthereumError(`Could not fetch vaults: `, error);
     }
   }
 
@@ -273,7 +293,7 @@ export function useEthereum(): UseEthereumReturnType {
       }
       await new Promise((resolve) => setTimeout(resolve, retryInterval));
     }
-    throw new Error(
+    throw new EthereumError(
       `Failed to fetch vault ${vaultUUID} after ${maxRetries} retries`,
     );
   }
@@ -282,9 +302,10 @@ export function useEthereum(): UseEthereumReturnType {
     try {
       if (!protocolContract)
         throw new Error("Protocol contract not initialized");
+      await protocolContract.callStatic.setupVault(btcDepositAmount);
       await protocolContract.setupVault(btcDepositAmount);
-    } catch (error) {
-      throw new Error(`Could not setup vault: ${error}`);
+    } catch (error: any) {
+      throwEthereumError(`Could not setup vault: `, error);
     }
   }
 
@@ -292,9 +313,10 @@ export function useEthereum(): UseEthereumReturnType {
     try {
       if (!protocolContract)
         throw new Error("Protocol contract not initialized");
+      await protocolContract.callStatic.closeVault(vaultUUID);
       await protocolContract.closeVault(vaultUUID);
     } catch (error) {
-      throw new Error(`Could not close vault: ${error}`);
+      throwEthereumError(`Could not close vault: `, error);
     }
   }
 
@@ -302,7 +324,7 @@ export function useEthereum(): UseEthereumReturnType {
     try {
       const { ethereum } = window;
       if (!ethereum) return false;
-      const added = await ethereum.request({
+      const response = await ethereum.request({
         method: "wallet_watchAsset",
         params: {
           type: "ERC20",
@@ -315,9 +337,14 @@ export function useEthereum(): UseEthereumReturnType {
           },
         },
       });
-      return added;
+      await response.wait();
+      return response;
     } catch (error) {
-      throw new Error(`Could not recommend dlcBTC token to MetaMask: ${error}`);
+      throwEthereumError(
+        `Could not recommend dlcBTC token to MetaMask: `,
+        error,
+      );
+      return false;
     }
   }
 

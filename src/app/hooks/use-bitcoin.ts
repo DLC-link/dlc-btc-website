@@ -1,6 +1,6 @@
-// import { Dispatch } from 'react';
 import { useDispatch } from "react-redux";
 
+import { BitcoinError } from "@models/error-types";
 import { Vault } from "@models/vault";
 import { mintUnmintActions } from "@store/slices/mintunmint/mintunmint.actions";
 import { vaultActions } from "@store/slices/vault/vault.actions";
@@ -17,7 +17,7 @@ export function useBitcoin(): UseBitcoinReturnType {
 
   function createURLParams(bitcoinContractOffer: any) {
     if (!routerWalletURL) {
-      throw new Error("Router wallet URL is undefined");
+      throw new BitcoinError("Router wallet URL is undefined");
     }
 
     const counterPartyWalletDetails = {
@@ -47,8 +47,10 @@ export function useBitcoin(): UseBitcoinReturnType {
         }),
       );
       dispatch(mintUnmintActions.setMintStep(2));
-    } catch (error) {
-      throw new Error(`Could not send contract offer for signing: ${error}`);
+    } catch (error: any) {
+      throw new BitcoinError(
+        `Could not send contract offer for signing: ${error.error.message}`,
+      );
     }
   }
 
@@ -63,12 +65,12 @@ export function useBitcoin(): UseBitcoinReturnType {
       });
       const responseStream = await response.json();
       if (!response.ok) {
-        throw new Error(responseStream.error);
+        throw new BitcoinError(responseStream.error.message);
       }
       return responseStream;
-    } catch (error) {
-      throw new Error(
-        `Could not fetch contract offer from counterparty wallet: ${error}`,
+    } catch (error: any) {
+      throw new BitcoinError(
+        `Could not fetch contract offer from counterparty wallet: ${error.message}`,
       );
     }
   }
