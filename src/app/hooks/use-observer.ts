@@ -6,6 +6,7 @@ import { mintUnmintActions } from "@store/slices/mintunmint/mintunmint.actions";
 import { AnyAction } from "redux";
 import { UseEthereumReturnType } from "./use-ethereum";
 import { modalActions } from "@store/slices/modal/modal.actions";
+import { VaultState } from "@models/vault";
 
 export function useObserver(
   ethereum: UseEthereumReturnType,
@@ -30,7 +31,7 @@ export function useObserver(
 
       console.log(`Vault ${vaultUUID} is ready`);
 
-      await getVault(vaultUUID).then(() => {
+      await getVault(vaultUUID, VaultState.READY).then(() => {
         dispatch(mintUnmintActions.setMintStep(1));
       });
     });
@@ -44,8 +45,9 @@ export function useObserver(
 
       console.log(`Vault ${vaultUUID} is closing`);
 
-      await getVault(vaultUUID);
-      dispatch(mintUnmintActions.setUnmintStep(1));
+      await getVault(vaultUUID, VaultState.CLOSING).then(() => {
+        dispatch(mintUnmintActions.setUnmintStep(1));
+      });
     });
 
     protocolContract.on("SetStatusFunded", async (...args) => {
@@ -57,7 +59,7 @@ export function useObserver(
 
       console.log(`Vault ${vaultUUID} is minted`);
 
-      await getVault(vaultUUID).then(() => {
+      await getVault(vaultUUID, VaultState.FUNDED).then(() => {
         dispatch(mintUnmintActions.setMintStep(0));
         dispatch(modalActions.toggleSuccessfulFlowModalVisibility("mint"));
       });
@@ -72,7 +74,7 @@ export function useObserver(
 
       console.log(`Vault ${vaultUUID} is closed`);
 
-      await getVault(vaultUUID).then(() => {
+      await getVault(vaultUUID, VaultState.CLOSED).then(() => {
         dispatch(mintUnmintActions.setUnmintStep(0));
         dispatch(modalActions.toggleSuccessfulFlowModalVisibility("unmint"));
       });

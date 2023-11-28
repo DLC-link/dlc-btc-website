@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { customShiftValue } from "@common/utilities";
 import { EthereumError } from "@models/error-types";
 import { Network, ethereumNetworks } from "@models/network";
-import { RawVault, Vault } from "@models/vault";
+import { RawVault, Vault, VaultState } from "@models/vault";
 import { RootState, store } from "@store/index";
 import { accountActions } from "@store/slices/account/account.actions";
 import { vaultActions } from "@store/slices/vault/vault.actions";
@@ -22,7 +22,7 @@ export interface UseEthereumReturnType {
   lockedBTCBalance: number | undefined;
   requestEthereumAccount: (network: Network) => Promise<void>;
   getAllVaults: () => Promise<void>;
-  getVault: (vaultUUID: string) => Promise<void>;
+  getVault: (vaultUUID: string, vaultState: VaultState) => Promise<void>;
   setupVault: (btcDepositAmount: number) => Promise<void>;
   closeVault: (vaultUUID: string) => Promise<void>;
   recommendTokenToMetamask: () => Promise<boolean>;
@@ -274,8 +274,9 @@ export function useEthereum(): UseEthereumReturnType {
 
   async function getVault(
     vaultUUID: string,
+    vaultState: VaultState,
     retryInterval = 5000,
-    maxRetries = 5,
+    maxRetries = 10,
   ): Promise<void> {
     for (let i = 0; i < maxRetries; i++) {
       try {
@@ -283,6 +284,8 @@ export function useEthereum(): UseEthereumReturnType {
           throw new Error("Protocol contract not initialized");
         const vault: RawVault = await protocolContract.getVault(vaultUUID);
         if (!vault) throw new Error("Vault is undefined");
+        if (vault.status !== vaultState)
+          throw new Error("Vault is not in the correct state");
         const formattedVault: Vault = formatVault(vault);
         store.dispatch(
           vaultActions.swapVault({ vaultUUID, updatedVault: formattedVault }),
