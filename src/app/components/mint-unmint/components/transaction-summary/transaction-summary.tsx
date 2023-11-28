@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
-import { HStack, Link, Spinner, Stack, Text, VStack } from "@chakra-ui/react";
+import { HStack, Spinner, Stack, Text, VStack } from "@chakra-ui/react";
 import { VaultCard } from "@components/vault/vault-card";
 import { useVaults } from "@hooks/use-vaults";
 import { Vault } from "@models/vault";
@@ -42,7 +42,6 @@ export function TransactionSummary({
   flow,
   blockchain,
 }: TransactionSummaryProps): React.JSX.Element {
-  const navigate = useNavigate();
   const { fundingVaults, fundedVaults, closingVaults, closedVaults } =
     useVaults();
   const [currentVault, setCurrentVault] = useState<Vault>(
@@ -95,14 +94,15 @@ export function TransactionSummary({
         borderColor={"border.cyan.01"}
       >
         <Text color={"white.01"} fontSize={"sm"}>
-          You can follow the status of the {flow} under{" "}
-          <Link
+          You can check all of your vaults' status under{" "}
+          <Text
+            as={Link}
+            to={"/my-vaults"}
             color={"accent.cyan.01"}
             textDecoration={"underline"}
-            onClick={() => navigate("/my-vaults")}
           >
             My Vaults
-          </Link>{" "}
+          </Text>{" "}
           tab.
         </Text>
       </Stack>

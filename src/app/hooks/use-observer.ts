@@ -5,6 +5,7 @@ import { RootState } from "@store/index";
 import { mintUnmintActions } from "@store/slices/mintunmint/mintunmint.actions";
 import { AnyAction } from "redux";
 import { UseEthereumReturnType } from "./use-ethereum";
+import { modalActions } from "@store/slices/modal/modal.actions";
 
 export function useObserver(
   ethereum: UseEthereumReturnType,
@@ -57,7 +58,8 @@ export function useObserver(
       console.log(`Vault ${vaultUUID} is minted`);
 
       await getVault(vaultUUID).then(() => {
-        dispatch(mintUnmintActions.setMintStep(3));
+        dispatch(mintUnmintActions.setMintStep(0));
+        dispatch(modalActions.toggleSuccessfulFlowModalVisibility("mint"));
       });
     });
 
@@ -71,7 +73,8 @@ export function useObserver(
       console.log(`Vault ${vaultUUID} is closed`);
 
       await getVault(vaultUUID).then(() => {
-        dispatch(mintUnmintActions.setUnmintStep(2));
+        dispatch(mintUnmintActions.setUnmintStep(0));
+        dispatch(modalActions.toggleSuccessfulFlowModalVisibility("unmint"));
       });
     });
   }, [protocolContract, dlcBTCContract, network]);
