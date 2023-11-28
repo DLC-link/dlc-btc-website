@@ -14,7 +14,15 @@ import { appTheme } from "./styles/app-theme";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <ReduxProvider store={store}>
     <PersistGate persistor={persistor} loading={null}>
-      <ChakraProvider resetCSS theme={appTheme}>
+      <ChakraProvider
+        resetCSS
+        theme={appTheme}
+        toastOptions={{
+          defaultOptions: {
+            position: "bottom",
+          },
+        }}
+      >
         <App />
       </ChakraProvider>
     </PersistGate>

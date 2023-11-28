@@ -9,6 +9,8 @@ import { VaultCardLayout } from "./components/vault-card.layout";
 import { VaultExpandedInformation } from "./components/vault-expanded-information/vault-expanded-information";
 import { VaultInformation } from "./components/vault-information";
 import { VaultProgressBar } from "./components/vault-progress-bar";
+import { useToast } from "@chakra-ui/react";
+import { BitcoinError } from "@models/error-types";
 
 interface VaultCardProps {
   vault: Vault;
@@ -23,6 +25,7 @@ export function VaultCard({
   isSelectable = false,
   handleSelect,
 }: VaultCardProps): React.JSX.Element {
+  const toast = useToast();
   const blockchainContext = useContext(BlockchainContext);
   const bitcoin = blockchainContext?.bitcoin;
 
@@ -36,7 +39,13 @@ export function VaultCard({
       await bitcoin?.fetchBitcoinContractOfferAndSendToUserWallet(vault);
     } catch (error) {
       setIsSubmitting(false);
-      throw new Error("Error locking vault");
+      toast({
+        title: "Failed to lock Bitcoin",
+        description: error instanceof BitcoinError ? error.message : "",
+        status: "error",
+        duration: 9000,
+        isClosable: true,
+      });
     }
   }
 
