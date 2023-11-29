@@ -128,6 +128,7 @@ export function useEthereum(): UseEthereumReturnType {
 
       if (walletNetworkChainID !== network?.id) {
         alert(`Please connect to ${network?.name}`);
+        return;
       }
       return { walletNetworkChainID, signer };
     } catch (error) {
@@ -214,7 +215,7 @@ export function useEthereum(): UseEthereumReturnType {
 
     const branchName = import.meta.env.VITE_ETHEREUM_DEPLOYMENT_BRANCH;
     const contractVersion = import.meta.env.VITE_ETHEREUM_DEPLOYMENT_VERSION;
-    const deploymentPlanURL = `https://raw.githubusercontent.com/DLC-link/dlc-solidity/${branchName}/deploymentFiles/${network?.name}/v${contractVersion}/${contractName}.json`;
+    const deploymentPlanURL = `https://raw.githubusercontent.com/DLC-link/dlc-solidity/${branchName}/deploymentFiles/${network?.name.toLowerCase()}/v${contractVersion}/${contractName}.json`;
 
     console.log(
       `Fetching deployment info for ${contractName} on ${network?.name} from dlc-solidity/${branchName}`,
