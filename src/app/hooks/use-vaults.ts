@@ -12,41 +12,42 @@ export function useVaults(): {
   closedVaults: Vault[];
 } {
   const { vaults } = useSelector((state: RootState) => state.vault);
+  const { network } = useSelector((state: RootState) => state.account);
 
   const readyVaults = useMemo(
     () =>
-      vaults
+      vaults[network ? network.id : "1"]
         .filter((vault) => vault.state === VaultState.READY)
         .sort((a, b) => b.timestamp - a.timestamp),
-    [vaults],
+    [vaults, network],
   );
   const fundedVaults = useMemo(
     () =>
-      vaults
+      vaults[network ? network.id : "1"]
         .filter((vault) => vault.state === VaultState.FUNDED)
         .sort((a, b) => b.timestamp - a.timestamp),
-    [vaults],
+    [vaults, network],
   );
   const fundingVaults = useMemo(
     () =>
-      vaults
+      vaults[network ? network.id : "1"]
         .filter((vault) => vault.state === VaultState.FUNDING)
         .sort((a, b) => b.timestamp - a.timestamp),
-    [vaults],
+    [vaults, network],
   );
   const closingVaults = useMemo(
     () =>
-      vaults
+      vaults[network ? network.id : "1"]
         .filter((vault) => vault.state === VaultState.CLOSING)
         .sort((a, b) => b.timestamp - a.timestamp),
-    [vaults],
+    [vaults, network],
   );
   const closedVaults = useMemo(
     () =>
-      vaults
+      vaults[network ? network.id : "1"]
         .filter((vault) => vault.state === VaultState.CLOSED)
         .sort((a, b) => b.timestamp - a.timestamp),
-    [vaults],
+    [vaults, network],
   );
 
   return {

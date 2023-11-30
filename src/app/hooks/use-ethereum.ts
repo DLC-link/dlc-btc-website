@@ -267,7 +267,13 @@ export function useEthereum(): UseEthereumReturnType {
       const vaults: RawVault[] =
         await protocolContract.getAllVaultsForAddress(address);
       const formattedVaults: Vault[] = vaults.map(formatVault);
-      store.dispatch(vaultActions.setVaults(formattedVaults));
+      if (!network) return;
+      store.dispatch(
+        vaultActions.setVaults({
+          newVaults: formattedVaults,
+          networkID: network?.id,
+        }),
+      );
     } catch (error) {
       throwEthereumError(`Could not fetch vaults: `, error);
     }
@@ -288,8 +294,13 @@ export function useEthereum(): UseEthereumReturnType {
         if (vault.status !== vaultState)
           throw new Error("Vault is not in the correct state");
         const formattedVault: Vault = formatVault(vault);
+        if (!network) return;
         store.dispatch(
-          vaultActions.swapVault({ vaultUUID, updatedVault: formattedVault }),
+          vaultActions.swapVault({
+            vaultUUID,
+            updatedVault: formattedVault,
+            networkID: network?.id,
+          }),
         );
         return;
       } catch (error) {

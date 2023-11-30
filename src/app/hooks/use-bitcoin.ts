@@ -1,4 +1,4 @@
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { BitcoinError } from "@models/error-types";
 import { Vault } from "@models/vault";
@@ -6,6 +6,7 @@ import { mintUnmintActions } from "@store/slices/mintunmint/mintunmint.actions";
 import { vaultActions } from "@store/slices/vault/vault.actions";
 
 import { useEndpoints } from "./use-endpoints";
+import { RootState } from "@store/index";
 
 export interface UseBitcoinReturnType {
   fetchBitcoinContractOfferAndSendToUserWallet: (vault: Vault) => Promise<void>;
@@ -14,6 +15,7 @@ export interface UseBitcoinReturnType {
 export function useBitcoin(): UseBitcoinReturnType {
   const dispatch = useDispatch();
   const { routerWalletURL } = useEndpoints();
+  const { network } = useSelector((state: RootState) => state.account);
 
   function createURLParams(bitcoinContractOffer: any) {
     if (!routerWalletURL) {
@@ -40,10 +42,12 @@ export function useBitcoin(): UseBitcoinReturnType {
         "acceptBitcoinContractOffer",
         urlParams,
       );
+      if (!network) return;
       dispatch(
         vaultActions.setVaultToFunding({
           vaultUUID,
           fundingTX: response.result.txId,
+          networkID: network.id,
         }),
       );
       dispatch(mintUnmintActions.setMintStep(2));
