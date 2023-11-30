@@ -20,6 +20,7 @@ export interface UseEthereumReturnType {
   dlcBTCContract: Contract | undefined;
   dlcBTCBalance: number | undefined;
   lockedBTCBalance: number | undefined;
+  totalSupply: number | undefined;
   requestEthereumAccount: (network: Network) => Promise<void>;
   getAllVaults: () => Promise<void>;
   getVault: (vaultUUID: string, vaultState: VaultState) => Promise<void>;
@@ -60,6 +61,14 @@ export function useEthereum(): UseEthereumReturnType {
   const [lockedBTCBalance, setLockedBTCBalance] = useState<number | undefined>(
     undefined,
   );
+  const [totalSupply, setTotalSupply] = useState<number | undefined>(undefined);
+
+  useEffect(() => {
+    const fetchTotalSupply = async () => {
+    await getTotalSupply();
+    }
+    fetchTotalSupply();
+  }, [network])
 
   useEffect(() => {
     if (!address || !network) return;
@@ -108,6 +117,35 @@ export function useEthereum(): UseEthereumReturnType {
     };
   }
 
+  async function getTotalSupply() {
+    const provider = ethers.providers.getDefaultProvider('https://testrpc.x1.tech')
+    const branchName = import.meta.env.VITE_ETHEREUM_DEPLOYMENT_BRANCH;
+    const contractVersion = import.meta.env.VITE_ETHEREUM_DEPLOYMENT_VERSION;
+    const deploymentPlanURL = `https://raw.githubusercontent.com/DLC-link/dlc-solidity/${branchName}/deploymentFiles/x1test/v${contractVersion}/DLCBTC.json`;
+
+    try {
+      const response = await fetch(deploymentPlanURL);
+      const contractData = await response.json();
+      const protocolContract = new ethers.Contract(
+        contractData.contract.address,
+        contractData.contract.abi,
+        provider
+      );
+      const totalSupply = await protocolContract.totalSupply();
+      setTotalSupply(customShiftValue(
+        parseInt(totalSupply),
+        8,
+        true,
+      ));
+    } catch (error) {
+      console.log('error', error)
+
+      throw new EthereumError(
+        `Could not fetch deployment info for ${'asdkasdkads'} on ${'asdasd'}`,
+      );
+    }}
+
+
   async function setupEthereumConfiguration(network: Network): Promise<void> {
     const ethereumProvider = await getEthereumProvider(network);
     if (!ethereumProvider) {
@@ -120,6 +158,7 @@ export function useEthereum(): UseEthereumReturnType {
   async function getEthereumProvider(network: Network) {
     try {
       const { ethereum } = window;
+
       const browserProvider = new ethers.providers.Web3Provider(ethereum);
       const signer = browserProvider.getSigner();
 
@@ -358,6 +397,7 @@ export function useEthereum(): UseEthereumReturnType {
     dlcBTCContract,
     dlcBTCBalance,
     lockedBTCBalance,
+    totalSupply,
     requestEthereumAccount,
     getAllVaults,
     getVault,

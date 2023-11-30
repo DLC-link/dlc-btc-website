@@ -26,6 +26,7 @@ export function TransactionForm(): React.JSX.Element {
   const toast = useToast();
   const blockchainContext = useContext(BlockchainContext);
   const ethereum = blockchainContext?.ethereum;
+  const bitcoinPrice = blockchainContext?.bitcoin.bitcoinPrice;
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSetup(btcDepositAmount: number) {
@@ -64,7 +65,7 @@ export function TransactionForm(): React.JSX.Element {
                 <Text w={"100%"} color={"accent.cyan.01"}>
                   Amount of dlcBTC you want to mint:
                 </Text>
-                <TransactionFormInput values={values} />
+                <TransactionFormInput values={values} bitcoinPrice={bitcoinPrice} />
                 <FormErrorMessage fontSize={"xs"}>
                   {errors.amount}
                 </FormErrorMessage>
