@@ -2,27 +2,19 @@ import { EthereumNetwork } from "@models/network";
 import { Vault, VaultState } from "@models/vault";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
-interface Vaults {
-  1: Vault[];
-  5: Vault[];
-  6: Vault[];
-  195: Vault[];
-}
 interface VaultSliceState {
-  vaults: Vaults;
+  vaults: { [key in EthereumNetwork]: Vault[] };
   status: string;
   error: string | null;
 }
 
-const initialVaultsState: Vaults = {
-  1: [],
-  5: [],
-  6: [],
-  195: [],
-};
-
 const initialVaultState: VaultSliceState = {
-  vaults: initialVaultsState,
+  vaults: {
+    [EthereumNetwork.Mainnet]: [],
+    [EthereumNetwork.Goerli]: [],
+    [EthereumNetwork.Sepolia]: [],
+    [EthereumNetwork.X1Testnet]: [],
+  },
   status: "idle",
   error: null,
 };
