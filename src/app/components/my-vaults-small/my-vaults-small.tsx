@@ -33,7 +33,7 @@ export function MyVaultsSmall({
   } = useVaults();
 
   useEffect(() => {
-    if (network && ethereum?.isLoaded) {
+    if (address && network && ethereum?.isLoaded) {
       const fetchAddressData = async () => {
         await ethereum?.getAllVaults();
         await ethereum?.getDLCBTCBalance();
@@ -42,7 +42,7 @@ export function MyVaultsSmall({
       };
       fetchAddressData();
     }
-  }, [network, ethereum?.isLoaded]);
+  }, [address, network, ethereum?.isLoaded]);
 
   return (
     <MyVaultsSmallLayout>

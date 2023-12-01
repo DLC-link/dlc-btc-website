@@ -227,7 +227,9 @@ export function useEthereum(): UseEthereumReturnType {
         network,
       };
 
+      setIsLoaded(false);
       await setupEthereumConfiguration(network);
+      setIsLoaded(true);
 
       store.dispatch(accountActions.login(accountInformation));
     } catch (error) {
