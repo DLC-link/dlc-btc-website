@@ -7,6 +7,10 @@ import { useVaults } from "@hooks/use-vaults";
 
 import { VaultsListGroupContainer } from "../vaults-list/components/vaults-list-group-container";
 import { MyVaultsSmallLayout } from "./components/my-vaults-small.layout";
+import { useContext, useEffect, useState } from "react";
+import { BlockchainContext } from "../../providers/blockchain-context-provider";
+import { useSelector } from "react-redux";
+import { RootState } from "@store/index";
 
 interface MyVaultsSmallProps {
   address?: string;
@@ -16,6 +20,10 @@ export function MyVaultsSmall({
   address,
 }: MyVaultsSmallProps): React.JSX.Element {
   const navigate = useNavigate();
+  const [isLoaded, setIsLoaded] = useState(false);
+  const { network } = useSelector((state: RootState) => state.account);
+  const blockchainContext = useContext(BlockchainContext);
+  const ethereum = blockchainContext?.ethereum;
   const {
     readyVaults,
     fundingVaults,
@@ -24,10 +32,22 @@ export function MyVaultsSmall({
     closedVaults,
   } = useVaults();
 
+  useEffect(() => {
+    if (network && ethereum?.isLoaded) {
+      const fetchAddressData = async () => {
+        await ethereum?.getAllVaults();
+        await ethereum?.getDLCBTCBalance();
+        await ethereum?.getLockedBTCBalance();
+        setIsLoaded(true);
+      };
+      fetchAddressData();
+    }
+  }, [network, ethereum?.isLoaded]);
+
   return (
     <MyVaultsSmallLayout>
       <VaultsList title={"My Vaults"} height={"545px"} isScrollable={!address}>
-        {address ? (
+        {address && isLoaded ? (
           <>
             <VaultsListGroupContainer label="Lock BTC" vaults={readyVaults} />
             <VaultsListGroupContainer
