@@ -4,7 +4,13 @@ import { useSelector } from "react-redux";
 
 import { customShiftValue } from "@common/utilities";
 import { EthereumError } from "@models/error-types";
-import { Network, ethereumNetworks } from "@models/network";
+import {
+  Network,
+  addNetworkParams,
+  ethereumNetworks,
+  hexChainIDs,
+} from "@models/network";
+import { EthereumNetwork } from "@models/network";
 import { RawVault, Vault, VaultState } from "@models/vault";
 import { RootState, store } from "@store/index";
 import { accountActions } from "@store/slices/account/account.actions";
@@ -19,13 +25,16 @@ export interface UseEthereumReturnType {
   dlcManagerContract: Contract | undefined;
   dlcBTCContract: Contract | undefined;
   dlcBTCBalance: number | undefined;
+  getDLCBTCBalance: () => Promise<void>;
   lockedBTCBalance: number | undefined;
+  getLockedBTCBalance: () => Promise<void>;
   requestEthereumAccount: (network: Network) => Promise<void>;
   getAllVaults: () => Promise<void>;
   getVault: (vaultUUID: string, vaultState: VaultState) => Promise<void>;
   setupVault: (btcDepositAmount: number) => Promise<void>;
   closeVault: (vaultUUID: string) => Promise<void>;
   recommendTokenToMetamask: () => Promise<boolean>;
+  isLoaded: boolean;
 }
 
 function throwEthereumError(message: string, error: any): void {
@@ -43,6 +52,8 @@ function throwEthereumError(message: string, error: any): void {
 export function useEthereum(): UseEthereumReturnType {
   const { fundedVaults } = useVaults();
   const { address, network } = useSelector((state: RootState) => state.account);
+
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
   const [protocolContract, setProtocolContract] = useState<
     Contract | undefined
@@ -65,37 +76,14 @@ export function useEthereum(): UseEthereumReturnType {
     if (!address || !network) return;
 
     if (!protocolContract && !dlcManagerContract && !dlcBTCContract) {
-      setupEthereumConfiguration(network);
+      const setupConfiguration = async () => {
+        setIsLoaded(false);
+        await setupEthereumConfiguration(network);
+        setIsLoaded(true);
+      };
+      setupConfiguration();
     }
   }, [address, network, protocolContract, dlcManagerContract, dlcBTCContract]);
-
-  useEffect(() => {
-    if (!address || !network || !protocolContract) return;
-
-    getAllVaults();
-  }, [address, network, protocolContract]);
-
-  useEffect(() => {
-    if (!address || !protocolContract || !dlcManagerContract || !dlcBTCContract)
-      return;
-
-    const fetchBalance = async () => {
-      try {
-        await getDLCBTCBalance();
-        await getLockedBTCBalance();
-      } catch (error) {
-        throwEthereumError(`Could not fetch balance: `, error);
-      }
-    };
-
-    fetchBalance();
-  }, [
-    address,
-    fundedVaults,
-    protocolContract,
-    dlcManagerContract,
-    dlcBTCContract,
-  ]);
 
   function formatVault(vault: any): Vault {
     return {
@@ -108,27 +96,67 @@ export function useEthereum(): UseEthereumReturnType {
     };
   }
 
+  async function addEthereumNetwork(
+    newEthereumNetwork: EthereumNetwork,
+  ): Promise<void> {
+    const { ethereum } = window;
+    try {
+      await ethereum.request({
+        method: "wallet_addEthereumChain",
+        params: addNetworkParams[newEthereumNetwork],
+      });
+    } catch (error: any) {
+      throwEthereumError(`Could not add Ethereum network: `, error);
+    }
+  }
+
+  async function switchEthereumNetwork(
+    newEthereumNetwork: EthereumNetwork,
+  ): Promise<void> {
+    const { ethereum } = window;
+    try {
+      await ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: hexChainIDs[newEthereumNetwork] }],
+      });
+    } catch (error: any) {
+      if (error.code === 4902) {
+        await addEthereumNetwork(newEthereumNetwork);
+      } else {
+        throwEthereumError(`Could not switch Ethereum network: `, error);
+      }
+    }
+  }
+
   async function setupEthereumConfiguration(network: Network): Promise<void> {
     const ethereumProvider = await getEthereumProvider(network);
     if (!ethereumProvider) {
       throw new EthereumError("Failed to get Ethereum provider");
     }
     const { walletNetworkChainID, signer } = ethereumProvider;
+    if (!walletNetworkChainID || !signer) {
+      throw new EthereumError(
+        "Failed to get wallet network chain ID or signer",
+      );
+    }
     await getEthereumContracts(walletNetworkChainID, signer);
   }
 
   async function getEthereumProvider(network: Network) {
     try {
       const { ethereum } = window;
-      const browserProvider = new ethers.providers.Web3Provider(ethereum);
+      const browserProvider = new ethers.providers.Web3Provider(
+        ethereum,
+        "any",
+      );
       const signer = browserProvider.getSigner();
 
       const walletNetwork = await browserProvider.getNetwork();
       const walletNetworkChainID = walletNetwork.chainId.toString();
 
       if (walletNetworkChainID !== network?.id) {
-        alert(`Please connect to ${network?.name}`);
-        return;
+        await switchEthereumNetwork(network?.id);
+        window.location.reload();
       }
       return { walletNetworkChainID, signer };
     } catch (error) {
@@ -199,7 +227,9 @@ export function useEthereum(): UseEthereumReturnType {
         network,
       };
 
+      setIsLoaded(false);
       await setupEthereumConfiguration(network);
+      setIsLoaded(true);
 
       store.dispatch(accountActions.login(accountInformation));
     } catch (error) {
@@ -368,12 +398,15 @@ export function useEthereum(): UseEthereumReturnType {
     dlcManagerContract,
     dlcBTCContract,
     dlcBTCBalance,
+    getDLCBTCBalance,
     lockedBTCBalance,
+    getLockedBTCBalance,
     requestEthereumAccount,
     getAllVaults,
     getVault,
     setupVault,
     closeVault,
     recommendTokenToMetamask,
+    isLoaded,
   };
 }
