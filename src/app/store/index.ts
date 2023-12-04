@@ -38,7 +38,7 @@ const rootReducer = combineReducers({
 const persistConfig: PersistConfig<RootState> = {
   key: "root",
   storage: storage,
-  whitelist: ["account", "vault", "mintunmint"],
+  whitelist: ["account", "vault"],
   transforms: [
     expireReducer("account", {
       persistedAtKey: "loadedAt",

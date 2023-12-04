@@ -6,15 +6,18 @@ import { MyVaults } from "@pages/my-vaults/my-vaults";
 import { About } from "./pages/about/about";
 import { Dashboard } from "./pages/dashboard/dashboard";
 import { BlockchainContextProvider } from "./providers/blockchain-context-provider";
+import { VaultContextProvider } from "./providers/vault-context-provider";
 
 export function App(): React.JSX.Element {
   return (
     <BlockchainContextProvider>
-      <AppLayout>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/my-vaults" element={<MyVaults />} />
-        <Route path="/how-it-works" element={<About />} />
-      </AppLayout>
+      <VaultContextProvider>
+        <AppLayout>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/my-vaults" element={<MyVaults />} />
+          <Route path="/how-it-works" element={<About />} />
+        </AppLayout>
+      </VaultContextProvider>
     </BlockchainContextProvider>
   );
 }

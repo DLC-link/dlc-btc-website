@@ -18,6 +18,7 @@ export const modalSlice = createSlice({
       state.isSelectWalletModalOpen = !state.isSelectWalletModalOpen;
     },
     toggleSuccessfulFlowModalVisibility: (state, action) => {
+      console.log(action.payload);
       state.isSuccesfulFlowModalOpen = [
         !state.isSuccesfulFlowModalOpen[0],
         action.payload,
