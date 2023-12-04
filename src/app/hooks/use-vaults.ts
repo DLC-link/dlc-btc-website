@@ -1,18 +1,40 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 
 import { Vault, VaultState } from "@models/vault";
 import { RootState } from "@store/index";
 
-export function useVaults(): {
+import { UseEthereumReturnType } from "./use-ethereum";
+
+export interface UseVaultsReturnType {
   readyVaults: Vault[];
   fundingVaults: Vault[];
   fundedVaults: Vault[];
   closingVaults: Vault[];
   closedVaults: Vault[];
-} {
+  isLoading: boolean;
+}
+
+export function useVaults(
+  ethereum?: UseEthereumReturnType,
+): UseVaultsReturnType {
   const { vaults } = useSelector((state: RootState) => state.vault);
-  const { network } = useSelector((state: RootState) => state.account);
+  const { address, network } = useSelector((state: RootState) => state.account);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!address || !network || !ethereum) return;
+    const { getAllVaults, isLoaded: isEthereumConfigLoaded } = ethereum;
+
+    if (!isEthereumConfigLoaded) return;
+
+    const fetchData = async () => {
+      setIsLoading(true);
+      await getAllVaults();
+      setIsLoading(false);
+    };
+    fetchData();
+  }, [address, network, ethereum?.isLoaded]);
 
   const readyVaults = useMemo(
     () =>
@@ -56,5 +78,6 @@ export function useVaults(): {
     closingVaults,
     fundedVaults,
     closedVaults,
+    isLoading,
   };
 }

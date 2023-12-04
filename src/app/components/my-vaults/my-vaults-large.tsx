@@ -1,12 +1,12 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { useSelector } from "react-redux";
 
 import { HStack } from "@chakra-ui/react";
 import { VaultsListGroupBlankContainer } from "@components/vaults-list/components/vaults-list-group-blank-container";
 import { VaultsListGroupContainer } from "@components/vaults-list/components/vaults-list-group-container";
 import { VaultsList } from "@components/vaults-list/vaults-list";
-import { useVaults } from "@hooks/use-vaults";
 import { RootState } from "@store/index";
+import { VaultContext } from "../../providers/vault-context-provider";
 
 import { BlockchainContext } from "../../providers/blockchain-context-provider";
 import { MyVaultsLargeHeader } from "./components/my-vaults-header/my-vaults-header";
@@ -15,16 +15,29 @@ import { MyVaultsSetupInformationStack } from "./components/my-vaults-setup-info
 
 export function MyVaultsLarge(): React.JSX.Element {
   const { address } = useSelector((state: RootState) => state.account);
+
+  const blockchainContext = useContext(BlockchainContext);
+  const ethereum = blockchainContext?.ethereum;
+
+  const vaultContext = useContext(VaultContext);
   const {
     readyVaults,
     fundingVaults,
     fundedVaults,
     closingVaults,
     closedVaults,
-  } = useVaults();
+  } = vaultContext.vaults;
 
-  const blockchainContext = useContext(BlockchainContext);
-  const ethereum = blockchainContext?.ethereum;
+  useEffect(() => {
+    if (!ethereum || !address) return;
+
+    const { getDLCBTCBalance, getLockedBTCBalance } = ethereum;
+    const fetchData = async () => {
+      await getDLCBTCBalance();
+      await getLockedBTCBalance();
+    };
+    fetchData();
+  }, [ethereum?.isLoaded, address]);
 
   return (
     <MyVaultsLargeLayout>
@@ -38,7 +51,7 @@ export function MyVaultsLarge(): React.JSX.Element {
           <VaultsList
             title={"In Process"}
             height={"475px"}
-            isScrollable={!address}
+            isScrollable={!!address}
           >
             <VaultsListGroupContainer label="Lock BTC" vaults={readyVaults} />
             <VaultsListGroupContainer
@@ -56,7 +69,7 @@ export function MyVaultsLarge(): React.JSX.Element {
         <VaultsList
           title={"Minted dlcBTC"}
           height={"475px"}
-          isScrollable={!address}
+          isScrollable={!!address}
         >
           {address ? (
             <VaultsListGroupContainer vaults={fundedVaults} />
@@ -67,7 +80,7 @@ export function MyVaultsLarge(): React.JSX.Element {
         <VaultsList
           title={"Closed Vaults"}
           height={"475px"}
-          isScrollable={!address}
+          isScrollable={!!address}
         >
           {address ? (
             <VaultsListGroupContainer vaults={closedVaults} />
