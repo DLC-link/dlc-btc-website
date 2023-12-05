@@ -20,7 +20,7 @@ export function useVaults(
 ): UseVaultsReturnType {
   const { vaults } = useSelector((state: RootState) => state.vault);
   const { address, network } = useSelector((state: RootState) => state.account);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!address || !network || !ethereum) return;

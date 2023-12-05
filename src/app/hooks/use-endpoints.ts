@@ -43,7 +43,7 @@ export function useEndpoints(): UseEndpointsReturnType {
         return {
           routerWalletURL: "https://devnet.dlc.link/eth-wallet",
           ethereumExplorerAPIURL: "https://sepolia.etherscan.io/tx/",
-          bitcoinExplorerAPIURL: "https://blockstream.info/testnet/tx/",
+          bitcoinExplorerAPIURL: "http://devnet.dlc.link/electrs/tx/",
         };
       case EthereumNetwork.Goerli:
         return {
