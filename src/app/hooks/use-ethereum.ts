@@ -132,8 +132,11 @@ export function useEthereum(): UseEthereumReturnType {
     newEthereumNetwork: EthereumNetwork,
   ): Promise<void> {
     const { ethereum } = window;
+    const metamaskProvider = ethereum.providers.find(
+      (provider: any) => provider.isMetaMask,
+    );
     try {
-      await ethereum.request({
+      await metamaskProvider.request({
         method: "wallet_addEthereumChain",
         params: addNetworkParams[newEthereumNetwork],
       });
@@ -146,8 +149,11 @@ export function useEthereum(): UseEthereumReturnType {
     newEthereumNetwork: EthereumNetwork,
   ): Promise<void> {
     const { ethereum } = window;
+    const metamaskProvider = ethereum.providers.find(
+      (provider: any) => provider.isMetaMask,
+    );
     try {
-      await ethereum.request({
+      await metamaskProvider.request({
         method: "wallet_switchEthereumChain",
         params: [{ chainId: hexChainIDs[newEthereumNetwork] }],
       });
@@ -178,7 +184,7 @@ export function useEthereum(): UseEthereumReturnType {
     try {
       const { ethereum } = window;
       const browserProvider = new ethers.providers.Web3Provider(
-        ethereum,
+        ethereum.providers.find((provider: any) => provider.isMetaMask),
         "any",
       );
       const signer = browserProvider.getSigner();
@@ -244,12 +250,16 @@ export function useEthereum(): UseEthereumReturnType {
     try {
       const { ethereum } = window;
 
-      if (!ethereum) {
+      const metamaskProvider = ethereum.providers.find(
+        (provider: any) => provider.isMetaMask,
+      );
+
+      if (!metamaskProvider) {
         alert("Install MetaMask!");
         return;
       }
 
-      const ethereumAccounts = await ethereum.request({
+      const ethereumAccounts = await metamaskProvider.request({
         method: "eth_requestAccounts",
       });
 
@@ -400,8 +410,11 @@ export function useEthereum(): UseEthereumReturnType {
   async function recommendTokenToMetamask(): Promise<boolean> {
     try {
       const { ethereum } = window;
-      if (!ethereum) return false;
-      const response = await ethereum.request({
+      const metamaskProvider = ethereum.providers.find(
+        (provider: any) => provider.isMetaMask,
+      );
+      if (!metamaskProvider) return false;
+      const response = await metamaskProvider.request({
         method: "wallet_watchAsset",
         params: {
           type: "ERC20",
