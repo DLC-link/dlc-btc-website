@@ -76,10 +76,10 @@ export function useEthereum(): UseEthereumReturnType {
 
   useEffect(() => {
     const fetchTotalSupply = async () => {
-    await getTotalSupply();
-    }
+      await getTotalSupply();
+    };
     fetchTotalSupply();
-  }, [network])
+  }, [network]);
 
   useEffect(() => {
     if (!address || !network) return;
@@ -106,10 +106,12 @@ export function useEthereum(): UseEthereumReturnType {
   }
 
   async function getTotalSupply() {
-    const provider = ethers.providers.getDefaultProvider('https://testrpc.x1.tech')
+    const provider = ethers.providers.getDefaultProvider(
+      "https://ethereum-sepolia.publicnode.com/",
+    );
     const branchName = import.meta.env.VITE_ETHEREUM_DEPLOYMENT_BRANCH;
     const contractVersion = import.meta.env.VITE_ETHEREUM_DEPLOYMENT_VERSION;
-    const deploymentPlanURL = `https://raw.githubusercontent.com/DLC-link/dlc-solidity/${branchName}/deploymentFiles/x1test/v${contractVersion}/DLCBTC.json`;
+    const deploymentPlanURL = `https://raw.githubusercontent.com/DLC-link/dlc-solidity/${branchName}/deploymentFiles/sepolia/v${contractVersion}/DLCBTC.json`;
 
     try {
       const response = await fetch(deploymentPlanURL);
@@ -117,21 +119,14 @@ export function useEthereum(): UseEthereumReturnType {
       const protocolContract = new ethers.Contract(
         contractData.contract.address,
         contractData.contract.abi,
-        provider
+        provider,
       );
       const totalSupply = await protocolContract.totalSupply();
-      setTotalSupply(customShiftValue(
-        parseInt(totalSupply),
-        8,
-        true,
-      ));
+      setTotalSupply(customShiftValue(parseInt(totalSupply), 8, true));
     } catch (error) {
-      console.log('error', error)
-
-      throw new EthereumError(
-        `Could not fetch deployment info for ${'asdkasdkads'} on ${'asdasd'}`,
-      );
-    }}
+      throw new EthereumError(`Could not fetch total supply info: ${error}}`);
+    }
+  }
 
   async function addEthereumNetwork(
     newEthereumNetwork: EthereumNetwork,

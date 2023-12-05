@@ -1,9 +1,9 @@
 import { useDispatch, useSelector } from "react-redux";
 
-import { BitcoinError } from '@models/error-types';
-import { Vault } from '@models/vault';
-import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
-import { vaultActions } from '@store/slices/vault/vault.actions';
+import { BitcoinError } from "@models/error-types";
+import { Vault } from "@models/vault";
+import { mintUnmintActions } from "@store/slices/mintunmint/mintunmint.actions";
+import { vaultActions } from "@store/slices/vault/vault.actions";
 
 import { useEndpoints } from "./use-endpoints";
 import { RootState } from "@store/index";
@@ -29,18 +29,18 @@ export function useBitcoin(): UseBitcoinReturnType {
 
   function createURLParams(bitcoinContractOffer: any) {
     if (!routerWalletURL) {
-      throw new BitcoinError('Router wallet URL is undefined');
+      throw new BitcoinError("Router wallet URL is undefined");
     }
 
     const counterPartyWalletDetails = {
       counterpartyWalletURL: routerWalletURL,
-      counterpartyWalletName: 'DLC.Link',
+      counterpartyWalletName: "DLC.Link",
       counterpartyWalletIcon:
-        'https://dlc-public-assets.s3.amazonaws.com/DLC.Link_logo_icon_color.svg',
+        "https://dlc-public-assets.s3.amazonaws.com/DLC.Link_logo_icon_color.svg",
     };
     const urlParams = {
       bitcoinContractOffer: JSON.stringify(bitcoinContractOffer),
-      bitcoinNetwork: JSON.stringify('regtest'),
+      bitcoinNetwork: JSON.stringify("regtest"),
       counterpartyWalletDetails: JSON.stringify(counterPartyWalletDetails),
     };
     return urlParams;
@@ -62,15 +62,17 @@ export function useBitcoin(): UseBitcoinReturnType {
       );
       dispatch(mintUnmintActions.setMintStep(2));
     } catch (error: any) {
-      throw new BitcoinError(`Could not send contract offer for signing: ${error.error.message}`);
+      throw new BitcoinError(
+        `Could not send contract offer for signing: ${error.error.message}`,
+      );
     }
   }
 
   async function fetchBitcoinContractOfferFromCounterpartyWallet(vault: Vault) {
     try {
       const response = await fetch(`${routerWalletURL}/offer`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           uuid: vault.uuid,
         }),
@@ -82,13 +84,14 @@ export function useBitcoin(): UseBitcoinReturnType {
       return responseStream;
     } catch (error: any) {
       throw new BitcoinError(
-        `Could not fetch contract offer from counterparty wallet: ${error.message}`
+        `Could not fetch contract offer from counterparty wallet: ${error.message}`,
       );
     }
   }
 
   async function fetchBitcoinContractOfferAndSendToUserWallet(vault: Vault) {
-    const bitcoinContractOffer = await fetchBitcoinContractOfferFromCounterpartyWallet(vault);
+    const bitcoinContractOffer =
+      await fetchBitcoinContractOfferFromCounterpartyWallet(vault);
     if (!bitcoinContractOffer) return;
     const urlParams = createURLParams(bitcoinContractOffer);
     await sendOfferForSigning(urlParams, vault.uuid);
@@ -96,9 +99,12 @@ export function useBitcoin(): UseBitcoinReturnType {
 
   async function fetchBitcoinPrice() {
     try {
-      const response = await fetch('https://api.coindesk.com/v1/bpi/currentprice.json', {
-        headers: { Accept: 'application/json' },
-      });
+      const response = await fetch(
+        "https://api.coindesk.com/v1/bpi/currentprice.json",
+        {
+          headers: { Accept: "application/json" },
+        },
+      );
       const message = await response.json();
       const bitcoinUSDPrice = message.bpi.USD.rate_float;
       setBitcoinPrice(bitcoinUSDPrice);

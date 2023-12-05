@@ -1,5 +1,4 @@
 import React, { createContext } from "react";
-import { useDispatch } from "react-redux";
 
 import { UseBitcoinReturnType, useBitcoin } from "@hooks/use-bitcoin";
 import { UseEthereumReturnType, useEthereum } from "@hooks/use-ethereum";
@@ -17,11 +16,10 @@ export const BlockchainContext = createContext<BlockchainContextType | null>(
 export function BlockchainContextProvider({
   children,
 }: HasChildren): React.JSX.Element {
-  const dispatch = useDispatch();
   const ethereum = useEthereum();
   const bitcoin = useBitcoin();
 
-  useObserver(ethereum, dispatch);
+  useObserver(ethereum);
 
   return (
     <BlockchainContext.Provider value={{ ethereum, bitcoin }}>

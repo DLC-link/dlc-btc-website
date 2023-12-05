@@ -65,7 +65,10 @@ export function TransactionForm(): React.JSX.Element {
                 <Text w={"100%"} color={"accent.cyan.01"}>
                   Amount of dlcBTC you want to mint:
                 </Text>
-                <TransactionFormInput values={values} bitcoinPrice={bitcoinPrice} />
+                <TransactionFormInput
+                  values={values}
+                  bitcoinPrice={bitcoinPrice}
+                />
                 <FormErrorMessage fontSize={"xs"}>
                   {errors.amount}
                 </FormErrorMessage>

@@ -16,7 +16,10 @@ export function LockScreen(): React.JSX.Element {
   return (
     <VStack w={"300px"} spacing={"15px"}>
       <VaultCard vault={readyVaults[0]} isSelected />
-      <LockScreenProtocolFee assetAmount={readyVaults[0].collateral} bitcoinPrice={bitcoin?.bitcoinPrice}/>
+      <LockScreenProtocolFee
+        assetAmount={readyVaults[0].collateral}
+        bitcoinPrice={bitcoin?.bitcoinPrice}
+      />
       <Button
         isLoading={isSubmitting}
         variant={"account"}

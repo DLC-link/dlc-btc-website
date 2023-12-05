@@ -20,7 +20,7 @@ interface TransactionFormInputProps {
 
 export function TransactionFormInput({
   values,
-  bitcoinPrice
+  bitcoinPrice,
 }: TransactionFormInputProps): React.JSX.Element {
   return (
     <VStack

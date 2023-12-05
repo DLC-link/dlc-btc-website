@@ -1,17 +1,14 @@
-import { Dispatch, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
+import { VaultState } from "@models/vault";
 import { RootState } from "@store/index";
 import { mintUnmintActions } from "@store/slices/mintunmint/mintunmint.actions";
-import { AnyAction } from "redux";
-import { UseEthereumReturnType } from "./use-ethereum";
 import { modalActions } from "@store/slices/modal/modal.actions";
-import { VaultState } from "@models/vault";
+import { UseEthereumReturnType } from "./use-ethereum";
 
-export function useObserver(
-  ethereum: UseEthereumReturnType,
-  dispatch: Dispatch<AnyAction>,
-): void {
+export function useObserver(ethereum: UseEthereumReturnType): void {
+  const dispatch = useDispatch();
   const { address, network } = useSelector((state: RootState) => state.account);
   const {
     protocolContract,
