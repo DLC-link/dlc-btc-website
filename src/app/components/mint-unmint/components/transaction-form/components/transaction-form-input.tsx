@@ -15,10 +15,12 @@ function validateTokenAmount(value: number): string | undefined {
 
 interface TransactionFormInputProps {
   values: TransactionFormValues;
+  bitcoinPrice?: number;
 }
 
 export function TransactionFormInput({
   values,
+  bitcoinPrice,
 }: TransactionFormInputProps): React.JSX.Element {
   return (
     <VStack
@@ -54,7 +56,7 @@ export function TransactionFormInput({
         <Text fontSize={"xl"}>dlcBTC</Text>
       </HStack>
       <Text pl={"30px"} color={"gray"} fontSize={"sm"}>
-        = ~{(values.amount * 36131.1).toFixed(4)}$
+        {bitcoinPrice && `= ~${(values.amount * bitcoinPrice).toFixed(4)}$`}
       </Text>
     </VStack>
   );

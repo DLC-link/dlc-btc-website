@@ -28,6 +28,7 @@ export interface UseEthereumReturnType {
   getDLCBTCBalance: () => Promise<void>;
   lockedBTCBalance: number | undefined;
   getLockedBTCBalance: () => Promise<void>;
+  totalSupply: number | undefined;
   requestEthereumAccount: (network: Network) => Promise<void>;
   getAllVaults: () => Promise<void>;
   getVault: (vaultUUID: string, vaultState: VaultState) => Promise<void>;
@@ -71,6 +72,14 @@ export function useEthereum(): UseEthereumReturnType {
   const [lockedBTCBalance, setLockedBTCBalance] = useState<number | undefined>(
     undefined,
   );
+  const [totalSupply, setTotalSupply] = useState<number | undefined>(undefined);
+
+  useEffect(() => {
+    const fetchTotalSupply = async () => {
+      await getTotalSupply();
+    };
+    fetchTotalSupply();
+  }, [network]);
 
   useEffect(() => {
     if (!address || !network) return;
@@ -94,6 +103,29 @@ export function useEthereum(): UseEthereumReturnType {
       closingTX: vault.closingTxId,
       timestamp: parseInt(vault.timestamp),
     };
+  }
+
+  async function getTotalSupply() {
+    const provider = ethers.providers.getDefaultProvider(
+      "https://ethereum-sepolia.publicnode.com/",
+    );
+    const branchName = import.meta.env.VITE_ETHEREUM_DEPLOYMENT_BRANCH;
+    const contractVersion = import.meta.env.VITE_ETHEREUM_DEPLOYMENT_VERSION;
+    const deploymentPlanURL = `https://raw.githubusercontent.com/DLC-link/dlc-solidity/${branchName}/deploymentFiles/sepolia/v${contractVersion}/DLCBTC.json`;
+
+    try {
+      const response = await fetch(deploymentPlanURL);
+      const contractData = await response.json();
+      const protocolContract = new ethers.Contract(
+        contractData.contract.address,
+        contractData.contract.abi,
+        provider,
+      );
+      const totalSupply = await protocolContract.totalSupply();
+      setTotalSupply(customShiftValue(parseInt(totalSupply), 8, true));
+    } catch (error) {
+      throw new EthereumError(`Could not fetch total supply info: ${error}}`);
+    }
   }
 
   async function addEthereumNetwork(
@@ -400,6 +432,7 @@ export function useEthereum(): UseEthereumReturnType {
     dlcBTCBalance,
     getDLCBTCBalance,
     lockedBTCBalance,
+    totalSupply,
     getLockedBTCBalance,
     requestEthereumAccount,
     getAllVaults,

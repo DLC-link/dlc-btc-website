@@ -7,14 +7,24 @@ import { vaultActions } from "@store/slices/vault/vault.actions";
 
 import { useEndpoints } from "./use-endpoints";
 import { RootState } from "@store/index";
+import { useEffect, useState } from "react";
 
 export interface UseBitcoinReturnType {
   fetchBitcoinContractOfferAndSendToUserWallet: (vault: Vault) => Promise<void>;
+  bitcoinPrice: number;
 }
 
 export function useBitcoin(): UseBitcoinReturnType {
   const dispatch = useDispatch();
   const { routerWalletURL } = useEndpoints();
+  const [bitcoinPrice, setBitcoinPrice] = useState(0);
+
+  useEffect(() => {
+    const getBitcoinPrice = async () => {
+      await fetchBitcoinPrice();
+    };
+    getBitcoinPrice();
+  }, []);
   const { network } = useSelector((state: RootState) => state.account);
 
   function createURLParams(bitcoinContractOffer: any) {
@@ -87,7 +97,24 @@ export function useBitcoin(): UseBitcoinReturnType {
     await sendOfferForSigning(urlParams, vault.uuid);
   }
 
+  async function fetchBitcoinPrice() {
+    try {
+      const response = await fetch(
+        "https://api.coindesk.com/v1/bpi/currentprice.json",
+        {
+          headers: { Accept: "application/json" },
+        },
+      );
+      const message = await response.json();
+      const bitcoinUSDPrice = message.bpi.USD.rate_float;
+      setBitcoinPrice(bitcoinUSDPrice);
+    } catch (error: any) {
+      throw new BitcoinError(`Could not fetch bitcoin price: ${error.message}`);
+    }
+  }
+
   return {
     fetchBitcoinContractOfferAndSendToUserWallet,
+    bitcoinPrice,
   };
 }

@@ -2,6 +2,7 @@ import { HStack, Text, VStack } from "@chakra-ui/react";
 
 interface LockScreenProtocolFeeProps {
   assetAmount?: number;
+  bitcoinPrice?: number;
 }
 
 function calculateProtocolFee(
@@ -21,6 +22,7 @@ function calculateProtocolFeeInUSD(
 
 export function LockScreenProtocolFee({
   assetAmount,
+  bitcoinPrice,
 }: LockScreenProtocolFeeProps): React.JSX.Element {
   return (
     <VStack
@@ -41,7 +43,9 @@ export function LockScreenProtocolFee({
       </HStack>
       <Text color={"white.01"} fontSize={"sm"}>
         ={" "}
-        {assetAmount && calculateProtocolFeeInUSD(assetAmount, 36.142, 0.0001)}{" "}
+        {assetAmount &&
+          bitcoinPrice &&
+          calculateProtocolFeeInUSD(assetAmount, bitcoinPrice, 0.0001)}{" "}
         $
       </Text>
     </VStack>
