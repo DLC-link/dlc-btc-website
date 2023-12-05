@@ -24,10 +24,10 @@ export function VaultsList({
         </Text>
       )}
       <VStack
-        overflowY={isScrollable ? "hidden" : "scroll"}
+        overflowY={isScrollable ? "scroll" : "hidden"}
         overflowX={"hidden"}
         alignItems={"start"}
-        pr={isScrollable ? "0px" : "15px"}
+        pr={isScrollable ? "15px" : "0px"}
         pb={"15px"}
         w={"100%"}
         css={scrollBarCSS}

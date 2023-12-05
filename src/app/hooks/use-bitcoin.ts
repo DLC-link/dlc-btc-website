@@ -1,12 +1,13 @@
-import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from "react-redux";
 
 import { BitcoinError } from '@models/error-types';
 import { Vault } from '@models/vault';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { vaultActions } from '@store/slices/vault/vault.actions';
 
-import { useEndpoints } from './use-endpoints';
+import { useEndpoints } from "./use-endpoints";
+import { RootState } from "@store/index";
+import { useEffect, useState } from "react";
 
 export interface UseBitcoinReturnType {
   fetchBitcoinContractOfferAndSendToUserWallet: (vault: Vault) => Promise<void>;
@@ -24,6 +25,7 @@ export function useBitcoin(): UseBitcoinReturnType {
     };
     getBitcoinPrice();
   }, []);
+  const { network } = useSelector((state: RootState) => state.account);
 
   function createURLParams(bitcoinContractOffer: any) {
     if (!routerWalletURL) {
@@ -46,12 +48,17 @@ export function useBitcoin(): UseBitcoinReturnType {
 
   async function sendOfferForSigning(urlParams: any, vaultUUID: string) {
     try {
-      const response = await window.btc.request('acceptBitcoinContractOffer', urlParams);
+      const response = await window.btc.request(
+        "acceptBitcoinContractOffer",
+        urlParams,
+      );
+      if (!network) return;
       dispatch(
         vaultActions.setVaultToFunding({
           vaultUUID,
           fundingTX: response.result.txId,
-        })
+          networkID: network.id,
+        }),
       );
       dispatch(mintUnmintActions.setMintStep(2));
     } catch (error: any) {
