@@ -25,10 +25,8 @@ export interface UseEthereumReturnType {
   protocolContract: Contract | undefined;
   dlcManagerContract: Contract | undefined;
   dlcBTCContract: Contract | undefined;
-  dlcBTCBalance: number | undefined;
-  getDLCBTCBalance: () => Promise<void>;
-  lockedBTCBalance: number | undefined;
-  getLockedBTCBalance: () => Promise<void>;
+  getDLCBTCBalance: () => Promise<number | undefined>;
+  getLockedBTCBalance: () => Promise<number | undefined>;
   totalSupply: number | undefined;
   requestEthereumAccount: (
     network: Network,
@@ -74,12 +72,6 @@ export function useEthereum(): UseEthereumReturnType {
     undefined,
   );
 
-  const [dlcBTCBalance, setDLCBTCBalance] = useState<number | undefined>(
-    undefined,
-  );
-  const [lockedBTCBalance, setLockedBTCBalance] = useState<number | undefined>(
-    undefined,
-  );
   const [totalSupply, setTotalSupply] = useState<number | undefined>(undefined);
 
   useEffect(() => {
@@ -338,19 +330,19 @@ export function useEthereum(): UseEthereumReturnType {
     }
   }
 
-  async function getLockedBTCBalance(): Promise<void> {
+  async function getLockedBTCBalance(): Promise<number | undefined> {
     try {
       const totalCollateral = fundedVaults.reduce(
         (sum: number, vault: Vault) => sum + vault.collateral,
         0,
       );
-      setLockedBTCBalance(Number(totalCollateral.toFixed(5)));
+      return Number(totalCollateral.toFixed(5));
     } catch (error) {
       throwEthereumError(`Could not fetch locked BTC balance: `, error);
     }
   }
 
-  async function getDLCBTCBalance(): Promise<void> {
+  async function getDLCBTCBalance(): Promise<number | undefined> {
     try {
       if (!dlcBTCContract) throw new Error("Protocol contract not initialized");
       await dlcBTCContract.callStatic.balanceOf(address);
@@ -359,7 +351,7 @@ export function useEthereum(): UseEthereumReturnType {
         8,
         true,
       );
-      setDLCBTCBalance(dlcBTCBalance);
+      return dlcBTCBalance;
     } catch (error) {
       throwEthereumError(`Could not fetch dlcBTC balance: `, error);
     }
@@ -474,9 +466,7 @@ export function useEthereum(): UseEthereumReturnType {
     protocolContract,
     dlcManagerContract,
     dlcBTCContract,
-    dlcBTCBalance,
     getDLCBTCBalance,
-    lockedBTCBalance,
     totalSupply,
     getLockedBTCBalance,
     requestEthereumAccount,
