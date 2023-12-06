@@ -132,9 +132,16 @@ export function useEthereum(): UseEthereumReturnType {
     newEthereumNetwork: EthereumNetwork,
   ): Promise<void> {
     const { ethereum } = window;
-    const metamaskProvider = ethereum.providers.find(
-      (provider: any) => provider.isMetaMask,
-    );
+
+    let metamaskProvider;
+    if ("providers" in ethereum) {
+      metamaskProvider = ethereum.providers.find(
+        (provider: any) => provider.isMetaMask,
+      );
+    } else {
+      metamaskProvider = ethereum;
+    }
+
     try {
       await metamaskProvider.request({
         method: "wallet_addEthereumChain",
@@ -149,9 +156,16 @@ export function useEthereum(): UseEthereumReturnType {
     newEthereumNetwork: EthereumNetwork,
   ): Promise<void> {
     const { ethereum } = window;
-    const metamaskProvider = ethereum.providers.find(
-      (provider: any) => provider.isMetaMask,
-    );
+
+    let metamaskProvider;
+    if ("providers" in ethereum) {
+      metamaskProvider = ethereum.providers.find(
+        (provider: any) => provider.isMetaMask,
+      );
+    } else {
+      metamaskProvider = ethereum;
+    }
+
     try {
       await metamaskProvider.request({
         method: "wallet_switchEthereumChain",
@@ -183,8 +197,17 @@ export function useEthereum(): UseEthereumReturnType {
   async function getEthereumProvider(network: Network) {
     try {
       const { ethereum } = window;
+
+      let metamaskProvider;
+      if ("providers" in ethereum) {
+        metamaskProvider = ethereum.providers.find(
+          (provider: any) => provider.isMetaMask,
+        );
+      } else {
+        metamaskProvider = ethereum;
+      }
       const browserProvider = new ethers.providers.Web3Provider(
-        ethereum.providers.find((provider: any) => provider.isMetaMask),
+        metamaskProvider,
         "any",
       );
       const signer = browserProvider.getSigner();
@@ -250,9 +273,14 @@ export function useEthereum(): UseEthereumReturnType {
     try {
       const { ethereum } = window;
 
-      const metamaskProvider = ethereum.providers.find(
-        (provider: any) => provider.isMetaMask,
-      );
+      let metamaskProvider;
+      if ("providers" in ethereum) {
+        metamaskProvider = ethereum.providers.find(
+          (provider: any) => provider.isMetaMask,
+        );
+      } else {
+        metamaskProvider = ethereum;
+      }
 
       if (!metamaskProvider) {
         alert("Install MetaMask!");
@@ -410,9 +438,16 @@ export function useEthereum(): UseEthereumReturnType {
   async function recommendTokenToMetamask(): Promise<boolean> {
     try {
       const { ethereum } = window;
-      const metamaskProvider = ethereum.providers.find(
-        (provider: any) => provider.isMetaMask,
-      );
+
+      let metamaskProvider;
+      if ("providers" in ethereum) {
+        metamaskProvider = ethereum.providers.find(
+          (provider: any) => provider.isMetaMask,
+        );
+      } else {
+        metamaskProvider = ethereum;
+      }
+
       if (!metamaskProvider) return false;
       const response = await metamaskProvider.request({
         method: "wallet_watchAsset",
