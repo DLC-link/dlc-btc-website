@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import { useSelector } from "react-redux";
 
 import { HStack } from "@chakra-ui/react";
@@ -7,24 +7,15 @@ import { VaultsListGroupContainer } from "@components/vaults-list/components/vau
 import { VaultsList } from "@components/vaults-list/vaults-list";
 import { RootState } from "@store/index";
 
-import { BlockchainContext } from "../../providers/blockchain-context-provider";
 import { VaultContext } from "../../providers/vault-context-provider";
 import { MyVaultsLargeHeader } from "./components/my-vaults-header/my-vaults-header";
 import { MyVaultsLargeLayout } from "./components/my-vaults-large.layout";
 import { MyVaultsSetupInformationStack } from "./components/my-vaults-setup-information-stack";
+import { BalanceContext } from "../../providers/balance-context-provider";
 
 export function MyVaultsLarge(): React.JSX.Element {
   const { address } = useSelector((state: RootState) => state.account);
-
-  const blockchainContext = useContext(BlockchainContext);
-  const ethereum = blockchainContext?.ethereum;
-  const [dlcBTCBalance, setDLCBTCBalance] = useState<number | undefined>(
-    undefined,
-  );
-  const [lockedBTCBalance, setLockedBTCBalance] = useState<number | undefined>(
-    undefined,
-  );
-
+  const { dlcBTCBalance, lockedBTCBalance } = useContext(BalanceContext);
   const vaultContext = useContext(VaultContext);
   const {
     readyVaults,
@@ -33,23 +24,6 @@ export function MyVaultsLarge(): React.JSX.Element {
     closingVaults,
     closedVaults,
   } = vaultContext.vaults;
-
-  useEffect(() => {
-    if (!ethereum || !address) return;
-
-    const { getDLCBTCBalance, getLockedBTCBalance } = ethereum;
-    const fetchData = async () => {
-      const currentTokenBalance = await getDLCBTCBalance();
-      if (currentTokenBalance !== dlcBTCBalance) {
-        setDLCBTCBalance(currentTokenBalance);
-      }
-      const currentLockedBTCBalance = await getLockedBTCBalance();
-      if (currentLockedBTCBalance !== lockedBTCBalance) {
-        setLockedBTCBalance(currentLockedBTCBalance);
-      }
-    };
-    fetchData();
-  }, [address, vaultContext.vaults]);
 
   return (
     <MyVaultsLargeLayout>
