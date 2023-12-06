@@ -10,13 +10,7 @@ import { UseEthereumReturnType } from "./use-ethereum";
 export function useObserver(ethereum: UseEthereumReturnType): void {
   const dispatch = useDispatch();
   const { address, network } = useSelector((state: RootState) => state.account);
-  const {
-    protocolContract,
-    dlcBTCContract,
-    getVault,
-    getDLCBTCBalance,
-    getLockedBTCBalance,
-  } = ethereum;
+  const { protocolContract, dlcBTCContract, getVault } = ethereum;
 
   useEffect(() => {
     if (!protocolContract || !dlcBTCContract) return;
@@ -66,8 +60,6 @@ export function useObserver(ethereum: UseEthereumReturnType): void {
         dispatch(mintUnmintActions.setMintStep(0));
         dispatch(modalActions.toggleSuccessfulFlowModalVisibility("mint"));
       });
-      await getDLCBTCBalance();
-      await getLockedBTCBalance();
     });
 
     protocolContract.on("PostCloseDLCHandler", async (...args) => {
@@ -83,8 +75,6 @@ export function useObserver(ethereum: UseEthereumReturnType): void {
         dispatch(mintUnmintActions.setUnmintStep(0));
         dispatch(modalActions.toggleSuccessfulFlowModalVisibility("unmint"));
       });
-      await getDLCBTCBalance();
-      await getLockedBTCBalance();
     });
   }, [protocolContract, dlcBTCContract, network]);
 }
