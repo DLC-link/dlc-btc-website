@@ -7,7 +7,7 @@ import { ModalLayout } from "@components/modals/components/modal.layout";
 import { SelectWalletMenu } from "@components/modals/select-wallet-modal/components/select-wallet-menu";
 import { SelectNetworkButton } from "@components/select-network-button/select-network-button";
 import { Network } from "@models/network";
-import { ethereumWallets } from "@models/wallet";
+import { WalletType, ethereumWallets } from "@models/wallet";
 
 import { BlockchainContext } from "../../../providers/blockchain-context-provider";
 
@@ -21,9 +21,9 @@ export function SelectWalletModal({
     undefined,
   );
 
-  async function handleLogin() {
+  async function handleLogin(walletType: WalletType) {
     if (!currentNetwork) throw new Error("No network selected");
-    await ethereum?.requestEthereumAccount(currentNetwork);
+    await ethereum?.requestEthereumAccount(currentNetwork, walletType);
     setCurrentNetwork(undefined);
     handleClose();
   }
@@ -62,7 +62,7 @@ export function SelectWalletModal({
               <SelectWalletMenu
                 key={wallet.name}
                 wallet={wallet}
-                handleClick={handleLogin}
+                handleClick={() => handleLogin(WalletType.Metamask)}
               />
             ))}
           </VStack>
