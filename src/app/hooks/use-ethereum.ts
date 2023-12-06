@@ -5,12 +5,12 @@ import { useSelector } from "react-redux";
 import { customShiftValue } from "@common/utilities";
 import { EthereumError } from "@models/error-types";
 import {
+  EthereumNetwork,
   Network,
   addNetworkParams,
   ethereumNetworks,
   hexChainIDs,
 } from "@models/network";
-import { EthereumNetwork } from "@models/network";
 import { RawVault, Vault, VaultState } from "@models/vault";
 import { RootState, store } from "@store/index";
 import { accountActions } from "@store/slices/account/account.actions";
@@ -18,6 +18,7 @@ import { vaultActions } from "@store/slices/vault/vault.actions";
 import { Contract, Signer, ethers } from "ethers";
 import { Logger } from "ethers/lib/utils";
 
+import { WalletType } from "@models/wallet";
 import { useVaults } from "./use-vaults";
 
 export interface UseEthereumReturnType {
@@ -29,7 +30,10 @@ export interface UseEthereumReturnType {
   lockedBTCBalance: number | undefined;
   getLockedBTCBalance: () => Promise<void>;
   totalSupply: number | undefined;
-  requestEthereumAccount: (network: Network) => Promise<void>;
+  requestEthereumAccount: (
+    network: Network,
+    walletType: WalletType,
+  ) => Promise<void>;
   getAllVaults: () => Promise<void>;
   getVault: (vaultUUID: string, vaultState: VaultState) => Promise<void>;
   setupVault: (btcDepositAmount: number) => Promise<void>;
@@ -52,7 +56,11 @@ function throwEthereumError(message: string, error: any): void {
 
 export function useEthereum(): UseEthereumReturnType {
   const { fundedVaults } = useVaults();
-  const { address, network } = useSelector((state: RootState) => state.account);
+  const {
+    address,
+    network,
+    walletType: currentWalletType,
+  } = useSelector((state: RootState) => state.account);
 
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
@@ -82,12 +90,12 @@ export function useEthereum(): UseEthereumReturnType {
   }, [network]);
 
   useEffect(() => {
-    if (!address || !network) return;
+    if (!address || !network || !currentWalletType) return;
 
     if (!protocolContract && !dlcManagerContract && !dlcBTCContract) {
       const setupConfiguration = async () => {
         setIsLoaded(false);
-        await setupEthereumConfiguration(network);
+        await setupEthereumConfiguration(network, currentWalletType);
         setIsLoaded(true);
       };
       setupConfiguration();
@@ -103,6 +111,35 @@ export function useEthereum(): UseEthereumReturnType {
       closingTX: vault.closingTxId,
       timestamp: parseInt(vault.timestamp),
     };
+  }
+
+  function getProvider(ethereum: any, walletType: WalletType): any {
+    if ("providers" in ethereum) {
+      return ethereum.providers.find(
+        (provider: any) => provider[`is${walletType}`],
+      );
+    }
+    return ethereum[`is${walletType}`] ? ethereum : undefined;
+  }
+
+  function checkWalletProvider(ethereum: any, walletType: WalletType): any {
+    const ethereumWalletProvider = getProvider(ethereum, walletType);
+    if (!ethereumWalletProvider) {
+      alert(`Install ${walletType}!`);
+      throw new EthereumError(`${walletType} wallet not found`);
+    }
+    return ethereumWalletProvider;
+  }
+
+  function getWalletProvider(walletType: WalletType): any {
+    const { ethereum } = window;
+
+    if (!ethereum) {
+      alert("Install MetaMask!");
+      throw new EthereumError("No ethereum wallet found");
+    }
+
+    return checkWalletProvider(ethereum, walletType);
   }
 
   async function getTotalSupply() {
@@ -130,20 +167,12 @@ export function useEthereum(): UseEthereumReturnType {
 
   async function addEthereumNetwork(
     newEthereumNetwork: EthereumNetwork,
+    walletType: WalletType,
   ): Promise<void> {
-    const { ethereum } = window;
-
-    let metamaskProvider;
-    if ("providers" in ethereum) {
-      metamaskProvider = ethereum.providers.find(
-        (provider: any) => provider.isMetaMask,
-      );
-    } else {
-      metamaskProvider = ethereum;
-    }
+    const walletProvider = getWalletProvider(walletType);
 
     try {
-      await metamaskProvider.request({
+      await walletProvider.request({
         method: "wallet_addEthereumChain",
         params: addNetworkParams[newEthereumNetwork],
       });
@@ -154,34 +183,29 @@ export function useEthereum(): UseEthereumReturnType {
 
   async function switchEthereumNetwork(
     newEthereumNetwork: EthereumNetwork,
+    walletType: WalletType,
   ): Promise<void> {
-    const { ethereum } = window;
-
-    let metamaskProvider;
-    if ("providers" in ethereum) {
-      metamaskProvider = ethereum.providers.find(
-        (provider: any) => provider.isMetaMask,
-      );
-    } else {
-      metamaskProvider = ethereum;
-    }
+    const walletProvider = getWalletProvider(walletType);
 
     try {
-      await metamaskProvider.request({
+      await walletProvider.request({
         method: "wallet_switchEthereumChain",
         params: [{ chainId: hexChainIDs[newEthereumNetwork] }],
       });
     } catch (error: any) {
       if (error.code === 4902) {
-        await addEthereumNetwork(newEthereumNetwork);
+        await addEthereumNetwork(newEthereumNetwork, walletType);
       } else {
         throwEthereumError(`Could not switch Ethereum network: `, error);
       }
     }
   }
 
-  async function setupEthereumConfiguration(network: Network): Promise<void> {
-    const ethereumProvider = await getEthereumProvider(network);
+  async function setupEthereumConfiguration(
+    network: Network,
+    walletType: WalletType,
+  ): Promise<void> {
+    const ethereumProvider = await getEthereumProvider(network, walletType);
     if (!ethereumProvider) {
       throw new EthereumError("Failed to get Ethereum provider");
     }
@@ -194,20 +218,12 @@ export function useEthereum(): UseEthereumReturnType {
     await getEthereumContracts(walletNetworkChainID, signer);
   }
 
-  async function getEthereumProvider(network: Network) {
+  async function getEthereumProvider(network: Network, walletType: WalletType) {
     try {
-      const { ethereum } = window;
+      const walletProvider = getWalletProvider(walletType);
 
-      let metamaskProvider;
-      if ("providers" in ethereum) {
-        metamaskProvider = ethereum.providers.find(
-          (provider: any) => provider.isMetaMask,
-        );
-      } else {
-        metamaskProvider = ethereum;
-      }
       const browserProvider = new ethers.providers.Web3Provider(
-        metamaskProvider,
+        walletProvider,
         "any",
       );
       const signer = browserProvider.getSigner();
@@ -216,7 +232,7 @@ export function useEthereum(): UseEthereumReturnType {
       const walletNetworkChainID = walletNetwork.chainId.toString();
 
       if (walletNetworkChainID !== network?.id) {
-        await switchEthereumNetwork(network?.id);
+        await switchEthereumNetwork(network?.id, walletType);
         window.location.reload();
       }
       return { walletNetworkChainID, signer };
@@ -269,36 +285,26 @@ export function useEthereum(): UseEthereumReturnType {
     }
   }
 
-  async function requestEthereumAccount(network: Network) {
+  async function requestEthereumAccount(
+    network: Network,
+    walletType: WalletType,
+  ) {
     try {
-      const { ethereum } = window;
+      if (!walletType) throw new Error("Wallet not initialized");
+      const walletProvider = getWalletProvider(walletType);
 
-      let metamaskProvider;
-      if ("providers" in ethereum) {
-        metamaskProvider = ethereum.providers.find(
-          (provider: any) => provider.isMetaMask,
-        );
-      } else {
-        metamaskProvider = ethereum;
-      }
-
-      if (!metamaskProvider) {
-        alert("Install MetaMask!");
-        return;
-      }
-
-      const ethereumAccounts = await metamaskProvider.request({
+      const ethereumAccounts = await walletProvider.request({
         method: "eth_requestAccounts",
       });
 
       const accountInformation = {
-        walletType: "metamask",
+        walletType: WalletType.Metamask,
         address: ethereumAccounts[0],
         network,
       };
 
       setIsLoaded(false);
-      await setupEthereumConfiguration(network);
+      await setupEthereumConfiguration(network, walletType);
       setIsLoaded(true);
 
       store.dispatch(accountActions.login(accountInformation));
@@ -437,19 +443,10 @@ export function useEthereum(): UseEthereumReturnType {
 
   async function recommendTokenToMetamask(): Promise<boolean> {
     try {
-      const { ethereum } = window;
+      if (!currentWalletType) throw new Error("Wallet not initialized");
+      const walletProvider = getWalletProvider(currentWalletType);
 
-      let metamaskProvider;
-      if ("providers" in ethereum) {
-        metamaskProvider = ethereum.providers.find(
-          (provider: any) => provider.isMetaMask,
-        );
-      } else {
-        metamaskProvider = ethereum;
-      }
-
-      if (!metamaskProvider) return false;
-      const response = await metamaskProvider.request({
+      const response = await walletProvider.request({
         method: "wallet_watchAsset",
         params: {
           type: "ERC20",
