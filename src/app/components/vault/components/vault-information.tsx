@@ -1,4 +1,5 @@
 import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 import { CheckIcon } from '@chakra-ui/icons';
 import { Button, HStack, Image, Text, VStack } from '@chakra-ui/react';
@@ -35,6 +36,8 @@ export function VaultInformation({
   handleClick,
 }: VaultInformationProps): React.JSX.Element {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const date = new Date(timestamp * 1000).toLocaleDateString('en-US');
 
   return (
@@ -63,7 +66,10 @@ export function VaultInformation({
         </VStack>
       ) : state === VaultState.READY && !isSelected ? (
         <Button
-          onClick={() => dispatch(mintUnmintActions.setMintStep([1, uuid]))}
+          onClick={() => {
+            navigate('/');
+            dispatch(mintUnmintActions.setMintStep([1, uuid]));
+          }}
           variant={'vault'}
           w={'85px'}
         >
