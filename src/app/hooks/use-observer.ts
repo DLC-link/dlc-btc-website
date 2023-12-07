@@ -10,11 +10,7 @@ import { UseEthereumReturnType } from "./use-ethereum";
 export function useObserver(ethereum: UseEthereumReturnType): void {
   const dispatch = useDispatch();
   const { address, network } = useSelector((state: RootState) => state.account);
-  const {
-    protocolContract,
-    dlcBTCContract,
-    getVault,
-  } = ethereum;
+  const { protocolContract, dlcBTCContract, getVault } = ethereum;
 
   useEffect(() => {
     if (!protocolContract || !dlcBTCContract) return;

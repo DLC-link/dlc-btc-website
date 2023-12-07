@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import { useSelector } from "react-redux";
 
 import { HStack } from "@chakra-ui/react";
@@ -6,19 +6,16 @@ import { VaultsListGroupBlankContainer } from "@components/vaults-list/component
 import { VaultsListGroupContainer } from "@components/vaults-list/components/vaults-list-group-container";
 import { VaultsList } from "@components/vaults-list/vaults-list";
 import { RootState } from "@store/index";
-import { VaultContext } from "../../providers/vault-context-provider";
 
-import { BlockchainContext } from "../../providers/blockchain-context-provider";
+import { VaultContext } from "../../providers/vault-context-provider";
 import { MyVaultsLargeHeader } from "./components/my-vaults-header/my-vaults-header";
 import { MyVaultsLargeLayout } from "./components/my-vaults-large.layout";
 import { MyVaultsSetupInformationStack } from "./components/my-vaults-setup-information-stack";
+import { BalanceContext } from "../../providers/balance-context-provider";
 
 export function MyVaultsLarge(): React.JSX.Element {
   const { address } = useSelector((state: RootState) => state.account);
-
-  const blockchainContext = useContext(BlockchainContext);
-  const ethereum = blockchainContext?.ethereum;
-
+  const { dlcBTCBalance, lockedBTCBalance } = useContext(BalanceContext);
   const vaultContext = useContext(VaultContext);
   const {
     readyVaults,
@@ -28,23 +25,12 @@ export function MyVaultsLarge(): React.JSX.Element {
     closedVaults,
   } = vaultContext.vaults;
 
-  useEffect(() => {
-    if (!ethereum || !address) return;
-
-    const { getDLCBTCBalance, getLockedBTCBalance } = ethereum;
-    const fetchData = async () => {
-      await getDLCBTCBalance();
-      await getLockedBTCBalance();
-    };
-    fetchData();
-  }, [ethereum?.isLoaded, address]);
-
   return (
     <MyVaultsLargeLayout>
       <MyVaultsLargeHeader
         address={address}
-        dlcBTCBalance={ethereum?.dlcBTCBalance}
-        lockedBTCBalance={ethereum?.lockedBTCBalance}
+        dlcBTCBalance={dlcBTCBalance}
+        lockedBTCBalance={lockedBTCBalance}
       />
       <HStack spacing={"35px"} w={"100%"}>
         {address ? (
