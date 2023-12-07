@@ -14,8 +14,6 @@ export function useObserver(ethereum: UseEthereumReturnType): void {
     protocolContract,
     dlcBTCContract,
     getVault,
-    getDLCBTCBalance,
-    getLockedBTCBalance,
   } = ethereum;
 
   useEffect(() => {
@@ -35,7 +33,7 @@ export function useObserver(ethereum: UseEthereumReturnType): void {
       console.log(`Vault ${vaultUUID} is ready`);
 
       await getVault(vaultUUID, VaultState.READY).then(() => {
-        dispatch(mintUnmintActions.setMintStep(1));
+        dispatch(mintUnmintActions.setMintStep([1, vaultUUID]));
       });
     });
 
@@ -49,7 +47,7 @@ export function useObserver(ethereum: UseEthereumReturnType): void {
       console.log(`Vault ${vaultUUID} is closing`);
 
       await getVault(vaultUUID, VaultState.CLOSING).then(() => {
-        dispatch(mintUnmintActions.setUnmintStep(1));
+        dispatch(mintUnmintActions.setUnmintStep([1, vaultUUID]));
       });
     });
 
@@ -63,11 +61,9 @@ export function useObserver(ethereum: UseEthereumReturnType): void {
       console.log(`Vault ${vaultUUID} is minted`);
 
       await getVault(vaultUUID, VaultState.FUNDED).then(() => {
-        dispatch(mintUnmintActions.setMintStep(0));
-        dispatch(modalActions.toggleSuccessfulFlowModalVisibility("mint"));
+        dispatch(mintUnmintActions.setMintStep([0, vaultUUID]));
+        dispatch(modalActions.toggleSuccessfulFlowModalVisibility({ flow: "mint", vaultUUID}));
       });
-      await getDLCBTCBalance();
-      await getLockedBTCBalance();
     });
 
     protocolContract.on("PostCloseDLCHandler", async (...args) => {
@@ -80,11 +76,9 @@ export function useObserver(ethereum: UseEthereumReturnType): void {
       console.log(`Vault ${vaultUUID} is closed`);
 
       await getVault(vaultUUID, VaultState.CLOSED).then(() => {
-        dispatch(mintUnmintActions.setUnmintStep(0));
-        dispatch(modalActions.toggleSuccessfulFlowModalVisibility("unmint"));
+        dispatch(mintUnmintActions.setUnmintStep([0, vaultUUID]));
+        dispatch(modalActions.toggleSuccessfulFlowModalVisibility({flow: "unmint", vaultUUID}));
       });
-      await getDLCBTCBalance();
-      await getLockedBTCBalance();
     });
   }, [protocolContract, dlcBTCContract, network]);
 }

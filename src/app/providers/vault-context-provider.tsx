@@ -11,6 +11,7 @@ interface VaultContextType {
 
 export const VaultContext = createContext<VaultContextType>({
   vaults: {
+    allVaults: [],
     readyVaults: [],
     fundingVaults: [],
     fundedVaults: [],

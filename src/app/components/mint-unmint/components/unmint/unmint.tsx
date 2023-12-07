@@ -20,11 +20,11 @@ export function Unmint(): React.JSX.Element {
 
   return (
     <UnmintLayout>
-      <ProgressTimeline variant={"unmint"} currentStep={unmintStep} />
+      <ProgressTimeline variant={"unmint"} currentStep={unmintStep[0]} />
       <HStack w={"100%"} alignItems={"start"} justifyContent={"space-between"}>
-        <Walkthrough flow={"unmint"} currentStep={unmintStep} />
-        {[0].includes(unmintStep) && <UnmintVaultSelector />}
-        {[1, 2].includes(unmintStep) && (
+        <Walkthrough flow={"unmint"} currentStep={unmintStep[0]} />
+        {[0].includes(unmintStep[0]) && <UnmintVaultSelector />}
+        {[1, 2].includes(unmintStep[0]) && (
           <TransactionSummary
             currentStep={unmintStep}
             flow={"unmint"}

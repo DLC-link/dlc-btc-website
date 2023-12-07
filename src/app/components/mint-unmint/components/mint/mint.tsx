@@ -16,17 +16,17 @@ export function Mint(): React.JSX.Element {
   const { mintStep } = useSelector((state: RootState) => state.mintunmint);
 
   function handleRestart() {
-    dispatch(mintUnmintActions.setMintStep(0));
+    dispatch(mintUnmintActions.setMintStep([0, '']));
   }
 
   return (
     <MintLayout>
-      <ProgressTimeline variant={"mint"} currentStep={mintStep} />
+      <ProgressTimeline variant={"mint"} currentStep={mintStep[0]} />
       <HStack w={"100%"} alignItems={"start"} justifyContent={"space-between"}>
-        <Walkthrough flow={"mint"} currentStep={mintStep} />
-        {[0].includes(mintStep) && <TransactionForm />}
-        {[1].includes(mintStep) && <LockScreen />}
-        {[2, 3].includes(mintStep) && (
+        <Walkthrough flow={"mint"} currentStep={mintStep[0]} />
+        {[0].includes(mintStep[0]) && <TransactionForm />}
+        {[1].includes(mintStep[0]) && <LockScreen currentStep={mintStep} />}
+        {[2, 3].includes(mintStep[0]) && (
           <TransactionSummary
             currentStep={mintStep}
             flow={"mint"}

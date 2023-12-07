@@ -13,7 +13,7 @@ import { useToast } from "@chakra-ui/react";
 import { BitcoinError } from "@models/error-types";
 
 interface VaultCardProps {
-  vault: Vault;
+  vault?: Vault;
   isSelected?: boolean;
   isSelectable?: boolean;
   handleSelect?: () => void;

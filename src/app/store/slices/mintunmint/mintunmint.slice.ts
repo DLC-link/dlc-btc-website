@@ -1,13 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 interface MintUnmintState {
-  mintStep: number;
-  unmintStep: number;
+  mintStep: [number, string]
+  unmintStep: [number, string]
 }
 
 const initialMintUnmintState: MintUnmintState = {
-  mintStep: 0,
-  unmintStep: 0,
+  mintStep: [0, ''],
+  unmintStep: [0, ''],
 };
 
 export const mintUnmintSlice = createSlice({
@@ -21,8 +21,8 @@ export const mintUnmintSlice = createSlice({
       state.unmintStep = action.payload;
     },
     resetMintUnmintState: (state) => {
-      state.mintStep = 0;
-      state.unmintStep = 0;
+      state.mintStep = [0, ''];
+      state.unmintStep = [0, ''];
     },
   },
 });

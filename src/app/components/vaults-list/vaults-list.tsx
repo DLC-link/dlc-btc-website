@@ -19,7 +19,7 @@ export function VaultsList({
   return (
     <FadeLayer height={height} fadeHeight={"35px"}>
       {title && (
-        <Text py={"15px"} color={"white.01"} fontWeight={600}>
+        <Text pt={"15px"} color={"white.01"} fontWeight={600}>
           {title}
         </Text>
       )}

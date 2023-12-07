@@ -66,7 +66,7 @@ export function UnmintVaultSelector(): React.JSX.Element {
           />
         </VStack>
       ) : (
-        <VaultsList height="358.5px" isScrollable={!!selectedVault}>
+        <VaultsList height="358.5px" isScrollable={!selectedVault}>
           <VaultsListGroupContainer
             vaults={fundedVaults}
             isSelectable

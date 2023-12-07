@@ -60,7 +60,7 @@ export function useBitcoin(): UseBitcoinReturnType {
           networkID: network.id,
         }),
       );
-      dispatch(mintUnmintActions.setMintStep(2));
+      dispatch(mintUnmintActions.setMintStep([2, vaultUUID]));
     } catch (error: any) {
       throw new BitcoinError(
         `Could not send contract offer for signing: ${error.error.message}`,

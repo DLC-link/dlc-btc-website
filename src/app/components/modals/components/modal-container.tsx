@@ -38,6 +38,7 @@ export function ModalContainer(): React.JSX.Element {
           )
         }
         flow={isSuccesfulFlowModalOpen[1]}
+        vaultUUID={isSuccesfulFlowModalOpen[2] ? isSuccesfulFlowModalOpen[2] : ""}
       />
     </>
   );

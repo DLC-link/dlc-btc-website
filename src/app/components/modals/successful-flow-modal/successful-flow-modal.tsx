@@ -5,12 +5,14 @@ import { ModalLayout } from "../components/modal.layout";
 
 interface SuccessfulFlowModalProps extends ModalComponentProps {
   flow: "mint" | "unmint";
+  vaultUUID: string;
 }
 
 export function SuccessfulFlowModal({
   isOpen,
   handleClose,
   flow,
+  vaultUUID
 }: SuccessfulFlowModalProps): React.JSX.Element {
   return (
     <ModalLayout
@@ -19,7 +21,7 @@ export function SuccessfulFlowModal({
       onClose={() => handleClose()}
     >
       <TransactionSummary
-        currentStep={flow === "mint" ? 3 : 2}
+        currentStep={[flow === "mint" ? 3 : 2, vaultUUID]}
         flow={flow}
         blockchain={"ethereum"}
       />

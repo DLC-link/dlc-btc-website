@@ -20,9 +20,9 @@ export function VaultsListGroupContainer({
   if (vaults.length === 0) return false;
 
   return (
-    <VStack py={"5px"} alignItems={"start"} w={"100%"} spacing={"15px"}>
+    <VStack pt={"15px"} alignItems={"start"} w={"100%"} spacing={"15px"}>
       {label && (
-        <HStack py={"12.5px"} spacing={"25px"}>
+        <HStack pt={"15px"} spacing={"25px"}>
           {["Locking BTC in Progress", "Unlocking BTC in Progress"].includes(
             label,
           ) && <Spinner color={"accent.cyan.01"} size={"md"} />}
