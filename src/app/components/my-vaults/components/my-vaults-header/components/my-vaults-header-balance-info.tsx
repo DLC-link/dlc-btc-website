@@ -1,4 +1,4 @@
-import { HStack, Image, Skeleton, Text, VStack } from "@chakra-ui/react";
+import { HStack, Image, Skeleton, Text, VStack } from '@chakra-ui/react';
 
 interface MyVaultsHeaderBalanceInfoProps {
   title: string;
@@ -16,15 +16,15 @@ export function MyVaultsHeaderBalanceInfo({
   showNone,
 }: MyVaultsHeaderBalanceInfoProps): React.JSX.Element {
   return (
-    <VStack justifyContent={"center"} alignItems={"start"} w={"35%"} h={"100%"}>
-      <Text color={"accent.cyan.01"} fontWeight={600} fontSize={"md"}>
+    <VStack justifyContent={'center'} alignItems={'start'} w={'35%'} h={'100%'}>
+      <Text color={'accent.cyan.01'} fontWeight={600} fontSize={'md'}>
         {title}
       </Text>
-      <Skeleton isLoaded={!!assetAmount} h={"auto"} w={"100%"}>
+      <Skeleton isLoaded={!!assetAmount} h={'auto'} w={'100%'}>
         <HStack>
-          <Image src={imageSrc} alt={altText} boxSize={"25px"} />
-          <Text color={"white"} fontWeight={800} fontSize={"xl"}>
-            {showNone ? "-" : assetAmount}
+          <Image src={imageSrc} alt={altText} boxSize={'25px'} />
+          <Text color={'white'} fontWeight={800} fontSize={'xl'}>
+            {showNone ? '-' : assetAmount}
           </Text>
         </HStack>
       </Skeleton>

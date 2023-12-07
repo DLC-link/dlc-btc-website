@@ -1,11 +1,11 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { createContext, useContext, useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 
-import { HasChildren } from "@models/has-children";
-import { RootState } from "@store/index";
+import { HasChildren } from '@models/has-children';
+import { RootState } from '@store/index';
 
-import { BlockchainContext } from "./blockchain-context-provider";
-import { VaultContext } from "./vault-context-provider";
+import { BlockchainContext } from './blockchain-context-provider';
+import { VaultContext } from './vault-context-provider';
 
 interface VaultContextType {
   dlcBTCBalance: number | undefined;
@@ -17,9 +17,7 @@ export const BalanceContext = createContext<VaultContextType>({
   lockedBTCBalance: undefined,
 });
 
-export function BalanceContextProvider({
-  children,
-}: HasChildren): React.JSX.Element {
+export function BalanceContextProvider({ children }: HasChildren): React.JSX.Element {
   const { address } = useSelector((state: RootState) => state.account);
 
   const blockchainContext = useContext(BlockchainContext);
@@ -27,17 +25,16 @@ export function BalanceContextProvider({
 
   const ethereum = blockchainContext?.ethereum;
 
-  const [dlcBTCBalance, setDLCBTCBalance] = useState<number | undefined>(
-    undefined,
-  );
-  const [lockedBTCBalance, setLockedBTCBalance] = useState<number | undefined>(
-    undefined,
-  );
+  const [dlcBTCBalance, setDLCBTCBalance] = useState<number | undefined>(undefined);
+  const [lockedBTCBalance, setLockedBTCBalance] = useState<number | undefined>(undefined);
 
   useEffect(() => {
     if (!ethereum || !address) return;
 
-    const { getDLCBTCBalance, getLockedBTCBalance } = ethereum;
+    const { getDLCBTCBalance, getLockedBTCBalance, isLoaded } = ethereum;
+
+    if (!isLoaded) return;
+
     const fetchData = async () => {
       const currentTokenBalance = await getDLCBTCBalance();
       if (currentTokenBalance !== dlcBTCBalance) {
@@ -49,7 +46,7 @@ export function BalanceContextProvider({
       }
     };
     fetchData();
-  }, [address, vaults]);
+  }, [address, vaults, ethereum?.isLoaded]);
 
   return (
     <BalanceContext.Provider value={{ dlcBTCBalance, lockedBTCBalance }}>

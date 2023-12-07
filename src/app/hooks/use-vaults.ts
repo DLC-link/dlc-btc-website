@@ -1,12 +1,13 @@
-import { useEffect, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
+import { useEffect, useMemo, useState } from 'react';
+import { useSelector } from 'react-redux';
 
-import { Vault, VaultState } from "@models/vault";
-import { RootState } from "@store/index";
+import { Vault, VaultState } from '@models/vault';
+import { RootState } from '@store/index';
 
-import { UseEthereumReturnType } from "./use-ethereum";
+import { UseEthereumReturnType } from './use-ethereum';
 
 export interface UseVaultsReturnType {
+  allVaults: Vault[];
   readyVaults: Vault[];
   fundingVaults: Vault[];
   fundedVaults: Vault[];
@@ -15,9 +16,7 @@ export interface UseVaultsReturnType {
   isLoading: boolean;
 }
 
-export function useVaults(
-  ethereum?: UseEthereumReturnType,
-): UseVaultsReturnType {
+export function useVaults(ethereum?: UseEthereumReturnType): UseVaultsReturnType {
   const { vaults } = useSelector((state: RootState) => state.vault);
   const { address, network } = useSelector((state: RootState) => state.account);
   const [isLoading, setIsLoading] = useState(true);
@@ -36,43 +35,49 @@ export function useVaults(
     fetchData();
   }, [address, network, ethereum?.isLoaded]);
 
+  const allVaults = useMemo(
+    () => [...vaults[network ? network.id : '1']].sort((a, b) => b.timestamp - a.timestamp),
+    [vaults, network]
+  );
+
   const readyVaults = useMemo(
     () =>
-      vaults[network ? network.id : "1"]
-        .filter((vault) => vault.state === VaultState.READY)
+      vaults[network ? network.id : '1']
+        .filter(vault => vault.state === VaultState.READY)
         .sort((a, b) => b.timestamp - a.timestamp),
-    [vaults, network],
+    [vaults, network]
   );
   const fundedVaults = useMemo(
     () =>
-      vaults[network ? network.id : "1"]
-        .filter((vault) => vault.state === VaultState.FUNDED)
+      vaults[network ? network.id : '1']
+        .filter(vault => vault.state === VaultState.FUNDED)
         .sort((a, b) => b.timestamp - a.timestamp),
-    [vaults, network],
+    [vaults, network]
   );
   const fundingVaults = useMemo(
     () =>
-      vaults[network ? network.id : "1"]
-        .filter((vault) => vault.state === VaultState.FUNDING)
+      vaults[network ? network.id : '1']
+        .filter(vault => vault.state === VaultState.FUNDING)
         .sort((a, b) => b.timestamp - a.timestamp),
-    [vaults, network],
+    [vaults, network]
   );
   const closingVaults = useMemo(
     () =>
-      vaults[network ? network.id : "1"]
-        .filter((vault) => vault.state === VaultState.CLOSING)
+      vaults[network ? network.id : '1']
+        .filter(vault => vault.state === VaultState.CLOSING)
         .sort((a, b) => b.timestamp - a.timestamp),
-    [vaults, network],
+    [vaults, network]
   );
   const closedVaults = useMemo(
     () =>
-      vaults[network ? network.id : "1"]
-        .filter((vault) => vault.state === VaultState.CLOSED)
+      vaults[network ? network.id : '1']
+        .filter(vault => vault.state === VaultState.CLOSED)
         .sort((a, b) => b.timestamp - a.timestamp),
-    [vaults, network],
+    [vaults, network]
   );
 
   return {
+    allVaults,
     readyVaults,
     fundingVaults,
     closingVaults,

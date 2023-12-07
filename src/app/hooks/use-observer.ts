@@ -1,11 +1,12 @@
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
-import { VaultState } from "@models/vault";
-import { RootState } from "@store/index";
-import { mintUnmintActions } from "@store/slices/mintunmint/mintunmint.actions";
-import { modalActions } from "@store/slices/modal/modal.actions";
-import { UseEthereumReturnType } from "./use-ethereum";
+import { VaultState } from '@models/vault';
+import { RootState } from '@store/index';
+import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
+import { modalActions } from '@store/slices/modal/modal.actions';
+
+import { UseEthereumReturnType } from './use-ethereum';
 
 export function useObserver(ethereum: UseEthereumReturnType): void {
   const dispatch = useDispatch();
@@ -19,7 +20,7 @@ export function useObserver(ethereum: UseEthereumReturnType): void {
     console.log(`Listening to [${protocolContract.address}]`);
     console.log(`Listening to [${dlcBTCContract.address}]`);
 
-    protocolContract.on("SetupVault", async (...args) => {
+    protocolContract.on('SetupVault', async (...args) => {
       const vaultOwner: string = args[2];
 
       if (vaultOwner.toLowerCase() !== address) return;
@@ -29,11 +30,11 @@ export function useObserver(ethereum: UseEthereumReturnType): void {
       console.log(`Vault ${vaultUUID} is ready`);
 
       await getVault(vaultUUID, VaultState.READY).then(() => {
-        dispatch(mintUnmintActions.setMintStep(1));
+        dispatch(mintUnmintActions.setMintStep([1, vaultUUID]));
       });
     });
 
-    protocolContract.on("CloseVault", async (...args) => {
+    protocolContract.on('CloseVault', async (...args) => {
       const vaultOwner: string = args[2];
 
       if (vaultOwner.toLowerCase() !== address) return;
@@ -43,11 +44,11 @@ export function useObserver(ethereum: UseEthereumReturnType): void {
       console.log(`Vault ${vaultUUID} is closing`);
 
       await getVault(vaultUUID, VaultState.CLOSING).then(() => {
-        dispatch(mintUnmintActions.setUnmintStep(1));
+        dispatch(mintUnmintActions.setUnmintStep([1, vaultUUID]));
       });
     });
 
-    protocolContract.on("SetStatusFunded", async (...args) => {
+    protocolContract.on('SetStatusFunded', async (...args) => {
       const vaultOwner = args[2];
 
       if (vaultOwner.toLowerCase() !== address) return;
@@ -57,12 +58,17 @@ export function useObserver(ethereum: UseEthereumReturnType): void {
       console.log(`Vault ${vaultUUID} is minted`);
 
       await getVault(vaultUUID, VaultState.FUNDED).then(() => {
-        dispatch(mintUnmintActions.setMintStep(0));
-        dispatch(modalActions.toggleSuccessfulFlowModalVisibility("mint"));
+        dispatch(mintUnmintActions.setMintStep([0, vaultUUID]));
+        dispatch(
+          modalActions.toggleSuccessfulFlowModalVisibility({
+            flow: 'mint',
+            vaultUUID,
+          })
+        );
       });
     });
 
-    protocolContract.on("PostCloseDLCHandler", async (...args) => {
+    protocolContract.on('PostCloseDLCHandler', async (...args) => {
       const vaultOwner = args[2];
 
       if (vaultOwner.toLowerCase() !== address) return;
@@ -72,8 +78,13 @@ export function useObserver(ethereum: UseEthereumReturnType): void {
       console.log(`Vault ${vaultUUID} is closed`);
 
       await getVault(vaultUUID, VaultState.CLOSED).then(() => {
-        dispatch(mintUnmintActions.setUnmintStep(0));
-        dispatch(modalActions.toggleSuccessfulFlowModalVisibility("unmint"));
+        dispatch(mintUnmintActions.setUnmintStep([0, vaultUUID]));
+        dispatch(
+          modalActions.toggleSuccessfulFlowModalVisibility({
+            flow: 'unmint',
+            vaultUUID,
+          })
+        );
       });
     });
   }, [protocolContract, dlcBTCContract, network]);

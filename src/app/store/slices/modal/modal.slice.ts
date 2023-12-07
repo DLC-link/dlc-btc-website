@@ -1,27 +1,25 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
 
 interface ModalState {
   isSelectWalletModalOpen: boolean;
-  isSuccesfulFlowModalOpen: [boolean, "mint" | "unmint"];
+  isSuccesfulFlowModalOpen: [boolean, 'mint' | 'unmint', string?];
 }
 
 const initialModalState: ModalState = {
   isSelectWalletModalOpen: false,
-  isSuccesfulFlowModalOpen: [false, "mint"],
+  isSuccesfulFlowModalOpen: [false, 'mint'],
 };
 
 export const modalSlice = createSlice({
-  name: "modal",
+  name: 'modal',
   initialState: initialModalState,
   reducers: {
-    toggleSelectWalletModalVisibility: (state) => {
+    toggleSelectWalletModalVisibility: state => {
       state.isSelectWalletModalOpen = !state.isSelectWalletModalOpen;
     },
     toggleSuccessfulFlowModalVisibility: (state, action) => {
-      state.isSuccesfulFlowModalOpen = [
-        !state.isSuccesfulFlowModalOpen[0],
-        action.payload,
-      ];
+      const { flow, vaultUUID } = action.payload;
+      state.isSuccesfulFlowModalOpen = [!state.isSuccesfulFlowModalOpen[0], flow, vaultUUID];
     },
   },
 });

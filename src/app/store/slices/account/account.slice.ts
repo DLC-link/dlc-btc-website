@@ -1,6 +1,6 @@
-import { Network } from "@models/network";
-import { WalletType } from "@models/wallet";
-import { createSlice } from "@reduxjs/toolkit";
+import { Network } from '@models/network';
+import { WalletType } from '@models/wallet';
+import { createSlice } from '@reduxjs/toolkit';
 
 interface AccountState {
   address: string | undefined;
@@ -21,7 +21,7 @@ export const initialAccountState: AccountState = {
 };
 
 export const accountSlice = createSlice({
-  name: "account",
+  name: 'account',
   initialState: initialAccountState,
   reducers: {
     login: (state, action) => {
@@ -30,7 +30,7 @@ export const accountSlice = createSlice({
       state.network = action.payload.network;
       state.loadedAt = new Date().toJSON();
     },
-    logout: (state) => {
+    logout: state => {
       state.address = undefined;
       state.walletType = undefined;
       state.dlcBTCBalance = 0;

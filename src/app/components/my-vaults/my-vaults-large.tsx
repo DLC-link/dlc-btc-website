@@ -1,29 +1,24 @@
-import { useContext } from "react";
-import { useSelector } from "react-redux";
+import { useContext } from 'react';
+import { useSelector } from 'react-redux';
 
-import { HStack } from "@chakra-ui/react";
-import { VaultsListGroupBlankContainer } from "@components/vaults-list/components/vaults-list-group-blank-container";
-import { VaultsListGroupContainer } from "@components/vaults-list/components/vaults-list-group-container";
-import { VaultsList } from "@components/vaults-list/vaults-list";
-import { RootState } from "@store/index";
+import { HStack } from '@chakra-ui/react';
+import { VaultsListGroupBlankContainer } from '@components/vaults-list/components/vaults-list-group-blank-container';
+import { VaultsListGroupContainer } from '@components/vaults-list/components/vaults-list-group-container';
+import { VaultsList } from '@components/vaults-list/vaults-list';
+import { RootState } from '@store/index';
 
-import { VaultContext } from "../../providers/vault-context-provider";
-import { MyVaultsLargeHeader } from "./components/my-vaults-header/my-vaults-header";
-import { MyVaultsLargeLayout } from "./components/my-vaults-large.layout";
-import { MyVaultsSetupInformationStack } from "./components/my-vaults-setup-information-stack";
-import { BalanceContext } from "../../providers/balance-context-provider";
+import { BalanceContext } from '../../providers/balance-context-provider';
+import { VaultContext } from '../../providers/vault-context-provider';
+import { MyVaultsLargeHeader } from './components/my-vaults-header/my-vaults-header';
+import { MyVaultsLargeLayout } from './components/my-vaults-large.layout';
+import { MyVaultsSetupInformationStack } from './components/my-vaults-setup-information-stack';
 
 export function MyVaultsLarge(): React.JSX.Element {
   const { address } = useSelector((state: RootState) => state.account);
   const { dlcBTCBalance, lockedBTCBalance } = useContext(BalanceContext);
   const vaultContext = useContext(VaultContext);
-  const {
-    readyVaults,
-    fundingVaults,
-    fundedVaults,
-    closingVaults,
-    closedVaults,
-  } = vaultContext.vaults;
+  const { readyVaults, fundingVaults, fundedVaults, closingVaults, closedVaults } =
+    vaultContext.vaults;
 
   return (
     <MyVaultsLargeLayout>
@@ -32,42 +27,24 @@ export function MyVaultsLarge(): React.JSX.Element {
         dlcBTCBalance={dlcBTCBalance}
         lockedBTCBalance={lockedBTCBalance}
       />
-      <HStack spacing={"35px"} w={"100%"}>
+      <HStack spacing={'35px'} w={'100%'}>
         {address ? (
-          <VaultsList
-            title={"In Process"}
-            height={"475px"}
-            isScrollable={!!address}
-          >
+          <VaultsList title={'In Process'} height={'475px'} isScrollable={!!address}>
             <VaultsListGroupContainer label="Lock BTC" vaults={readyVaults} />
-            <VaultsListGroupContainer
-              label="Locking BTC in Progress"
-              vaults={fundingVaults}
-            />
-            <VaultsListGroupContainer
-              label="Unlocking BTC in Progress"
-              vaults={closingVaults}
-            />
+            <VaultsListGroupContainer label="Locking BTC in Progress" vaults={fundingVaults} />
+            <VaultsListGroupContainer label="Unlocking BTC in Progress" vaults={closingVaults} />
           </VaultsList>
         ) : (
           <MyVaultsSetupInformationStack />
         )}
-        <VaultsList
-          title={"Minted dlcBTC"}
-          height={"475px"}
-          isScrollable={!!address}
-        >
+        <VaultsList title={'Minted dlcBTC'} height={'475px'} isScrollable={!!address}>
           {address ? (
             <VaultsListGroupContainer vaults={fundedVaults} />
           ) : (
             <VaultsListGroupBlankContainer />
           )}
         </VaultsList>
-        <VaultsList
-          title={"Closed Vaults"}
-          height={"475px"}
-          isScrollable={!!address}
-        >
+        <VaultsList title={'Closed Vaults'} height={'475px'} isScrollable={!!address}>
           {address ? (
             <VaultsListGroupContainer vaults={closedVaults} />
           ) : (

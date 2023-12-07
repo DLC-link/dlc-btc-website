@@ -1,17 +1,17 @@
-import ReactDOM from "react-dom/client";
-import { Provider as ReduxProvider } from "react-redux";
+import ReactDOM from 'react-dom/client';
+import { Provider as ReduxProvider } from 'react-redux';
 
-import { ChakraProvider } from "@chakra-ui/react";
-import "@fontsource/poppins";
-import "@fontsource/poppins/600.css";
-import "@fontsource/poppins/800.css";
-import { PersistGate } from "redux-persist/integration/react";
+import { ChakraProvider } from '@chakra-ui/react';
+import '@fontsource/poppins';
+import '@fontsource/poppins/600.css';
+import '@fontsource/poppins/800.css';
+import { PersistGate } from 'redux-persist/integration/react';
 
-import { App } from "./app/app";
-import { persistor, store } from "./app/store";
-import { appTheme } from "./styles/app-theme";
+import { App } from './app/app';
+import { persistor, store } from './app/store';
+import { appTheme } from './styles/app-theme';
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
+ReactDOM.createRoot(document.getElementById('root')!).render(
   <ReduxProvider store={store}>
     <PersistGate persistor={persistor} loading={null}>
       <ChakraProvider
@@ -19,12 +19,12 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         theme={appTheme}
         toastOptions={{
           defaultOptions: {
-            position: "bottom",
+            position: 'bottom',
           },
         }}
       >
         <App />
       </ChakraProvider>
     </PersistGate>
-  </ReduxProvider>,
+  </ReduxProvider>
 );

@@ -1,39 +1,48 @@
-import { useContext, useState } from "react";
+import { useContext, useState } from 'react';
 
-import { Button, VStack } from "@chakra-ui/react";
-import { VaultCard } from "@components/vault/vault-card";
-import { useVaults } from "@hooks/use-vaults";
+import { Button, VStack } from '@chakra-ui/react';
+import { VaultCard } from '@components/vault/vault-card';
+import { useVaults } from '@hooks/use-vaults';
+import { Vault } from '@models/vault';
 
-import { BlockchainContext } from "../../../../providers/blockchain-context-provider";
-import { LockScreenProtocolFee } from "./components/protocol-fee";
+import { BlockchainContext } from '../../../../providers/blockchain-context-provider';
+import { LockScreenProtocolFee } from './components/protocol-fee';
 
-export function LockScreen(): React.JSX.Element {
+interface LockScreenProps {
+  currentStep: [number, string];
+}
+
+export function LockScreen({ currentStep }: LockScreenProps): React.JSX.Element {
   const { readyVaults } = useVaults();
   const blockchainContext = useContext(BlockchainContext);
   const bitcoin = blockchainContext?.bitcoin;
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const currentVault = readyVaults.find(vault => vault.uuid === currentStep[1]);
+
+  async function handleClick(currentVault?: Vault) {
+    if (!currentVault) return;
+
+    try {
+      setIsSubmitting(true);
+      await bitcoin?.fetchBitcoinContractOfferAndSendToUserWallet(currentVault);
+    } catch (error) {
+      setIsSubmitting(false);
+      throw new Error('Error locking vault');
+    }
+  }
+
   return (
-    <VStack w={"300px"} spacing={"15px"}>
-      <VaultCard vault={readyVaults[0]} isSelected />
+    <VStack w={'300px'} spacing={'15px'}>
+      <VaultCard vault={currentVault} isSelected />
       <LockScreenProtocolFee
-        assetAmount={readyVaults[0].collateral}
+        assetAmount={currentVault?.collateral}
         bitcoinPrice={bitcoin?.bitcoinPrice}
       />
       <Button
         isLoading={isSubmitting}
-        variant={"account"}
-        onClick={async () => {
-          try {
-            setIsSubmitting(true);
-            await bitcoin?.fetchBitcoinContractOfferAndSendToUserWallet(
-              readyVaults[0],
-            );
-          } catch (error) {
-            setIsSubmitting(false);
-            throw new Error("Error locking vault");
-          }
-        }}
+        variant={'account'}
+        onClick={() => handleClick(currentVault)}
       >
         Lock BTC
       </Button>

@@ -31,6 +31,14 @@ module.exports = {
     '@typescript-eslint/ban-types': ['error'],
     '@typescript-eslint/consistent-type-definitions': ['error', 'interface'],
     '@typescript-eslint/array-type': ['error'],
+    '@typescript-eslint/quotes': [
+      'error',
+      'single',
+      {
+        avoidEscape: true,
+        allowTemplateLiterals: true,
+      },
+    ],
 
     'deprecation/deprecation': ['warn'],
 

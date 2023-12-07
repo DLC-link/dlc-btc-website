@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { VaultState } from "@models/vault";
+import { VaultState } from '@models/vault';
 
 export function useConfirmationChecker(
   txID: string | undefined,
-  vaultState: VaultState | undefined,
+  vaultState: VaultState | undefined
 ): number {
   const bitcoinExplorerTXURL = `https://devnet.dlc.link/electrs/tx/${txID}`;
   const bitcoinExplorerHeightURL = `https://devnet.dlc.link/electrs/blocks/tip/height`;
@@ -12,17 +12,10 @@ export function useConfirmationChecker(
 
   const [transactionProgress, setTransactionProgress] = useState(0);
 
-  const memoizedTransactionProgress = useMemo(
-    () => transactionProgress,
-    [transactionProgress],
-  );
+  const memoizedTransactionProgress = useMemo(() => transactionProgress, [transactionProgress]);
 
   const fetchTransactionDetails = async () => {
-    if (
-      !txID ||
-      (vaultState &&
-        ![VaultState.FUNDING, VaultState.CLOSED].includes(vaultState))
-    ) {
+    if (!txID || (vaultState && ![VaultState.FUNDING, VaultState.CLOSED].includes(vaultState))) {
       clearInterval(fetchInterval.current);
       return;
     }
@@ -30,7 +23,7 @@ export function useConfirmationChecker(
     let bitcoinCurrentBlockHeight;
     try {
       const response = await fetch(bitcoinExplorerHeightURL, {
-        headers: { Accept: "application/json" },
+        headers: { Accept: 'application/json' },
       });
       bitcoinCurrentBlockHeight = await response.json();
     } catch (error) {
@@ -41,17 +34,15 @@ export function useConfirmationChecker(
 
     try {
       const response = await fetch(bitcoinExplorerTXURL, {
-        headers: { Accept: "application/json" },
+        headers: { Accept: 'application/json' },
       });
       const bitcoinTransactionDetails = await response.json();
-      bitcoinTransactionBlockHeight =
-        bitcoinTransactionDetails.status.block_height;
+      bitcoinTransactionBlockHeight = bitcoinTransactionDetails.status.block_height;
     } catch (error) {
       console.error(error);
     }
 
-    const difference =
-      bitcoinCurrentBlockHeight - bitcoinTransactionBlockHeight;
+    const difference = bitcoinCurrentBlockHeight - bitcoinTransactionBlockHeight;
 
     setTransactionProgress(difference);
 
@@ -63,10 +54,7 @@ export function useConfirmationChecker(
   fetchTransactionDetails();
 
   useEffect(() => {
-    fetchInterval.current = setInterval(
-      fetchTransactionDetails,
-      10000,
-    ) as unknown as number; // Cleanup the interval when the component unmounts
+    fetchInterval.current = setInterval(fetchTransactionDetails, 10000) as unknown as number; // Cleanup the interval when the component unmounts
     return () => clearInterval(fetchInterval.current);
   }, [vaultState, txID]);
 

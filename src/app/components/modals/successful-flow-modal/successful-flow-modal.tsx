@@ -1,27 +1,25 @@
-import { TransactionSummary } from "@components/mint-unmint/components/transaction-summary/transaction-summary";
+import { TransactionSummary } from '@components/mint-unmint/components/transaction-summary/transaction-summary';
 
-import { ModalComponentProps } from "../components/modal-container";
-import { ModalLayout } from "../components/modal.layout";
+import { ModalComponentProps } from '../components/modal-container';
+import { ModalLayout } from '../components/modal.layout';
 
 interface SuccessfulFlowModalProps extends ModalComponentProps {
-  flow: "mint" | "unmint";
+  flow: 'mint' | 'unmint';
+  vaultUUID: string;
 }
 
 export function SuccessfulFlowModal({
   isOpen,
   handleClose,
   flow,
+  vaultUUID,
 }: SuccessfulFlowModalProps): React.JSX.Element {
   return (
-    <ModalLayout
-      title={"Success!"}
-      isOpen={isOpen}
-      onClose={() => handleClose()}
-    >
+    <ModalLayout title={'Success!'} isOpen={isOpen} onClose={() => handleClose()}>
       <TransactionSummary
-        currentStep={flow === "mint" ? 3 : 2}
+        currentStep={[flow === 'mint' ? 3 : 2, vaultUUID]}
         flow={flow}
-        blockchain={"ethereum"}
+        blockchain={'ethereum'}
       />
     </ModalLayout>
   );
