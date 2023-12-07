@@ -1,3 +1,5 @@
+import { useDispatch, useSelector } from 'react-redux';
+
 import {
   Divider,
   Spacer,
@@ -7,46 +9,50 @@ import {
   TabPanel,
   TabPanels,
   Tabs,
-} from "@chakra-ui/react";
+} from '@chakra-ui/react';
+import { RootState } from '@store/index';
+import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 
-import { MintUnmintLayout } from "./components/mint-unmint.layout";
-import { Mint } from "./components/mint/mint";
-import { ProtocolSummaryStack } from "./components/protocol-summary-stack/protocol-summary-stack";
-import { SetupInformationStack } from "./components/setup-information-stack/setup-information-stack";
-import { Unmint } from "./components/unmint/unmint";
+import { MintUnmintLayout } from './components/mint-unmint.layout';
+import { Mint } from './components/mint/mint';
+import { ProtocolSummaryStack } from './components/protocol-summary-stack/protocol-summary-stack';
+import { SetupInformationStack } from './components/setup-information-stack/setup-information-stack';
+import { Unmint } from './components/unmint/unmint';
 
 interface MintUnmintContainerProps {
   address?: string;
 }
 
-export function MintUnmint({
-  address,
-}: MintUnmintContainerProps): React.JSX.Element {
+export function MintUnmint({ address }: MintUnmintContainerProps): React.JSX.Element {
+  const dispatch = useDispatch();
+
+  const { activeTab } = useSelector((state: RootState) => state.mintunmint);
+
+  function handleTabsChange(index: number) {
+    dispatch(mintUnmintActions.setActiveTab(index));
+  }
+
   return (
     <MintUnmintLayout>
-      <Tabs variant="unstyled">
+      <Tabs variant="unstyled" index={activeTab} onChange={handleTabsChange}>
         <TabList>
           <Tab>Mint</Tab>
           <Tab isDisabled={!address}>Unmint</Tab>
         </TabList>
-        <TabIndicator mt="5px" h="3.5px" bg={"accent.cyan.01"} />
+        <TabIndicator mt="5px" h="3.5px" bg={'accent.cyan.01'} />
         <Spacer />
         <TabPanels>
-          {address ? (
-            <TabPanel>
+          <TabPanel>
+            {address ? (
               <Mint />
-            </TabPanel>
-          ) : (
-            <TabPanel>
-              <SetupInformationStack />
-              <Divider
-                orientation={"horizontal"}
-                h={"35px"}
-                variant={"thick"}
-              />
-              <ProtocolSummaryStack />
-            </TabPanel>
-          )}
+            ) : (
+              <>
+                <SetupInformationStack />
+                <Divider orientation={'horizontal'} h={'35px'} variant={'thick'} />
+                <ProtocolSummaryStack />
+              </>
+            )}
+          </TabPanel>
           <TabPanel>
             <Unmint />
           </TabPanel>

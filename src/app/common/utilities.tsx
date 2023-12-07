@@ -1,4 +1,4 @@
-import Decimal from "decimal.js";
+import Decimal from 'decimal.js';
 
 export function easyTruncateAddress(address: string): string {
   const truncationLength = 4;
@@ -7,11 +7,7 @@ export function easyTruncateAddress(address: string): string {
   return `${prefix}...${suffix}`;
 }
 
-export function customShiftValue(
-  value: number,
-  shift: number,
-  unshift: boolean,
-): number {
+export function customShiftValue(value: number, shift: number, unshift: boolean): number {
   const decimalPoweredShift = new Decimal(10 ** shift);
   const decimalValue = new Decimal(Number(value));
   const decimalShiftedValue = unshift

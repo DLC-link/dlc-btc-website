@@ -1,6 +1,6 @@
-import { EthereumNetwork } from "@models/network";
-import { Vault, VaultState } from "@models/vault";
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { EthereumNetwork } from '@models/network';
+import { Vault, VaultState } from '@models/vault';
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
 interface VaultSliceState {
   vaults: { [key in EthereumNetwork]: Vault[] };
@@ -15,22 +15,20 @@ const initialVaultState: VaultSliceState = {
     [EthereumNetwork.Sepolia]: [],
     [EthereumNetwork.X1Testnet]: [],
   },
-  status: "idle",
+  status: 'idle',
   error: null,
 };
 
 export const vaultSlice = createSlice({
-  name: "vault",
+  name: 'vault',
   initialState: initialVaultState,
   reducers: {
     setVaults: (
       state,
-      action: PayloadAction<{ newVaults: Vault[]; networkID: EthereumNetwork }>,
+      action: PayloadAction<{ newVaults: Vault[]; networkID: EthereumNetwork }>
     ) => {
       const { newVaults, networkID } = action.payload;
-      const vaultMap = new Map(
-        state.vaults[networkID].map((vault) => [vault.uuid, vault]),
-      );
+      const vaultMap = new Map(state.vaults[networkID].map(vault => [vault.uuid, vault]));
 
       state.vaults[networkID] = newVaults.map((newVault: Vault) => {
         const existingVault = vaultMap.get(newVault.uuid);
@@ -39,11 +37,8 @@ export const vaultSlice = createSlice({
           return newVault;
         } else {
           const shouldUpdate =
-            existingVault.state !== VaultState.FUNDING ||
-            newVault.state === VaultState.FUNDED;
-          return shouldUpdate
-            ? { ...existingVault, ...newVault }
-            : existingVault;
+            existingVault.state !== VaultState.FUNDING || newVault.state === VaultState.FUNDED;
+          return shouldUpdate ? { ...existingVault, ...newVault } : existingVault;
         }
       });
     },
@@ -53,12 +48,10 @@ export const vaultSlice = createSlice({
         vaultUUID: string;
         updatedVault: Vault;
         networkID: EthereumNetwork;
-      }>,
+      }>
     ) => {
       const { vaultUUID, updatedVault, networkID } = action.payload;
-      const vaultIndex = state.vaults[networkID].findIndex(
-        (vault) => vault.uuid === vaultUUID,
-      );
+      const vaultIndex = state.vaults[networkID].findIndex(vault => vault.uuid === vaultUUID);
 
       if (vaultIndex === -1) {
         state.vaults[networkID].push(updatedVault);
@@ -72,13 +65,11 @@ export const vaultSlice = createSlice({
         vaultUUID: string;
         fundingTX: string;
         networkID: EthereumNetwork;
-      }>,
+      }>
     ) => {
       const { vaultUUID, fundingTX, networkID } = action.payload;
 
-      const vaultIndex = state.vaults[networkID].findIndex(
-        (vault) => vault.uuid === vaultUUID,
-      );
+      const vaultIndex = state.vaults[networkID].findIndex(vault => vault.uuid === vaultUUID);
 
       if (vaultIndex === -1) return;
 

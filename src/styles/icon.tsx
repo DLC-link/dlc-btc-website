@@ -1,6 +1,6 @@
-import React, { SVGProps } from "react";
+import React, { SVGProps } from 'react';
 
-export const StepIconOne: React.FC<SVGProps<SVGSVGElement>> = (props) => (
+export const StepIconOne: React.FC<SVGProps<SVGSVGElement>> = props => (
   <svg
     data-name="Layer 4"
     xmlns="http://www.w3.org/2000/svg"
@@ -16,7 +16,7 @@ export const StepIconOne: React.FC<SVGProps<SVGSVGElement>> = (props) => (
   </svg>
 );
 
-export const StepIconTwo: React.FC<SVGProps<SVGSVGElement>> = (props) => (
+export const StepIconTwo: React.FC<SVGProps<SVGSVGElement>> = props => (
   <svg
     data-name="Layer 4"
     xmlns="http://www.w3.org/2000/svg"
@@ -32,7 +32,7 @@ export const StepIconTwo: React.FC<SVGProps<SVGSVGElement>> = (props) => (
   </svg>
 );
 
-export const StepIconThree: React.FC<SVGProps<SVGSVGElement>> = (props) => (
+export const StepIconThree: React.FC<SVGProps<SVGSVGElement>> = props => (
   <svg
     data-name="Layer 4"
     xmlns="http://www.w3.org/2000/svg"

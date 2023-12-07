@@ -35,14 +35,8 @@ export function useVaults(ethereum?: UseEthereumReturnType): UseVaultsReturnType
     fetchData();
   }, [address, network, ethereum?.isLoaded]);
 
-  console.log('vaults', vaults);
-  console.log('network', network);
-
   const allVaults = useMemo(
-    () =>
-      vaults[network ? network.id : '1']
-        .filter(vault => vault.state !== VaultState.READY)
-        .sort((a, b) => b.timestamp - a.timestamp),
+    () => [...vaults[network ? network.id : '1']].sort((a, b) => b.timestamp - a.timestamp),
     [vaults, network]
   );
 

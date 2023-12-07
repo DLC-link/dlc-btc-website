@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 
-import { EthereumNetwork } from "@models/network";
-import { RootState } from "@store/index";
+import { EthereumNetwork } from '@models/network';
+import { RootState } from '@store/index';
 
 interface UseEndpointsReturnType {
   routerWalletURL: string | undefined;
@@ -13,20 +13,16 @@ interface UseEndpointsReturnType {
 export function useEndpoints(): UseEndpointsReturnType {
   const { network } = useSelector((state: RootState) => state.account);
 
-  const [routerWalletURL, setRouterWalletURL] = useState<string | undefined>(
-    undefined,
+  const [routerWalletURL, setRouterWalletURL] = useState<string | undefined>(undefined);
+  const [ethereumExplorerAPIURL, setEthereumExplorerAPIURL] = useState<string | undefined>(
+    undefined
   );
-  const [ethereumExplorerAPIURL, setEthereumExplorerAPIURL] = useState<
-    string | undefined
-  >(undefined);
-  const [bitcoinExplorerAPIURL, setBitcoinExplorerAPIURL] =
-    useState<string>("");
+  const [bitcoinExplorerAPIURL, setBitcoinExplorerAPIURL] = useState<string>('');
 
   useEffect(() => {
     if (!network) return;
 
-    const { routerWalletURL, ethereumExplorerAPIURL, bitcoinExplorerAPIURL } =
-      getEndpoints();
+    const { routerWalletURL, ethereumExplorerAPIURL, bitcoinExplorerAPIURL } = getEndpoints();
 
     setRouterWalletURL(routerWalletURL);
     setEthereumExplorerAPIURL(ethereumExplorerAPIURL);
@@ -41,21 +37,21 @@ export function useEndpoints(): UseEndpointsReturnType {
     switch (network?.id) {
       case EthereumNetwork.Sepolia:
         return {
-          routerWalletURL: "https://devnet.dlc.link/eth-wallet",
-          ethereumExplorerAPIURL: "https://sepolia.etherscan.io/tx/",
-          bitcoinExplorerAPIURL: "http://devnet.dlc.link/electrs/tx/",
+          routerWalletURL: 'https://devnet.dlc.link/eth-wallet',
+          ethereumExplorerAPIURL: 'https://sepolia.etherscan.io/tx/',
+          bitcoinExplorerAPIURL: 'http://devnet.dlc.link/electrs/tx/',
         };
       case EthereumNetwork.Goerli:
         return {
-          routerWalletURL: "https://testnet.dlc.link/eth-wallet",
-          ethereumExplorerAPIURL: "https://goerli.etherscan.io/tx/",
-          bitcoinExplorerAPIURL: "https://blockstream.info/testnet/tx/",
+          routerWalletURL: 'https://testnet.dlc.link/eth-wallet',
+          ethereumExplorerAPIURL: 'https://goerli.etherscan.io/tx/',
+          bitcoinExplorerAPIURL: 'https://blockstream.info/testnet/tx/',
         };
       case EthereumNetwork.X1Testnet:
         return {
-          routerWalletURL: "https://devnet.dlc.link/okx-wallet",
-          ethereumExplorerAPIURL: "https://www.oklink.com/x1-test/tx/",
-          bitcoinExplorerAPIURL: "http://devnet.dlc.link/electrs/tx/",
+          routerWalletURL: 'https://devnet.dlc.link/okx-wallet',
+          ethereumExplorerAPIURL: 'https://www.oklink.com/x1-test/tx/',
+          bitcoinExplorerAPIURL: 'http://devnet.dlc.link/electrs/tx/',
         };
       default:
         throw new Error(`Unsupported network: ${network?.name}`);
