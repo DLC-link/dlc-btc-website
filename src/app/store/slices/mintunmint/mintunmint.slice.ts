@@ -7,8 +7,8 @@ interface MintUnmintState {
 }
 
 const initialMintUnmintState: MintUnmintState = {
-  mintStep: [0, ''],
-  unmintStep: [0, ''],
+  mintStep: [2, ''],
+  unmintStep: [1, ''],
   activeTab: 0,
 };
 

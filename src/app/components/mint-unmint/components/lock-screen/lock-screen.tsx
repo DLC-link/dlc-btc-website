@@ -1,9 +1,11 @@
 import { useContext, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 import { Button, VStack } from '@chakra-ui/react';
 import { VaultCard } from '@components/vault/vault-card';
 import { useVaults } from '@hooks/use-vaults';
 import { Vault } from '@models/vault';
+import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 
 import { BlockchainContext } from '../../../../providers/blockchain-context-provider';
 import { LockScreenProtocolFee } from './components/protocol-fee';
@@ -13,6 +15,7 @@ interface LockScreenProps {
 }
 
 export function LockScreen({ currentStep }: LockScreenProps): React.JSX.Element {
+  const dispatch = useDispatch();
   const { readyVaults } = useVaults();
   const blockchainContext = useContext(BlockchainContext);
   const bitcoin = blockchainContext?.bitcoin;
@@ -45,6 +48,13 @@ export function LockScreen({ currentStep }: LockScreenProps): React.JSX.Element 
         onClick={() => handleClick(currentVault)}
       >
         Lock BTC
+      </Button>
+      <Button
+        isLoading={isSubmitting}
+        variant={'navigate'}
+        onClick={() => dispatch(mintUnmintActions.setMintStep([0, '']))}
+      >
+        Cancel
       </Button>
     </VStack>
   );
