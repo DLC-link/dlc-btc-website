@@ -37,19 +37,19 @@ export function useEndpoints(): UseEndpointsReturnType {
     switch (network?.id) {
       case EthereumNetwork.Sepolia:
         return {
-          routerWalletURL: 'https://devnet.dlc.link/eth-wallet',
+          routerWalletURL: 'https://devnet.dlc.link/router-wallet',
           ethereumExplorerAPIURL: 'https://sepolia.etherscan.io/tx/',
           bitcoinExplorerAPIURL: 'http://devnet.dlc.link/electrs/tx/',
         };
       case EthereumNetwork.Goerli:
         return {
-          routerWalletURL: 'https://testnet.dlc.link/eth-wallet',
+          routerWalletURL: 'https://devnet.dlc.link/router-wallet',
           ethereumExplorerAPIURL: 'https://goerli.etherscan.io/tx/',
           bitcoinExplorerAPIURL: 'https://blockstream.info/testnet/tx/',
         };
       case EthereumNetwork.X1Testnet:
         return {
-          routerWalletURL: 'https://devnet.dlc.link/okx-wallet',
+          routerWalletURL: 'https://devnet.dlc.link/router-wallet',
           ethereumExplorerAPIURL: 'https://www.oklink.com/x1-test/tx/',
           bitcoinExplorerAPIURL: 'http://devnet.dlc.link/electrs/tx/',
         };
