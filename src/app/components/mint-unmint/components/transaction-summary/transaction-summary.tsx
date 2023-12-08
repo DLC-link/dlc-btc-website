@@ -1,8 +1,10 @@
-import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
 
-import { HStack, Spinner, Stack, Text, VStack } from '@chakra-ui/react';
+import { Button, HStack, Spinner, Stack, Text, VStack } from '@chakra-ui/react';
 import { VaultCard } from '@components/vault/vault-card';
 import { useVaults } from '@hooks/use-vaults';
+import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 
 import { TransactionSummaryPreviewCard } from './components/transaction-summary-preview-card';
 
@@ -40,6 +42,8 @@ export function TransactionSummary({
   flow,
   blockchain,
 }: TransactionSummaryProps): React.JSX.Element {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { allVaults } = useVaults();
   const currentVault = allVaults.find(vault => vault.uuid === currentStep[1]);
 
@@ -79,6 +83,19 @@ export function TransactionSummary({
           tab.
         </Text>
       </Stack>
+      <Button
+        variant={'navigate'}
+        onClick={() => {
+          dispatch(
+            flow === 'mint'
+              ? mintUnmintActions.setMintStep([0, ''])
+              : mintUnmintActions.setUnmintStep([0, ''])
+          );
+          navigate('/my-vaults');
+        }}
+      >
+        View in My Vaults
+      </Button>
     </VStack>
   );
 }

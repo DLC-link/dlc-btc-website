@@ -1,9 +1,7 @@
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { HStack } from '@chakra-ui/react';
-import { StepButton } from '@components/step-button/step-button';
 import { RootState } from '@store/index';
-import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 
 import { LockScreen } from '../lock-screen/lock-screen';
 import { ProgressTimeline } from '../progress-timeline/progress-timeline';
@@ -13,12 +11,7 @@ import { Walkthrough } from '../walkthrough/walkthrough';
 import { MintLayout } from './components/mint.layout';
 
 export function Mint(): React.JSX.Element {
-  const dispatch = useDispatch();
   const { mintStep } = useSelector((state: RootState) => state.mintunmint);
-
-  function handleRestart() {
-    dispatch(mintUnmintActions.setMintStep([0, '']));
-  }
 
   return (
     <MintLayout>
@@ -31,7 +24,6 @@ export function Mint(): React.JSX.Element {
           <TransactionSummary currentStep={mintStep} flow={'mint'} blockchain={'ethereum'} />
         )}
       </HStack>
-      <StepButton handleClick={handleRestart} />
     </MintLayout>
   );
 }
