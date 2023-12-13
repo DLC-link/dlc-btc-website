@@ -2,6 +2,7 @@ import { VStack } from '@chakra-ui/react';
 import { HasChildren } from '@models/has-children';
 
 export function MintLayout({ children }: HasChildren): React.JSX.Element {
+  
   return (
     <VStack
       alignContent={'start'}

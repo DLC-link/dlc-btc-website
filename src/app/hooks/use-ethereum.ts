@@ -37,6 +37,22 @@ export interface UseEthereumReturnType {
   isLoaded: boolean;
 }
 
+function isMetaMask(provider: any): boolean {
+  console.log('provider', provider)
+  console.log('typeof provider', typeof provider)
+  console.log('provider !== null', provider !== null)
+  console.log('metamaskInProvider', '_metamask' in provider )
+  console.log('isMetaMaskInProvider', 'isMetaMask' in provider)
+  console.log('provider.isMetaMask', provider.isMetaMask)
+  return (
+    typeof provider === 'object' &&
+    provider !== null &&
+    '_metamask' in provider &&
+    'isMetaMask' in provider &&
+    provider.isMetaMask === true
+  );
+}
+
 function throwEthereumError(message: string, error: any): void {
   if (error.code === Logger.errors.CALL_EXCEPTION) {
     throw new EthereumError(
@@ -94,15 +110,16 @@ export function useEthereum(): UseEthereumReturnType {
     };
   }
 
-  function getProvider(ethereum: any, walletType: WalletType): any {
-    if ('providers' in ethereum) {
-      return ethereum.providers.find((provider: any) => provider[`is${walletType}`]);
+  function getProvider(ethereum: any): any {
+    if (isMetaMask(ethereum)) {
+      return ethereum;
+    } else {
+     return undefined;
     }
-    return ethereum[`is${walletType}`] ? ethereum : undefined;
   }
 
   function checkWalletProvider(ethereum: any, walletType: WalletType): any {
-    const ethereumWalletProvider = getProvider(ethereum, walletType);
+    const ethereumWalletProvider = getProvider(ethereum);
     if (!ethereumWalletProvider) {
       alert(`Install ${walletType}!`);
       throw new EthereumError(`${walletType} wallet not found`);
@@ -113,6 +130,7 @@ export function useEthereum(): UseEthereumReturnType {
   function getWalletProvider(walletType: WalletType): any {
     const { ethereum } = window;
 
+    console.log('ethereum', ethereum)
     if (!ethereum) {
       alert('Install MetaMask!');
       throw new EthereumError('No ethereum wallet found');
@@ -251,6 +269,8 @@ export function useEthereum(): UseEthereumReturnType {
     try {
       if (!walletType) throw new Error('Wallet not initialized');
       const walletProvider = getWalletProvider(walletType);
+
+      console.log('walletProvider', walletProvider);
 
       const ethereumAccounts = await walletProvider.request({
         method: 'eth_requestAccounts',

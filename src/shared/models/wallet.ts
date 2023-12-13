@@ -1,6 +1,7 @@
 export enum WalletType {
   Metamask = 'MetaMask',
   Coinbase = 'CoinbaseWallet',
+  Trust = 'TrustWallet',
 }
 
 export interface Wallet {
