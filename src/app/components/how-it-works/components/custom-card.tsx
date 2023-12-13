@@ -19,7 +19,6 @@ export function CustomCard({
     <VStack
       alignContent={'start'}
       alignItems={'start'}
-      justifyContent={'space-between'}
       p={padding}
       w={width}
       h={height}
