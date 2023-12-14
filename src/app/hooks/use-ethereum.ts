@@ -38,12 +38,12 @@ export interface UseEthereumReturnType {
 }
 
 function isMetaMask(provider: any): boolean {
-  console.log('provider', provider)
-  console.log('typeof provider', typeof provider)
-  console.log('provider !== null', provider !== null)
-  console.log('metamaskInProvider', '_metamask' in provider )
-  console.log('isMetaMaskInProvider', 'isMetaMask' in provider)
-  console.log('provider.isMetaMask', provider.isMetaMask)
+  console.log('provider', provider);
+  console.log('typeof provider', typeof provider);
+  console.log('provider !== null', provider !== null);
+  console.log('metamaskInProvider', '_metamask' in provider);
+  console.log('isMetaMaskInProvider', 'isMetaMask' in provider);
+  console.log('provider.isMetaMask', provider.isMetaMask);
   return (
     typeof provider === 'object' &&
     provider !== null &&
@@ -114,7 +114,7 @@ export function useEthereum(): UseEthereumReturnType {
     if (isMetaMask(ethereum)) {
       return ethereum;
     } else {
-     return undefined;
+      return undefined;
     }
   }
 
@@ -130,7 +130,7 @@ export function useEthereum(): UseEthereumReturnType {
   function getWalletProvider(walletType: WalletType): any {
     const { ethereum } = window;
 
-    console.log('ethereum', ethereum)
+    console.log('ethereum', ethereum);
     if (!ethereum) {
       alert('Install MetaMask!');
       throw new EthereumError('No ethereum wallet found');

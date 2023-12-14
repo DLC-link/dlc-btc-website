@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Skeleton } from '@chakra-ui/react';
 import { VaultsListGroupBlankContainer } from '@components/vaults-list/components/vaults-list-group-blank-container';
 import { VaultsList } from '@components/vaults-list/vaults-list';
+import { VaultContext } from '@providers/vault-context-provider';
 
-import { VaultContext } from '../../providers/vault-context-provider';
 import { VaultsListGroupContainer } from '../vaults-list/components/vaults-list-group-container';
 import { MyVaultsSmallLayout } from './components/my-vaults-small.layout';
 

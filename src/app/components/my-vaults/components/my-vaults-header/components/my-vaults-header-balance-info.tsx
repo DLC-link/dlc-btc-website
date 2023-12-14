@@ -20,7 +20,7 @@ export function MyVaultsHeaderBalanceInfo({
       <Text color={'accent.cyan.01'} fontWeight={600} fontSize={'md'}>
         {title}
       </Text>
-      <Skeleton isLoaded={!!assetAmount} h={'auto'} w={'100%'}>
+      <Skeleton isLoaded={assetAmount !== undefined} h={'auto'} w={'100%'}>
         <HStack>
           <Image src={imageSrc} alt={altText} boxSize={'25px'} />
           <Text color={'white'} fontWeight={800} fontSize={'xl'}>

@@ -2,8 +2,8 @@
 import { useContext } from 'react';
 
 import { Skeleton, Text, VStack } from '@chakra-ui/react';
+import { BlockchainContext } from '@providers/blockchain-context-provider';
 
-import { BlockchainContext } from '../../../../providers/blockchain-context-provider';
 import { ProtocolSummaryStackLayout } from './components/protocol-summary-stack.layout';
 
 export function ProtocolSummaryStack(): React.JSX.Element {

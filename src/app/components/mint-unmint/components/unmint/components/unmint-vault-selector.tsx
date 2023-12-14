@@ -6,9 +6,8 @@ import { VaultsListGroupContainer } from '@components/vaults-list/components/vau
 import { VaultsList } from '@components/vaults-list/vaults-list';
 import { useVaults } from '@hooks/use-vaults';
 import { Vault } from '@models/vault';
-
-import { scrollBarCSS } from '../../../../../../styles/css-styles';
-import { BlockchainContext } from '../../../../../providers/blockchain-context-provider';
+import { BlockchainContext } from '@providers/blockchain-context-provider';
+import { scrollBarCSS } from '@styles/css-styles';
 
 export function UnmintVaultSelector(): React.JSX.Element {
   const [selectedVault, setSelectedVault] = useState<Vault | undefined>(undefined);

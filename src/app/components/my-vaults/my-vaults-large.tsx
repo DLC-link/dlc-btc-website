@@ -5,10 +5,10 @@ import { HStack } from '@chakra-ui/react';
 import { VaultsListGroupBlankContainer } from '@components/vaults-list/components/vaults-list-group-blank-container';
 import { VaultsListGroupContainer } from '@components/vaults-list/components/vaults-list-group-container';
 import { VaultsList } from '@components/vaults-list/vaults-list';
+import { BalanceContext } from '@providers/balance-context-provider';
+import { VaultContext } from '@providers/vault-context-provider';
 import { RootState } from '@store/index';
 
-import { BalanceContext } from '../../providers/balance-context-provider';
-import { VaultContext } from '../../providers/vault-context-provider';
 import { MyVaultsLargeHeader } from './components/my-vaults-header/my-vaults-header';
 import { MyVaultsLargeLayout } from './components/my-vaults-large.layout';
 import { MyVaultsSetupInformationStack } from './components/my-vaults-setup-information-stack';

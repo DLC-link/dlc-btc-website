@@ -5,9 +5,9 @@ import { Button, VStack } from '@chakra-ui/react';
 import { VaultCard } from '@components/vault/vault-card';
 import { useVaults } from '@hooks/use-vaults';
 import { Vault } from '@models/vault';
+import { BlockchainContext } from '@providers/blockchain-context-provider';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 
-import { BlockchainContext } from '../../../../providers/blockchain-context-provider';
 import { LockScreenProtocolFee } from './components/protocol-fee';
 
 interface LockScreenProps {

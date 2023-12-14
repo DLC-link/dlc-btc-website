@@ -42,7 +42,7 @@ export function MintUnmint({ address }: MintUnmintContainerProps): React.JSX.Ele
   }
 
   return (
-    <MintUnmintLayout animate={animate} step={activeTab === 0 ? mintStep[0] : unmintStep[0]}>
+    <MintUnmintLayout animate={animate}>
       <Tabs variant="unstyled" index={activeTab} onChange={handleTabsChange}>
         <TabList>
           <Tab>Mint</Tab>
