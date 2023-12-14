@@ -33,6 +33,14 @@ export default defineConfig({
     { 
       find: "@hooks", 
       replacement: resolve(__dirname, './src/app/hooks') 
+    },
+    { 
+      find: "@providers", 
+      replacement: resolve(__dirname, './src/app/providers') 
+    },
+    { 
+      find: "@styles", 
+      replacement: resolve(__dirname, './src/styles') 
     }]
   }
 })

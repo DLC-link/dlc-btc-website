@@ -1,3 +1,5 @@
+import { keyframes } from '@emotion/react';
+
 export const scrollBarCSS = {
   '&::-webkit-scrollbar': {
     background: 'rgba(255,255,255,0.25)',
@@ -10,3 +12,11 @@ export const scrollBarCSS = {
     background: 'rgba(7,232,216,1)',
   },
 };
+
+export const boxShadowAnimation = keyframes`
+0% { box-shadow: 0 0 5px rgba(255,255,255,0); }
+25% { box-shadow: 0 0 10px rgba(255,255,255,0.5); }
+50% { box-shadow: 0 0 15px rgba(255,255,255,0.75); }
+75% { box-shadow: 0 0 10px rgba(255,255,255,0.5); }
+100% { box-shadow: 0 0 5px rgba(7,232,216,0); }
+`;

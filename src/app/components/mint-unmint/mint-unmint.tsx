@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import {
@@ -25,15 +26,23 @@ interface MintUnmintContainerProps {
 
 export function MintUnmint({ address }: MintUnmintContainerProps): React.JSX.Element {
   const dispatch = useDispatch();
+  const [animate, setAnimate] = useState(false);
 
-  const { activeTab } = useSelector((state: RootState) => state.mintunmint);
+  const { activeTab, mintStep, unmintStep } = useSelector((state: RootState) => state.mintunmint);
+
+  useEffect(() => {
+    setAnimate(true);
+    setTimeout(() => {
+      setAnimate(false);
+    }, 1000);
+  }, [mintStep, unmintStep]);
 
   function handleTabsChange(index: number) {
     dispatch(mintUnmintActions.setActiveTab(index));
   }
 
   return (
-    <MintUnmintLayout>
+    <MintUnmintLayout animate={animate}>
       <Tabs variant="unstyled" index={activeTab} onChange={handleTabsChange}>
         <TabList>
           <Tab>Mint</Tab>

@@ -3,9 +3,9 @@ import { useContext, useState } from 'react';
 import { Button, FormControl, FormErrorMessage, Text, VStack, useToast } from '@chakra-ui/react';
 import { customShiftValue } from '@common/utilities';
 import { EthereumError } from '@models/error-types';
+import { BlockchainContext } from '@providers/blockchain-context-provider';
 import { Form, Formik } from 'formik';
 
-import { BlockchainContext } from '../../../../providers/blockchain-context-provider';
 import { TransactionFormInput } from './components/transaction-form-input';
 import { TransactionFormWarning } from './components/transaction-form-warning';
 

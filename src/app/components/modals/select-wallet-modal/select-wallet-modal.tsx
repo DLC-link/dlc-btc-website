@@ -8,8 +8,7 @@ import { SelectWalletMenu } from '@components/modals/select-wallet-modal/compone
 import { SelectNetworkButton } from '@components/select-network-button/select-network-button';
 import { Network } from '@models/network';
 import { WalletType, ethereumWallets } from '@models/wallet';
-
-import { BlockchainContext } from '../../../providers/blockchain-context-provider';
+import { BlockchainContext } from '@providers/blockchain-context-provider';
 
 export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps): React.JSX.Element {
   const blockchainContext = useContext(BlockchainContext);
