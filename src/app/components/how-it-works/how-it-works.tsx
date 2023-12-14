@@ -1,9 +1,9 @@
 import { VStack } from '@chakra-ui/react';
 
-import { BottomSection } from './components/bottom-section';
+import { BottomSection } from './bottom/bottom-section';
 import { HowItWorksLayout } from './components/how-it-works-layout';
-import { MiddleSection } from './components/middle-section';
-import { TopSection } from './components/top-section';
+import { MiddleSection } from './middle/middle-section';
+import { TopSection } from './top/top-section';
 
 export function HowItWorks(): React.JSX.Element {
   return (
