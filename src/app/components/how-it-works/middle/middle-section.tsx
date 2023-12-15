@@ -1,4 +1,6 @@
-import { Box, HStack, Text, VStack } from '@chakra-ui/react';
+import { Box, HStack, Text } from '@chakra-ui/react';
+
+import { ExplanationBlock } from './components/explanation-block';
 
 export function MiddleSection(): React.JSX.Element {
   return (
@@ -13,18 +15,46 @@ export function MiddleSection(): React.JSX.Element {
       backgroundPosition={'0% 0%'}
       boxShadow={'6px 6px 12px #0000004D'}
       mixBlendMode={'screen'}
+      display={'flex'}
+      justifyContent={'center'}
+      alignItems={'center'}
     >
-      <HStack gap={'84px'}>
-        <VStack align={'left'}>
-          <Text color={'white.01'} fontSize={'56px'} fontWeight={'bold'}>
-            dlcBTC
-          </Text>
-          <Text color={'white.01'} fontSize={'21px'} width={'462px'}>
-            dlcBTC lets you use your Bitcoin on different DeFi platforms, all without giving up
-            control of your actual Bitcoin.
-          </Text>
-        </VStack>
-        <Box w={'486px'} h={'274px'} backgroundColor={'white.02'}></Box>
+      <HStack>
+        <ExplanationBlock
+          src={'/images/mint-btc-grad.png'}
+          title={'What is dlcBTC?'}
+          content={
+            <Text color={'white'}>
+              dlcBTC is a{' '}
+              <Box as={'span'} fontWeight={'bold'}>
+                non-custodial
+              </Box>{' '}
+              representation of Bitcoin on the Ethereum blockchain.
+            </Text>
+          }
+        ></ExplanationBlock>
+        <ExplanationBlock
+          src={'/images/dlc-img.png'}
+          title={'How Does It Work?'}
+          content={
+            <Text color={'white'}>
+              <Text as={'span'} variant={'navigate'}>
+                Discreet Log Contracts (DLCs)
+              </Text>{' '}
+              ensure only authorized parties can access locked Bitcoin, without third-party risks.
+              dlcBTC is a representation of Bitcoin on the Ethereum blockchain.
+            </Text>
+          }
+        ></ExplanationBlock>
+        <ExplanationBlock
+          src={'/images/unmint-btc-grad.png'}
+          title={'Why is It Safer?'}
+          content={
+            <Text color={'white'}>
+              Your Bitcoin remains secure on its native chain and cannot be redirected or stolen.
+            </Text>
+          }
+        ></ExplanationBlock>
       </HStack>
     </Box>
   );
