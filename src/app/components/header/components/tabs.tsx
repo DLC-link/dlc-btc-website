@@ -13,12 +13,12 @@ export function NavigationTabs({
   return (
     <HStack spacing={'25px'} marginRight={'150px'}>
       <TabButton
-        title={'Mint/Unmint dlcBTC'}
+        title={'Mint/Redeem dlcBTC'}
         isActive={activeTab === '/'}
         handleClick={() => handleTabClick('/')}
       />
       <TabButton
-        title={'My Vaults'}
+        title={'My Mint Vaults'}
         isActive={activeTab === '/my-vaults'}
         handleClick={() => handleTabClick('/my-vaults')}
       />
