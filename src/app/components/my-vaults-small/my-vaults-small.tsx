@@ -22,7 +22,7 @@ export function MyVaultsSmall({ address }: MyVaultsSmallProps): React.JSX.Elemen
 
   return (
     <MyVaultsSmallLayout>
-      <VaultsList title={'My Vaults'} height={'545px'} isScrollable={!!address && !isLoading}>
+      <VaultsList title={'My Mint Vaults'} height={'545px'} isScrollable={!!address && !isLoading}>
         {address ? (
           <Skeleton isLoaded={!isLoading} w={'100%'}>
             <VaultsListGroupContainer label="Lock BTC" vaults={readyVaults} />

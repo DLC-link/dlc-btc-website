@@ -31,6 +31,7 @@ export function MintUnmint({ address }: MintUnmintContainerProps): React.JSX.Ele
   const { activeTab, mintStep, unmintStep } = useSelector((state: RootState) => state.mintunmint);
 
   useEffect(() => {
+    if (!address) return;
     setAnimate(true);
     setTimeout(() => {
       setAnimate(false);
@@ -46,7 +47,7 @@ export function MintUnmint({ address }: MintUnmintContainerProps): React.JSX.Ele
       <Tabs variant="unstyled" index={activeTab} onChange={handleTabsChange}>
         <TabList>
           <Tab>Mint</Tab>
-          <Tab isDisabled={!address}>Unmint</Tab>
+          <Tab isDisabled={!address}>Redeem</Tab>
         </TabList>
         <TabIndicator mt="5px" h="3.5px" bg={'accent.cyan.01'} />
         <Spacer />
