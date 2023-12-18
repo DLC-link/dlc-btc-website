@@ -25,7 +25,7 @@ const navigate = defineStyle({
   px: '25px',
   h: '50px',
   w: '100%',
-  fontSize: 'md',
+  fontSize: 'lg',
   fontWeight: 600,
   bg: 'none',
   border: '1px solid',

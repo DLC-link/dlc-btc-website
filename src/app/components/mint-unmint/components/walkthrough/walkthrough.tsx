@@ -119,7 +119,7 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
             <WalkthroughLayout>
               <WalkthroughHeader
                 currentStep={currentStep}
-                title={'Unmint dlcBTC'}
+                title={'Redeem dlcBTC'}
                 blockchain={'ethereum'}
               />
               <Text color={'white.01'} fontSize={'md'}>

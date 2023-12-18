@@ -22,7 +22,7 @@ export function VaultsListGroupContainer({
   return (
     <VStack pt={'15px'} alignItems={'start'} w={'100%'} spacing={'15px'}>
       {label && (
-        <HStack pt={'15px'} spacing={'25px'}>
+        <HStack pt={'15px'}>
           {['Locking BTC in Progress', 'Unlocking BTC in Progress'].includes(label) && (
             <Spinner color={'accent.cyan.01'} size={'md'} />
           )}
