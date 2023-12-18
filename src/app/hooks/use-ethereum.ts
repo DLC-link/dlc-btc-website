@@ -37,22 +37,6 @@ export interface UseEthereumReturnType {
   isLoaded: boolean;
 }
 
-function isMetaMask(provider: any): boolean {
-  console.log('provider', provider);
-  console.log('typeof provider', typeof provider);
-  console.log('provider !== null', provider !== null);
-  console.log('metamaskInProvider', '_metamask' in provider);
-  console.log('isMetaMaskInProvider', 'isMetaMask' in provider);
-  console.log('provider.isMetaMask', provider.isMetaMask);
-  return (
-    typeof provider === 'object' &&
-    provider !== null &&
-    '_metamask' in provider &&
-    'isMetaMask' in provider &&
-    provider.isMetaMask === true
-  );
-}
-
 function throwEthereumError(message: string, error: any): void {
   if (error.code === Logger.errors.CALL_EXCEPTION) {
     throw new EthereumError(
@@ -110,33 +94,76 @@ export function useEthereum(): UseEthereumReturnType {
     };
   }
 
-  function getProvider(ethereum: any): any {
-    if (isMetaMask(ethereum)) {
-      return ethereum;
-    } else {
-      return undefined;
-    }
+  function validateMetaMask(provider: any): boolean {
+    return (
+      typeof provider === 'object' &&
+      provider !== null &&
+      '_metamask' in provider &&
+      'isMetaMask' in provider &&
+      provider.isMetaMask === true
+    );
   }
 
-  function checkWalletProvider(ethereum: any, walletType: WalletType): any {
-    const ethereumWalletProvider = getProvider(ethereum);
-    if (!ethereumWalletProvider) {
-      alert(`Install ${walletType}!`);
-      throw new EthereumError(`${walletType} wallet not found`);
-    }
-    return ethereumWalletProvider;
+  function checkIfMultipleEthereumProviders(ethereum: any): boolean {
+    return (
+      'providerMap' in ethereum &&
+      ethereum.providerMap instanceof Map &&
+      ethereum.providerMap.size > 1
+    );
+  }
+
+  function alertMissingWallet(walletType: WalletType): void {
+    alert(`Install ${walletType}!`);
+    throw new EthereumError(`${walletType} wallet not found`);
+  }
+
+  function alertNonMetaMaskProvider(): void {
+    alert(
+      'Your current Ethereum provider is not MetaMask. Please ensure that MetaMask is your active Ethereum wallet and disable any other Ethereum wallets in your browser, then reload the page.'
+    );
   }
 
   function getWalletProvider(walletType: WalletType): any {
     const { ethereum } = window;
 
-    console.log('ethereum', ethereum);
     if (!ethereum) {
-      alert('Install MetaMask!');
-      throw new EthereumError('No ethereum wallet found');
+      alertMissingWallet(walletType);
     }
 
-    return checkWalletProvider(ethereum, walletType);
+    let provider;
+
+    if (checkIfMultipleEthereumProviders(ethereum)) {
+      switch (walletType) {
+        case WalletType.Metamask:
+          provider = ethereum.providerMap.get(walletType);
+          if (validateMetaMask(provider)) {
+            provider = ethereum.providerMap.get(walletType);
+            break;
+          } else {
+            alertNonMetaMaskProvider();
+            break;
+          }
+        default:
+          alertMissingWallet(walletType);
+          break;
+      }
+    } else {
+      switch (walletType) {
+        case WalletType.Metamask:
+          if (validateMetaMask(ethereum)) {
+            provider = ethereum;
+            break;
+          } else {
+            alertNonMetaMaskProvider();
+            break;
+          }
+        default:
+          alertMissingWallet(walletType);
+          break;
+      }
+    }
+
+    return provider;
   }
 
   async function getTotalSupply() {
