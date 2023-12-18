@@ -1,15 +1,11 @@
 import { Box, HStack, Text, VStack } from '@chakra-ui/react';
 
+import { IntroVideo } from './components/intro-video';
+
 export function TopSection(): React.JSX.Element {
   return (
-    <Box
-      px={'25px'}
-      w={'1280px'}
-      h={'274px'}
-      paddingInlineStart={'130px'}
-      paddingInlineEnd={'130px'}
-    >
-      <HStack gap={'84px'}>
+    <Box w={'1280px'} h={'274px'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
+      <HStack width={'1000px'} justifyContent={'space-between'}>
         <VStack align={'left'}>
           <Text color={'white.01'} fontSize={'56px'} fontWeight={'bold'}>
             dlcBTC
@@ -19,7 +15,11 @@ export function TopSection(): React.JSX.Element {
             control of your actual Bitcoin.
           </Text>
         </VStack>
-        <Box w={'486px'} h={'274px'} backgroundColor={'white.02'}></Box>
+        <IntroVideo
+          opts={{ height: '274px', width: '486px', playerVars: { autoplay: 0, controls: 1 } }}
+          placeholderHeight={'274px'}
+          placeholderWidth={'486px'}
+        />
       </HStack>
     </Box>
   );

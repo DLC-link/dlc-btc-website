@@ -19,7 +19,7 @@ export function MiddleSection(): React.JSX.Element {
       justifyContent={'center'}
       alignItems={'center'}
     >
-      <HStack>
+      <HStack width={'1000px'} justifyContent={'space-between'}>
         <ExplanationBlock
           src={'/images/mint-btc-grad.png'}
           title={'What is dlcBTC?'}
@@ -42,7 +42,6 @@ export function MiddleSection(): React.JSX.Element {
                 Discreet Log Contracts (DLCs)
               </Text>{' '}
               ensure only authorized parties can access locked Bitcoin, without third-party risks.
-              dlcBTC is a representation of Bitcoin on the Ethereum blockchain.
             </Text>
           }
         ></ExplanationBlock>

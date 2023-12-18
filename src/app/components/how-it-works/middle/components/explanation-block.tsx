@@ -1,4 +1,4 @@
-import { Image, Text, VStack } from '@chakra-ui/react';
+import { Box, Image, Text, VStack } from '@chakra-ui/react';
 
 interface ExplanationBlockProps {
   src: string;
@@ -13,7 +13,14 @@ export function ExplanationBlock({
 }: ExplanationBlockProps): React.JSX.Element {
   return (
     <VStack width={'316px'} alignItems={'left'}>
-      <Image src={src} width={'200px'} />
+      <Box display={'flex'} justifyContent={'center'} alignItems={'center'}>
+        <Image
+          src={src}
+          width={src === '/images/dlc-img.png' ? '315px' : '200px'}
+          height={src === '/images/dlc-img.png' ? '120px' : '100px'}
+        />
+      </Box>
+
       <Text variant={'title'}>{title}</Text>
       {content}
     </VStack>

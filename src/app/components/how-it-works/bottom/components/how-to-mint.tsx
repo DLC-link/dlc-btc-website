@@ -1,4 +1,5 @@
-import { Box, Button, Image, Text } from '@chakra-ui/react';
+import { Button, Image, Text } from '@chakra-ui/react';
+import { IntroVideo } from '@components/how-it-works/top/components/intro-video';
 
 import { CustomCard } from '../../components/custom-card';
 import { FlowStep } from './flow-step';
@@ -60,7 +61,11 @@ export function HowToMint(): React.JSX.Element {
             }
             hasBadge={false}
           />
-          <Box w={'435px'} h={'262px'} backgroundColor={'white.02'}></Box>
+          <IntroVideo
+            opts={{ height: '262px', width: '435px', playerVars: { autoplay: 0, controls: 1 } }}
+            placeholderHeight={'262px'}
+            placeholderWidth={'435px'}
+          />
           <Button variant={'account'}>Mint dlcBTC</Button>
         </>
       }
