@@ -9,12 +9,7 @@ export function HowToUnmint(): React.JSX.Element {
       {
         <>
           <Text variant={'title'}>How to Unmint dlcBTC</Text>
-          <Image
-            src={'/images/unmintBtc.png'}
-            alt={'unmint image'}
-            height={'39px'}
-            width={'185px'}
-          />
+          <Image src={'/images/unmintBtc.png'} alt={'unmint image'} h={'39px'} w={'185px'} />
           <FlowStep
             step={'Step 1'}
             title={'Unmint dlcBTC'}

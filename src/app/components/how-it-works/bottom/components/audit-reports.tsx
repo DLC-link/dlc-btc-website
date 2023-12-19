@@ -8,7 +8,7 @@ export function AuditReports(): React.JSX.Element {
         <>
           <Text variant={'title'}>Audit Reports</Text>
           <HStack>
-            <Image src={'/images/report.png'} width={'34px'} height={'42px'}></Image>
+            <Image src={'/images/report.png'} w={'34px'} h={'42px'}></Image>
             <Text color={'white'}>
               Coin Fabric: Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy.
             </Text>

@@ -12,12 +12,12 @@ export function ExplanationBlock({
   content,
 }: ExplanationBlockProps): React.JSX.Element {
   return (
-    <VStack width={'316px'} alignItems={'left'}>
+    <VStack w={'316px'} alignItems={'left'}>
       <Box display={'flex'} justifyContent={'center'} alignItems={'center'}>
         <Image
           src={src}
-          width={src === '/images/dlc-img.png' ? '315px' : '200px'}
-          height={src === '/images/dlc-img.png' ? '120px' : '100px'}
+          w={src === '/images/dlc-img.png' ? '315px' : '200px'}
+          h={src === '/images/dlc-img.png' ? '120px' : '100px'}
         />
       </Box>
 

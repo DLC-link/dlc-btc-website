@@ -10,14 +10,14 @@ export function HowToMint(): React.JSX.Element {
       {
         <>
           <Text variant={'title'}>How to Mint dlcBTC</Text>
-          <Image src={'/images/mintBtc.png'} alt={'mint image'} height={'39px'} width={'185px'} />
+          <Image src={'/images/mintBtc.png'} alt={'mint image'} h={'39px'} w={'185px'} />
           <FlowStep
             step={'Step 1'}
             title={'Deposit Adress'}
             content={
               <Text color={'white'}>
                 Select an amount of Bitcoin you would like to lock and confirm it in your{' '}
-                <Text as={'span'} color={'rgba(154, 201, 255, 1)'}>
+                <Text as={'span'} color={'light.blue.01'}>
                   Ethereum Wallet.{' '}
                 </Text>
                 You will receive your deposit token dlcBTC to the same address.
@@ -31,7 +31,7 @@ export function HowToMint(): React.JSX.Element {
             content={
               <Text color={'white'}>
                 Confirm the transaction in your{' '}
-                <Text as={'span'} color={'rgba(154, 201, 255, 1)'}>
+                <Text as={'span'} color={'light.blue.01'}>
                   Bitcoin Wallet
                 </Text>{' '}
                 which will lock your Bitcoin on-chain.
@@ -45,11 +45,11 @@ export function HowToMint(): React.JSX.Element {
             content={
               <Text color={'white'}>
                 Wait for Bitcoin to get locked on chain
-                <Text as={'span'} color={'rgba(154, 201, 255, 1)'}>
+                <Text as={'span'} color={'light.blue.01'}>
                   (~1 hour).{' '}
                 </Text>
                 After confirmation dlcBTC tokens will automatically appear in your{' '}
-                <Text as={'span'} color={'rgba(154, 201, 255, 1)'}>
+                <Text as={'span'} color={'light.blue.01'}>
                   Ethereum Wallet.{' '}
                 </Text>{' '}
                 You can use dlcBTC in big{' '}

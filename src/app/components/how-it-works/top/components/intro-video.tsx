@@ -29,7 +29,7 @@ export function IntroVideo({
         h={placeholderHeight}
         w={placeholderWidth}
       >
-        <Box borderRadius={'lg'} overflow={'hidden'} width={'100%'} maxW={'500px'}>
+        <Box borderRadius={'lg'} overflow={'hidden'} w={'100%'} maxW={'500px'}>
           <YouTube videoId="x9D1owU1tB8" opts={opts} onReady={onPlayerReady} />
         </Box>
       </Skeleton>

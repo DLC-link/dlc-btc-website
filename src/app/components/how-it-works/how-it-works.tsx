@@ -9,7 +9,7 @@ export function HowItWorks(): React.JSX.Element {
   return (
     <HowItWorksLayout>
       {
-        <VStack gap={'100px'}>
+        <VStack spacing={'100px'}>
           <TopSection />
           <MiddleSection />
           <BottomSection />

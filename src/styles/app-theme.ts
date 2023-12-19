@@ -49,6 +49,7 @@ export const appTheme = extendTheme({
     'white.01': 'rgba(255,255,255,1)',
     'white.02': 'rgba(255,255,255,0.75)',
     'white.03': 'rgba(255,255,255,0.35)',
+    'light.blue.01': 'rgba(154, 201, 255, 1)',
   },
   fonts: {
     body: "'Poppins', poppins",

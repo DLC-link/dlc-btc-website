@@ -20,7 +20,7 @@ export function SetupInformationStack(): React.JSX.Element {
 
   return (
     <SetupInformationStackLayout>
-      <HStack width={'100%'} spacing={'25px'}>
+      <HStack w={'100%'} spacing={'25px'}>
         <VStack alignItems={'start'} h={'150px'}>
           <Text variant={'welcome'} alignContent={'start'}>
             {setupText}

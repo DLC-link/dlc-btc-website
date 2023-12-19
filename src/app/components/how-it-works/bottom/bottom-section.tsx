@@ -7,7 +7,7 @@ import { SupportedWallets } from './components/supported-wallets/supported-walle
 
 export function BottomSection(): React.JSX.Element {
   return (
-    <HStack gap={'25px'} alignItems={'flex-start'}>
+    <HStack spacing={'25px'} alignItems={'start'}>
       <HowToMint />
       <VStack spacing={'25px'}>
         <HowToUnmint />
