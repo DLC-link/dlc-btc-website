@@ -27,6 +27,7 @@ export interface UseEthereumReturnType {
   dlcBTCContract: Contract | undefined;
   getDLCBTCBalance: () => Promise<number | undefined>;
   getLockedBTCBalance: () => Promise<number | undefined>;
+  getProtocolFee: () => Promise<number | undefined>;
   totalSupply: number | undefined;
   requestEthereumAccount: (network: Network, walletType: WalletType) => Promise<void>;
   getAllVaults: () => Promise<void>;
@@ -186,6 +187,16 @@ export function useEthereum(): UseEthereumReturnType {
       setTotalSupply(customShiftValue(parseInt(totalSupply), 8, true));
     } catch (error) {
       throw new EthereumError(`Could not fetch total supply info: ${error}}`);
+    }
+  }
+
+  async function getProtocolFee(): Promise<number | undefined> {
+    if (!protocolContract) throw new Error('Protocol contract not initialized');
+    try {
+      const btcMintFeeRate = await protocolContract.btcMintFeeRate();
+      return customShiftValue(btcMintFeeRate.toNumber(), 4, true);
+    } catch (error) {
+      throwEthereumError(`Could not fetch protocol fee: `, error);
     }
   }
 
@@ -467,6 +478,7 @@ export function useEthereum(): UseEthereumReturnType {
     dlcManagerContract,
     dlcBTCContract,
     getDLCBTCBalance,
+    getProtocolFee,
     totalSupply,
     getLockedBTCBalance,
     requestEthereumAccount,
