@@ -1,23 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import {
-  Divider,
-  Spacer,
-  Tab,
-  TabIndicator,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-} from '@chakra-ui/react';
+import { Spacer, Tab, TabIndicator, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react';
 import { RootState } from '@store/index';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 
 import { MintUnmintLayout } from './components/mint-unmint.layout';
 import { Mint } from './components/mint/mint';
-import { ProtocolSummaryStack } from './components/protocol-summary-stack/protocol-summary-stack';
-import { SetupInformationStack } from './components/setup-information-stack/setup-information-stack';
 import { Unmint } from './components/unmint/unmint';
 
 interface MintUnmintContainerProps {
@@ -53,15 +42,7 @@ export function MintUnmint({ address }: MintUnmintContainerProps): React.JSX.Ele
         <Spacer />
         <TabPanels>
           <TabPanel>
-            {address ? (
-              <Mint />
-            ) : (
-              <>
-                <SetupInformationStack />
-                <Divider orientation={'horizontal'} h={'35px'} variant={'thick'} />
-                <ProtocolSummaryStack />
-              </>
-            )}
+            <Mint />
           </TabPanel>
           <TabPanel>
             <Unmint />

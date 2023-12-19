@@ -12,7 +12,7 @@ export function ProtocolSummaryStack(): React.JSX.Element {
   const bitcoinPrice = blockchainContext?.bitcoin.bitcoinPrice;
   return (
     <ProtocolSummaryStackLayout>
-      <VStack alignItems={'start'} h={'250px'} w={'50%'} spacing={'15px'}>
+      <VStack alignItems={'start'}>
         <Text alignContent={'start'} color={'white'} fontSize={'lg'}>
           TVL
         </Text>
@@ -29,7 +29,6 @@ export function ProtocolSummaryStack(): React.JSX.Element {
           </Skeleton>
         </VStack>
       </VStack>
-      {/* <ProtocolHistory /> */}
     </ProtocolSummaryStackLayout>
   );
 }
