@@ -1,0 +1,69 @@
+name: Validate PR In Merge Queue
+
+on:
+  merge_group:
+
+jobs:
+  lint-eslint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/provision
+
+      - name: Lint
+        run: yarn lint:eslint
+
+  lint-filename:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/provision
+
+      - name: File name checker
+        run: yarn lint:filename
+
+  lint-prettier:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/provision
+
+      - name: Lint
+        run: yarn lint:prettier
+
+  lint-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Lint commit message
+        uses: wagoid/commitlint-github-action@v4
+
+  lint-unused-exports:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/provision
+
+      - name: Lint unused TypeScript exports
+        run: yarn lint:unused-exports
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/provision
+
+      - name: Typecheck
+        run: yarn typecheck
+
+  test-unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/provision
+
+      - name: Test
+        run: yarn test:unit
