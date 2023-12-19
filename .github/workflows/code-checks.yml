@@ -1,10 +1,10 @@
-name: Validate PR
+name: Code Checks
 
 on:
-  pull_request:
+  merge_group:
+  push:
     branches:
-      - 'dev'
-      - 'main'
+      - '**'
 
 jobs:
   lint-eslint:
@@ -33,6 +33,16 @@ jobs:
 
       - name: Lint
         run: yarn lint:prettier
+
+  lint-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Lint commit message
+        uses: wagoid/commitlint-github-action@v4
 
   lint-unused-exports:
     runs-on: ubuntu-latest
