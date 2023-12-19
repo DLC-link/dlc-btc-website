@@ -1,4 +1,4 @@
-name: Validate PR In Merge Queue
+name: Validate In Merge Queue
 
 on:
   merge_group:
