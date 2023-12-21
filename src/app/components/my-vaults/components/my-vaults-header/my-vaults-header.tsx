@@ -17,7 +17,7 @@ export function MyVaultsLargeHeader({
     <VStack w={'100%'} h={'100px'}>
       <HStack w={'100%'} h={'150px'} justifyContent={'space-between'} pr={'25px'}>
         <Text color={'white'} fontSize={'4xl'} fontWeight={600}>
-          My Mint Vaults
+          My Vaults
         </Text>
         <HStack w={'450px'} h={'75%'} justifyContent={'space-between'}>
           <Divider orientation={'vertical'} h={'35px'} variant={'thick'} />
