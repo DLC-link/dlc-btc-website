@@ -1,4 +1,4 @@
-import { Box, Button, Image, Text, VStack } from '@chakra-ui/react';
+import { Box, Button, Image, Link, Text, VStack } from '@chakra-ui/react';
 
 interface WalletInfoProps {
   src: string;
@@ -21,7 +21,16 @@ export function WalletInfo({ src, coinName, content }: WalletInfoProps): React.J
         h={src === '/images/metamask.png' ? '12px' : '14px'}
       />
       <Box w={'92px'}>
-        <Button variant={'vault'}>Download</Button>
+        <Link
+          href={
+            src === '/images/metamask.png'
+              ? 'https://chromewebstore.google.com/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?pli=1'
+              : 'https://chromewebstore.google.com/detail/leather/ldinpeekobnhjjdofggfgjlcehhmanlj'
+          }
+          isExternal
+        >
+          <Button variant={'vault'}>Download</Button>
+        </Link>
       </Box>
       <Text color={'light.blue.01'} fontStyle={'bold'}>
         {coinName}
