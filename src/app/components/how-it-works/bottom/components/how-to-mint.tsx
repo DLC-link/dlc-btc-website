@@ -1,4 +1,4 @@
-import { Button, Image, Text } from '@chakra-ui/react';
+import { Box, Button, Image, Text } from '@chakra-ui/react';
 import { IntroVideo } from '@components/how-it-works/top/components/intro-video';
 
 import { CustomCard } from '../../components/custom-card';
@@ -11,6 +11,7 @@ export function HowToMint(): React.JSX.Element {
         <>
           <Text variant={'title'}>How to Mint dlcBTC</Text>
           <Image src={'/images/mintBtc.png'} alt={'mint image'} h={'39px'} w={'185px'} />
+          <Box h={'25px'} />
           <FlowStep
             step={'Step 1'}
             title={'Deposit Adress'}
@@ -66,6 +67,7 @@ export function HowToMint(): React.JSX.Element {
             placeholderHeight={'262px'}
             placeholderWidth={'435px'}
           />
+          <Box h={'10px'} />
           <Button variant={'account'}>Mint dlcBTC</Button>
         </>
       }

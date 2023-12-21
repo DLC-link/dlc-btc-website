@@ -18,7 +18,7 @@ export function FlowStep({
   badge,
 }: FlowStepProps): React.JSX.Element {
   return (
-    <VStack align={'left'} spacing={'0px'}>
+    <VStack align={'left'} spacing={'0px'} pb={'20px'}>
       <Text variant={'step'}>{step}</Text>
       {hasBadge ? (
         <HStack>

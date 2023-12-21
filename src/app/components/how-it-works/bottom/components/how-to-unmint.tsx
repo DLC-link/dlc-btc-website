@@ -1,4 +1,4 @@
-import { Button, Image, Text } from '@chakra-ui/react';
+import { Box, Button, Image, Text } from '@chakra-ui/react';
 
 import { CustomCard } from '../../components/custom-card';
 import { FlowStep } from './flow-step';
@@ -10,6 +10,7 @@ export function HowToUnmint(): React.JSX.Element {
         <>
           <Text variant={'title'}>How to Unmint dlcBTC</Text>
           <Image src={'/images/unmintBtc.png'} alt={'unmint image'} h={'39px'} w={'185px'} />
+          <Box h={'25px'} />
           <FlowStep
             step={'Step 1'}
             title={'Unmint dlcBTC'}
