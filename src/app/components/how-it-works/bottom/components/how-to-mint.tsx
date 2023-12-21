@@ -1,10 +1,16 @@
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+
 import { Box, Button, Image, Text } from '@chakra-ui/react';
 import { IntroVideo } from '@components/how-it-works/top/components/intro-video';
+import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 
 import { CustomCard } from '../../components/custom-card';
 import { FlowStep } from './flow-step';
 
 export function HowToMint(): React.JSX.Element {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   return (
     <CustomCard width={'488px'} height={'970px'} padding={'25px'}>
       {
@@ -68,7 +74,16 @@ export function HowToMint(): React.JSX.Element {
             placeholderWidth={'435px'}
           />
           <Box h={'10px'} />
-          <Button variant={'account'}>Mint dlcBTC</Button>
+          <Button
+            onClick={() => {
+              navigate('/');
+              dispatch(mintUnmintActions.setMintStep([1, '']));
+              close();
+            }}
+            variant={'account'}
+          >
+            Mint dlcBTC
+          </Button>
         </>
       }
     </CustomCard>

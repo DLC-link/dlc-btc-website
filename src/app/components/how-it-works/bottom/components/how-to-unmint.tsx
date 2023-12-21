@@ -1,9 +1,15 @@
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+
 import { Box, Button, Image, Text } from '@chakra-ui/react';
+import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 
 import { CustomCard } from '../../components/custom-card';
 import { FlowStep } from './flow-step';
 
 export function HowToUnmint(): React.JSX.Element {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   return (
     <CustomCard width={'488px'} height={'343px'} padding={'25px'}>
       {
@@ -22,7 +28,16 @@ export function HowToUnmint(): React.JSX.Element {
             }
             hasBadge={false}
           />
-          <Button variant={'account'}>Unmint dlcBTC</Button>
+          <Button
+            onClick={() => {
+              navigate('/');
+              dispatch(mintUnmintActions.setUnmintStep([0, '']));
+              close();
+            }}
+            variant={'account'}
+          >
+            Unmint dlcBTC
+          </Button>
         </>
       }
     </CustomCard>
