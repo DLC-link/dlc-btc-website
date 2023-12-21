@@ -44,7 +44,7 @@ export function useConfirmationChecker(
 
     const difference = bitcoinCurrentBlockHeight - bitcoinTransactionBlockHeight;
 
-    setTransactionProgress(difference);
+    setTransactionProgress(difference > 0 ? difference : 0);
 
     if (difference > 6) {
       clearInterval(fetchInterval.current);

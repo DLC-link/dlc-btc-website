@@ -1,7 +1,12 @@
 import { VStack } from '@chakra-ui/react';
-import { HasChildren } from '@models/has-children';
+import { boxShadowAnimation } from '@styles/css-styles';
 
-export function MintUnmintLayout({ children }: HasChildren): React.JSX.Element {
+interface MintUnmintLayoutProps {
+  children: React.ReactNode;
+  animate?: boolean;
+}
+
+export function MintUnmintLayout({ children, animate }: MintUnmintLayoutProps): React.JSX.Element {
   return (
     <VStack
       px={'15px'}
@@ -11,6 +16,9 @@ export function MintUnmintLayout({ children }: HasChildren): React.JSX.Element {
       border={'1px solid'}
       borderRadius={'md'}
       borderColor={'border.cyan.01'}
+      css={{
+        animation: animate ? `${boxShadowAnimation} 0.5s 2 ease-in-out` : 'none',
+      }}
     >
       {children}
     </VStack>

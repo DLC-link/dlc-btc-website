@@ -1,10 +1,6 @@
-import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-
 import { CheckIcon } from '@chakra-ui/icons';
-import { Button, HStack, Image, Text, VStack } from '@chakra-ui/react';
+import { HStack, Image, Text, VStack } from '@chakra-ui/react';
 import { VaultState } from '@models/vault';
-import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 
 import { VaultExpandButton } from './vault-expand-button';
 
@@ -15,7 +11,6 @@ const getAssetLogo = (state: VaultState) => {
 };
 
 interface VaultInformationProps {
-  uuid: string;
   collateral: number;
   state: VaultState;
   timestamp: number;
@@ -26,7 +21,6 @@ interface VaultInformationProps {
 }
 
 export function VaultInformation({
-  uuid,
   state,
   collateral,
   timestamp,
@@ -35,9 +29,6 @@ export function VaultInformation({
   isSelected,
   handleClick,
 }: VaultInformationProps): React.JSX.Element {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-
   const date = new Date(timestamp * 1000).toLocaleDateString('en-US');
 
   return (
@@ -64,17 +55,6 @@ export function VaultInformation({
         >
           {isSelected && <CheckIcon color={'accent.cyan.01'} boxSize={'15px'} />}
         </VStack>
-      ) : state === VaultState.READY && !isSelected ? (
-        <Button
-          onClick={() => {
-            navigate('/');
-            dispatch(mintUnmintActions.setMintStep([1, uuid]));
-          }}
-          variant={'vault'}
-          w={'85px'}
-        >
-          Lock BTC
-        </Button>
       ) : (
         <VaultExpandButton isExpanded={isExpanded} handleClick={() => handleClick()} />
       )}

@@ -34,7 +34,6 @@ export function VaultCard({
   return (
     <VaultCardLayout isSelectable={isSelectable} handleClick={() => handleSelect && handleSelect()}>
       <VaultInformation
-        uuid={vault.uuid}
         collateral={vault.collateral}
         state={vault.state}
         timestamp={vault.timestamp}
@@ -46,9 +45,12 @@ export function VaultCard({
       {isExpanded && (
         <VaultExpandedInformation
           uuid={vault.uuid}
+          state={vault.state}
           fundingTX={vault.fundingTX}
           closingTX={vault.closingTX}
           isExpanded={isExpanded}
+          isSelected={isSelected}
+          close={() => setIsExpanded(false)}
         />
       )}
       {[VaultState.FUNDING, VaultState.CLOSED].includes(vault.state) && (

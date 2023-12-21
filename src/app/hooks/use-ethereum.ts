@@ -27,6 +27,7 @@ export interface UseEthereumReturnType {
   dlcBTCContract: Contract | undefined;
   getDLCBTCBalance: () => Promise<number | undefined>;
   getLockedBTCBalance: () => Promise<number | undefined>;
+  getProtocolFee: () => Promise<number | undefined>;
   totalSupply: number | undefined;
   requestEthereumAccount: (network: Network, walletType: WalletType) => Promise<void>;
   getAllVaults: () => Promise<void>;
@@ -94,31 +95,76 @@ export function useEthereum(): UseEthereumReturnType {
     };
   }
 
-  function getProvider(ethereum: any, walletType: WalletType): any {
-    if ('providers' in ethereum) {
-      return ethereum.providers.find((provider: any) => provider[`is${walletType}`]);
-    }
-    return ethereum[`is${walletType}`] ? ethereum : undefined;
+  function validateMetaMask(provider: any): boolean {
+    return (
+      typeof provider === 'object' &&
+      provider !== null &&
+      '_metamask' in provider &&
+      'isMetaMask' in provider &&
+      provider.isMetaMask === true
+    );
   }
 
-  function checkWalletProvider(ethereum: any, walletType: WalletType): any {
-    const ethereumWalletProvider = getProvider(ethereum, walletType);
-    if (!ethereumWalletProvider) {
-      alert(`Install ${walletType}!`);
-      throw new EthereumError(`${walletType} wallet not found`);
-    }
-    return ethereumWalletProvider;
+  function checkIfMultipleEthereumProviders(ethereum: any): boolean {
+    return (
+      'providerMap' in ethereum &&
+      ethereum.providerMap instanceof Map &&
+      ethereum.providerMap.size > 1
+    );
+  }
+
+  function alertMissingWallet(walletType: WalletType): void {
+    alert(`Install ${walletType}!`);
+    throw new EthereumError(`${walletType} wallet not found`);
+  }
+
+  function alertNonMetaMaskProvider(): void {
+    alert(
+      'Your current Ethereum provider is not MetaMask. Please ensure that MetaMask is your active Ethereum wallet and disable any other Ethereum wallets in your browser, then reload the page.'
+    );
   }
 
   function getWalletProvider(walletType: WalletType): any {
     const { ethereum } = window;
 
     if (!ethereum) {
-      alert('Install MetaMask!');
-      throw new EthereumError('No ethereum wallet found');
+      alertMissingWallet(walletType);
     }
 
-    return checkWalletProvider(ethereum, walletType);
+    let provider;
+
+    if (checkIfMultipleEthereumProviders(ethereum)) {
+      switch (walletType) {
+        case WalletType.Metamask:
+          provider = ethereum.providerMap.get(walletType);
+          if (validateMetaMask(provider)) {
+            provider = ethereum.providerMap.get(walletType);
+            break;
+          } else {
+            alertNonMetaMaskProvider();
+            break;
+          }
+        default:
+          alertMissingWallet(walletType);
+          break;
+      }
+    } else {
+      switch (walletType) {
+        case WalletType.Metamask:
+          if (validateMetaMask(ethereum)) {
+            provider = ethereum;
+            break;
+          } else {
+            alertNonMetaMaskProvider();
+            break;
+          }
+        default:
+          alertMissingWallet(walletType);
+          break;
+      }
+    }
+
+    return provider;
   }
 
   async function getTotalSupply() {
@@ -141,6 +187,16 @@ export function useEthereum(): UseEthereumReturnType {
       setTotalSupply(customShiftValue(parseInt(totalSupply), 8, true));
     } catch (error) {
       throw new EthereumError(`Could not fetch total supply info: ${error}}`);
+    }
+  }
+
+  async function getProtocolFee(): Promise<number | undefined> {
+    if (!protocolContract) throw new Error('Protocol contract not initialized');
+    try {
+      const btcMintFeeRate = await protocolContract.btcMintFeeRate();
+      return customShiftValue(btcMintFeeRate.toNumber(), 4, true);
+    } catch (error) {
+      throwEthereumError(`Could not fetch protocol fee: `, error);
     }
   }
 
@@ -251,6 +307,8 @@ export function useEthereum(): UseEthereumReturnType {
     try {
       if (!walletType) throw new Error('Wallet not initialized');
       const walletProvider = getWalletProvider(walletType);
+
+      console.log('walletProvider', walletProvider);
 
       const ethereumAccounts = await walletProvider.request({
         method: 'eth_requestAccounts',
@@ -420,6 +478,7 @@ export function useEthereum(): UseEthereumReturnType {
     dlcManagerContract,
     dlcBTCContract,
     getDLCBTCBalance,
+    getProtocolFee,
     totalSupply,
     getLockedBTCBalance,
     requestEthereumAccount,

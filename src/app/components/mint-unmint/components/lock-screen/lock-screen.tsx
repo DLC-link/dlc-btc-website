@@ -1,13 +1,13 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { Button, VStack } from '@chakra-ui/react';
 import { VaultCard } from '@components/vault/vault-card';
 import { useVaults } from '@hooks/use-vaults';
 import { Vault } from '@models/vault';
+import { BlockchainContext } from '@providers/blockchain-context-provider';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 
-import { BlockchainContext } from '../../../../providers/blockchain-context-provider';
 import { LockScreenProtocolFee } from './components/protocol-fee';
 
 interface LockScreenProps {
@@ -19,9 +19,20 @@ export function LockScreen({ currentStep }: LockScreenProps): React.JSX.Element 
   const { readyVaults } = useVaults();
   const blockchainContext = useContext(BlockchainContext);
   const bitcoin = blockchainContext?.bitcoin;
+  const ethereum = blockchainContext?.ethereum;
+
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [protocolFeePercentage, setProtocolFeePercentage] = useState<number | undefined>(undefined);
 
   const currentVault = readyVaults.find(vault => vault.uuid === currentStep[1]);
+
+  useEffect(() => {
+    const fetchProtocolFeePercentage = async () => {
+      const currentProtocolFeePercentage = await ethereum?.getProtocolFee();
+      setProtocolFeePercentage(currentProtocolFeePercentage);
+    };
+    fetchProtocolFeePercentage();
+  }, [ethereum]);
 
   async function handleClick(currentVault?: Vault) {
     if (!currentVault) return;
@@ -41,6 +52,7 @@ export function LockScreen({ currentStep }: LockScreenProps): React.JSX.Element 
       <LockScreenProtocolFee
         assetAmount={currentVault?.collateral}
         bitcoinPrice={bitcoin?.bitcoinPrice}
+        protocolFeePercentage={protocolFeePercentage}
       />
       <Button
         isLoading={isSubmitting}

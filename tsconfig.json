@@ -9,6 +9,8 @@
       "@pages/*": ["app/pages/*"],
       "@shared/*": ["shared/*"],
       "@hooks/*": ["app/hooks/*"],
+      "@providers/*": ["app/providers/*"],
+      "@styles/*": ["styles/*"],
     },
     "target": "ES2020",
     "useDefineForClassFields": true,

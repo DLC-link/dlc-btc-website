@@ -1,5 +1,5 @@
 import { useDispatch } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { Button, HStack, Spinner, Stack, Text, VStack } from '@chakra-ui/react';
 import { VaultCard } from '@components/vault/vault-card';
@@ -35,12 +35,14 @@ interface TransactionSummaryProps {
   currentStep: [number, string];
   flow: 'mint' | 'unmint';
   blockchain: 'ethereum' | 'bitcoin';
+  handleClose?: () => void;
 }
 
 export function TransactionSummary({
   currentStep,
   flow,
   blockchain,
+  handleClose,
 }: TransactionSummaryProps): React.JSX.Element {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -68,19 +70,9 @@ export function TransactionSummary({
           />
         </>
       )}
-      <Stack
-        p={'15px'}
-        w={'100%'}
-        border={'1px solid'}
-        borderRadius={'md'}
-        borderColor={'border.cyan.01'}
-      >
+      <Stack p={'5px'} w={'100%'}>
         <Text color={'white.01'} fontSize={'sm'}>
-          You can check all of your vaults' status under{' '}
-          <Text as={Link} to={'/my-vaults'} color={'accent.cyan.01'} textDecoration={'underline'}>
-            My Vaults
-          </Text>{' '}
-          tab.
+          View vault statuses in the My Vaults tab.
         </Text>
       </Stack>
       <Button
@@ -92,6 +84,7 @@ export function TransactionSummary({
               : mintUnmintActions.setUnmintStep([0, ''])
           );
           navigate('/my-vaults');
+          handleClose && handleClose();
         }}
       >
         View in My Vaults
