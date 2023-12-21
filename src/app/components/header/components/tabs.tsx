@@ -18,7 +18,7 @@ export function NavigationTabs({
         handleClick={() => handleTabClick('/')}
       />
       <TabButton
-        title={'My Mint Vaults'}
+        title={'My Vaults'}
         isActive={activeTab === '/my-vaults'}
         handleClick={() => handleTabClick('/my-vaults')}
       />
