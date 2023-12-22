@@ -77,7 +77,7 @@ export function HowToMint(): React.JSX.Element {
           <Button
             onClick={() => {
               navigate('/');
-              dispatch(mintUnmintActions.setMintStep([1, '']));
+              dispatch(mintUnmintActions.setMintStep([0, '']));
               close();
             }}
             variant={'account'}

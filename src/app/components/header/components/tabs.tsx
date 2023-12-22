@@ -22,11 +22,11 @@ export function NavigationTabs({
         isActive={activeTab === '/my-vaults'}
         handleClick={() => handleTabClick('/my-vaults')}
       />
-      {/* <TabButton
+      <TabButton
         title={'How It Works'}
         isActive={activeTab === '/how-it-works'}
         handleClick={() => handleTabClick('/how-it-works')}
-      /> */}
+      />
     </HStack>
   );
 }
