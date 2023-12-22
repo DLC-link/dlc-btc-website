@@ -22,6 +22,24 @@ const navigate = defineStyle({
   },
 });
 
+const step = defineStyle({
+  color: 'accent.cyan.01',
+  fontSize: 'lg',
+  fontWeight: 'regular',
+});
+
+const title = defineStyle({
+  color: 'white',
+  fontSize: '2xl',
+  fontWeight: 'bold',
+});
+
+const subTitle = defineStyle({
+  color: 'white',
+  fontSize: 'lg',
+  fontWeight: 'bold',
+});
+
 export const textTheme = defineStyleConfig({
-  variants: { header, welcome, navigate },
+  variants: { header, welcome, navigate, step, title, subTitle },
 });
