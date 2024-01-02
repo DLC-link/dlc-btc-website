@@ -72,6 +72,9 @@ const company = defineStyle({
 });
 
 const wallet = defineStyle({
+  p: '10px',
+  h: '50px',
+  w: '275px',
   bgGradient: 'linear(to-b, background.content.01, background.content.02)',
   border: '0.5px solid',
   borderColor: 'border.white.01',
