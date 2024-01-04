@@ -17,11 +17,13 @@ export function ProgressTimeline({
         <VStack w={'100%'}>
           <HStack w={'100%'}>
             <StepGraphics currentStep={currentStep} stepIndex={0} />
-            <StepGraphics currentStep={currentStep} stepIndex={1} isLastStep />
+            <StepGraphics currentStep={currentStep} stepIndex={1} />
+            <StepGraphics currentStep={currentStep} stepIndex={2} isLastStep />
           </HStack>
           <HStack w={'100%'} justifyContent={'space-between'}>
             <StepText currentStep={currentStep} stepIndex={0} title="Unmint dlcBTC" />
-            <StepText currentStep={currentStep} stepIndex={1} title="Receive BTC" />
+            <StepText currentStep={currentStep} stepIndex={1} title="Waiting" />
+            <StepText currentStep={currentStep} stepIndex={2} title="Receive BTC" />
           </HStack>
         </VStack>
       );
@@ -31,12 +33,14 @@ export function ProgressTimeline({
           <HStack w={'100%'} p={'0px'}>
             <StepGraphics currentStep={currentStep} stepIndex={0} />
             <StepGraphics currentStep={currentStep} stepIndex={1} />
-            <StepGraphics currentStep={currentStep} stepIndex={2} isLastStep />
+            <StepGraphics currentStep={currentStep} stepIndex={2} />
+            <StepGraphics currentStep={currentStep} stepIndex={3} isLastStep />
           </HStack>
           <HStack w={'100%'} justifyContent={'space-between'}>
             <StepText currentStep={currentStep} stepIndex={0} title="Create Vault" />
             <StepText currentStep={currentStep} stepIndex={1} title="Lock BTC" />
-            <StepText currentStep={currentStep} stepIndex={2} title="Mint dlcBTC" />
+            <StepText currentStep={currentStep} stepIndex={2} title="Waiting" />
+            <StepText currentStep={currentStep} stepIndex={3} title="Mint dlcBTC" />
           </HStack>
         </VStack>
       );

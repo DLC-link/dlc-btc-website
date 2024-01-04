@@ -72,6 +72,19 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
             <WalkthroughLayout>
               <WalkthroughHeader
                 currentStep={currentStep}
+                title={'Waiting'}
+                blockchain={'bitcoin'}
+              />
+              <Text color={'white.01'} fontSize={'md'}>
+                Waiting.......
+              </Text>
+            </WalkthroughLayout>
+          );
+        case 3:
+          return (
+            <WalkthroughLayout>
+              <WalkthroughHeader
+                currentStep={currentStep}
                 title={'Mint dlcBTC'}
                 blockchain={'ethereum'}
               />
@@ -129,6 +142,19 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
             </WalkthroughLayout>
           );
         case 1:
+          return (
+            <WalkthroughLayout>
+              <WalkthroughHeader
+                currentStep={currentStep}
+                title={'Waiting'}
+                blockchain={'bitcoin'}
+              />
+              <Text color={'white.01'} fontSize={'md'}>
+                Waiting.......
+              </Text>
+            </WalkthroughLayout>
+          );
+        case 2:
           return (
             <WalkthroughLayout>
               <WalkthroughHeader

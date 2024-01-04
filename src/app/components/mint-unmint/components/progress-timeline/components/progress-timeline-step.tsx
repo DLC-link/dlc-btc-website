@@ -1,6 +1,11 @@
 import { Divider, Text } from '@chakra-ui/react';
 
-import { StepIconOne, StepIconThree, StepIconTwo } from '../../../../../../styles/icon';
+import {
+  StepIconFour,
+  StepIconOne,
+  StepIconThree,
+  StepIconTwo,
+} from '../../../../../../styles/icon';
 
 interface StepProps {
   currentStep: number;
@@ -23,6 +28,8 @@ function getIconForStep(currentStep: number, stepIndex: number): React.JSX.Eleme
       return <StepIconTwo {...properties} />;
     case 2:
       return <StepIconThree {...properties} />;
+    case 3:
+      return <StepIconFour {...properties} />;
     default:
       return <StepIconOne {...properties} />;
   }
