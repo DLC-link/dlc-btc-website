@@ -12,6 +12,7 @@ interface StepProps {
   stepIndex: number;
   isLastStep?: boolean;
   title?: string;
+  marginLeft?: string;
 }
 
 function getIconForStep(currentStep: number, stepIndex: number): React.JSX.Element {
@@ -55,13 +56,21 @@ export function StepGraphics({
   );
 }
 
-export function StepText({ currentStep, stepIndex, title }: StepProps): React.JSX.Element {
+export function StepText({
+  currentStep,
+  stepIndex,
+  marginLeft,
+  title,
+  isLastStep = false,
+}: StepProps): React.JSX.Element {
   return (
     <Text
       color={currentStep >= stepIndex ? 'accent.cyan.01' : 'white.01'}
       fontSize={'xs'}
       fontWeight={currentStep === stepIndex ? 800 : 400}
       opacity={currentStep > stepIndex ? '50%' : '100%'}
+      marginLeft={marginLeft}
+      textAlign={isLastStep ? 'right' : 'center'}
     >
       {title}
     </Text>
