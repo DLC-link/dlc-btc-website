@@ -1,4 +1,4 @@
-import { Divider, Text } from '@chakra-ui/react';
+import { Divider, Text, VStack } from '@chakra-ui/react';
 
 import {
   StepIconFour,
@@ -11,8 +11,9 @@ interface StepProps {
   currentStep: number;
   stepIndex: number;
   isLastStep?: boolean;
+  isFirstStep?: boolean;
   title?: string;
-  marginLeft?: string;
+  width?: string;
 }
 
 function getIconForStep(currentStep: number, stepIndex: number): React.JSX.Element {
@@ -59,20 +60,29 @@ export function StepGraphics({
 export function StepText({
   currentStep,
   stepIndex,
-  marginLeft,
+  width,
   title,
   isLastStep = false,
+  isFirstStep = false,
 }: StepProps): React.JSX.Element {
+  let align: any;
+  if (isFirstStep) {
+    align = 'start';
+  } else if (isLastStep) {
+    align = 'end';
+  } else {
+    align = 'center';
+  }
   return (
-    <Text
-      color={currentStep >= stepIndex ? 'accent.cyan.01' : 'white.01'}
-      fontSize={'xs'}
-      fontWeight={currentStep === stepIndex ? 800 : 400}
-      opacity={currentStep > stepIndex ? '50%' : '100%'}
-      marginLeft={marginLeft}
-      textAlign={isLastStep ? 'right' : 'center'}
-    >
-      {title}
-    </Text>
+    <VStack w={width} align={align}>
+      <Text
+        color={currentStep >= stepIndex ? 'accent.cyan.01' : 'white.01'}
+        fontSize={'xs'}
+        fontWeight={currentStep === stepIndex ? 800 : 400}
+        opacity={currentStep > stepIndex ? '50%' : '100%'}
+      >
+        {title}
+      </Text>
+    </VStack>
   );
 }

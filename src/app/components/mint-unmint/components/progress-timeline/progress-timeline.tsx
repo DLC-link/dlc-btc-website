@@ -20,14 +20,20 @@ export function ProgressTimeline({
             <StepGraphics currentStep={currentStep} stepIndex={1} />
             <StepGraphics currentStep={currentStep} stepIndex={2} isLastStep />
           </HStack>
-          <HStack w={'100%'} spacing={'185px'}>
-            <StepText currentStep={currentStep} stepIndex={0} title="Unmint dlcBTC" />
-            <StepText currentStep={currentStep} stepIndex={1} title="Waiting" />
+          <HStack w={'100%'} spacing={'0px'}>
+            <StepText
+              currentStep={currentStep}
+              stepIndex={0}
+              title="Unmint dlcBTC"
+              width={'33%'}
+              isFirstStep
+            />
+            <StepText currentStep={currentStep} stepIndex={1} title="Waiting" width={'33%'} />
             <StepText
               currentStep={currentStep}
               stepIndex={2}
               title="Receive BTC"
-              marginLeft={'15px'}
+              width={'34%'}
               isLastStep
             />
           </HStack>
@@ -42,15 +48,21 @@ export function ProgressTimeline({
             <StepGraphics currentStep={currentStep} stepIndex={2} />
             <StepGraphics currentStep={currentStep} stepIndex={3} isLastStep />
           </HStack>
-          <HStack w={'100%'} spacing={'90px'}>
-            <StepText currentStep={currentStep} stepIndex={0} title="Create Vault" />
-            <StepText currentStep={currentStep} stepIndex={1} title="Lock BTC" marginLeft={'8px'} />
-            <StepText currentStep={currentStep} stepIndex={2} title="Waiting" marginLeft={'55px'} />
+          <HStack w={'100%'} spacing={'0px'}>
+            <StepText
+              currentStep={currentStep}
+              stepIndex={0}
+              title="Create Vault"
+              width={'15%'}
+              isFirstStep
+            />
+            <StepText currentStep={currentStep} stepIndex={1} title="Lock BTC" width={'37%'} />
+            <StepText currentStep={currentStep} stepIndex={2} title="Waiting" width={'29%'} />
             <StepText
               currentStep={currentStep}
               stepIndex={3}
               title="Mint dlcBTC"
-              marginLeft={'15px'}
+              width={'19%'}
               isLastStep
             />
           </HStack>
