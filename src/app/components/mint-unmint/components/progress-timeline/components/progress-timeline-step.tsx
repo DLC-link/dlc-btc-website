@@ -65,16 +65,8 @@ export function StepText({
   isLastStep = false,
   isFirstStep = false,
 }: StepProps): React.JSX.Element {
-  let align: any;
-  if (isFirstStep) {
-    align = 'start';
-  } else if (isLastStep) {
-    align = 'end';
-  } else {
-    align = 'center';
-  }
   return (
-    <VStack w={width} align={align}>
+    <VStack w={width} align={isFirstStep ? 'start' : isLastStep ? 'end' : 'center'}>
       <Text
         color={currentStep >= stepIndex ? 'accent.cyan.01' : 'white.01'}
         fontSize={'xs'}
