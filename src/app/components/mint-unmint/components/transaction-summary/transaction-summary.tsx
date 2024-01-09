@@ -20,14 +20,16 @@ interface FlowPropertyMap {
 const flowPropertyMap: FlowPropertyMap = {
   mint: {
     2: { title: 'a) Locking BTC in progress', subtitle: 'Minting dlcBTC' },
-    3: { title: 'Minted dlcBTC' },
+    3: { title: 'Wait....' },
+    4: { title: 'Minted dlcBTC' },
   },
   unmint: {
     1: {
       title: 'a) Closing vault in progress',
       subtitle: 'Your BTC is being unlocked',
     },
-    2: { title: 'Vault closed' },
+    2: { title: 'Wait....' },
+    3: { title: 'Vault closed' },
   },
 };
 

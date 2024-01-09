@@ -146,11 +146,12 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
             <WalkthroughLayout>
               <WalkthroughHeader
                 currentStep={currentStep}
-                title={'Waiting'}
+                title={'Wait 24 hours'}
                 blockchain={'bitcoin'}
               />
               <Text color={'white.01'} fontSize={'md'}>
-                Waiting.......
+                After a successful unmint (<span style={{ color: 'accent.cyan.01' }}>~1 hour</span>)
+                your will receive BTC in your bitcoin wallet.
               </Text>
             </WalkthroughLayout>
           );
@@ -159,12 +160,12 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
             <WalkthroughLayout>
               <WalkthroughHeader
                 currentStep={currentStep}
-                title={'Receive Bitcoin'}
+                title={'Claim BTC'}
                 blockchain={'bitcoin'}
               />
               <Text color={'white.01'} fontSize={'md'}>
-                After a successful unmint (<span style={{ color: 'accent.cyan.01' }}>~1 hour</span>)
-                your will receive BTC in your bitcoin wallet.
+                Click on the "Claim BTC" button and you will receive the AMOUNT in your Bitcoin
+                wallet.
               </Text>
             </WalkthroughLayout>
           );
