@@ -17,12 +17,23 @@ export function MyVaultsSmall({ address }: MyVaultsSmallProps): React.JSX.Elemen
   const navigate = useNavigate();
 
   const vaultContext = useContext(VaultContext);
-  const { readyVaults, fundingVaults, fundedVaults, closingVaults, closedVaults, isLoading } =
-    vaultContext.vaults;
+  const {
+    readyVaults,
+    fundingVaults,
+    fundedVaults,
+    closingVaults,
+    closedVaults,
+    isLoading,
+    allVaults,
+  } = vaultContext.vaults;
 
   return (
     <MyVaultsSmallLayout>
-      <VaultsList title={'My Vaults'} height={'545px'} isScrollable={!!address && !isLoading}>
+      <VaultsList
+        title={'My Vaults'}
+        height={'545px'}
+        isScrollable={!!address && !isLoading && allVaults.length > 0}
+      >
         {address ? (
           <Skeleton isLoaded={!isLoading} w={'100%'}>
             <VaultsListGroupContainer label="Lock BTC" vaults={readyVaults} />

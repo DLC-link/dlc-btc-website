@@ -64,6 +64,8 @@ export function UnmintVaultSelector(): React.JSX.Element {
             handleSelect={() => setSelectedVault(undefined)}
           />
         </VStack>
+      ) : fundedVaults.length == 0 ? (
+        <Text color={'white'}>You don't have any active vaults.</Text>
       ) : (
         <VaultsList height="305px" isScrollable={!selectedVault}>
           <VaultsListGroupContainer
