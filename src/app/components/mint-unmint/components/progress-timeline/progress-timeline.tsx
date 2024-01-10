@@ -25,15 +25,15 @@ export function ProgressTimeline({
               currentStep={currentStep}
               stepIndex={0}
               title="Unmint dlcBTC"
-              width={'33%'}
+              width={'34%'}
               isFirstStep
             />
-            <StepText currentStep={currentStep} stepIndex={1} title="Waiting" width={'33%'} />
+            <StepText currentStep={currentStep} stepIndex={1} title="Wait 24 hours" width={'33%'} />
             <StepText
               currentStep={currentStep}
               stepIndex={2}
               title="Receive BTC"
-              width={'34%'}
+              width={'33%'}
               isLastStep
             />
           </HStack>
@@ -57,7 +57,7 @@ export function ProgressTimeline({
               isFirstStep
             />
             <StepText currentStep={currentStep} stepIndex={1} title="Lock BTC" width={'37%'} />
-            <StepText currentStep={currentStep} stepIndex={2} title="Waiting" width={'29%'} />
+            <StepText currentStep={currentStep} stepIndex={2} title="Wait 24 hours" width={'29%'} />
             <StepText
               currentStep={currentStep}
               stepIndex={3}
