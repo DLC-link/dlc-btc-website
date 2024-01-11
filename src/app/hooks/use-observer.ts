@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { VaultState } from '@models/vault';
 import { RootState } from '@store/index';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
-//import { modalActions } from '@store/slices/modal/modal.actions';
 
 import { UseEthereumReturnType } from './use-ethereum';
 
@@ -59,12 +58,6 @@ export function useObserver(ethereum: UseEthereumReturnType): void {
 
       await getVault(vaultUUID, VaultState.FUNDED).then(() => {
         dispatch(mintUnmintActions.setMintStep([3, vaultUUID]));
-        // dispatch(
-        //   modalActions.toggleSuccessfulFlowModalVisibility({
-        //     flow: 'mint',
-        //     vaultUUID,
-        //   })
-        // );
       });
     });
 
@@ -79,12 +72,6 @@ export function useObserver(ethereum: UseEthereumReturnType): void {
 
       await getVault(vaultUUID, VaultState.CLOSED).then(() => {
         dispatch(mintUnmintActions.setUnmintStep([0, vaultUUID]));
-        // dispatch(
-        //   modalActions.toggleSuccessfulFlowModalVisibility({
-        //     flow: 'unmint',
-        //     vaultUUID,
-        //   })
-        // );
       });
     });
   }, [protocolContract, dlcBTCContract, network]);

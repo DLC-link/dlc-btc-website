@@ -6,8 +6,6 @@ import { VaultCard } from '@components/vault/vault-card';
 import { useVaults } from '@hooks/use-vaults';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 
-//import { TransactionSummaryPreviewCard } from './components/transaction-summary-preview-card';
-
 interface FlowPropertyMap {
   [key: string]: {
     [key: number]: {
@@ -19,9 +17,8 @@ interface FlowPropertyMap {
 
 const flowPropertyMap: FlowPropertyMap = {
   mint: {
-    2: { title: 'a) Locking BTC in progress' },
-    3: { title: 'Locking BTC in progress' },
-    4: { title: 'Minted dlcBTC' },
+    2: { title: 'Locking BTC in progress' },
+    3: { title: 'Minted dlcBTC' },
   },
   unmint: {
     1: {
@@ -43,7 +40,6 @@ interface TransactionSummaryProps {
 export function TransactionSummary({
   currentStep,
   flow,
-  //blockchain,
   handleClose,
 }: TransactionSummaryProps): React.JSX.Element {
   const navigate = useNavigate();
@@ -61,17 +57,6 @@ export function TransactionSummary({
         <Text color={'accent.cyan.01'}>{flowPropertyMap[flow][currentStep[0]].title}:</Text>
       </HStack>
       <VaultCard vault={currentVault} />
-
-      {/* <>
-        <Text pt={'25px'} color={'white.01'}>
-          b) {flowPropertyMap[flow][currentStep[0]].subtitle}:
-        </Text>
-        <TransactionSummaryPreviewCard
-          blockchain={blockchain}
-          assetAmount={currentVault?.collateral}
-        />
-      </> */}
-
       <Stack p={'5px'} w={'100%'}>
         <Text color={'white.01'} fontSize={'sm'}>
           View vault statuses in the My Vaults tab.

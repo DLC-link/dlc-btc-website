@@ -73,7 +73,7 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
               <WalkthroughHeader
                 currentStep={currentStep}
                 title={'Validation'}
-                blockchain={'bitcoin'}
+                blockchain={'ethereum'}
               />
               <Text color={'white.01'} fontSize={'md'}>
                 Wait until Bitcoin is locked on-chain and all other validation checks have been
@@ -97,11 +97,11 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
                 title={'Minted dlcBTC'}
                 blockchain={'ethereum'}
               />
-              <Text color={'white.01'} fontSize={'sm'}>
+              <Text color={'white.01'} fontSize={'md'}>
                 Your request is validated and you have successfully minted a{' '}
                 <span style={{ fontWeight: 800 }}>dlcBTC token.</span>
               </Text>
-              <Text color={'white.01'} fontSize={'sm'}>
+              <Text color={'white.01'} fontSize={'md'}>
                 To ensure your <span style={{ fontWeight: 800 }}>dlcBTC tokens </span>
                 are <span style={{ fontWeight: 800 }}>visible </span>
                 simply <span style={{ fontWeight: 800 }}>add them </span>
