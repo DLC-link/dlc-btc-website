@@ -7,7 +7,7 @@ import { Vault, VaultState } from '@models/vault';
 import { VaultCardLayout } from './components/vault-card.layout';
 import { VaultExpandedInformation } from './components/vault-expanded-information/vault-expanded-information';
 import { VaultInformation } from './components/vault-information';
-import { VaultProgressBar } from './components/vault-progress-bar';
+import { ActionType, VaultProgressBar } from './components/vault-progress-bar';
 
 interface VaultCardProps {
   vault?: Vault;
@@ -54,7 +54,11 @@ export function VaultCard({
         />
       )}
       {[VaultState.FUNDING, VaultState.CLOSED].includes(vault.state) && (
-        <VaultProgressBar confirmedBlocks={confirmations} vaultState={vault.state} />
+        <VaultProgressBar
+          confirmedBlocks={confirmations}
+          vaultState={vault.state}
+          actionType={ActionType.CONFIRM}
+        />
       )}
     </VaultCardLayout>
   );

@@ -1,7 +1,7 @@
 import { Box, Progress, Text, VStack } from '@chakra-ui/react';
 import { VaultState } from '@models/vault';
 
-enum ActionType {
+export enum ActionType {
   CONFIRM = 'CONFIRM',
   VERIFY = 'VERIFY',
 }
