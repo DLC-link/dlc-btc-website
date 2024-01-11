@@ -6,7 +6,7 @@ import { VaultCard } from '@components/vault/vault-card';
 import { useVaults } from '@hooks/use-vaults';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 
-import { TransactionSummaryPreviewCard } from './components/transaction-summary-preview-card';
+//import { TransactionSummaryPreviewCard } from './components/transaction-summary-preview-card';
 
 interface FlowPropertyMap {
   [key: string]: {
@@ -19,8 +19,8 @@ interface FlowPropertyMap {
 
 const flowPropertyMap: FlowPropertyMap = {
   mint: {
-    2: { title: 'a) Locking BTC in progress', subtitle: 'Minting dlcBTC' },
-    3: { title: 'Wait....' },
+    2: { title: 'a) Locking BTC in progress' },
+    3: { title: 'Locking BTC in progress' },
     4: { title: 'Minted dlcBTC' },
   },
   unmint: {
@@ -43,7 +43,7 @@ interface TransactionSummaryProps {
 export function TransactionSummary({
   currentStep,
   flow,
-  blockchain,
+  //blockchain,
   handleClose,
 }: TransactionSummaryProps): React.JSX.Element {
   const navigate = useNavigate();
@@ -52,7 +52,7 @@ export function TransactionSummary({
   const currentVault = allVaults.find(vault => vault.uuid === currentStep[1]);
 
   const showProcessing =
-    (flow === 'mint' && currentStep[0] === 3) || (flow === 'unmint' && currentStep[0] === 2);
+    (flow === 'mint' && currentStep[0] === 2) || (flow === 'unmint' && currentStep[0] === 2);
 
   return (
     <VStack alignItems={'start'} w={'300px'} spacing={'15px'}>
@@ -61,17 +61,17 @@ export function TransactionSummary({
         <Text color={'accent.cyan.01'}>{flowPropertyMap[flow][currentStep[0]].title}:</Text>
       </HStack>
       <VaultCard vault={currentVault} />
-      {showProcessing && (
-        <>
-          <Text pt={'25px'} color={'white.01'}>
-            b) {flowPropertyMap[flow][currentStep[0]].subtitle}:
-          </Text>
-          <TransactionSummaryPreviewCard
-            blockchain={blockchain}
-            assetAmount={currentVault?.collateral}
-          />
-        </>
-      )}
+
+      {/* <>
+        <Text pt={'25px'} color={'white.01'}>
+          b) {flowPropertyMap[flow][currentStep[0]].subtitle}:
+        </Text>
+        <TransactionSummaryPreviewCard
+          blockchain={blockchain}
+          assetAmount={currentVault?.collateral}
+        />
+      </> */}
+
       <Stack p={'5px'} w={'100%'}>
         <Text color={'white.01'} fontSize={'sm'}>
           View vault statuses in the My Vaults tab.

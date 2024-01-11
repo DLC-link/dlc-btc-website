@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux';
 
-import { HStack, Text } from '@chakra-ui/react';
+import { HStack } from '@chakra-ui/react';
 import { RootState } from '@store/index';
 
 import { LockScreen } from '../lock-screen/lock-screen';
@@ -20,7 +20,9 @@ export function Mint(): React.JSX.Element {
         <Walkthrough flow={'mint'} currentStep={mintStep[0]} />
         {[0].includes(mintStep[0]) && <TransactionForm />}
         {[1].includes(mintStep[0]) && <LockScreen currentStep={mintStep} />}
-        {[2].includes(mintStep[0]) && <Text color={'white'}>Wait 24 hours</Text>}
+        {[2].includes(mintStep[0]) && (
+          <TransactionSummary currentStep={mintStep} flow={'mint'} blockchain={'ethereum'} />
+        )}
         {[3].includes(mintStep[0]) && (
           <TransactionSummary currentStep={mintStep} flow={'mint'} blockchain={'ethereum'} />
         )}
