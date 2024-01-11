@@ -72,24 +72,12 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
             <WalkthroughLayout>
               <WalkthroughHeader
                 currentStep={currentStep}
-                title={'Waiting'}
-                blockchain={'bitcoin'}
-              />
-              <Text color={'white.01'} fontSize={'md'}>
-                Waiting.......
-              </Text>
-            </WalkthroughLayout>
-          );
-        case 3:
-          return (
-            <WalkthroughLayout>
-              <WalkthroughHeader
-                currentStep={currentStep}
-                title={'Mint dlcBTC'}
+                title={'Validation'}
                 blockchain={'ethereum'}
               />
               <Text color={'white.01'} fontSize={'sm'}>
-                Wait for Bitcoin to get locked on chain{' '}
+                Wait until Bitcoin is locked on-chain and all other validation checks have been
+                processed{' '}
                 <Link
                   color={'accent.cyan.01'}
                   href="https://ethereum.org/"
@@ -98,7 +86,20 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
                 >
                   (~1 hour)
                 </Link>
-                . After 6 confirmations, dlcBTC tokens will appear in your Ethereum Wallet.
+              </Text>
+            </WalkthroughLayout>
+          );
+        case 3:
+          return (
+            <WalkthroughLayout>
+              <WalkthroughHeader
+                currentStep={currentStep}
+                title={'Minted dlcBTC'}
+                blockchain={'ethereum'}
+              />
+              <Text color={'white.01'} fontSize={'sm'}>
+                Your request is validated and you have successfully minted a{' '}
+                <span style={{ fontWeight: 800 }}>dlcBTC token.</span>
               </Text>
               <Text color={'white.01'} fontSize={'sm'}>
                 To ensure your <span style={{ fontWeight: 800 }}>dlcBTC tokens </span>

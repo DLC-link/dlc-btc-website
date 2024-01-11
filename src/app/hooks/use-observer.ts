@@ -58,13 +58,7 @@ export function useObserver(ethereum: UseEthereumReturnType): void {
       console.log(`Vault ${vaultUUID} is minted`);
 
       await getVault(vaultUUID, VaultState.FUNDED).then(() => {
-        dispatch(mintUnmintActions.setMintStep([0, vaultUUID]));
-        dispatch(
-          modalActions.toggleSuccessfulFlowModalVisibility({
-            flow: 'mint',
-            vaultUUID,
-          })
-        );
+        dispatch(mintUnmintActions.setMintStep([3, vaultUUID]));
       });
     });
 

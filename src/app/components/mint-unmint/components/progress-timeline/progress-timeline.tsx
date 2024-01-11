@@ -57,7 +57,7 @@ export function ProgressTimeline({
               isFirstStep
             />
             <StepText currentStep={currentStep} stepIndex={1} title="Lock BTC" width={'37%'} />
-            <StepText currentStep={currentStep} stepIndex={2} title="Wait 24 hours" width={'29%'} />
+            <StepText currentStep={currentStep} stepIndex={2} title="Validation" width={'29%'} />
             <StepText
               currentStep={currentStep}
               stepIndex={3}
