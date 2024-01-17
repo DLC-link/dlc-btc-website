@@ -29,7 +29,13 @@ export function MyVaultsLarge(): React.JSX.Element {
       />
       <HStack spacing={'35px'} w={'100%'}>
         {address ? (
-          <VaultsList title={'In Process'} height={'475px'} isScrollable={!!address}>
+          <VaultsList
+            title={'In Process'}
+            height={'475px'}
+            isScrollable={
+              !!address && [...readyVaults, ...fundingVaults, ...closingVaults].length > 0
+            }
+          >
             <VaultsListGroupContainer label="Lock BTC" vaults={readyVaults} />
             <VaultsListGroupContainer label="Locking BTC in Progress" vaults={fundingVaults} />
             <VaultsListGroupContainer label="Unlocking BTC in Progress" vaults={closingVaults} />
@@ -37,14 +43,22 @@ export function MyVaultsLarge(): React.JSX.Element {
         ) : (
           <MyVaultsSetupInformationStack />
         )}
-        <VaultsList title={'Minted dlcBTC'} height={'475px'} isScrollable={!!address}>
+        <VaultsList
+          title={'Minted dlcBTC'}
+          height={'475px'}
+          isScrollable={!!address && fundedVaults.length > 0}
+        >
           {address ? (
             <VaultsListGroupContainer vaults={fundedVaults} />
           ) : (
             <VaultsListGroupBlankContainer />
           )}
         </VaultsList>
-        <VaultsList title={'Closed Vaults'} height={'475px'} isScrollable={!!address}>
+        <VaultsList
+          title={'Closed Vaults'}
+          height={'475px'}
+          isScrollable={!!address && closedVaults.length > 0}
+        >
           {address ? (
             <VaultsListGroupContainer vaults={closedVaults} />
           ) : (
