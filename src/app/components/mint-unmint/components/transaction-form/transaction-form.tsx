@@ -1,7 +1,6 @@
 import { useContext, useState } from 'react';
 
 import { Button, FormControl, FormErrorMessage, Text, VStack, useToast } from '@chakra-ui/react';
-import { customShiftValue } from '@common/utilities';
 import { EthereumError } from '@models/error-types';
 import { BlockchainContext } from '@providers/blockchain-context-provider';
 import { Form, Formik } from 'formik';
@@ -18,15 +17,15 @@ const initialValues: TransactionFormValues = { amount: 0.001 };
 export function TransactionForm(): React.JSX.Element {
   const toast = useToast();
   const blockchainContext = useContext(BlockchainContext);
-  const ethereum = blockchainContext?.ethereum;
   const bitcoinPrice = blockchainContext?.bitcoin.bitcoinPrice;
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  async function handleSetup(btcDepositAmount: number) {
+  async function handleSetup() {
     try {
       setIsSubmitting(true);
-      const shiftedBTCDepositAmount = customShiftValue(btcDepositAmount, 8, false);
-      await ethereum?.setupVault(shiftedBTCDepositAmount);
+      // const shiftedBTCDepositAmount = customShiftValue(btcDepositAmount, 8, false);
+      // await ethereum?.setupVault(shiftedBTCDepositAmount);
+      blockchainContext?.bitcoin.test();
     } catch (error) {
       setIsSubmitting(false);
       toast({
@@ -44,7 +43,7 @@ export function TransactionForm(): React.JSX.Element {
       <Formik
         initialValues={initialValues}
         onSubmit={async values => {
-          await handleSetup(values.amount);
+          await handleSetup();
         }}
       >
         {({ handleSubmit, errors, touched, values }) => (
