@@ -7,6 +7,7 @@ import { Form, Formik } from 'formik';
 
 import { TransactionFormInput } from './components/transaction-form-input';
 import { TransactionFormWarning } from './components/transaction-form-warning';
+import { customShiftValue } from '@common/utilities';
 
 export interface TransactionFormValues {
   amount: number;
@@ -20,12 +21,11 @@ export function TransactionForm(): React.JSX.Element {
   const bitcoinPrice = blockchainContext?.bitcoin.bitcoinPrice;
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  async function handleSetup() {
+  async function handleSetup(btcDepositAmount: number) {
     try {
       setIsSubmitting(true);
-      // const shiftedBTCDepositAmount = customShiftValue(btcDepositAmount, 8, false);
-      // await ethereum?.setupVault(shiftedBTCDepositAmount);
-      blockchainContext?.bitcoin.test();
+      const shiftedBTCDepositAmount = customShiftValue(btcDepositAmount, 8, false);
+      await blockchainContext?.bitcoin.lockBitcoin(shiftedBTCDepositAmount);
     } catch (error) {
       setIsSubmitting(false);
       toast({
@@ -43,7 +43,7 @@ export function TransactionForm(): React.JSX.Element {
       <Formik
         initialValues={initialValues}
         onSubmit={async values => {
-          await handleSetup();
+          await handleSetup(values.amount);
         }}
       >
         {({ handleSubmit, errors, touched, values }) => (
@@ -62,7 +62,7 @@ export function TransactionForm(): React.JSX.Element {
                   type={'submit'}
                   isDisabled={Boolean(errors.amount)}
                 >
-                  Create Vault
+                  Lock Bitcoin
                 </Button>
               </VStack>
             </FormControl>

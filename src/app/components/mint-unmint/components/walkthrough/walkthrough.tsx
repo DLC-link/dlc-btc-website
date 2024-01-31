@@ -25,17 +25,17 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
               <WalkthroughHeader
                 currentStep={currentStep}
                 title={'Create Vault'}
-                blockchain={'ethereum'}
+                blockchain={'bitcoin'}
               />
               <Text color={'white.01'} fontSize={'md'}>
-                Select an amount of dlcBTC you would like to mint and confirm it in your{' '}
+                Select an amount of dlcBTC you would like to mint and sign the required transactions in your{' '}
                 <Link
                   color={'accent.cyan.01'}
-                  href="https://metamask.io/"
+                  href="https://leather.io/"
                   isExternal
                   textDecoration={'underline'}
                 >
-                  Ethereum Wallet
+                  Bitcoin Wallet
                 </Link>
                 .
               </Text>
