@@ -77,16 +77,28 @@ interface RpcResponse {
 }
 
 export interface UseBitcoinReturnType {
-  signAndBroadcastFundingPSBT: (btcAmount: number) => Promise<SignAndBroadcastFundingPSBTResult>;
-  signClosingPSBT: (params: SignAndBroadcastFundingPSBTResult) => Promise<void>;
+  signAndBroadcastFundingPSBT: (
+    btcAmount: number
+  ) => Promise<{
+    fundingTransactionID: string;
+    multisigTransaction: btc.P2TROut;
+    userNativeSegwitAddress: string;
+    btcAmount: number;
+  }>;
+  signClosingPSBT: (
+    fundingTransactionID: string,
+    multisigTransaction: btc.P2TROut,
+    userNativeSegwitAddress: string,
+    btcAmount: number
+  ) => Promise<void>;
   bitcoinPrice: number;
 }
 
 export interface SignAndBroadcastFundingPSBTResult {
-  fundingTransactionID: string, 
-  multisigTransaction: btc.P2TROut, 
-  userNativeSegwitAddress: string, 
-  btcAmount: number
+  fundingTransactionID: string;
+  multisigTransaction: btc.P2TROut;
+  userNativeSegwitAddress: string;
+  btcAmount: number;
 }
 
 const ELECTRUM_API_URL = 'https://devnet.dlc.link/electrs';
@@ -103,9 +115,13 @@ export function useBitcoin(): UseBitcoinReturnType {
   }, []);
 
   async function getBitcoinAddresses(): Promise<Address[]> {
-    const rpcResponse: RpcResponse = await window.btc?.request('getAddresses');
-    const userAddresses = rpcResponse.result.addresses;
-    return userAddresses;
+    try {
+      const rpcResponse: RpcResponse = await window.btc?.request('getAddresses');
+      const userAddresses = rpcResponse.result.addresses;
+      return userAddresses;
+    } catch (error) {
+      throw new BitcoinError(`Error getting bitcoin addresses: ${error}`);
+    }
   }
 
   async function gatherUTXOs(bitcoinNativeSegwitAddress: BitcoinNativeSegwitAddress): Promise<any> {
@@ -136,7 +152,7 @@ export function useBitcoin(): UseBitcoinReturnType {
   function createMultisigTransactionAndAddress(
     userPublicKey: Uint8Array,
     attestorPublicKey: Uint8Array,
-    btcNetwork: BitcoinNetwork,
+    btcNetwork: BitcoinNetwork
   ): {
     multisigTransaction: btc.P2TROut;
     multisigAddress: string;
@@ -213,11 +229,10 @@ export function useBitcoin(): UseBitcoinReturnType {
     return result.result.hex;
   }
 
-
   async function handleFundingTransaction(
-multisigAddress: string,
-userChangeAddress: string,
-utxos: any[],
+    multisigAddress: string,
+    userChangeAddress: string,
+    utxos: any[],
     btcAmount: number,
     btcNetwork: BitcoinNetwork
   ): Promise<{ fundingTransaction: Uint8Array; fundingTransactionHex: string }> {
@@ -250,7 +265,14 @@ utxos: any[],
     return closingTransactionHex;
   }
 
-  async function signAndBroadcastFundingPSBT(btcAmount: number): Promise<SignAndBroadcastFundingPSBTResult> {
+  async function signAndBroadcastFundingPSBT(
+    btcAmount: number
+  ): Promise<{
+    fundingTransactionID: string;
+    multisigTransaction: btc.P2TROut;
+    userNativeSegwitAddress: string;
+    btcAmount: number;
+  }> {
     const userAddresses = await getBitcoinAddresses();
     const userNativeSegwitAccount = userAddresses[0] as BitcoinNativeSegwitAddress;
     const userNativeSegwitAddress = userNativeSegwitAccount.address;
@@ -268,9 +290,8 @@ utxos: any[],
     const { multisigTransaction, multisigAddress } = createMultisigTransactionAndAddress(
       hex.decode(userPublicKey),
       hex.decode(attestorPublicKey),
-      btcNetwork,
+      btcNetwork
     );
-
 
     const { fundingTransaction, fundingTransactionHex } = await handleFundingTransaction(
       multisigAddress,
@@ -286,8 +307,14 @@ utxos: any[],
     return { fundingTransactionID, multisigTransaction, userNativeSegwitAddress, btcAmount };
   }
 
-  async function signClosingPSBT({fundingTransactionID, multisigTransaction, userNativeSegwitAddress, btcAmount} : SignAndBroadcastFundingPSBTResult): Promise<void> {
-    if (!fundingTransactionID || !multisigTransaction || !userNativeSegwitAddress || !btcAmount) console.error('missing data');
+  async function signClosingPSBT(
+    fundingTransactionID: string,
+    multisigTransaction: btc.P2TROut,
+    userNativeSegwitAddress: string,
+    btcAmount: number
+  ): Promise<void> {
+    if (!fundingTransactionID || !multisigTransaction || !userNativeSegwitAddress || !btcAmount)
+      console.error('missing data');
     const closingTransactionHex = await handleClosingTransaction(
       fundingTransactionID,
       multisigTransaction,

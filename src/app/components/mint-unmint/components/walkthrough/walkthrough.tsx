@@ -28,7 +28,8 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
                 blockchain={'bitcoin'}
               />
               <Text color={'white.01'} fontSize={'md'}>
-                Select an amount of dlcBTC you would like to mint and sign the required transactions in your{' '}
+                Select an amount of dlcBTC you would like to mint and sign the required transactions
+                in your{' '}
                 <Link
                   color={'accent.cyan.01'}
                   href="https://leather.io/"
