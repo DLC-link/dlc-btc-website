@@ -77,14 +77,23 @@ interface RpcResponse {
 }
 
 export interface UseBitcoinReturnType {
-  lockBitcoin: (btcAmount: number) => Promise<void>;
+  signAndBroadcastFundingPSBT: (btcAmount: number) => Promise<SignAndBroadcastFundingPSBTResult>;
+  signClosingPSBT: (params: SignAndBroadcastFundingPSBTResult) => Promise<void>;
   bitcoinPrice: number;
+}
+
+export interface SignAndBroadcastFundingPSBTResult {
+  fundingTransactionID: string, 
+  multisigTransaction: btc.P2TROut, 
+  userNativeSegwitAddress: string, 
+  btcAmount: number
 }
 
 const ELECTRUM_API_URL = 'https://devnet.dlc.link/electrs';
 
 export function useBitcoin(): UseBitcoinReturnType {
   const [bitcoinPrice, setBitcoinPrice] = useState(0);
+  const [btcNetwork, setBTCNetwork] = useState<BitcoinNetwork>(regtest);
 
   useEffect(() => {
     const getBitcoinPrice = async () => {
@@ -224,14 +233,14 @@ utxos: any[],
   }
 
   async function handleClosingTransaction(
-    fundingTransaction: any,
-    multisigTransaction: any,
+    fundingTransactionID: string,
+    multisigTransaction: btc.P2TROut,
     userAddress: string,
     btcAmount: number,
     btcNetwork: BitcoinNetwork
   ): Promise<string> {
     const closingTransaction = createClosingTransaction(
-      fundingTransaction,
+      fundingTransactionID,
       multisigTransaction,
       userAddress,
       btcAmount,
@@ -241,11 +250,10 @@ utxos: any[],
     return closingTransactionHex;
   }
 
-  async function lockBitcoin(btcAmount: number): Promise<void> {
-    const btcNetwork = regtest;
-
+  async function signAndBroadcastFundingPSBT(btcAmount: number): Promise<SignAndBroadcastFundingPSBTResult> {
     const userAddresses = await getBitcoinAddresses();
-    const userNativeSegwitAddress = userAddresses[0] as BitcoinNativeSegwitAddress;
+    const userNativeSegwitAccount = userAddresses[0] as BitcoinNativeSegwitAddress;
+    const userNativeSegwitAddress = userNativeSegwitAccount.address;
     const userTaprootAddress = userAddresses[1] as BitcoinTaprootAddress;
     const userPublicKey = userTaprootAddress.tweakedPublicKey;
 
@@ -263,9 +271,10 @@ utxos: any[],
       btcNetwork,
     );
 
+
     const { fundingTransaction, fundingTransactionHex } = await handleFundingTransaction(
       multisigAddress,
-      userNativeSegwitAddress.address,
+      userNativeSegwitAddress,
       userUTXOs,
       btcAmount,
       btcNetwork
@@ -274,10 +283,15 @@ utxos: any[],
 
     const fundingTransactionID = getFundingTransactionID(fundingTransaction);
 
+    return { fundingTransactionID, multisigTransaction, userNativeSegwitAddress, btcAmount };
+  }
+
+  async function signClosingPSBT({fundingTransactionID, multisigTransaction, userNativeSegwitAddress, btcAmount} : SignAndBroadcastFundingPSBTResult): Promise<void> {
+    if (!fundingTransactionID || !multisigTransaction || !userNativeSegwitAddress || !btcAmount) console.error('missing data');
     const closingTransactionHex = await handleClosingTransaction(
       fundingTransactionID,
       multisigTransaction,
-      userNativeSegwitAddress.address,
+      userNativeSegwitAddress,
       btcAmount,
       btcNetwork
     );
@@ -298,7 +312,8 @@ utxos: any[],
   }
 
   return {
-    lockBitcoin,
+    signAndBroadcastFundingPSBT,
+    signClosingPSBT,
     bitcoinPrice,
   };
 }
