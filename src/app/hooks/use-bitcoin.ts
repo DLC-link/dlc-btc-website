@@ -40,7 +40,7 @@ export function useBitcoin(): UseBitcoinReturnType {
     };
     const urlParams = {
       bitcoinContractOffer: JSON.stringify(bitcoinContractOffer),
-      bitcoinNetwork: JSON.stringify('regtest'),
+      bitcoinNetwork: JSON.stringify('testnet'),
       counterpartyWalletDetails: JSON.stringify(counterPartyWalletDetails),
     };
     return urlParams;
