@@ -6,8 +6,8 @@ export function useConfirmationChecker(
   txID: string | undefined,
   vaultState: VaultState | undefined
 ): number {
-  const bitcoinExplorerTXURL = `https://devnet.dlc.link/electrs/tx/${txID}`;
-  const bitcoinExplorerHeightURL = `https://devnet.dlc.link/electrs/blocks/tip/height`;
+  const bitcoinExplorerTXURL = `https://testnet.dlc.link/electrs/tx/${txID}`;
+  const bitcoinExplorerHeightURL = `https://testnet.dlc.link/electrs/blocks/tip/height`;
   const fetchInterval = useRef<number | undefined>(undefined);
 
   const [transactionProgress, setTransactionProgress] = useState(0);
