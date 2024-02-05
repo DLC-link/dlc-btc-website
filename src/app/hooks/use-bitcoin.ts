@@ -149,7 +149,6 @@ export function useBitcoin(): UseBitcoinReturnType {
   async function getAttestorPublicKey(): Promise<string> {
     const response = await fetch('http://localhost:3000/publickey');
     const attestorPublicKey = await response.text();
-    console.log('attestorPublicKey', attestorPublicKey);
     return attestorPublicKey;
   }
 
@@ -212,7 +211,7 @@ export function useBitcoin(): UseBitcoinReturnType {
     try {
       const response = await fetch('http://localhost:3000/create-psbt-event', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
         body: JSON.stringify({
           uuid,
           closingPsbt: closingPSBT,
@@ -231,7 +230,8 @@ export function useBitcoin(): UseBitcoinReturnType {
     btcAmount: number,
     btcNetwork: BitcoinNetwork
   ): Promise<Uint8Array> {
-    const closingTransaction = new btc.Transaction();
+    const closingTransaction = new btc.Transaction({ PSBTVersion: 0 });
+    
     const fundingInput = {
       txid: hexToBytes(fundingTransactionID),
       index: 0,
@@ -239,7 +239,7 @@ export function useBitcoin(): UseBitcoinReturnType {
       ...multisigTransaction,
     };
     closingTransaction.addInput(fundingInput);
-    closingTransaction.addOutputAddress(userNativeSegwitAddress, BigInt(btcAmount), btcNetwork);
+    closingTransaction.addOutputAddress(userNativeSegwitAddress, BigInt(btcAmount - 10000), btcNetwork);
     const closingPSBT = closingTransaction.toPSBT();
     return closingPSBT;
   }
@@ -299,8 +299,7 @@ export function useBitcoin(): UseBitcoinReturnType {
     );
     const closingTransactionHex = await signPSBT(closingTransaction, false);
 
-    const response = await sendPSBT(closingTransactionHex, uuid, userAddress);
-    console.log('response', response);
+    await sendPSBT(closingTransactionHex, uuid, userAddress);
     return closingTransactionHex;
   }
 
