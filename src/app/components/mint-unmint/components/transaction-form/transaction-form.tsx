@@ -1,20 +1,8 @@
 import { useContext, useState } from 'react';
 
-import {
-  Button,
-  Checkbox,
-  Fade,
-  FormControl,
-  FormErrorMessage,
-  HStack,
-  Stack,
-  Text,
-  VStack,
-  useToast,
-} from '@chakra-ui/react';
+import { Button, FormControl, FormErrorMessage, Text, VStack, useToast } from '@chakra-ui/react';
 import { customShiftValue } from '@common/utilities';
-import { useSignPSBT } from '@hooks/use-sign-psbt';
-import { BitcoinError } from '@models/error-types';
+import { EthereumError } from '@models/error-types';
 import { BlockchainContext } from '@providers/blockchain-context-provider';
 import { Form, Formik } from 'formik';
 
@@ -30,9 +18,7 @@ const initialValues: TransactionFormValues = { amount: 0.001 };
 export function TransactionForm(): React.JSX.Element {
   const toast = useToast();
   const blockchainContext = useContext(BlockchainContext);
-  const { handleSignTransaction, fundingTransactionSigned, closingTransactionSigned } = useSignPSBT(
-    blockchainContext?.bitcoin
-  );
+  const ethereum = blockchainContext?.ethereum;
   const bitcoinPrice = blockchainContext?.bitcoin.bitcoinPrice;
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -40,13 +26,12 @@ export function TransactionForm(): React.JSX.Element {
     try {
       setIsSubmitting(true);
       const shiftedBTCDepositAmount = customShiftValue(btcDepositAmount, 8, false);
-      await handleSignTransaction(shiftedBTCDepositAmount);
-      setIsSubmitting(false);
+      await ethereum?.setupVault(shiftedBTCDepositAmount);
     } catch (error) {
       setIsSubmitting(false);
       toast({
-        title: 'Failed to sign transaction',
-        description: error instanceof BitcoinError ? error.message : '',
+        title: 'Failed to create vault',
+        description: error instanceof EthereumError ? error.message : '',
         status: 'error',
         duration: 9000,
         isClosable: true,
@@ -78,42 +63,8 @@ export function TransactionForm(): React.JSX.Element {
                   type={'submit'}
                   isDisabled={Boolean(errors.amount)}
                 >
-                  {fundingTransactionSigned ? 'Sign Closing Transaction' : 'Lock Bitcoin'}
+                  Create Vault
                 </Button>
-                <Stack w={'100%'}>
-                  <Fade
-                    in={isSubmitting || (fundingTransactionSigned && !closingTransactionSigned)}
-                  >
-                    <VStack
-                      w={'100%'}
-                      spacing={'10px'}
-                      p={'15px'}
-                      bgColor={'white.03'}
-                      borderRadius={'md'}
-                    >
-                      <HStack w={'100%'} justifyContent={'space-between'}>
-                        <Checkbox
-                          iconColor={'accent.orange.01'}
-                          isChecked={fundingTransactionSigned}
-                          isDisabled
-                        />
-                        <Text color={'white.01'} fontSize={'sm'} fontWeight={800}>
-                          Funding Transaction
-                        </Text>
-                      </HStack>
-                      <HStack w={'100%'} justifyContent={'space-between'}>
-                        <Checkbox
-                          iconColor={'accent.orange.01'}
-                          isChecked={closingTransactionSigned}
-                          isDisabled
-                        />
-                        <Text color={'white.01'} fontSize={'sm'} fontWeight={800}>
-                          Closing Transaction
-                        </Text>
-                      </HStack>
-                    </VStack>
-                  </Fade>
-                </Stack>
               </VStack>
             </FormControl>
           </Form>

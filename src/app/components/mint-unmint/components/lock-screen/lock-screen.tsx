@@ -1,9 +1,11 @@
 import { useContext, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { Button, VStack } from '@chakra-ui/react';
+import { Button, Checkbox, Fade, HStack, Stack, Text, VStack, useToast } from '@chakra-ui/react';
 import { VaultCard } from '@components/vault/vault-card';
+import { useSignPSBT } from '@hooks/use-sign-psbt';
 import { useVaults } from '@hooks/use-vaults';
+import { BitcoinError } from '@models/error-types';
 import { Vault } from '@models/vault';
 import { BlockchainContext } from '@providers/blockchain-context-provider';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
@@ -15,10 +17,13 @@ interface LockScreenProps {
 }
 
 export function LockScreen({ currentStep }: LockScreenProps): React.JSX.Element {
+  const toast = useToast();
   const dispatch = useDispatch();
   const { readyVaults } = useVaults();
   const blockchainContext = useContext(BlockchainContext);
   const bitcoin = blockchainContext?.bitcoin;
+  const { handleSignTransaction, fundingTransactionSigned, closingTransactionSigned } =
+    useSignPSBT(bitcoin);
   const ethereum = blockchainContext?.ethereum;
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -39,10 +44,17 @@ export function LockScreen({ currentStep }: LockScreenProps): React.JSX.Element 
 
     try {
       setIsSubmitting(true);
-      await bitcoin?.fetchBitcoinContractOfferAndSendToUserWallet(currentVault);
+      await handleSignTransaction(currentVault.collateral, currentVault.uuid);
+      setIsSubmitting(false);
     } catch (error) {
       setIsSubmitting(false);
-      throw new Error('Error locking vault');
+      toast({
+        title: 'Failed to sign transaction',
+        description: error instanceof BitcoinError ? error.message : '',
+        status: 'error',
+        duration: 9000,
+        isClosable: true,
+      });
     }
   }
 
@@ -68,6 +80,32 @@ export function LockScreen({ currentStep }: LockScreenProps): React.JSX.Element 
       >
         Cancel
       </Button>
+      <Stack w={'100%'}>
+        <Fade in={isSubmitting || (fundingTransactionSigned && !closingTransactionSigned)}>
+          <VStack w={'100%'} spacing={'10px'} p={'15px'} bgColor={'white.03'} borderRadius={'md'}>
+            <HStack w={'100%'} justifyContent={'space-between'}>
+              <Checkbox
+                iconColor={'accent.orange.01'}
+                isChecked={fundingTransactionSigned}
+                isDisabled
+              />
+              <Text color={'white.01'} fontSize={'sm'} fontWeight={800}>
+                Funding Transaction
+              </Text>
+            </HStack>
+            <HStack w={'100%'} justifyContent={'space-between'}>
+              <Checkbox
+                iconColor={'accent.orange.01'}
+                isChecked={closingTransactionSigned}
+                isDisabled
+              />
+              <Text color={'white.01'} fontSize={'sm'} fontWeight={800}>
+                Closing Transaction
+              </Text>
+            </HStack>
+          </VStack>
+        </Fade>
+      </Stack>
     </VStack>
   );
 }

@@ -1,12 +1,17 @@
 import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
+import { customShiftValue } from '@common/utilities';
 import { BitcoinError } from '@models/error-types';
 import * as btc from '@scure/btc-signer';
+import { RootState } from '@store/index';
+import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
+import { vaultActions } from '@store/slices/vault/vault.actions';
 
 import { UseBitcoinReturnType } from './use-bitcoin';
 
-export interface UseSignPSBTReturnType {
-  handleSignTransaction: (btcAmount: number) => Promise<void>;
+interface UseSignPSBTReturnType {
+  handleSignTransaction: (btcAmount: number, vaultUUID: string) => Promise<void>;
   fundingTransactionSigned: boolean;
   closingTransactionSigned: boolean;
 }
@@ -15,7 +20,10 @@ export function useSignPSBT(useBitcoin?: UseBitcoinReturnType): UseSignPSBTRetur
   if (!useBitcoin) throw new Error('useBitcoin must be set before useSignPSBT can be used');
 
   const { signAndBroadcastFundingPSBT, signClosingPSBT } = useBitcoin;
+  const { network } = useSelector((state: RootState) => state.account);
+  const dispatch = useDispatch();
   const [btcAmount, setBTCAmount] = useState<number | undefined>();
+  const [vaultUUID, setVaultUUID] = useState<string | undefined>();
   const [fundingTransactionSigned, setFundingTransactionSigned] = useState(false);
   const [closingTransactionSigned, setClosingTransactionSigned] = useState(false);
   const [fundingTransactionID, setFundingTransactionID] = useState<string | undefined>();
@@ -23,24 +31,39 @@ export function useSignPSBT(useBitcoin?: UseBitcoinReturnType): UseSignPSBTRetur
   const [userNativeSegwitAddress, setUserNativeSegwitAddress] = useState<string | undefined>();
 
   useEffect(() => {
-    if (
-      fundingTransactionSigned &&
-      btcAmount &&
-      fundingTransactionID &&
-      multisigTransaction &&
-      userNativeSegwitAddress
-    ) {
-      handleSignClosingTransaction();
-    }
+    const signClosingTransaction = async () => {
+      if (
+        fundingTransactionSigned &&
+        btcAmount &&
+        vaultUUID &&
+        network &&
+        fundingTransactionID &&
+        multisigTransaction &&
+        userNativeSegwitAddress
+      ) {
+        await handleSignClosingTransaction();
+        dispatch(
+          vaultActions.setVaultToFunding({
+            vaultUUID,
+            fundingTX: fundingTransactionID,
+            networkID: network.id,
+          })
+        );
+        dispatch(mintUnmintActions.setMintStep([2, vaultUUID]));
+      }
+    };
+    signClosingTransaction();
   }, [
     fundingTransactionSigned,
     btcAmount,
     fundingTransactionID,
     multisigTransaction,
     userNativeSegwitAddress,
+    network,
+    vaultUUID,
   ]);
 
-  async function handleSignFundingTransaction(btcAmount: number) {
+  async function handleSignFundingTransaction(btcAmount: number): Promise<string> {
     try {
       const { fundingTransactionID, multisigTransaction, userNativeSegwitAddress } =
         await signAndBroadcastFundingPSBT(btcAmount);
@@ -49,6 +72,7 @@ export function useSignPSBT(useBitcoin?: UseBitcoinReturnType): UseSignPSBTRetur
       setMultisigTransaction(multisigTransaction);
       setUserNativeSegwitAddress(userNativeSegwitAddress);
       setFundingTransactionSigned(true);
+      return fundingTransactionID;
     } catch (error) {
       throw new BitcoinError(`Error signing funding transaction: ${error}`);
     }
@@ -56,7 +80,13 @@ export function useSignPSBT(useBitcoin?: UseBitcoinReturnType): UseSignPSBTRetur
 
   async function handleSignClosingTransaction() {
     try {
-      if (!fundingTransactionID || !multisigTransaction || !userNativeSegwitAddress || !btcAmount) {
+      if (
+        !fundingTransactionID ||
+        !multisigTransaction ||
+        !userNativeSegwitAddress ||
+        !btcAmount ||
+        !vaultUUID
+      ) {
         throw new Error(
           'Funding transaction must be signed before closing transaction can be signed'
         );
@@ -64,6 +94,7 @@ export function useSignPSBT(useBitcoin?: UseBitcoinReturnType): UseSignPSBTRetur
       await signClosingPSBT(
         fundingTransactionID,
         multisigTransaction,
+        vaultUUID,
         userNativeSegwitAddress,
         btcAmount
       );
@@ -73,12 +104,24 @@ export function useSignPSBT(useBitcoin?: UseBitcoinReturnType): UseSignPSBTRetur
     }
   }
 
-  async function handleSignTransaction(btcAmount: number) {
-    setBTCAmount(btcAmount);
+  async function handleSignTransaction(btcAmount: number, vaultUUID: string) {
+    const shiftedBTCDepositAmount = customShiftValue(btcAmount, 8, false);
+    setBTCAmount(shiftedBTCDepositAmount);
+    setVaultUUID(vaultUUID);
     if (!fundingTransactionSigned) {
-      await handleSignFundingTransaction(btcAmount);
+      await handleSignFundingTransaction(shiftedBTCDepositAmount);
     } else {
       await handleSignClosingTransaction();
+      if (fundingTransactionID && network && vaultUUID) {
+        dispatch(
+          vaultActions.setVaultToFunding({
+            vaultUUID,
+            fundingTX: fundingTransactionID,
+            networkID: network.id,
+          })
+        );
+        dispatch(mintUnmintActions.setMintStep([2, vaultUUID]));
+      }
     }
   }
 
