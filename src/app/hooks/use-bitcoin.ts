@@ -216,6 +216,7 @@ export function useBitcoin(): UseBitcoinReturnType {
           uuid,
           closingPsbt: closingPSBT,
           mintAddress: userNativeSegwitAddress,
+          chain: 'evm-sepolia'
         }),
       });
       console.log('response', response);
