@@ -6,6 +6,8 @@ import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
 import { hex } from '@scure/base';
 import * as btc from '@scure/btc-signer';
 
+import { useEndpoints } from './use-endpoints';
+
 const networkModes = ['mainnet', 'testnet'] as const;
 
 type NetworkModes = (typeof networkModes)[number];
@@ -91,16 +93,8 @@ export interface UseBitcoinReturnType {
   bitcoinPrice: number;
 }
 
-// interface SignAndBroadcastFundingPSBTResult {
-//   fundingTransactionID: string;
-//   multisigTransaction: btc.P2TROut;
-//   userNativeSegwitAddress: string;
-//   btcAmount: number;
-// }
-
-const ELECTRUM_API_URL = 'https://devnet.dlc.link/electrs';
-
 export function useBitcoin(): UseBitcoinReturnType {
+  const { attestorAPIURL, bitcoinBlockchainAPIURL } = useEndpoints();
   const [bitcoinPrice, setBitcoinPrice] = useState(0);
   const [btcNetwork, setBTCNetwork] = useState<BitcoinNetwork>(regtest);
 
@@ -123,7 +117,7 @@ export function useBitcoin(): UseBitcoinReturnType {
 
   async function gatherUTXOs(bitcoinNativeSegwitAddress: BitcoinNativeSegwitAddress): Promise<any> {
     const response = await fetch(
-      `${ELECTRUM_API_URL}/address/${bitcoinNativeSegwitAddress.address}/utxo`
+      `${bitcoinBlockchainAPIURL}/address/${bitcoinNativeSegwitAddress.address}/utxo`
     );
     const allUTXOs = await response.json();
     const userPublicKey = hexToBytes(bitcoinNativeSegwitAddress.publicKey);
@@ -131,14 +125,13 @@ export function useBitcoin(): UseBitcoinReturnType {
 
     const utxos = await Promise.all(
       allUTXOs.map(async (utxo: UTXO) => {
-        const txHex = await (await fetch(`${ELECTRUM_API_URL}/tx/${utxo.txid}/hex`)).text();
+        const txHex = await (await fetch(`${bitcoinBlockchainAPIURL}/tx/${utxo.txid}/hex`)).text();
         return {
           ...spend,
           txid: utxo.txid,
           index: utxo.vout,
           value: utxo.value,
           nonWitnessUtxo: hex.decode(txHex),
-          // script: utxo.scriptpubkey, //do i need to handle when it is witness? how?
         };
       })
     );
@@ -147,9 +140,16 @@ export function useBitcoin(): UseBitcoinReturnType {
   }
 
   async function getAttestorPublicKey(): Promise<string> {
-    const response = await fetch('http://localhost:3000/publickey');
-    const attestorPublicKey = await response.text();
-    return attestorPublicKey;
+    const attestorGetGroupPublicKeyURL = `${attestorAPIURL}/get-group-publickey`;
+
+    try {
+      const response = await fetch(attestorGetGroupPublicKeyURL);
+      const attestorGroupPublicKey = await response.text();
+
+      return attestorGroupPublicKey;
+    } catch (error) {
+      throw new BitcoinError(`Error getting attestor public key: ${error}`);
+    }
   }
 
   function createMultisigTransactionAndAddress(
@@ -196,30 +196,25 @@ export function useBitcoin(): UseBitcoinReturnType {
     return fundingPSBT;
   }
 
-  // function getFundingTransactionID(fundingTransaction: Uint8Array): string {
-  //   const sha256x2 = (...msgs: Uint8Array[]) => sha256(sha256(concatBytes(...msgs)));
-  //   const fundingTransactionID = hex.encode(sha256x2(fundingTransaction).reverse());
-  //   return fundingTransactionID;
-  // }
-
   async function sendPSBT(
     closingPSBT: string,
     uuid: string,
     userNativeSegwitAddress: string
   ): Promise<void> {
     setBTCNetwork(regtest);
+    const attestorCreatePSBTEventURL = `${attestorAPIURL}/create-psbt-event`;
     try {
-      const response = await fetch('http://localhost:3000/create-psbt-event', {
+      const response = await fetch(attestorCreatePSBTEventURL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
         body: JSON.stringify({
           uuid,
-          closingPsbt: closingPSBT,
-          mintAddress: userNativeSegwitAddress,
-          chain: 'evm-sepolia'
+          closing_psbt: closingPSBT,
+          mint_address: userNativeSegwitAddress,
+          chain: 'evm-sepolia',
         }),
       });
-      console.log('response', response);
+      console.log('response', await response.text());
     } catch (error) {
       throw new BitcoinError(`Error sending PSBT: ${error}`);
     }
@@ -232,7 +227,6 @@ export function useBitcoin(): UseBitcoinReturnType {
     btcNetwork: BitcoinNetwork
   ): Promise<Uint8Array> {
     const closingTransaction = new btc.Transaction({ PSBTVersion: 0 });
-    
     const fundingInput = {
       txid: hexToBytes(fundingTransactionID),
       index: 0,
@@ -240,7 +234,11 @@ export function useBitcoin(): UseBitcoinReturnType {
       ...multisigTransaction,
     };
     closingTransaction.addInput(fundingInput);
-    closingTransaction.addOutputAddress(userNativeSegwitAddress, BigInt(btcAmount - 10000), btcNetwork);
+    closingTransaction.addOutputAddress(
+      userNativeSegwitAddress,
+      BigInt(btcAmount - 10000),
+      btcNetwork
+    );
     const closingPSBT = closingTransaction.toPSBT();
     return closingPSBT;
   }
@@ -274,7 +272,7 @@ export function useBitcoin(): UseBitcoinReturnType {
     transaction.finalize();
 
     let fundingTransactionID = '';
-    await fetch(`${ELECTRUM_API_URL}/tx`, {
+    await fetch(`${bitcoinBlockchainAPIURL}/tx`, {
       method: 'POST',
       body: bytesToHex(transaction.extract()),
     }).then(async response => {
@@ -317,11 +315,6 @@ export function useBitcoin(): UseBitcoinReturnType {
     const userPublicKey = userTaprootAddress.tweakedPublicKey;
 
     const attestorPublicKey = await getAttestorPublicKey();
-
-    // const preImage = hexToBytes('107661134f21fc7c02223d50ab9eb3600bc3ffc3712423a1e47bb1f9a9dbf55f');
-    // const preImageHash = hexToBytes(
-    //   '6c60f404f8167a38fc70eaf8aa17ac351023bef86bcb9d1086a19afe95bd5333'
-    // );
 
     const userUTXOs = await gatherUTXOs(userAddresses[0] as BitcoinNativeSegwitAddress);
     const { multisigTransaction, multisigAddress } = createMultisigTransactionAndAddress(

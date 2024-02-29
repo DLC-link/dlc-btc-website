@@ -72,6 +72,28 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
             <WalkthroughLayout>
               <WalkthroughHeader
                 currentStep={currentStep}
+                title={'Sign Closing Transaction'}
+                blockchain={'bitcoin'}
+              />
+              <Text color={'white.01'} fontSize={'md'}>
+                Sign the closing transaction in your{' '}
+                <Link
+                  color={'accent.cyan.01'}
+                  href="https://leather.io/"
+                  isExternal
+                  textDecoration={'underline'}
+                >
+                  Bitcoin Wallet{' '}
+                </Link>
+                which will be broadcasted once the dlcBTC is redeemed.
+              </Text>
+            </WalkthroughLayout>
+          );
+        case 3:
+          return (
+            <WalkthroughLayout>
+              <WalkthroughHeader
+                currentStep={currentStep}
                 title={'Mint dlcBTC'}
                 blockchain={'ethereum'}
               />

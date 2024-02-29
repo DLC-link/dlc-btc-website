@@ -1,10 +1,12 @@
-import { Divider, Text } from '@chakra-ui/react';
+import { Divider, Stack, Text } from '@chakra-ui/react';
 
 import { StepIconOne, StepIconThree, StepIconTwo } from '../../../../../../styles/icon';
 
 interface StepProps {
+  width?: string;
   currentStep: number;
   stepIndex: number;
+  isFirstStep?: boolean;
   isLastStep?: boolean;
   title?: string;
 }
@@ -48,15 +50,25 @@ export function StepGraphics({
   );
 }
 
-export function StepText({ currentStep, stepIndex, title }: StepProps): React.JSX.Element {
+export function StepText({
+  currentStep,
+  stepIndex,
+  width,
+  title,
+  isFirstStep = false,
+  isLastStep = false,
+}: StepProps): React.JSX.Element {
   return (
-    <Text
-      color={currentStep >= stepIndex ? 'accent.cyan.01' : 'white.01'}
-      fontSize={'xs'}
-      fontWeight={currentStep === stepIndex ? 800 : 400}
-      opacity={currentStep > stepIndex ? '50%' : '100%'}
-    >
-      {title}
-    </Text>
+    <Stack h={'25px'} w={width}>
+      <Text
+        textAlign={isFirstStep ? 'left' : isLastStep ? 'right' : 'center'}
+        color={currentStep >= stepIndex ? 'accent.cyan.01' : 'white.01'}
+        fontSize={'xs'}
+        fontWeight={currentStep === stepIndex ? 800 : 400}
+        opacity={currentStep > stepIndex ? '50%' : '100%'}
+      >
+        {title}
+      </Text>
+    </Stack>
   );
 }
