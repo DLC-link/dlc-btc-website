@@ -80,7 +80,7 @@ export function SignClosingTransactionScreen({
         variant={'account'}
         onClick={() => handleClick(currentVault)}
       >
-        Sign Closing Transaction
+        Sign Closing TX
       </Button>
       <Button
         isLoading={isSubmitting}

@@ -1,9 +1,8 @@
-import { useContext } from 'react';
 
 import { Button, HStack, Image, Spinner, Text, VStack } from '@chakra-ui/react';
 import { VaultCard } from '@components/vault/vault-card';
+import { useBlockchainContext } from '@hooks/use-blockchain-context';
 import { Vault } from '@models/vault';
-import { BlockchainContext } from '@providers/blockchain-context-provider';
 
 interface VaultsListGroupContainerProps {
   label?: string;
@@ -20,8 +19,9 @@ export function VaultsListGroupContainer({
   isSelectable = false,
   handleSelect,
 }: VaultsListGroupContainerProps): React.JSX.Element | boolean {
-  const blockchainContext = useContext(BlockchainContext);
-  const ethereum = blockchainContext?.ethereum;
+  const blockchainContext = useBlockchainContext();
+  const { ethereum } = blockchainContext;
+  const { recommendTokenToMetamask } = ethereum;
 
   if (vaults.length === 0) return false;
 
@@ -40,7 +40,7 @@ export function VaultsListGroupContainer({
               variant={'ghost'}
               size={'xs'}
               _hover={{ backgroundColor: 'accent.cyan.01' }}
-              onClick={() => ethereum?.recommendTokenToMetamask()}
+              onClick={async () => await recommendTokenToMetamask()}
             >
               <HStack>
                 <Image src={'/images/logos/dlc-btc-logo.svg'} alt={'dlcBTC'} boxSize={'15px'} />

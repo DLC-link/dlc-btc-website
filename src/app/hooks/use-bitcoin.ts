@@ -345,7 +345,7 @@ export function useBitcoin(): UseBitcoinReturnType {
     if (!fundingTransactionID || !multisigTransaction || !userNativeSegwitAddress || !btcAmount) {
       throw new BitcoinError('Missing parameters to sign closing PSBT');
     }
-    const closingTransactionHex = await handleClosingTransaction(
+    await handleClosingTransaction(
       fundingTransactionID,
       multisigTransaction,
       userNativeSegwitAddress,
@@ -353,7 +353,6 @@ export function useBitcoin(): UseBitcoinReturnType {
       btcAmount,
       btcNetwork
     );
-    console.log('closingTransactionHex', closingTransactionHex);
   }
 
   async function fetchBitcoinPrice() {

@@ -1,9 +1,8 @@
-import { useContext } from 'react';
 
 import { Button, HStack, Image, Link, Text } from '@chakra-ui/react';
 import { TutorialVideo } from '@components/tutorial-video/tutorial-video';
 
-import { BlockchainContext } from '../../../../providers/blockchain-context-provider';
+import { useBlockchainContext } from '@hooks/use-blockchain-context';
 import { WalkthroughHeader } from './components/walkthrough-header';
 import { WalkthroughLayout } from './components/walkthrough.layout';
 
@@ -13,8 +12,9 @@ interface WalkthroughProps {
 }
 
 export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.Element {
-  const blockchainContext = useContext(BlockchainContext);
-  const ethereum = blockchainContext?.ethereum;
+  const blockchainContext = useBlockchainContext();
+  const { ethereum } = blockchainContext;
+  const { recommendTokenToMetamask } = ethereum;
 
   switch (flow) {
     case 'mint':
@@ -72,7 +72,7 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
             <WalkthroughLayout>
               <WalkthroughHeader
                 currentStep={currentStep}
-                title={'Sign Closing Transaction'}
+                title={'Sign Closing TX'}
                 blockchain={'bitcoin'}
               />
               <Text color={'white.01'} fontSize={'md'}>
@@ -115,7 +115,7 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
                 simply <span style={{ fontWeight: 800 }}>add them </span>
                 to your Ethereum Wallet.
               </Text>
-              <Button variant={'vault'} onClick={() => ethereum?.recommendTokenToMetamask()}>
+              <Button variant={'vault'} onClick={async () => await recommendTokenToMetamask()}>
                 <HStack>
                   <Image src={'/images/logos/dlc-btc-logo.svg'} alt={'dlcBTC'} boxSize={'25px'} />
                   <Text> Add Token to Wallet</Text>

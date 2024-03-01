@@ -11,7 +11,6 @@ export function useConfirmationChecker(vault?: Vault): number {
   const [transactionProgress, setTransactionProgress] = useState(0);
 
   const memoizedTransactionProgress = useMemo(() => transactionProgress, [transactionProgress]);
-  console.log('vault?.state', vault);
 
   const fetchTransactionDetails = async () => {
     if (!txID || (vault?.state && ![VaultState.FUNDING, VaultState.CLOSED].includes(vault.state))) {
@@ -30,8 +29,7 @@ export function useConfirmationChecker(vault?: Vault): number {
     }
 
     let bitcoinTransactionBlockHeight;
-    console.log(vault?.closingTX);
-    console.log(bitcoinExplorerTXURL);
+
     try {
       const response = await fetch(bitcoinExplorerTXURL, {
         headers: { Accept: 'application/json' },

@@ -46,13 +46,13 @@ export function ProgressTimeline({
             <StepText
               currentStep={currentStep}
               stepIndex={2}
-              width={'25%'}
-              title="Sign Closing Transaction"
+              width={'26%'}
+              title="Sign Closing TX"
             />
             <StepText
               currentStep={currentStep}
               stepIndex={3}
-              width={'13.5%'}
+              width={'12.5%'}
               isLastStep
               title="Mint dlcBTC"
             />

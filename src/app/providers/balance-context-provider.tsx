@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { HasChildren } from '@models/has-children';
 import { RootState } from '@store/index';
 
-import { BlockchainContext } from './blockchain-context-provider';
+import { useBlockchainContext } from '@hooks/use-blockchain-context';
 import { VaultContext } from './vault-context-provider';
 
 interface VaultContextType {
@@ -20,18 +20,17 @@ export const BalanceContext = createContext<VaultContextType>({
 export function BalanceContextProvider({ children }: HasChildren): React.JSX.Element {
   const { address } = useSelector((state: RootState) => state.account);
 
-  const blockchainContext = useContext(BlockchainContext);
-  const { vaults } = useContext(VaultContext);
+  const blockchainContext = useBlockchainContext();
+  const { ethereum } = blockchainContext;
+  const { getDLCBTCBalance, getLockedBTCBalance, isLoaded } = ethereum;
 
-  const ethereum = blockchainContext?.ethereum;
+  const { vaults } = useContext(VaultContext);
 
   const [dlcBTCBalance, setDLCBTCBalance] = useState<number | undefined>(undefined);
   const [lockedBTCBalance, setLockedBTCBalance] = useState<number | undefined>(undefined);
 
   useEffect(() => {
-    if (!ethereum || !address) return;
-
-    const { getDLCBTCBalance, getLockedBTCBalance, isLoaded } = ethereum;
+    if (!address) return;
 
     if (!isLoaded) return;
 
@@ -46,7 +45,7 @@ export function BalanceContextProvider({ children }: HasChildren): React.JSX.Ele
       }
     };
     fetchData();
-  }, [address, vaults, ethereum?.isLoaded]);
+  }, [address, vaults, isLoaded]);
 
   return (
     <BalanceContext.Provider value={{ dlcBTCBalance, lockedBTCBalance }}>
