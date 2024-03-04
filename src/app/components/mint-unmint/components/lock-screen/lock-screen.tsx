@@ -54,7 +54,10 @@ export function LockScreen({
     try {
       setIsSubmitting(true);
       await handleSignFundingTransaction(currentVault.collateral, currentVault.uuid);
-      setIsSubmitting(false);
+      setTimeout(() => {
+        dispatch(mintUnmintActions.setMintStep([2, currentVault.uuid]));
+        setIsSubmitting(false);
+      }, 3000);
     } catch (error) {
       setIsSubmitting(false);
       toast({

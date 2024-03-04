@@ -44,7 +44,6 @@ export function usePSBT(bitcoinHandler: UseBitcoinReturnType): UseSignPSBTReturn
       setFundingTransactionID(fundingTransactionID);
       setMultisigTransaction(multisigTransaction);
 
-      dispatch(mintUnmintActions.setMintStep([2, vaultUUID]));
       return fundingTransactionID;
     } catch (error) {
       throw new BitcoinError(`Error signing funding transaction: ${error}`);
