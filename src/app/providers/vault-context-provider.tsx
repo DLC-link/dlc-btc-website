@@ -1,9 +1,8 @@
 import { createContext } from 'react';
 
+import { useBlockchainContext } from '@hooks/use-blockchain-context';
 import { UseVaultsReturnType, useVaults } from '@hooks/use-vaults';
 import { HasChildren } from '@models/has-children';
-
-import { useBlockchainContext } from '@hooks/use-blockchain-context';
 
 interface VaultContextType {
   vaults: UseVaultsReturnType;

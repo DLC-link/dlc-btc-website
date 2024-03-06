@@ -1,4 +1,3 @@
-
 import { Button, HStack, Image, Spinner, Text, VStack } from '@chakra-ui/react';
 import { VaultCard } from '@components/vault/vault-card';
 import { useBlockchainContext } from '@hooks/use-blockchain-context';

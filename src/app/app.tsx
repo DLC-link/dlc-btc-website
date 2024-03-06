@@ -1,8 +1,8 @@
 import { Route } from 'react-router-dom';
 
 import { AppLayout } from '@components/app.layout';
-import { ProofOfReserve } from '@components/proof-of-reserve/proof-of-reserve';
 import { MyVaults } from '@pages/my-vaults/my-vaults';
+import { ProofOfReservePage } from '@pages/proof-of-reserve/proof-of-reserve-page';
 import { BalanceContextProvider } from '@providers/balance-context-provider';
 
 import { About } from './pages/about/about';
@@ -19,7 +19,7 @@ export function App(): React.JSX.Element {
             <Route path="/" element={<Dashboard />} />
             <Route path="/my-vaults" element={<MyVaults />} />
             <Route path="/how-it-works" element={<About />} />
-            <Route path="/proof-of-reserve" element={<ProofOfReserve />} />
+            <Route path="/proof-of-reserve" element={<ProofOfReservePage />} />
           </AppLayout>
         </BalanceContextProvider>
       </VaultContextProvider>
