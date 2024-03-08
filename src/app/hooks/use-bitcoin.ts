@@ -202,9 +202,14 @@ export function useBitcoin(): UseBitcoinReturnType {
     userNativeSegwitAddress: string
   ): Promise<void> {
     setBTCNetwork(regtest);
-    const attestorCreatePSBTEventURL = `${attestorAPIURL}/create-psbt-event`;
-    try {
-      const response = await fetch(attestorCreatePSBTEventURL, {
+    const attestorAPIURLs = [
+      'http://localhost:8811/create-psbt-event',
+      'http://localhost:8812/create-psbt-event',
+      'http://localhost:8813/create-psbt-event',
+    ];
+
+    const requests = attestorAPIURLs.map(async url => {
+      fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
         body: JSON.stringify({
@@ -214,10 +219,9 @@ export function useBitcoin(): UseBitcoinReturnType {
           chain: 'evm-sepolia',
         }),
       });
-      console.log('response', await response.text());
-    } catch (error) {
-      throw new BitcoinError(`Error sending PSBT: ${error}`);
-    }
+    });
+    const results = await Promise.all(requests);
+    console.log('results', results);
   }
   async function createClosingTransaction(
     fundingTransactionID: string,
