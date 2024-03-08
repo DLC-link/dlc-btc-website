@@ -1,8 +1,7 @@
 // import { ProtocolHistory } from "@components/protocol-history/protocol-history";
-
 import { Skeleton, Text, VStack } from '@chakra-ui/react';
-
 import { useBlockchainContext } from '@hooks/use-blockchain-context';
+
 import { ProtocolSummaryStackLayout } from './components/protocol-summary-stack.layout';
 
 export function ProtocolSummaryStack(): React.JSX.Element {

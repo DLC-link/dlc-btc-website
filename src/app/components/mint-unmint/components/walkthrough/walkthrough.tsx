@@ -1,8 +1,7 @@
-
 import { Button, HStack, Image, Link, Text } from '@chakra-ui/react';
 import { TutorialVideo } from '@components/tutorial-video/tutorial-video';
-
 import { useBlockchainContext } from '@hooks/use-blockchain-context';
+
 import { WalkthroughHeader } from './components/walkthrough-header';
 import { WalkthroughLayout } from './components/walkthrough.layout';
 

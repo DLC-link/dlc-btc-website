@@ -1,10 +1,10 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
+import { useBlockchainContext } from '@hooks/use-blockchain-context';
 import { HasChildren } from '@models/has-children';
 import { RootState } from '@store/index';
 
-import { useBlockchainContext } from '@hooks/use-blockchain-context';
 import { VaultContext } from './vault-context-provider';
 
 interface VaultContextType {
