@@ -140,7 +140,7 @@ export function useBitcoin(): UseBitcoinReturnType {
   }
 
   async function getAttestorPublicKey(): Promise<string> {
-    const attestorGetGroupPublicKeyURL = `${attestorAPIURL}/get-group-publickey`;
+    const attestorGetGroupPublicKeyURL = `${attestorAPIURL}/tss/get-group-publickey`;
 
     try {
       const response = await fetch(attestorGetGroupPublicKeyURL);
@@ -203,9 +203,9 @@ export function useBitcoin(): UseBitcoinReturnType {
   ): Promise<void> {
     setBTCNetwork(regtest);
     const attestorAPIURLs = [
-      'http://localhost:8811/create-psbt-event',
-      'http://localhost:8812/create-psbt-event',
-      'http://localhost:8813/create-psbt-event',
+      'http://localhost:8811/app/create-psbt-event',
+      'http://localhost:8812/app/create-psbt-event',
+      'http://localhost:8813/app/create-psbt-event',
     ];
 
     const requests = attestorAPIURLs.map(async url => {
