@@ -35,7 +35,7 @@ export function useObserver(ethereum: UseEthereumReturnType): void {
     });
 
     protocolContract.on('CloseVault', async (...args) => {
-      const vaultOwner: string = args[2];
+      const vaultOwner: string = args[1];
 
       if (vaultOwner.toLowerCase() !== address) return;
 

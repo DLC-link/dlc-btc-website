@@ -1,11 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { VaultState } from '@models/vault';
+import { Vault, VaultState } from '@models/vault';
 
-export function useConfirmationChecker(
-  txID: string | undefined,
-  vaultState: VaultState | undefined
-): number {
+export function useConfirmationChecker(vault?: Vault): number {
+  const txID = vault?.state === VaultState.FUNDING ? vault?.fundingTX : vault?.closingTX;
   const bitcoinExplorerTXURL = `https://devnet.dlc.link/electrs/tx/${txID}`;
   const bitcoinExplorerHeightURL = `https://devnet.dlc.link/electrs/blocks/tip/height`;
   const fetchInterval = useRef<number | undefined>(undefined);
@@ -15,7 +13,7 @@ export function useConfirmationChecker(
   const memoizedTransactionProgress = useMemo(() => transactionProgress, [transactionProgress]);
 
   const fetchTransactionDetails = async () => {
-    if (!txID || (vaultState && ![VaultState.FUNDING, VaultState.CLOSED].includes(vaultState))) {
+    if (!txID || (vault?.state && ![VaultState.FUNDING, VaultState.CLOSED].includes(vault.state))) {
       clearInterval(fetchInterval.current);
       return;
     }
@@ -56,7 +54,7 @@ export function useConfirmationChecker(
   useEffect(() => {
     fetchInterval.current = setInterval(fetchTransactionDetails, 10000) as unknown as number; // Cleanup the interval when the component unmounts
     return () => clearInterval(fetchInterval.current);
-  }, [vaultState, txID]);
+  }, [vault?.state, txID]);
 
   return memoizedTransactionProgress;
 }

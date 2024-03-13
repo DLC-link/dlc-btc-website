@@ -1,15 +1,16 @@
 // import { ProtocolHistory } from "@components/protocol-history/protocol-history";
-import { useContext } from 'react';
-
 import { Skeleton, Text, VStack } from '@chakra-ui/react';
-import { BlockchainContext } from '@providers/blockchain-context-provider';
+import { useBlockchainContext } from '@hooks/use-blockchain-context';
 
 import { ProtocolSummaryStackLayout } from './components/protocol-summary-stack.layout';
 
 export function ProtocolSummaryStack(): React.JSX.Element {
-  const blockchainContext = useContext(BlockchainContext);
-  const totalSupply = blockchainContext?.ethereum.totalSupply;
-  const bitcoinPrice = blockchainContext?.bitcoin.bitcoinPrice;
+  const blockchainContext = useBlockchainContext();
+  const { ethereum, bitcoin } = blockchainContext;
+
+  const { totalSupply } = ethereum;
+  const { bitcoinPrice } = bitcoin;
+
   return (
     <ProtocolSummaryStackLayout>
       <VStack alignItems={'start'}>

@@ -5,7 +5,7 @@ import { UseEthereumReturnType, useEthereum } from '@hooks/use-ethereum';
 import { useObserver } from '@hooks/use-observer';
 import { HasChildren } from '@models/has-children';
 
-interface BlockchainContextType {
+export interface BlockchainContextType {
   ethereum: UseEthereumReturnType;
   bitcoin: UseBitcoinReturnType;
 }

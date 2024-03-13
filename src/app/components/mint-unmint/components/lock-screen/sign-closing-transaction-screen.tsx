@@ -13,19 +13,19 @@ import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 
 import { LockScreenProtocolFee } from './components/protocol-fee';
 
-interface LockScreenProps {
+interface SignClosingTransactionScreenProps {
   bitcoinHandler: UseBitcoinReturnType;
   ethereumHandler: UseEthereumReturnType;
   psbtHandler: UseSignPSBTReturnType;
   currentStep: [number, string];
 }
 
-export function LockScreen({
+export function SignClosingTransactionScreen({
   currentStep,
   bitcoinHandler,
-  psbtHandler,
   ethereumHandler,
-}: LockScreenProps): React.JSX.Element {
+  psbtHandler,
+}: SignClosingTransactionScreenProps): React.JSX.Element {
   const toast = useToast();
   const dispatch = useDispatch();
 
@@ -33,7 +33,7 @@ export function LockScreen({
 
   const { bitcoinPrice } = bitcoinHandler;
   const { getProtocolFee } = ethereumHandler;
-  const { handleSignFundingTransaction } = psbtHandler;
+  const { handleSignClosingTransaction } = psbtHandler;
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [protocolFeePercentage, setProtocolFeePercentage] = useState<number | undefined>(undefined);
@@ -53,11 +53,8 @@ export function LockScreen({
 
     try {
       setIsSubmitting(true);
-      await handleSignFundingTransaction(currentVault.collateral, currentVault.uuid);
-      setTimeout(() => {
-        dispatch(mintUnmintActions.setMintStep([2, currentVault.uuid]));
-        setIsSubmitting(false);
-      }, 3000);
+      await handleSignClosingTransaction();
+      setIsSubmitting(false);
     } catch (error) {
       setIsSubmitting(false);
       toast({
@@ -83,7 +80,7 @@ export function LockScreen({
         variant={'account'}
         onClick={() => handleClick(currentVault)}
       >
-        Lock BTC
+        Sign Closing TX
       </Button>
       <Button
         isLoading={isSubmitting}
