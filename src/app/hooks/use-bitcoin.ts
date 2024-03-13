@@ -94,7 +94,7 @@ export interface UseBitcoinReturnType {
 }
 
 export function useBitcoin(): UseBitcoinReturnType {
-  const { attestorAPIURL, bitcoinBlockchainAPIURL } = useEndpoints();
+  const { attestorAPIURLs, bitcoinBlockchainAPIURL } = useEndpoints();
   const [bitcoinPrice, setBitcoinPrice] = useState(0);
   const [btcNetwork, setBTCNetwork] = useState<BitcoinNetwork>(regtest);
 
@@ -139,13 +139,10 @@ export function useBitcoin(): UseBitcoinReturnType {
     return utxos;
   }
 
-  async function getAttestorPublicKey(): Promise<string> {
-    const attestorGetGroupPublicKeyURL = `${attestorAPIURL}/tss/get-group-publickey`;
-
+  async function getAttestorPublicKey(attestorGetGroupPublicKeyURL: string): Promise<string> {
     try {
       const response = await fetch(attestorGetGroupPublicKeyURL);
       const attestorGroupPublicKey = await response.text();
-
       return attestorGroupPublicKey;
     } catch (error) {
       throw new BitcoinError(`Error getting attestor public key: ${error}`);
@@ -202,13 +199,8 @@ export function useBitcoin(): UseBitcoinReturnType {
     userNativeSegwitAddress: string
   ): Promise<void> {
     setBTCNetwork(regtest);
-    const attestorAPIURLs = [
-      'http://localhost:8811/app/create-psbt-event',
-      'http://localhost:8812/app/create-psbt-event',
-      'http://localhost:8813/app/create-psbt-event',
-    ];
-
-    const requests = attestorAPIURLs.map(async url => {
+    const createPSBTURLs = attestorAPIURLs.map(url => `${url}/app/create-psbt-event`);
+    const requests = createPSBTURLs.map(async url => {
       fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
@@ -220,8 +212,7 @@ export function useBitcoin(): UseBitcoinReturnType {
         }),
       });
     });
-    const results = await Promise.all(requests);
-    console.log('results', results);
+    await Promise.all(requests);
   }
   async function createClosingTransaction(
     fundingTransactionID: string,
@@ -318,7 +309,8 @@ export function useBitcoin(): UseBitcoinReturnType {
     const userTaprootAddress = userAddresses[1] as BitcoinTaprootAddress;
     const userPublicKey = userTaprootAddress.tweakedPublicKey;
 
-    const attestorPublicKey = await getAttestorPublicKey();
+    const attestorGetGroupPublicKeyURL = `${attestorAPIURLs[0]}/tss/get-group-publickey`;
+    const attestorPublicKey = await getAttestorPublicKey(attestorGetGroupPublicKeyURL);
 
     const userUTXOs = await gatherUTXOs(userAddresses[0] as BitcoinNativeSegwitAddress);
     const { multisigTransaction, multisigAddress } = createMultisigTransactionAndAddress(

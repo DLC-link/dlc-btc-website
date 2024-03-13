@@ -308,8 +308,6 @@ export function useEthereum(): UseEthereumReturnType {
       if (!walletType) throw new Error('Wallet not initialized');
       const walletProvider = getWalletProvider(walletType);
 
-      console.log('walletProvider', walletProvider);
-
       const ethereumAccounts = await walletProvider.request({
         method: 'eth_requestAccounts',
       });
