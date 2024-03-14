@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { BitcoinNetwork, regtest } from '@models/bitcoin-network';
+import { BitcoinNetwork } from '@models/bitcoin-network';
 import { BitcoinError } from '@models/error-types';
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
 import { hex } from '@scure/base';
@@ -8,13 +8,9 @@ import * as btc from '@scure/btc-signer';
 
 import { useEndpoints } from './use-endpoints';
 
-const networkModes = ['mainnet', 'testnet'] as const;
+const networkModes = ['mainnet', 'testnet', 'regtest'] as const;
 
 type NetworkModes = (typeof networkModes)[number];
-
-// type BitcoinTestnetModes = 'testnet' | 'regtest' | 'signet';
-
-// type BitcoinNetworkModes = NetworkModes | BitcoinTestnetModes;
 
 declare enum SignatureHash {
   ALL = 1,
@@ -27,7 +23,7 @@ declare enum SignatureHash {
 interface SignPsbtRequestParams {
   hex: string;
   allowedSighash?: SignatureHash[];
-  signAtIndex?: number | number[];
+  signAtIndex?: number | number[]; // default is all inputs
   network?: NetworkModes; // default is user's current network
   account?: number; // default is user's current account
   broadcast?: boolean; // default is false - finalize/broadcast tx
@@ -94,9 +90,8 @@ export interface UseBitcoinReturnType {
 }
 
 export function useBitcoin(): UseBitcoinReturnType {
-  const { attestorAPIURLs, bitcoinBlockchainAPIURL } = useEndpoints();
+  const { attestorAPIURLs, bitcoinNetwork, bitcoinBlockchainAPIURL } = useEndpoints();
   const [bitcoinPrice, setBitcoinPrice] = useState(0);
-  const [btcNetwork, setBTCNetwork] = useState<BitcoinNetwork>(regtest);
 
   useEffect(() => {
     const getBitcoinPrice = async () => {
@@ -121,7 +116,7 @@ export function useBitcoin(): UseBitcoinReturnType {
     );
     const allUTXOs = await response.json();
     const userPublicKey = hexToBytes(bitcoinNativeSegwitAddress.publicKey);
-    const spend = btc.p2wpkh(userPublicKey, regtest);
+    const spend = btc.p2wpkh(userPublicKey, bitcoinNetwork);
 
     const utxos = await Promise.all(
       allUTXOs.map(async (utxo: UTXO) => {
@@ -198,7 +193,6 @@ export function useBitcoin(): UseBitcoinReturnType {
     uuid: string,
     userNativeSegwitAddress: string
   ): Promise<void> {
-    setBTCNetwork(regtest);
     const createPSBTURLs = attestorAPIURLs.map(url => `${url}/app/create-psbt-event`);
     const requests = createPSBTURLs.map(async url => {
       fetch(url, {
@@ -238,11 +232,9 @@ export function useBitcoin(): UseBitcoinReturnType {
     return closingPSBT;
   }
 
-  async function signPSBT(psbt: Uint8Array, shouldBroadcast: boolean): Promise<string> {
+  async function signPSBT(psbt: Uint8Array): Promise<string> {
     const requestParams: SignPsbtRequestParams = {
       hex: bytesToHex(psbt),
-      signAtIndex: [0],
-      broadcast: shouldBroadcast,
     };
     const result = await window.btc.request('signPsbt', requestParams);
     return result.result.hex;
@@ -254,7 +246,7 @@ export function useBitcoin(): UseBitcoinReturnType {
     utxos: any[],
     btcAmount: number,
     btcNetwork: BitcoinNetwork
-  ): Promise<{ fundingTransactionHex: string; fundingTransactionID: string }> {
+  ): Promise<string> {
     const fundingTransaction = createFundingTransaction(
       multisigAddress,
       userChangeAddress,
@@ -262,7 +254,7 @@ export function useBitcoin(): UseBitcoinReturnType {
       btcAmount,
       btcNetwork
     );
-    const fundingTransactionHex = await signPSBT(fundingTransaction, false);
+    const fundingTransactionHex = await signPSBT(fundingTransaction);
     const transaction = btc.Transaction.fromPSBT(hexToBytes(fundingTransactionHex));
     transaction.finalize();
 
@@ -273,7 +265,7 @@ export function useBitcoin(): UseBitcoinReturnType {
     }).then(async response => {
       fundingTransactionID = await response.text();
     });
-    return { fundingTransactionHex, fundingTransactionID };
+    return fundingTransactionID;
   }
 
   async function handleClosingTransaction(
@@ -291,7 +283,7 @@ export function useBitcoin(): UseBitcoinReturnType {
       btcAmount,
       btcNetwork
     );
-    const closingTransactionHex = await signPSBT(closingTransaction, false);
+    const closingTransactionHex = await signPSBT(closingTransaction);
 
     await sendPSBT(closingTransactionHex, uuid, userAddress);
     return closingTransactionHex;
@@ -316,17 +308,16 @@ export function useBitcoin(): UseBitcoinReturnType {
     const { multisigTransaction, multisigAddress } = createMultisigTransactionAndAddress(
       hex.decode(userPublicKey),
       hex.decode(attestorPublicKey),
-      btcNetwork
+      bitcoinNetwork
     );
 
-    const { fundingTransactionHex, fundingTransactionID } = await handleFundingTransaction(
+    const fundingTransactionID = await handleFundingTransaction(
       multisigAddress,
       userNativeSegwitAddress,
       userUTXOs,
       btcAmount,
-      btcNetwork
+      bitcoinNetwork
     );
-    console.log('fundingTransactionHex', fundingTransactionHex);
 
     return { fundingTransactionID, multisigTransaction, userNativeSegwitAddress, btcAmount };
   }
@@ -347,7 +338,7 @@ export function useBitcoin(): UseBitcoinReturnType {
       userNativeSegwitAddress,
       uuid,
       btcAmount,
-      btcNetwork
+      bitcoinNetwork
     );
   }
 
