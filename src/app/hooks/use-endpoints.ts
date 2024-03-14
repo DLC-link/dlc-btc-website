@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
+import { BitcoinNetwork, bitcoin, regtest, testnet } from '@models/bitcoin-network';
 import { EthereumNetwork } from '@models/network';
 import { RootState } from '@store/index';
 
@@ -9,6 +10,7 @@ interface NetworkEndpoints {
   ethereumExplorerAPIURL: string;
   bitcoinExplorerAPIURL: string;
   bitcoinBlockchainAPIURL: string;
+  bitcoinNetwork: BitcoinNetwork;
 }
 
 export function useEndpoints(): NetworkEndpoints {
@@ -18,6 +20,7 @@ export function useEndpoints(): NetworkEndpoints {
   const [ethereumExplorerAPIURL, setEthereumExplorerAPIURL] = useState<string>('');
   const [bitcoinExplorerAPIURL, setBitcoinExplorerAPIURL] = useState<string>('');
   const [bitcoinBlockchainAPIURL, setBitcoinBlockchainAPIURL] = useState<string>('');
+  const [bitcoinNetwork, setBitcoinNetwork] = useState<BitcoinNetwork>(regtest);
 
   useEffect(() => {
     if (!network) return;
@@ -33,42 +36,50 @@ export function useEndpoints(): NetworkEndpoints {
     setEthereumExplorerAPIURL(ethereumExplorerAPIURL);
     setBitcoinExplorerAPIURL(bitcoinExplorerAPIURL);
     setBitcoinBlockchainAPIURL(bitcoinBlockchainAPIURL);
+    setBitcoinNetwork(bitcoinNetwork);
   }, [network]);
 
   function getEndpoints(): NetworkEndpoints {
+    const attestorAPIURLs: string[] = import.meta.env.VITE_ATTESTOR_API_URLS.split(',');
+
+    const bitcoinNetworkName = import.meta.env.VITE_BITCOIN_NETWORK;
+    let bitcoinNetwork;
+
+    switch (bitcoinNetworkName) {
+      case 'mainnet':
+        bitcoinNetwork = bitcoin;
+        break;
+      case 'testnet':
+        bitcoinNetwork = testnet;
+        break;
+      default:
+        bitcoinNetwork = regtest;
+    }
+
     switch (network?.id) {
       case EthereumNetwork.Sepolia:
         return {
-          attestorAPIURLs: [
-            'https://devnet.dlc.link/attestor-1',
-            'https://devnet.dlc.link/attestor-2',
-            'https://devnet.dlc.link/attestor-3',
-          ],
+          attestorAPIURLs,
           ethereumExplorerAPIURL: 'https://sepolia.etherscan.io/tx/',
           bitcoinExplorerAPIURL: 'http://devnet.dlc.link/electrs/tx/',
           bitcoinBlockchainAPIURL: 'https://devnet.dlc.link/electrs',
+          bitcoinNetwork,
         };
       case EthereumNetwork.Goerli:
         return {
-          attestorAPIURLs: [
-            'http://localhost:8811',
-            'http://localhost:8812',
-            'http://localhost:8813',
-          ],
+          attestorAPIURLs,
           ethereumExplorerAPIURL: 'https://goerli.etherscan.io/tx/',
           bitcoinExplorerAPIURL: 'https://blockstream.info/testnet/tx/',
           bitcoinBlockchainAPIURL: 'https://devnet.dlc.link/electrs',
+          bitcoinNetwork,
         };
       case EthereumNetwork.X1Testnet:
         return {
-          attestorAPIURLs: [
-            'http://localhost:8811',
-            'http://localhost:8812',
-            'http://localhost:8813',
-          ],
+          attestorAPIURLs,
           ethereumExplorerAPIURL: 'https://www.oklink.com/x1-test/tx/',
           bitcoinExplorerAPIURL: 'http://devnet.dlc.link/electrs/tx/',
           bitcoinBlockchainAPIURL: 'https://devnet.dlc.link/electrs',
+          bitcoinNetwork,
         };
       default:
         throw new Error(`Unsupported network: ${network?.name}`);
@@ -79,5 +90,6 @@ export function useEndpoints(): NetworkEndpoints {
     ethereumExplorerAPIURL,
     bitcoinExplorerAPIURL,
     bitcoinBlockchainAPIURL,
+    bitcoinNetwork,
   };
 }
