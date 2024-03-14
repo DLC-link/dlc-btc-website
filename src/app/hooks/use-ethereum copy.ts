@@ -1,10 +1,17 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { EthereumError } from '@models/error-types';
-import { EthereumNetwork, Network, addNetworkParams, hexChainIDs } from '@models/network';
+import {
+  EthereumNetwork,
+  Network,
+  addNetworkParams,
+  ethereumNetworks,
+  hexChainIDs,
+} from '@models/network';
 import { WalletType } from '@models/wallet';
+import { EthereumContext } from '@providers/blockchain-context-provider';
 import { RootState, store } from '@store/index';
 import { accountActions } from '@store/slices/account/account.actions';
 import { ethers } from 'ethers';
@@ -12,7 +19,6 @@ import { Logger } from 'ethers/lib/utils';
 
 export interface UseEthereumReturnType {
   connectEthereumAccount: (network: Network, walletType: WalletType) => Promise<void>;
-  ethereumSigner: ethers.providers.JsonRpcSigner | null;
   isLoaded: boolean;
 }
 
@@ -27,10 +33,12 @@ function throwEthereumError(message: string, error: any): void {
 }
 
 export function useEthereumAccount(): UseEthereumReturnType {
-  const { network, walletType } = useSelector((state: RootState) => state.account);
+  // const { network, walletType } = useSelector((state: RootState) => state.account);
+  const { setEthereumSigner } = useContext(EthereumContext);
+  const network = ethereumNetworks[2];
+  const walletType = WalletType.Metamask;
 
   const [walletProvider, setWalletProvider] = useState<any>(null);
-  const [ethereumSigner, setEthereumSigner] = useState<any>(null);
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
   function validateMetaMask(provider: any): boolean {
@@ -141,7 +149,7 @@ export function useEthereumAccount(): UseEthereumReturnType {
     }
   }
 
-  async function getEthereumSigner() {
+  async function getEthereumSigner(walletProvider: any) {
     if (!walletType) throw new Error('Please select a wallet to connect to Ethereum.');
     if (!network) throw new Error('Please select a network to connect to Ethereum.');
 
@@ -156,28 +164,33 @@ export function useEthereumAccount(): UseEthereumReturnType {
         await switchEthereumNetwork(network.id);
         window.location.reload();
       }
-
-      return signer;
+      console.log('setEthereumSigner:', setEthereumSigner);
+      setEthereumSigner(signer);
     } catch (error) {
-      throwEthereumError(`Could not connect to Ethereum: `, error);
+      throw new Error(`Could not get Ethereum signer: ${error}`);
     }
   }
 
   async function connectEthereumAccount() {
     try {
+      console.log('Connecting to Ethereum...');
+      console.log('Wallet type:', walletType);
+
       if (!walletType) throw new Error('Please select a wallet to connect to Ethereum.');
       if (!network) throw new Error('Please select a network to connect to Ethereum.');
+      console.log('Network:', network);
 
       setIsLoaded(false);
 
       const walletProvider = getWalletProvider();
+      console.log('Wallet Provider:', walletProvider);
       setWalletProvider(walletProvider);
 
       const ethereumAccounts = await walletProvider.request({
         method: 'eth_requestAccounts',
       });
 
-      const ethereumSigner = await getEthereumSigner();
+      const ethereumSigner = await getEthereumSigner(walletProvider);
       setEthereumSigner(ethereumSigner);
 
       const accountInformation = {
@@ -190,13 +203,12 @@ export function useEthereumAccount(): UseEthereumReturnType {
 
       setIsLoaded(true);
     } catch (error) {
-      throwEthereumError(`Could not connect to Ethereum: `, error);
+      throw Error(`Could not connect to Ethereum: ${error}`);
     }
   }
 
   return {
     connectEthereumAccount,
-    ethereumSigner,
     isLoaded,
   };
 }

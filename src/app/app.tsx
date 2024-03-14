@@ -7,12 +7,12 @@ import { BalanceContextProvider } from '@providers/balance-context-provider';
 
 import { About } from './pages/about/about';
 import { Dashboard } from './pages/dashboard/dashboard';
-import { BlockchainContextProvider } from './providers/blockchain-context-provider';
+import { EthereumContextProvider } from './providers/blockchain-context-provider';
 import { VaultContextProvider } from './providers/vault-context-provider';
 
 export function App(): React.JSX.Element {
   return (
-    <BlockchainContextProvider>
+    <EthereumContextProvider>
       <VaultContextProvider>
         <BalanceContextProvider>
           <AppLayout>
@@ -23,6 +23,6 @@ export function App(): React.JSX.Element {
           </AppLayout>
         </BalanceContextProvider>
       </VaultContextProvider>
-    </BlockchainContextProvider>
+    </EthereumContextProvider>
   );
 }

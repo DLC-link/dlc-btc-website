@@ -2,16 +2,21 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { VaultState } from '@models/vault';
+import { EthereumContractConfig } from '@providers/blockchain-context-provider';
 import { RootState } from '@store/index';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { modalActions } from '@store/slices/modal/modal.actions';
 
 import { UseEthereumReturnType } from './use-ethereum';
 
-export function useObserver(ethereum: UseEthereumReturnType): void {
+export function useObserver(
+  ethereumContractConfig: EthereumContractConfig,
+  ethereumHandler: UseEthereumReturnType
+): void {
   const dispatch = useDispatch();
   const { address, network } = useSelector((state: RootState) => state.account);
-  const { protocolContract, dlcBTCContract, getVault } = ethereum;
+  const { protocolContract, dlcBTCContract } = ethereumContractConfig;
+  const { getVault } = ethereumHandler;
 
   useEffect(() => {
     if (!protocolContract || !dlcBTCContract) return;

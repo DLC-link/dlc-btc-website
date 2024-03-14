@@ -1,6 +1,5 @@
 import { Button, HStack, Image, Spinner, Text, VStack } from '@chakra-ui/react';
 import { VaultCard } from '@components/vault/vault-card';
-import { useBlockchainContext } from '@hooks/use-blockchain-context';
 import { Vault } from '@models/vault';
 
 interface VaultsListGroupContainerProps {
@@ -18,9 +17,13 @@ export function VaultsListGroupContainer({
   isSelectable = false,
   handleSelect,
 }: VaultsListGroupContainerProps): React.JSX.Element | boolean {
-  const blockchainContext = useBlockchainContext();
-  const { ethereum } = blockchainContext;
-  const { recommendTokenToMetamask } = ethereum;
+  // const ethereumHandler = useEthereum();
+  // const { recommendTokenToMetamask } = ethereum;
+
+  //TODO: Add back recommended token to metamask
+  function recommendTokenToMetamask() {
+    return;
+  }
 
   if (vaults.length === 0) return false;
 

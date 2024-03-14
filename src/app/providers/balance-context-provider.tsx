@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
-import { useBlockchainContext } from '@hooks/use-blockchain-context';
+import { useEthereum } from '@hooks/use-ethereum';
 import { HasChildren } from '@models/has-children';
 import { RootState } from '@store/index';
 
@@ -20,9 +20,8 @@ export const BalanceContext = createContext<VaultContextType>({
 export function BalanceContextProvider({ children }: HasChildren): React.JSX.Element {
   const { address } = useSelector((state: RootState) => state.account);
 
-  const blockchainContext = useBlockchainContext();
-  const { ethereum } = blockchainContext;
-  const { getDLCBTCBalance, getLockedBTCBalance, isLoaded } = ethereum;
+  const ethereumHandler = useEthereum();
+  const { getDLCBTCBalance, getLockedBTCBalance, isLoaded } = ethereumHandler;
 
   const { vaults } = useContext(VaultContext);
 

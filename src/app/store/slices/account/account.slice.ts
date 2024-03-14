@@ -1,4 +1,4 @@
-import { Network } from '@models/network';
+import { EthereumNetwork, Network, ethereumNetworks } from '@models/network';
 import { WalletType } from '@models/wallet';
 import { createSlice } from '@reduxjs/toolkit';
 
@@ -13,8 +13,8 @@ interface AccountState {
 
 export const initialAccountState: AccountState = {
   address: undefined,
-  walletType: undefined,
-  network: undefined,
+  walletType: WalletType.Metamask,
+  network: ethereumNetworks[3],
   dlcBTCBalance: 0,
   lockedBTCBalance: 0,
   loadedAt: undefined,

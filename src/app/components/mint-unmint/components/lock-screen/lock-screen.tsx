@@ -3,8 +3,8 @@ import { useDispatch } from 'react-redux';
 
 import { Button, VStack, useToast } from '@chakra-ui/react';
 import { VaultCard } from '@components/vault/vault-card';
-import { UseBitcoinReturnType } from '@hooks/use-bitcoin';
-import { UseEthereumReturnType } from '@hooks/use-ethereum';
+import { UseBitcoinReturnType, useBitcoin } from '@hooks/use-bitcoin';
+import { UseEthereumReturnType, useEthereum } from '@hooks/use-ethereum';
 import { UseSignPSBTReturnType } from '@hooks/use-psbt';
 import { useVaults } from '@hooks/use-vaults';
 import { BitcoinError } from '@models/error-types';
@@ -14,20 +14,15 @@ import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { LockScreenProtocolFee } from './components/protocol-fee';
 
 interface LockScreenProps {
-  bitcoinHandler: UseBitcoinReturnType;
-  ethereumHandler: UseEthereumReturnType;
-  psbtHandler: UseSignPSBTReturnType;
   currentStep: [number, string];
 }
 
-export function LockScreen({
-  currentStep,
-  bitcoinHandler,
-  psbtHandler,
-  ethereumHandler,
-}: LockScreenProps): React.JSX.Element {
+export function LockScreen({ currentStep }: LockScreenProps): React.JSX.Element {
   const toast = useToast();
   const dispatch = useDispatch();
+
+  const bitcoinHandler = useBitcoin();
+  const ethereumHandler = useEthereum();
 
   const { readyVaults } = useVaults();
 

@@ -1,6 +1,5 @@
 import { Button, HStack, Image, Link, Text } from '@chakra-ui/react';
 import { TutorialVideo } from '@components/tutorial-video/tutorial-video';
-import { useBlockchainContext } from '@hooks/use-blockchain-context';
 
 import { WalkthroughHeader } from './components/walkthrough-header';
 import { WalkthroughLayout } from './components/walkthrough.layout';
@@ -11,9 +10,13 @@ interface WalkthroughProps {
 }
 
 export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.Element {
-  const blockchainContext = useBlockchainContext();
-  const { ethereum } = blockchainContext;
-  const { recommendTokenToMetamask } = ethereum;
+  // const ethereumHandler = useEthereum();
+  // const { recommendTokenToMetamask } = ethereumHandler;
+
+  //TODO: Add back recommended token to metamask
+  function recommendTokenToMetamask() {
+    return;
+  }
 
   switch (flow) {
     case 'mint':

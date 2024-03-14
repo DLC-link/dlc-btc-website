@@ -23,9 +23,7 @@ export function useVaults(ethereum?: UseEthereumReturnType): UseVaultsReturnType
 
   useEffect(() => {
     if (!address || !network || !ethereum) return;
-    const { getAllVaults, isLoaded: isEthereumConfigLoaded } = ethereum;
-
-    if (!isEthereumConfigLoaded) return;
+    const { getAllVaults } = ethereum;
 
     const fetchData = async () => {
       setIsLoading(true);
@@ -33,7 +31,7 @@ export function useVaults(ethereum?: UseEthereumReturnType): UseVaultsReturnType
       setIsLoading(false);
     };
     fetchData();
-  }, [address, network, ethereum?.isLoaded]);
+  }, [address, network]);
 
   const allVaults = useMemo(
     () => [...vaults[network ? network.id : '1']].sort((a, b) => b.timestamp - a.timestamp),

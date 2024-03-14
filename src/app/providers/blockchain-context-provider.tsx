@@ -1,55 +1,57 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 
-import { UseBitcoinReturnType, useBitcoin } from '@hooks/use-bitcoin';
-import { UseEthereumReturnType, useEthereum } from '@hooks/use-ethereum';
-import { useEthereumAccount } from '@hooks/use-ethereum copy';
+import { useEthereum } from '@hooks/use-ethereum';
+import { useEthereumContracts } from '@hooks/use-ethereum-contracts';
 import { useObserver } from '@hooks/use-observer';
 import { HasChildren } from '@models/has-children';
-import { ethers } from 'ethers';
+import { Contract, ethers } from 'ethers';
 
-export interface BlockchainContextType {
-  ethereum: UseEthereumReturnType;
-  bitcoin: UseBitcoinReturnType;
+export interface EthereumContextProviderType {
+  ethereumContractConfig: EthereumContractConfig;
+  setEthereumSigner: (signer: ethers.providers.JsonRpcSigner) => void;
 }
 
-interface EthereumContractConfig {
-  protocolContract: ethers.Contract | undefined;
-  dlcManagerContract: ethers.Contract | undefined;
-  dlcBTCContract: ethers.Contract | undefined;
+export interface EthereumContractConfig {
+  protocolContract: Contract | undefined;
+  dlcManagerContract: Contract | undefined;
+  dlcBTCContract: Contract | undefined;
 }
 
-export const BlockchainContext = createContext<BlockchainContextType | null>(null);
+export const EthereumContext = createContext<any>({});
 
-export function BlockchainContextProvider({ children }: HasChildren): React.JSX.Element {
-  const [ethereumSigner, setEthereumSigner] = useState<any>(null);
-  const [ethereumContractConfig, setEthereumContractConfig] = useState<
-    EthereumContractConfig | undefined
-  >(undefined);
+export function EthereumContextProvider({ children }: HasChildren): React.JSX.Element {
+  const ethereumSigner = React.useRef<any>();
 
-  function setContract(contractName: string, contract: ethers.Contract): void {
-    switch (contractName) {
-      case 'protocolContract':
-        setEthereumContractConfig({ ...ethereumContractConfig, protocolContract: contract });
-        break;
-      case 'dlcManagerContract':
-        setEthereumContractConfig({ ...ethereumContractConfig, dlcManagerContract: contract });
-        break;
-      case 'dlcBTCContract':
-        setEthereumContractConfig({ ...ethereumContractConfig, dlcBTCContract: contract });
-        break;
-      default:
-        throw new Error('Invalid contract');
-    }
+  function setEthereumSignerHandler(signer: ethers.providers.JsonRpcSigner): void {
+    if (signer === undefined) return;
+    console.log('Setting Ethereum Signer:', signer);
+
+    ethereumSigner.current = signer;
   }
 
-  const ethereum = useEthereum();
-  const bitcoin = useBitcoin();
+  const { protocolContract, dlcManagerContract, dlcBTCContract } = useEthereumContracts(
+    ethereumSigner.current
+  );
 
-  useObserver(ethereum);
+  useEffect(() => {
+    console.log('Ethereum Signer:', ethereumSigner);
+    console.log('Protocol Contract:', protocolContract);
+    console.log('DLC Manager Contract:', dlcManagerContract);
+    console.log('DLC BTC Contract:', dlcBTCContract);
+  }, [ethereumSigner, protocolContract, dlcManagerContract, dlcBTCContract]);
+
+  const ethereumHandler = useEthereum();
+
+  useObserver({ protocolContract, dlcManagerContract, dlcBTCContract }, ethereumHandler);
 
   return (
-    <BlockchainContext.Provider value={{ ethereum, bitcoin }}>
+    <EthereumContext.Provider
+      value={{
+        ethereumContractConfig: { protocolContract, dlcManagerContract, dlcBTCContract },
+        setEthereumSigner: setEthereumSignerHandler,
+      }}
+    >
       {children}
-    </BlockchainContext.Provider>
+    </EthereumContext.Provider>
   );
 }

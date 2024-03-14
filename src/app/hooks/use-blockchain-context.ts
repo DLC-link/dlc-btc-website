@@ -1,9 +1,12 @@
 import { useContext } from 'react';
 
-import { BlockchainContext, BlockchainContextType } from '@providers/blockchain-context-provider';
+import {
+  EthereumContext,
+  EthereumContextProviderType,
+} from '@providers/blockchain-context-provider';
 
-export function useBlockchainContext(): BlockchainContextType {
-  const blockchainContext = useContext(BlockchainContext);
+export function useBlockchainContext(): EthereumContextProviderType {
+  const blockchainContext = useContext(EthereumContext);
 
   if (!blockchainContext) {
     throw new Error(

@@ -1,8 +1,6 @@
 import { useSelector } from 'react-redux';
 
 import { HStack } from '@chakra-ui/react';
-import { useBlockchainContext } from '@hooks/use-blockchain-context';
-import { usePSBT } from '@hooks/use-psbt';
 import { RootState } from '@store/index';
 
 import { LockScreen } from '../lock-screen/lock-screen';
@@ -14,9 +12,6 @@ import { Walkthrough } from '../walkthrough/walkthrough';
 import { MintLayout } from './components/mint.layout';
 
 export function Mint(): React.JSX.Element {
-  const { bitcoin, ethereum } = useBlockchainContext();
-  const psbtHandler = usePSBT(bitcoin);
-
   const { mintStep } = useSelector((state: RootState) => state.mintunmint);
 
   return (
