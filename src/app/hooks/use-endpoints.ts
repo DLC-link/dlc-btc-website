@@ -43,6 +43,8 @@ export function useEndpoints(): NetworkEndpoints {
     const attestorAPIURLs: string[] = import.meta.env.VITE_ATTESTOR_API_URLS.split(',');
 
     const bitcoinNetworkName = import.meta.env.VITE_BITCOIN_NETWORK;
+    const bitcoinBlockchainAPIURL = import.meta.env.VITE_BITCOIN_BLOCKCHAIN_API_URL;
+    const bitcoinExplorerAPIURL = import.meta.env.VITE_BITCOIN_EXPLORER_API_URL;
     let bitcoinNetwork;
 
     switch (bitcoinNetworkName) {
@@ -61,24 +63,24 @@ export function useEndpoints(): NetworkEndpoints {
         return {
           attestorAPIURLs,
           ethereumExplorerAPIURL: 'https://sepolia.etherscan.io/tx/',
-          bitcoinExplorerAPIURL: 'http://devnet.dlc.link/electrs/tx/',
-          bitcoinBlockchainAPIURL: 'https://devnet.dlc.link/electrs',
+          bitcoinExplorerAPIURL,
+          bitcoinBlockchainAPIURL,
           bitcoinNetwork,
         };
       case EthereumNetwork.Goerli:
         return {
           attestorAPIURLs,
           ethereumExplorerAPIURL: 'https://goerli.etherscan.io/tx/',
-          bitcoinExplorerAPIURL: 'https://blockstream.info/testnet/tx/',
-          bitcoinBlockchainAPIURL: 'https://devnet.dlc.link/electrs',
+          bitcoinExplorerAPIURL,
+          bitcoinBlockchainAPIURL,
           bitcoinNetwork,
         };
       case EthereumNetwork.X1Testnet:
         return {
           attestorAPIURLs,
           ethereumExplorerAPIURL: 'https://www.oklink.com/x1-test/tx/',
-          bitcoinExplorerAPIURL: 'http://devnet.dlc.link/electrs/tx/',
-          bitcoinBlockchainAPIURL: 'https://devnet.dlc.link/electrs',
+          bitcoinExplorerAPIURL,
+          bitcoinBlockchainAPIURL,
           bitcoinNetwork,
         };
       default:
