@@ -5,13 +5,13 @@ import { useSelector } from 'react-redux';
 import { customShiftValue } from '@common/utilities';
 import { EthereumError } from '@models/error-types';
 import { RawVault, Vault, VaultState } from '@models/vault';
-import { EthereumContext } from '@providers/blockchain-context-provider';
+import { VaultContext } from '@providers/vault-context-provider';
 import { RootState, store } from '@store/index';
 import { vaultActions } from '@store/slices/vault/vault.actions';
 import { ethers } from 'ethers';
 import { Logger } from 'ethers/lib/utils';
 
-import { useVaults } from './use-vaults';
+import { useEthereumContext } from './use-ethereum-context';
 
 export interface UseEthereumReturnType {
   getDLCBTCBalance: () => Promise<number | undefined>;
@@ -22,11 +22,9 @@ export interface UseEthereumReturnType {
   getVault: (vaultUUID: string, vaultState: VaultState) => Promise<void>;
   setupVault: (btcDepositAmount: number) => Promise<void>;
   closeVault: (vaultUUID: string) => Promise<void>;
-  // recommendTokenToMetamask: () => Promise<boolean>;
-  isLoaded: boolean;
 }
 
-function throwEthereumError(message: string, error: any): void {
+export function throwEthereumError(message: string, error: any): void {
   if (error.code === Logger.errors.CALL_EXCEPTION) {
     throw new EthereumError(
       `${message}${error instanceof Error && 'errorName' in error ? error.errorName : error}`
@@ -37,18 +35,21 @@ function throwEthereumError(message: string, error: any): void {
 }
 
 export function useEthereum(): UseEthereumReturnType {
-  const { ethereumContractConfig } = useContext(EthereumContext);
-  const { fundedVaults } = useVaults();
+  const { vaults } = useContext(VaultContext);
+  const { protocolContract, dlcBTCContract } = useEthereumContext();
+
   const { address, network } = useSelector((state: RootState) => state.account);
 
   const [totalSupply, setTotalSupply] = useState<number | undefined>(undefined);
-  const [isLoaded, setIsLoaded] = useState<boolean>(false);
+
+  const fetchTotalSupplyIfReady = async () => {
+    if (network) {
+      await getTotalSupply();
+    }
+  };
 
   useEffect(() => {
-    const fetchTotalSupply = async () => {
-      await getTotalSupply();
-    };
-    fetchTotalSupply();
+    fetchTotalSupplyIfReady();
   }, [network]);
 
   function formatVault(vault: any): Vault {
@@ -86,10 +87,9 @@ export function useEthereum(): UseEthereumReturnType {
   }
 
   async function getProtocolFee(): Promise<number | undefined> {
-    if (!ethereumContractConfig.protocolContract)
-      throw new Error('Protocol contract not initialized');
+    if (!protocolContract) throw new Error('Protocol contract not initialized');
     try {
-      const btcMintFeeRate = await ethereumContractConfig.protocolContract.btcMintFeeRate();
+      const btcMintFeeRate = await protocolContract.btcMintFeeRate();
       return customShiftValue(btcMintFeeRate.toNumber(), 4, true);
     } catch (error) {
       throwEthereumError(`Could not fetch protocol fee: `, error);
@@ -98,7 +98,7 @@ export function useEthereum(): UseEthereumReturnType {
 
   async function getLockedBTCBalance(): Promise<number | undefined> {
     try {
-      const totalCollateral = fundedVaults.reduce(
+      const totalCollateral = vaults.fundedVaults.reduce(
         (sum: number, vault: Vault) => sum + vault.collateral,
         0
       );
@@ -110,11 +110,10 @@ export function useEthereum(): UseEthereumReturnType {
 
   async function getDLCBTCBalance(): Promise<number | undefined> {
     try {
-      if (!ethereumContractConfig.dlcBTCContract)
-        throw new Error('Protocol contract not initialized');
-      await ethereumContractConfig.dlcBTCContract.callStatic.balanceOf(address);
+      if (!dlcBTCContract) throw new Error('Protocol contract not initialized');
+      await dlcBTCContract.callStatic.balanceOf(address);
       const dlcBTCBalance = customShiftValue(
-        parseInt(await ethereumContractConfig.dlcBTCContract.balanceOf(address)),
+        parseInt(await dlcBTCContract.balanceOf(address)),
         8,
         true
       );
@@ -126,11 +125,9 @@ export function useEthereum(): UseEthereumReturnType {
 
   async function getAllVaults(): Promise<void> {
     try {
-      if (!ethereumContractConfig.protocolContract)
-        throw new Error('Protocol contract not initialized');
-      await ethereumContractConfig.protocolContract.callStatic.getAllVaultsForAddress(address);
-      const vaults: RawVault[] =
-        await ethereumContractConfig.protocolContract.getAllVaultsForAddress(address);
+      if (!protocolContract) throw new Error('Protocol contract not initialized');
+      await protocolContract.callStatic.getAllVaultsForAddress(address);
+      const vaults: RawVault[] = await protocolContract.getAllVaultsForAddress(address);
       const formattedVaults: Vault[] = vaults.map(formatVault);
       if (!network) return;
       store.dispatch(
@@ -152,9 +149,8 @@ export function useEthereum(): UseEthereumReturnType {
   ): Promise<void> {
     for (let i = 0; i < maxRetries; i++) {
       try {
-        if (!ethereumContractConfig.protocolContract)
-          throw new Error('Protocol contract not initialized');
-        const vault: RawVault = await ethereumContractConfig.protocolContract.getVault(vaultUUID);
+        if (!protocolContract) throw new Error('Protocol contract not initialized');
+        const vault: RawVault = await protocolContract.getVault(vaultUUID);
         if (!vault) throw new Error('Vault is undefined');
         if (vault.status !== vaultState) throw new Error('Vault is not in the correct state');
         const formattedVault: Vault = formatVault(vault);
@@ -177,10 +173,9 @@ export function useEthereum(): UseEthereumReturnType {
 
   async function setupVault(btcDepositAmount: number): Promise<void> {
     try {
-      if (!ethereumContractConfig.protocolContract)
-        throw new Error('Protocol contract not initialized');
-      await ethereumContractConfig.protocolContract.callStatic.setupVault(btcDepositAmount);
-      await ethereumContractConfig.protocolContract.setupVault(btcDepositAmount);
+      if (!protocolContract) throw new Error('Protocol contract not initialized');
+      await protocolContract.callStatic.setupVault(btcDepositAmount);
+      await protocolContract.setupVault(btcDepositAmount);
     } catch (error: any) {
       throwEthereumError(`Could not setup vault: `, error);
     }
@@ -188,40 +183,13 @@ export function useEthereum(): UseEthereumReturnType {
 
   async function closeVault(vaultUUID: string) {
     try {
-      if (!ethereumContractConfig.protocolContract)
-        throw new Error('Protocol contract not initialized');
-      await ethereumContractConfig.protocolContract.callStatic.closeVault(vaultUUID);
-      await ethereumContractConfig.protocolContract.closeVault(vaultUUID);
+      if (!protocolContract) throw new Error('Protocol contract not initialized');
+      await protocolContract.callStatic.closeVault(vaultUUID);
+      await protocolContract.closeVault(vaultUUID);
     } catch (error) {
       throwEthereumError(`Could not close vault: `, error);
     }
   }
-
-  // async function recommendTokenToMetamask(): Promise<boolean> {
-  //   try {
-  //     if (!currentWalletType) throw new Error('Wallet not initialized');
-  //     const walletProvider = getWalletProvider(currentWalletType);
-
-  //     const response = await walletProvider.request({
-  //       method: 'wallet_watchAsset',
-  //       params: {
-  //         type: 'ERC20',
-  //         options: {
-  //           address: dlcBTCContract?.address,
-  //           symbol: 'dlcBTC',
-  //           decimals: 8,
-  //           image:
-  //             'https://cdn.discordapp.com/attachments/994505799902691348/1035507437748367360/DLC.Link_Emoji.png',
-  //         },
-  //       },
-  //     });
-  //     await response.wait();
-  //     return response;
-  //   } catch (error) {
-  //     throwEthereumError(`Could not recommend dlcBTC token to MetaMask: `, error);
-  //     return false;
-  //   }
-  // }
 
   return {
     getDLCBTCBalance,
@@ -232,7 +200,5 @@ export function useEthereum(): UseEthereumReturnType {
     getVault,
     setupVault,
     closeVault,
-    isLoaded,
-    // recommendTokenToMetamask,
   };
 }

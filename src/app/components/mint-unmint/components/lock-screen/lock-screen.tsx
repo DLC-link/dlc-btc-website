@@ -3,9 +3,9 @@ import { useDispatch } from 'react-redux';
 
 import { Button, VStack, useToast } from '@chakra-ui/react';
 import { VaultCard } from '@components/vault/vault-card';
-import { UseBitcoinReturnType, useBitcoin } from '@hooks/use-bitcoin';
-import { UseEthereumReturnType, useEthereum } from '@hooks/use-ethereum';
-import { UseSignPSBTReturnType } from '@hooks/use-psbt';
+import { useBitcoin } from '@hooks/use-bitcoin';
+import { useEthereum } from '@hooks/use-ethereum';
+import { usePSBT } from '@hooks/use-psbt';
 import { useVaults } from '@hooks/use-vaults';
 import { BitcoinError } from '@models/error-types';
 import { Vault } from '@models/vault';
@@ -21,14 +21,10 @@ export function LockScreen({ currentStep }: LockScreenProps): React.JSX.Element 
   const toast = useToast();
   const dispatch = useDispatch();
 
-  const bitcoinHandler = useBitcoin();
-  const ethereumHandler = useEthereum();
-
+  const { bitcoinPrice } = useBitcoin();
+  const { getProtocolFee } = useEthereum();
   const { readyVaults } = useVaults();
-
-  const { bitcoinPrice } = bitcoinHandler;
-  const { getProtocolFee } = ethereumHandler;
-  const { handleSignFundingTransaction } = psbtHandler;
+  const { handleSignFundingTransaction } = usePSBT();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [protocolFeePercentage, setProtocolFeePercentage] = useState<number | undefined>(undefined);

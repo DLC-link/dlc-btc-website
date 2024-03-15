@@ -1,6 +1,5 @@
 import { createContext } from 'react';
 
-import { useEthereum } from '@hooks/use-ethereum';
 import { UseVaultsReturnType, useVaults } from '@hooks/use-vaults';
 import { HasChildren } from '@models/has-children';
 
@@ -21,8 +20,7 @@ export const VaultContext = createContext<VaultContextType>({
 });
 
 export function VaultContextProvider({ children }: HasChildren): React.JSX.Element {
-  const ethereumHandler = useEthereum();
-  const vaults = useVaults(ethereumHandler);
+  const vaults = useVaults();
 
   return <VaultContext.Provider value={{ vaults }}>{children}</VaultContext.Provider>;
 }

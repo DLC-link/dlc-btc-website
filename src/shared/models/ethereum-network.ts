@@ -1,51 +1,51 @@
-export interface Network {
-  id: EthereumNetwork;
+export interface EthereumNetwork {
+  id: EthereumNetworkID;
   name: string;
 }
 
-export enum EthereumNetwork {
+export enum EthereumNetworkID {
   Mainnet = '1',
   Goerli = '5',
   Sepolia = '11155111',
   X1Testnet = '195',
 }
 
-const ethereumOKXTestnet: Network = {
+const ethereumOKXTestnet: EthereumNetwork = {
   name: 'X1Test',
-  id: EthereumNetwork.X1Testnet,
+  id: EthereumNetworkID.X1Testnet,
 };
 
-const ethereumMainnet: Network = {
+const ethereumMainnet: EthereumNetwork = {
   name: 'Mainnet',
-  id: EthereumNetwork.Mainnet,
+  id: EthereumNetworkID.Mainnet,
 };
 
-const ethereumGoerli: Network = {
+const ethereumGoerli: EthereumNetwork = {
   name: 'Goerli',
-  id: EthereumNetwork.Goerli,
+  id: EthereumNetworkID.Goerli,
 };
 
-const ethereumSepolia: Network = {
+const ethereumSepolia: EthereumNetwork = {
   name: 'Sepolia',
-  id: EthereumNetwork.Sepolia,
+  id: EthereumNetworkID.Sepolia,
 };
 
-export const ethereumNetworks: Network[] = [
+export const ethereumNetworks: EthereumNetwork[] = [
   ethereumMainnet,
   ethereumGoerli,
   ethereumSepolia,
   ethereumOKXTestnet,
 ];
 
-export const hexChainIDs: { [key in EthereumNetwork]: string } = {
-  [EthereumNetwork.Mainnet]: '0x1',
-  [EthereumNetwork.Goerli]: '0x5',
-  [EthereumNetwork.Sepolia]: '0xAA36A7',
-  [EthereumNetwork.X1Testnet]: '0x3C',
+export const hexChainIDs: { [key in EthereumNetworkID]: string } = {
+  [EthereumNetworkID.Mainnet]: '0x1',
+  [EthereumNetworkID.Goerli]: '0x5',
+  [EthereumNetworkID.Sepolia]: '0xAA36A7',
+  [EthereumNetworkID.X1Testnet]: '0x3C',
 };
 
 export const addNetworkParams = {
-  [EthereumNetwork.X1Testnet]: [
+  [EthereumNetworkID.X1Testnet]: [
     {
       chainId: '0xC3',
       rpcUrls: ['https://testrpc.x1.tech', 'https://x1testrpc.okx.com/'],
@@ -58,7 +58,7 @@ export const addNetworkParams = {
       blockExplorerUrls: ['https://www.oklink.com/x1-test'],
     },
   ],
-  [EthereumNetwork.Sepolia]: [
+  [EthereumNetworkID.Sepolia]: [
     {
       chainId: '11155111',
       rpcUrls: ['https://ethereum-sepolia.publicnode.com/', 'https://sepolia.infura.io/v3/'],
@@ -71,7 +71,7 @@ export const addNetworkParams = {
       blockExplorerUrls: ['https://sepolia.etherscan.io/'],
     },
   ],
-  [EthereumNetwork.Goerli]: [
+  [EthereumNetworkID.Goerli]: [
     {
       chainId: '5',
       rpcUrls: ['https://ethereum-goerli.publicnode.com', 'https://goerli.infura.io/v3/'],
@@ -84,7 +84,7 @@ export const addNetworkParams = {
       blockExplorerUrls: ['https://goerli.etherscan.io/'],
     },
   ],
-  [EthereumNetwork.Mainnet]: [
+  [EthereumNetworkID.Mainnet]: [
     {
       chainId: '1',
       rpcUrls: ['https://mainnet.infura.io/v3/'],

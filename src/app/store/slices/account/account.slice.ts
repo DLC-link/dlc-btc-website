@@ -1,11 +1,11 @@
-import { EthereumNetwork, Network, ethereumNetworks } from '@models/network';
+import { EthereumNetwork, ethereumNetworks } from '@models/ethereum-network';
 import { WalletType } from '@models/wallet';
 import { createSlice } from '@reduxjs/toolkit';
 
 interface AccountState {
   address: string | undefined;
   walletType: WalletType | undefined;
-  network: Network | undefined;
+  network: EthereumNetwork | undefined;
   dlcBTCBalance: number | undefined;
   lockedBTCBalance: number | undefined;
   loadedAt: string | undefined;

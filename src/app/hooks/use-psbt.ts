@@ -8,18 +8,17 @@ import { RootState } from '@store/index';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { vaultActions } from '@store/slices/vault/vault.actions';
 
-import { UseBitcoinReturnType } from './use-bitcoin';
+import { useBitcoin } from './use-bitcoin';
 
 export interface UseSignPSBTReturnType {
   handleSignFundingTransaction: (btcAmount: number, vaultUUID: string) => Promise<string>;
   handleSignClosingTransaction: () => Promise<void>;
 }
 
-export function usePSBT(bitcoinHandler: UseBitcoinReturnType): UseSignPSBTReturnType {
+export function usePSBT(): UseSignPSBTReturnType {
   const dispatch = useDispatch();
+  const { signAndBroadcastFundingPSBT, signClosingPSBT } = useBitcoin();
   const { network } = useSelector((state: RootState) => state.account);
-
-  const { signAndBroadcastFundingPSBT, signClosingPSBT } = bitcoinHandler;
 
   const [vaultUUID, setVaultUUID] = useState<string | undefined>();
   const [bitcoinAmount, setBitcoinAmount] = useState<number | undefined>();

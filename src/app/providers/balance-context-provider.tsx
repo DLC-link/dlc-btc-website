@@ -1,11 +1,8 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { createContext, useEffect, useState } from 'react';
 
 import { useEthereum } from '@hooks/use-ethereum';
+import { useEthereumContext } from '@hooks/use-ethereum-context';
 import { HasChildren } from '@models/has-children';
-import { RootState } from '@store/index';
-
-import { VaultContext } from './vault-context-provider';
 
 interface VaultContextType {
   dlcBTCBalance: number | undefined;
@@ -18,22 +15,16 @@ export const BalanceContext = createContext<VaultContextType>({
 });
 
 export function BalanceContextProvider({ children }: HasChildren): React.JSX.Element {
-  const { address } = useSelector((state: RootState) => state.account);
+  const { contractsLoaded } = useEthereumContext();
 
   const ethereumHandler = useEthereum();
-  const { getDLCBTCBalance, getLockedBTCBalance, isLoaded } = ethereumHandler;
-
-  const { vaults } = useContext(VaultContext);
+  const { getDLCBTCBalance, getLockedBTCBalance } = ethereumHandler;
 
   const [dlcBTCBalance, setDLCBTCBalance] = useState<number | undefined>(undefined);
   const [lockedBTCBalance, setLockedBTCBalance] = useState<number | undefined>(undefined);
 
-  useEffect(() => {
-    if (!address) return;
-
-    if (!isLoaded) return;
-
-    const fetchData = async () => {
+  const fetchBalancesIfReady = async () => {
+    if (contractsLoaded) {
       const currentTokenBalance = await getDLCBTCBalance();
       if (currentTokenBalance !== dlcBTCBalance) {
         setDLCBTCBalance(currentTokenBalance);
@@ -42,9 +33,12 @@ export function BalanceContextProvider({ children }: HasChildren): React.JSX.Ele
       if (currentLockedBTCBalance !== lockedBTCBalance) {
         setLockedBTCBalance(currentLockedBTCBalance);
       }
-    };
-    fetchData();
-  }, [address, vaults, isLoaded]);
+    }
+  };
+
+  useEffect(() => {
+    fetchBalancesIfReady();
+  }, [contractsLoaded]);
 
   return (
     <BalanceContext.Provider value={{ dlcBTCBalance, lockedBTCBalance }}>

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { BitcoinNetwork, bitcoin, regtest, testnet } from '@models/bitcoin-network';
-import { EthereumNetwork } from '@models/network';
+import { EthereumNetworkID } from '@models/ethereum-network';
 import { RootState } from '@store/index';
 
 interface NetworkEndpoints {
@@ -57,7 +57,7 @@ export function useEndpoints(): NetworkEndpoints {
     }
 
     switch (network?.id) {
-      case EthereumNetwork.Sepolia:
+      case EthereumNetworkID.Sepolia:
         return {
           attestorAPIURLs,
           ethereumExplorerAPIURL: 'https://sepolia.etherscan.io/tx/',
@@ -65,7 +65,7 @@ export function useEndpoints(): NetworkEndpoints {
           bitcoinBlockchainAPIURL: 'https://devnet.dlc.link/electrs',
           bitcoinNetwork,
         };
-      case EthereumNetwork.Goerli:
+      case EthereumNetworkID.Goerli:
         return {
           attestorAPIURLs,
           ethereumExplorerAPIURL: 'https://goerli.etherscan.io/tx/',
@@ -73,7 +73,7 @@ export function useEndpoints(): NetworkEndpoints {
           bitcoinBlockchainAPIURL: 'https://devnet.dlc.link/electrs',
           bitcoinNetwork,
         };
-      case EthereumNetwork.X1Testnet:
+      case EthereumNetworkID.X1Testnet:
         return {
           attestorAPIURLs,
           ethereumExplorerAPIURL: 'https://www.oklink.com/x1-test/tx/',

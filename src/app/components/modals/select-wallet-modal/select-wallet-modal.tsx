@@ -6,17 +6,18 @@ import { ModalComponentProps } from '@components/modals/components/modal-contain
 import { ModalLayout } from '@components/modals/components/modal.layout';
 import { SelectWalletMenu } from '@components/modals/select-wallet-modal/components/select-wallet-menu';
 import { SelectNetworkButton } from '@components/select-network-button/select-network-button';
-import { useEthereumAccount } from '@hooks/use-ethereum copy';
-import { Network } from '@models/network';
+import { useEthereumAccount } from '@hooks/use-ethereum-account';
+import { Network } from '@models/ethereum-network';
 import { WalletType, ethereumWallets } from '@models/wallet';
 
 export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps): React.JSX.Element {
   const ethereumAccountHandler = useEthereumAccount();
+
   const [currentNetwork, setCurrentNetwork] = useState<Network | undefined>(undefined);
 
   async function handleLogin(walletType: WalletType) {
     if (!currentNetwork) throw new Error('No network selected');
-    await ethereumAccountHandler?.connectEthereumAccount(currentNetwork, walletType);
+    await ethereumAccountHandler?.connectEthereumAccount(walletType, currentNetwork);
     setCurrentNetwork(undefined);
     handleClose();
   }
@@ -44,7 +45,7 @@ export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps):
               <SelectWalletMenu
                 key={wallet.name}
                 wallet={wallet}
-                handleClick={() => handleLogin(WalletType.Metamask)}
+                handleClick={() => handleLogin(wallet.id)}
               />
             ))}
           </VStack>

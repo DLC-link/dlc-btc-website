@@ -1,19 +1,19 @@
-import { EthereumNetwork } from '@models/network';
+import { EthereumNetworkID } from '@models/ethereum-network';
 import { Vault, VaultState } from '@models/vault';
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
 interface VaultSliceState {
-  vaults: { [key in EthereumNetwork]: Vault[] };
+  vaults: { [key in EthereumNetworkID]: Vault[] };
   status: string;
   error: string | null;
 }
 
 const initialVaultState: VaultSliceState = {
   vaults: {
-    [EthereumNetwork.Mainnet]: [],
-    [EthereumNetwork.Goerli]: [],
-    [EthereumNetwork.Sepolia]: [],
-    [EthereumNetwork.X1Testnet]: [],
+    [EthereumNetworkID.Mainnet]: [],
+    [EthereumNetworkID.Goerli]: [],
+    [EthereumNetworkID.Sepolia]: [],
+    [EthereumNetworkID.X1Testnet]: [],
   },
   status: 'idle',
   error: null,
@@ -25,7 +25,7 @@ export const vaultSlice = createSlice({
   reducers: {
     setVaults: (
       state,
-      action: PayloadAction<{ newVaults: Vault[]; networkID: EthereumNetwork }>
+      action: PayloadAction<{ newVaults: Vault[]; networkID: EthereumNetworkID }>
     ) => {
       const { newVaults, networkID } = action.payload;
       const vaultMap = new Map(state.vaults[networkID].map(vault => [vault.uuid, vault]));
@@ -47,7 +47,7 @@ export const vaultSlice = createSlice({
       action: PayloadAction<{
         vaultUUID: string;
         updatedVault: Vault;
-        networkID: EthereumNetwork;
+        networkID: EthereumNetworkID;
       }>
     ) => {
       const { vaultUUID, updatedVault, networkID } = action.payload;
@@ -64,7 +64,7 @@ export const vaultSlice = createSlice({
       action: PayloadAction<{
         vaultUUID: string;
         fundingTX: string;
-        networkID: EthereumNetwork;
+        networkID: EthereumNetworkID;
       }>
     ) => {
       const { vaultUUID, fundingTX, networkID } = action.payload;

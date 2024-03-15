@@ -2,21 +2,20 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { VaultState } from '@models/vault';
-import { EthereumContractConfig } from '@providers/blockchain-context-provider';
 import { RootState } from '@store/index';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { modalActions } from '@store/slices/modal/modal.actions';
 
-import { UseEthereumReturnType } from './use-ethereum';
+import { useEthereum } from './use-ethereum';
+import { useEthereumContext } from './use-ethereum-context';
 
-export function useObserver(
-  ethereumContractConfig: EthereumContractConfig,
-  ethereumHandler: UseEthereumReturnType
-): void {
+export function useEthereumObserver(): void {
   const dispatch = useDispatch();
+
+  const { protocolContract, dlcBTCContract } = useEthereumContext();
+  const { getVault } = useEthereum();
+
   const { address, network } = useSelector((state: RootState) => state.account);
-  const { protocolContract, dlcBTCContract } = ethereumContractConfig;
-  const { getVault } = ethereumHandler;
 
   useEffect(() => {
     if (!protocolContract || !dlcBTCContract) return;
@@ -25,7 +24,7 @@ export function useObserver(
     console.log(`Listening to [${protocolContract.address}]`);
     console.log(`Listening to [${dlcBTCContract.address}]`);
 
-    protocolContract.on('SetupVault', async (...args) => {
+    protocolContract.on('SetupVault', async (...args: any[]) => {
       const vaultOwner: string = args[2];
 
       if (vaultOwner.toLowerCase() !== address) return;
@@ -39,7 +38,7 @@ export function useObserver(
       });
     });
 
-    protocolContract.on('CloseVault', async (...args) => {
+    protocolContract.on('CloseVault', async (...args: any[]) => {
       const vaultOwner: string = args[1];
 
       if (vaultOwner.toLowerCase() !== address) return;
@@ -53,7 +52,7 @@ export function useObserver(
       });
     });
 
-    protocolContract.on('SetStatusFunded', async (...args) => {
+    protocolContract.on('SetStatusFunded', async (...args: any[]) => {
       const vaultOwner = args[2];
 
       if (vaultOwner.toLowerCase() !== address) return;
@@ -73,7 +72,7 @@ export function useObserver(
       });
     });
 
-    protocolContract.on('PostCloseDLCHandler', async (...args) => {
+    protocolContract.on('PostCloseDLCHandler', async (...args: any[]) => {
       const vaultOwner = args[2];
 
       if (vaultOwner.toLowerCase() !== address) return;
