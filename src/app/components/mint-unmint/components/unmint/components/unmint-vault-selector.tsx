@@ -13,9 +13,9 @@ import { scrollBarCSS } from '@styles/css-styles';
 
 export function UnmintVaultSelector(): React.JSX.Element {
   const { fundedVaults } = useVaults();
-  const { unmintStep } = useSelector((state: RootState) => state.mintunmint);
+  const { closeVault } = useEthereum();
 
-  const ethereumHandler = useEthereum();
+  const { unmintStep } = useSelector((state: RootState) => state.mintunmint);
 
   const [selectedVault, setSelectedVault] = useState<Vault | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,7 +33,7 @@ export function UnmintVaultSelector(): React.JSX.Element {
     if (selectedVault) {
       try {
         setIsSubmitting(true);
-        await ethereumHandler.closeVault(selectedVault.uuid);
+        await closeVault(selectedVault.uuid);
       } catch (error) {
         setIsSubmitting(false);
         throw new Error('Error closing vault');
