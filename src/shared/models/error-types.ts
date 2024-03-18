@@ -11,3 +11,10 @@ export class EthereumError extends Error {
     this.name = 'EthereumError';
   }
 }
+
+export class AttestorError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'AttestorError';
+  }
+}

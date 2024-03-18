@@ -1,10 +1,10 @@
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import { HStack, Menu, MenuButton, MenuItem, MenuList, Text } from '@chakra-ui/react';
-import { Network, ethereumNetworks } from '@models/network';
+import { EthereumNetwork, ethereumNetworks } from '@models/ethereum-network';
 
 interface SelectNetworkButtonProps {
-  handleClick: (network: Network) => void;
-  currentNetwork?: Network;
+  handleClick: (network: EthereumNetwork) => void;
+  currentNetwork?: EthereumNetwork;
 }
 
 export function SelectNetworkButton({

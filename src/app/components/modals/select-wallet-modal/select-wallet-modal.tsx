@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 
 import { CheckIcon } from '@chakra-ui/icons';
 import { HStack, ScaleFade, Text, VStack } from '@chakra-ui/react';
@@ -6,23 +6,23 @@ import { ModalComponentProps } from '@components/modals/components/modal-contain
 import { ModalLayout } from '@components/modals/components/modal.layout';
 import { SelectWalletMenu } from '@components/modals/select-wallet-modal/components/select-wallet-menu';
 import { SelectNetworkButton } from '@components/select-network-button/select-network-button';
-import { Network } from '@models/network';
+import { useEthereumAccount } from '@hooks/use-ethereum-account';
+import { EthereumNetwork } from '@models/ethereum-network';
 import { WalletType, ethereumWallets } from '@models/wallet';
-import { BlockchainContext } from '@providers/blockchain-context-provider';
 
 export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps): React.JSX.Element {
-  const blockchainContext = useContext(BlockchainContext);
-  const ethereum = blockchainContext?.ethereum;
-  const [currentNetwork, setCurrentNetwork] = useState<Network | undefined>(undefined);
+  const ethereumAccountHandler = useEthereumAccount();
+
+  const [currentNetwork, setCurrentNetwork] = useState<EthereumNetwork | undefined>(undefined);
 
   async function handleLogin(walletType: WalletType) {
     if (!currentNetwork) throw new Error('No network selected');
-    await ethereum?.requestEthereumAccount(currentNetwork, walletType);
+    await ethereumAccountHandler?.connectEthereumAccount(walletType, currentNetwork);
     setCurrentNetwork(undefined);
     handleClose();
   }
 
-  const handleNetworkChange = (currentNetwork: Network) => {
+  const handleNetworkChange = (currentNetwork: EthereumNetwork) => {
     setCurrentNetwork(currentNetwork);
   };
 
@@ -45,7 +45,7 @@ export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps):
               <SelectWalletMenu
                 key={wallet.name}
                 wallet={wallet}
-                handleClick={() => handleLogin(WalletType.Metamask)}
+                handleClick={() => handleLogin(wallet.id)}
               />
             ))}
           </VStack>

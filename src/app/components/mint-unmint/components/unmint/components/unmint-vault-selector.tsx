@@ -1,22 +1,21 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { Button, Text, VStack } from '@chakra-ui/react';
 import { VaultCard } from '@components/vault/vault-card';
 import { VaultsListGroupContainer } from '@components/vaults-list/components/vaults-list-group-container';
 import { VaultsList } from '@components/vaults-list/vaults-list';
+import { useEthereum } from '@hooks/use-ethereum';
 import { useVaults } from '@hooks/use-vaults';
 import { Vault } from '@models/vault';
-import { BlockchainContext } from '@providers/blockchain-context-provider';
 import { RootState } from '@store/index';
 import { scrollBarCSS } from '@styles/css-styles';
 
 export function UnmintVaultSelector(): React.JSX.Element {
   const { fundedVaults } = useVaults();
-  const { unmintStep } = useSelector((state: RootState) => state.mintunmint);
+  const { closeVault } = useEthereum();
 
-  const blockchainContext = useContext(BlockchainContext);
-  const ethereum = blockchainContext?.ethereum;
+  const { unmintStep } = useSelector((state: RootState) => state.mintunmint);
 
   const [selectedVault, setSelectedVault] = useState<Vault | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -34,7 +33,7 @@ export function UnmintVaultSelector(): React.JSX.Element {
     if (selectedVault) {
       try {
         setIsSubmitting(true);
-        await ethereum?.closeVault(selectedVault.uuid);
+        await closeVault(selectedVault.uuid);
       } catch (error) {
         setIsSubmitting(false);
         throw new Error('Error closing vault');

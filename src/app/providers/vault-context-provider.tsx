@@ -1,6 +1,5 @@
 import { createContext } from 'react';
 
-import { useBlockchainContext } from '@hooks/use-blockchain-context';
 import { UseVaultsReturnType, useVaults } from '@hooks/use-vaults';
 import { HasChildren } from '@models/has-children';
 
@@ -21,10 +20,7 @@ export const VaultContext = createContext<VaultContextType>({
 });
 
 export function VaultContextProvider({ children }: HasChildren): React.JSX.Element {
-  const blockchainContext = useBlockchainContext();
-  const { ethereum } = blockchainContext;
-
-  const vaults = useVaults(ethereum);
+  const vaults = useVaults();
 
   return <VaultContext.Provider value={{ vaults }}>{children}</VaultContext.Provider>;
 }

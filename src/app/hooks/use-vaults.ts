@@ -4,7 +4,8 @@ import { useSelector } from 'react-redux';
 import { Vault, VaultState } from '@models/vault';
 import { RootState } from '@store/index';
 
-import { UseEthereumReturnType } from './use-ethereum';
+import { useEthereum } from './use-ethereum';
+import { useEthereumContext } from './use-ethereum-context';
 
 export interface UseVaultsReturnType {
   allVaults: Vault[];
@@ -16,24 +17,26 @@ export interface UseVaultsReturnType {
   isLoading: boolean;
 }
 
-export function useVaults(ethereum?: UseEthereumReturnType): UseVaultsReturnType {
+export function useVaults(): UseVaultsReturnType {
+  const { contractsLoaded } = useEthereumContext();
+  const { getAllVaults } = useEthereum();
+
   const { vaults } = useSelector((state: RootState) => state.vault);
-  const { address, network } = useSelector((state: RootState) => state.account);
+  const { network } = useSelector((state: RootState) => state.account);
+
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    if (!address || !network || !ethereum) return;
-    const { getAllVaults, isLoaded: isEthereumConfigLoaded } = ethereum;
-
-    if (!isEthereumConfigLoaded) return;
-
-    const fetchData = async () => {
+  const fetchVaultsIfReady = async () => {
+    if (contractsLoaded) {
       setIsLoading(true);
       await getAllVaults();
       setIsLoading(false);
-    };
-    fetchData();
-  }, [address, network, ethereum?.isLoaded]);
+    }
+  };
+
+  useEffect(() => {
+    fetchVaultsIfReady();
+  }, [contractsLoaded]);
 
   const allVaults = useMemo(
     () => [...vaults[network ? network.id : '1']].sort((a, b) => b.timestamp - a.timestamp),

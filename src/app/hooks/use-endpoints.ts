@@ -2,15 +2,17 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { BitcoinNetwork, bitcoin, regtest, testnet } from '@models/bitcoin-network';
-import { EthereumNetwork } from '@models/network';
+import { EthereumNetworkID } from '@models/ethereum-network';
 import { RootState } from '@store/index';
 
 interface NetworkEndpoints {
   attestorAPIURLs: string[];
   ethereumExplorerAPIURL: string;
+  ethereumAttestorChainID: string;
   bitcoinExplorerAPIURL: string;
   bitcoinBlockchainAPIURL: string;
   bitcoinNetwork: BitcoinNetwork;
+  bitcoinNetworkName: string;
 }
 
 export function useEndpoints(): NetworkEndpoints {
@@ -18,9 +20,11 @@ export function useEndpoints(): NetworkEndpoints {
 
   const [attestorAPIURLs, setAttestorAPIURLs] = useState<string[]>([]);
   const [ethereumExplorerAPIURL, setEthereumExplorerAPIURL] = useState<string>('');
+  const [ethereumAttestorChainID, setEthereumAttestorChainID] = useState<string>('');
   const [bitcoinExplorerAPIURL, setBitcoinExplorerAPIURL] = useState<string>('');
   const [bitcoinBlockchainAPIURL, setBitcoinBlockchainAPIURL] = useState<string>('');
   const [bitcoinNetwork, setBitcoinNetwork] = useState<BitcoinNetwork>(regtest);
+  const [bitcoinNetworkName, setBitcoinNetworkName] = useState<string>('');
 
   useEffect(() => {
     if (!network) return;
@@ -28,15 +32,21 @@ export function useEndpoints(): NetworkEndpoints {
     const {
       attestorAPIURLs,
       ethereumExplorerAPIURL,
+      ethereumAttestorChainID,
       bitcoinExplorerAPIURL,
       bitcoinBlockchainAPIURL,
+      bitcoinNetwork,
+      bitcoinNetworkName,
     } = getEndpoints();
 
     setAttestorAPIURLs(attestorAPIURLs);
     setEthereumExplorerAPIURL(ethereumExplorerAPIURL);
+    setEthereumAttestorChainID(ethereumAttestorChainID);
     setBitcoinExplorerAPIURL(bitcoinExplorerAPIURL);
     setBitcoinBlockchainAPIURL(bitcoinBlockchainAPIURL);
     setBitcoinNetwork(bitcoinNetwork);
+    setBitcoinNetworkName(bitcoinNetworkName);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [network]);
 
   function getEndpoints(): NetworkEndpoints {
@@ -59,29 +69,35 @@ export function useEndpoints(): NetworkEndpoints {
     }
 
     switch (network?.id) {
-      case EthereumNetwork.Sepolia:
+      case EthereumNetworkID.Sepolia:
         return {
           attestorAPIURLs,
           ethereumExplorerAPIURL: 'https://sepolia.etherscan.io/tx/',
+          ethereumAttestorChainID: 'evm-sepolia',
           bitcoinExplorerAPIURL,
           bitcoinBlockchainAPIURL,
           bitcoinNetwork,
+          bitcoinNetworkName,
         };
-      case EthereumNetwork.Goerli:
+      case EthereumNetworkID.Goerli:
         return {
           attestorAPIURLs,
           ethereumExplorerAPIURL: 'https://goerli.etherscan.io/tx/',
+          ethereumAttestorChainID: 'evm-goerli',
           bitcoinExplorerAPIURL,
           bitcoinBlockchainAPIURL,
           bitcoinNetwork,
+          bitcoinNetworkName,
         };
-      case EthereumNetwork.X1Testnet:
+      case EthereumNetworkID.X1Testnet:
         return {
           attestorAPIURLs,
           ethereumExplorerAPIURL: 'https://www.oklink.com/x1-test/tx/',
+          ethereumAttestorChainID: 'evm-x1-test',
           bitcoinExplorerAPIURL,
           bitcoinBlockchainAPIURL,
           bitcoinNetwork,
+          bitcoinNetworkName,
         };
       default:
         throw new Error(`Unsupported network: ${network?.name}`);
@@ -90,8 +106,10 @@ export function useEndpoints(): NetworkEndpoints {
   return {
     attestorAPIURLs,
     ethereumExplorerAPIURL,
+    ethereumAttestorChainID,
     bitcoinExplorerAPIURL,
     bitcoinBlockchainAPIURL,
     bitcoinNetwork,
+    bitcoinNetworkName,
   };
 }

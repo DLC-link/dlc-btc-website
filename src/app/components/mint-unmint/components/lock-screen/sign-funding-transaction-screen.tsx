@@ -3,9 +3,8 @@ import { useDispatch } from 'react-redux';
 
 import { Button, VStack, useToast } from '@chakra-ui/react';
 import { VaultCard } from '@components/vault/vault-card';
-import { UseBitcoinReturnType } from '@hooks/use-bitcoin';
-import { UseEthereumReturnType } from '@hooks/use-ethereum';
-import { UseSignPSBTReturnType } from '@hooks/use-psbt';
+import { useBitcoinPrice } from '@hooks/use-bitcoin-price';
+import { useEthereum } from '@hooks/use-ethereum';
 import { useVaults } from '@hooks/use-vaults';
 import { BitcoinError } from '@models/error-types';
 import { Vault } from '@models/vault';
@@ -13,27 +12,21 @@ import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 
 import { LockScreenProtocolFee } from './components/protocol-fee';
 
-interface LockScreenProps {
-  bitcoinHandler: UseBitcoinReturnType;
-  ethereumHandler: UseEthereumReturnType;
-  psbtHandler: UseSignPSBTReturnType;
+interface SignClosingTransactionScreenProps {
   currentStep: [number, string];
+  handleSignFundingTransaction: (btcAmount: number, vaultUUID: string) => Promise<void>;
 }
 
-export function LockScreen({
+export function SignFundingTransactionScreen({
   currentStep,
-  bitcoinHandler,
-  psbtHandler,
-  ethereumHandler,
-}: LockScreenProps): React.JSX.Element {
+  handleSignFundingTransaction,
+}: SignClosingTransactionScreenProps): React.JSX.Element {
   const toast = useToast();
   const dispatch = useDispatch();
 
+  const { bitcoinPrice } = useBitcoinPrice();
+  const { getProtocolFee } = useEthereum();
   const { readyVaults } = useVaults();
-
-  const { bitcoinPrice } = bitcoinHandler;
-  const { getProtocolFee } = ethereumHandler;
-  const { handleSignFundingTransaction } = psbtHandler;
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [protocolFeePercentage, setProtocolFeePercentage] = useState<number | undefined>(undefined);
@@ -45,6 +38,7 @@ export function LockScreen({
       const currentProtocolFeePercentage = await getProtocolFee();
       setProtocolFeePercentage(currentProtocolFeePercentage);
     };
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     fetchProtocolFeePercentage();
   }, [getProtocolFee]);
 

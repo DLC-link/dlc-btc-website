@@ -1,11 +1,8 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { createContext, useEffect, useState } from 'react';
 
-import { useBlockchainContext } from '@hooks/use-blockchain-context';
+import { useEthereum } from '@hooks/use-ethereum';
+import { useEthereumContext } from '@hooks/use-ethereum-context';
 import { HasChildren } from '@models/has-children';
-import { RootState } from '@store/index';
-
-import { VaultContext } from './vault-context-provider';
 
 interface VaultContextType {
   dlcBTCBalance: number | undefined;
@@ -18,23 +15,14 @@ export const BalanceContext = createContext<VaultContextType>({
 });
 
 export function BalanceContextProvider({ children }: HasChildren): React.JSX.Element {
-  const { address } = useSelector((state: RootState) => state.account);
-
-  const blockchainContext = useBlockchainContext();
-  const { ethereum } = blockchainContext;
-  const { getDLCBTCBalance, getLockedBTCBalance, isLoaded } = ethereum;
-
-  const { vaults } = useContext(VaultContext);
+  const { contractsLoaded } = useEthereumContext();
+  const { getDLCBTCBalance, getLockedBTCBalance } = useEthereum();
 
   const [dlcBTCBalance, setDLCBTCBalance] = useState<number | undefined>(undefined);
   const [lockedBTCBalance, setLockedBTCBalance] = useState<number | undefined>(undefined);
 
-  useEffect(() => {
-    if (!address) return;
-
-    if (!isLoaded) return;
-
-    const fetchData = async () => {
+  const fetchBalancesIfReady = async () => {
+    if (contractsLoaded) {
       const currentTokenBalance = await getDLCBTCBalance();
       if (currentTokenBalance !== dlcBTCBalance) {
         setDLCBTCBalance(currentTokenBalance);
@@ -43,9 +31,14 @@ export function BalanceContextProvider({ children }: HasChildren): React.JSX.Ele
       if (currentLockedBTCBalance !== lockedBTCBalance) {
         setLockedBTCBalance(currentLockedBTCBalance);
       }
-    };
-    fetchData();
-  }, [address, vaults, isLoaded]);
+    }
+  };
+
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    fetchBalancesIfReady();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contractsLoaded]);
 
   return (
     <BalanceContext.Provider value={{ dlcBTCBalance, lockedBTCBalance }}>
