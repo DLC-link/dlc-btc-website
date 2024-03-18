@@ -3,9 +3,8 @@ import { useDispatch } from 'react-redux';
 
 import { Button, VStack, useToast } from '@chakra-ui/react';
 import { VaultCard } from '@components/vault/vault-card';
-import { UseBitcoinReturnType } from '@hooks/use-bitcoin';
-import { UseEthereumReturnType } from '@hooks/use-ethereum';
-import { UseSignPSBTReturnType } from '@hooks/use-psbt';
+import { useBitcoinPrice } from '@hooks/use-bitcoin-price';
+import { useEthereum } from '@hooks/use-ethereum';
 import { useVaults } from '@hooks/use-vaults';
 import { BitcoinError } from '@models/error-types';
 import { Vault } from '@models/vault';
@@ -14,26 +13,21 @@ import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { LockScreenProtocolFee } from './components/protocol-fee';
 
 interface SignClosingTransactionScreenProps {
-  bitcoinHandler: UseBitcoinReturnType;
-  ethereumHandler: UseEthereumReturnType;
-  psbtHandler: UseSignPSBTReturnType;
   currentStep: [number, string];
+  handleSignClosingTransaction: () => Promise<void>;
 }
 
 export function SignClosingTransactionScreen({
   currentStep,
-  bitcoinHandler,
-  ethereumHandler,
-  psbtHandler,
+  handleSignClosingTransaction,
 }: SignClosingTransactionScreenProps): React.JSX.Element {
   const toast = useToast();
   const dispatch = useDispatch();
 
   const { readyVaults } = useVaults();
 
-  const { bitcoinPrice } = bitcoinHandler;
-  const { getProtocolFee } = ethereumHandler;
-  const { handleSignClosingTransaction } = psbtHandler;
+  const { bitcoinPrice } = useBitcoinPrice();
+  const { getProtocolFee } = useEthereum();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [protocolFeePercentage, setProtocolFeePercentage] = useState<number | undefined>(undefined);
@@ -45,6 +39,7 @@ export function SignClosingTransactionScreen({
       const currentProtocolFeePercentage = await getProtocolFee();
       setProtocolFeePercentage(currentProtocolFeePercentage);
     };
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     fetchProtocolFeePercentage();
   }, [getProtocolFee]);
 

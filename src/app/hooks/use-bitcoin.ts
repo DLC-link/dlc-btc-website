@@ -1,11 +1,10 @@
-import { useEffect, useState } from 'react';
-
 import { BitcoinNetwork } from '@models/bitcoin-network';
 import { BitcoinError } from '@models/error-types';
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
 import { hex } from '@scure/base';
 import * as btc from '@scure/btc-signer';
 
+import { useAttestors } from './use-attestors';
 import { useEndpoints } from './use-endpoints';
 
 const networkModes = ['mainnet', 'testnet', 'regtest'] as const;
@@ -74,226 +73,244 @@ interface RpcResponse {
 
 export interface UseBitcoinReturnType {
   signAndBroadcastFundingPSBT: (btcAmount: number) => Promise<{
-    fundingTransactionID: string;
+    fundingTransaction: btc.Transaction;
     multisigTransaction: btc.P2TROut;
     userNativeSegwitAddress: string;
-    btcAmount: number;
   }>;
-  signClosingPSBT: (
+  signAndSendClosingPSBT: (
     fundingTransactionID: string,
     multisigTransaction: btc.P2TROut,
     uuid: string,
     userNativeSegwitAddress: string,
-    btcAmount: number
+    bitcoinAmount: number
   ) => Promise<void>;
-  bitcoinPrice: number;
+  broadcastTransaction: (transaction: btc.Transaction) => Promise<string>;
 }
 
 export function useBitcoin(): UseBitcoinReturnType {
-  const { attestorAPIURLs, bitcoinNetwork, bitcoinBlockchainAPIURL } = useEndpoints();
-  const [bitcoinPrice, setBitcoinPrice] = useState(0);
+  const { bitcoinNetwork, bitcoinNetworkName, bitcoinBlockchainAPIURL } = useEndpoints();
+  const { getAttestorGroupPublicKey, sendClosingTransactionToAttestors } = useAttestors();
 
-  useEffect(() => {
-    const getBitcoinPrice = async () => {
-      await fetchBitcoinPrice();
-    };
-    getBitcoinPrice();
-  }, []);
+  /**
+   * Checks if the user's wallet is on the same network as the app.
+   *
+   * @param userNativeSegwitAddress - The user's native segwit address.
+   * @throws BitcoinError - If the user's wallet is not on the same network as the app.
+   */
+  function checkUserWalletNetwork(userNativeSegwitAddress: Address): void {
+    if (bitcoinNetworkName === 'mainnet' && !userNativeSegwitAddress.address.startsWith('bc1')) {
+      throw new BitcoinError('User wallet is not on Bitcoin Mainnet');
+    } else if (
+      bitcoinNetworkName === 'testnet' &&
+      !userNativeSegwitAddress.address.startsWith('tb1')
+    ) {
+      throw new BitcoinError('User wallet is not on Bitcoin Testnet');
+    } else if (
+      bitcoinNetworkName === 'regtest' &&
+      !userNativeSegwitAddress.address.startsWith('bcrt1')
+    ) {
+      throw new BitcoinError('User wallet is not on Bitcoin Regtest');
+    } else {
+      return;
+    }
+  }
 
+  /**
+   * Fetches the user's native segwit and taproot addresses from the user's wallet. Taproot address is required for the user's public key, which is used in the multisig transaction.
+   * Current implementation is using Leather Wallet.
+   *
+   * @returns A promise that resolves to the user's native segwit and taproot addresses.
+   */
   async function getBitcoinAddresses(): Promise<Address[]> {
     try {
       const rpcResponse: RpcResponse = await window.btc?.request('getAddresses');
       const userAddresses = rpcResponse.result.addresses;
+      checkUserWalletNetwork(userAddresses[0]);
       return userAddresses;
     } catch (error) {
       throw new BitcoinError(`Error getting bitcoin addresses: ${error}`);
     }
   }
 
-  async function gatherUTXOs(bitcoinNativeSegwitAddress: BitcoinNativeSegwitAddress): Promise<any> {
-    const response = await fetch(
-      `${bitcoinBlockchainAPIURL}/address/${bitcoinNativeSegwitAddress.address}/utxo`
-    );
-    const allUTXOs = await response.json();
-    const userPublicKey = hexToBytes(bitcoinNativeSegwitAddress.publicKey);
-    const spend = btc.p2wpkh(userPublicKey, bitcoinNetwork);
+  /**
+   * Fetches the UTXOs for the user's native segwit address.
 
-    const utxos = await Promise.all(
-      allUTXOs.map(async (utxo: UTXO) => {
-        const txHex = await (await fetch(`${bitcoinBlockchainAPIURL}/tx/${utxo.txid}/hex`)).text();
-        return {
-          ...spend,
-          txid: utxo.txid,
-          index: utxo.vout,
-          value: utxo.value,
-          nonWitnessUtxo: hex.decode(txHex),
-        };
-      })
-    );
-
-    return utxos;
-  }
-
-  async function getAttestorPublicKey(attestorGetGroupPublicKeyURL: string): Promise<string> {
+   *
+   * @param bitcoinNativeSegwitAddress - The user's native segwit address.
+   * @returns A promise that resolves to the UTXOs.
+   */
+  async function getUTXOs(bitcoinNativeSegwitAddress: BitcoinNativeSegwitAddress): Promise<any> {
     try {
-      const response = await fetch(attestorGetGroupPublicKeyURL);
-      const attestorGroupPublicKey = await response.text();
-      return attestorGroupPublicKey;
+      const response = await fetch(
+        `${bitcoinBlockchainAPIURL}/address/${bitcoinNativeSegwitAddress.address}/utxo`
+      );
+      const allUTXOs = await response.json();
+      const userPublicKey = hexToBytes(bitcoinNativeSegwitAddress.publicKey);
+      const spend = btc.p2wpkh(userPublicKey, bitcoinNetwork);
+
+      const utxos = await Promise.all(
+        allUTXOs.map(async (utxo: UTXO) => {
+          const txHex = await (
+            await fetch(`${bitcoinBlockchainAPIURL}/tx/${utxo.txid}/hex`)
+          ).text();
+          return {
+            ...spend,
+            txid: utxo.txid,
+            index: utxo.vout,
+            value: utxo.value,
+            nonWitnessUtxo: hex.decode(txHex),
+          };
+        })
+      );
+      return utxos;
     } catch (error) {
-      throw new BitcoinError(`Error getting attestor public key: ${error}`);
+      throw new BitcoinError(`Error getting UTXOs: ${error}`);
     }
   }
 
-  function createMultisigTransactionAndAddress(
+  /**
+   * Creates a multisig transaction using the user's public key and the attestor group's public key.
+   * The funding transaction is sent to the multisig address.
+   *
+   * @param userPublicKey - The user's public key.
+   * @param attestorGroupPublicKey - The attestor group's public key.
+   * @returns A promise that resolves to the multisig transaction.
+   */
+  function createMultisigTransaction(
     userPublicKey: Uint8Array,
-    attestorPublicKey: Uint8Array,
-    btcNetwork: BitcoinNetwork
-  ): {
-    multisigTransaction: btc.P2TROut;
-    multisigAddress: string;
-  } {
-    const multisig = btc.p2tr_ns(2, [userPublicKey, attestorPublicKey]);
-    const multisigTransaction = btc.p2tr(undefined, multisig, btcNetwork);
-    const multisigAddress = multisigTransaction.address;
+    attestorGroupPublicKey: Uint8Array,
+    bitcoinNetwork: BitcoinNetwork
+  ): btc.P2TROut {
+    const multisig = btc.p2tr_ns(2, [userPublicKey, attestorGroupPublicKey]);
+    const multisigTransaction = btc.p2tr(undefined, multisig, bitcoinNetwork);
 
-    if (!multisigAddress) throw new BitcoinError('Could not create multisig address');
-
-    return { multisigTransaction, multisigAddress };
+    return multisigTransaction;
   }
 
-  function createFundingTransaction(
+  /**
+   * Creates the first PSBT, which is the funding transaction.
+   * Uses the selected UTXOs to fund the transaction.
+   *
+   * @param selectedUTXOs - The UTXOs selected for funding the transaction.
+   * @param multisigAddress - The multisig address.
+   * @param bitcoinAmount - The amount of bitcoin.
+   * @param bitcoinNetwork - The bitcoin network.
+   * @returns A promise that resolves to the funding PSBT.
+   */ function createFundingTransaction(
     multisigAddress: string,
     userChangeAddress: string,
     utxos: any[],
-    btcAmount: number,
-    btcNetwork: BitcoinNetwork
+    bitcoinAmount: number,
+    bitcoinNetwork: BitcoinNetwork
   ): Uint8Array {
-    const outputs = [
-      { address: multisigAddress, amount: BigInt(btcAmount) }, // amount in satoshi
-    ];
+    const outputs = [{ address: multisigAddress, amount: BigInt(bitcoinAmount) }];
 
     const selected = btc.selectUTXO(utxos, outputs, 'default', {
-      changeAddress: userChangeAddress, // required, address to send change
-      feePerByte: 2n, // require, fee per vbyte in satoshi
-      bip69: false, // ?? // lexicographical Indexing of Transaction Inputs and Outputs
-      createTx: true, // create tx with selected inputs/outputs
-      network: btcNetwork,
+      changeAddress: userChangeAddress,
+      feePerByte: 2n,
+      bip69: false,
+      createTx: true,
+      network: bitcoinNetwork,
     });
 
     const fundingTX = selected?.tx;
 
-    if (!fundingTX) throw new BitcoinError('Could not create funding transaction');
+    if (!fundingTX) throw new BitcoinError('Could not create Funding Transaction');
 
     const fundingPSBT = fundingTX.toPSBT();
+
     return fundingPSBT;
   }
 
-  async function sendPSBT(
-    closingPSBT: string,
-    uuid: string,
-    userNativeSegwitAddress: string
-  ): Promise<void> {
-    const createPSBTURLs = attestorAPIURLs.map(url => `${url}/app/create-psbt-event`);
-    const requests = createPSBTURLs.map(async url => {
-      fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-        body: JSON.stringify({
-          uuid,
-          closing_psbt: closingPSBT,
-          mint_address: userNativeSegwitAddress,
-          chain: 'evm-sepolia',
-        }),
-      });
-    });
-    await Promise.all(requests);
-  }
+  /**
+   * Creates the second PSBT, which is the closing transaction.
+   * Uses the funding transaction ID to create the closing transaction.
+   * The closing transaction is sent to the user's native segwit address.
+   *
+   * @param fundingTransactionID - The ID of the funding transaction.
+   * @param multisigTransaction - The multisig transaction.
+   * @param userNativeSegwitAddress - The user's native segwit address.
+   * @param bitcoinAmount - The amount of bitcoin.
+   * @param bitcoinNetwork - The bitcoin network.
+   * @returns A promise that resolves to the closing PSBT.
+   */
   async function createClosingTransaction(
     fundingTransactionID: string,
     multisigTransaction: any,
     userNativeSegwitAddress: string,
-    btcAmount: number,
-    btcNetwork: BitcoinNetwork
+    bitcoinAmount: number,
+    bitcoinNetwork: BitcoinNetwork
   ): Promise<Uint8Array> {
     const closingTransaction = new btc.Transaction({ PSBTVersion: 0 });
+
     const fundingInput = {
       txid: hexToBytes(fundingTransactionID),
       index: 0,
-      witnessUtxo: { amount: BigInt(btcAmount), script: multisigTransaction.script },
+      witnessUtxo: { amount: BigInt(bitcoinAmount), script: multisigTransaction.script },
       ...multisigTransaction,
     };
+
     closingTransaction.addInput(fundingInput);
     closingTransaction.addOutputAddress(
       userNativeSegwitAddress,
-      BigInt(btcAmount - 10000),
-      btcNetwork
+      BigInt(bitcoinAmount - 10000),
+      bitcoinNetwork
     );
+
     const closingPSBT = closingTransaction.toPSBT();
+
     return closingPSBT;
   }
 
+  /**
+   * Signs the PSBTs. Requests the user's wallet to sign the PSBT.
+   * Current implementation is using Leather Wallet.
+   *
+   * @param psbt - The PSBT to sign.
+   * @returns A promise that resolves to the signed PSBT.
+   */
   async function signPSBT(psbt: Uint8Array): Promise<string> {
-    const requestParams: SignPsbtRequestParams = {
-      hex: bytesToHex(psbt),
-    };
-    const result = await window.btc.request('signPsbt', requestParams);
-    return result.result.hex;
+    try {
+      const requestParams: SignPsbtRequestParams = {
+        hex: bytesToHex(psbt),
+      };
+      const result = await window.btc.request('signPsbt', requestParams);
+      return result.result.hex;
+    } catch (error) {
+      throw new BitcoinError(`Error signing PSBT: ${error}`);
+    }
   }
 
-  async function handleFundingTransaction(
-    multisigAddress: string,
-    userChangeAddress: string,
-    utxos: any[],
-    btcAmount: number,
-    btcNetwork: BitcoinNetwork
-  ): Promise<string> {
-    const fundingTransaction = createFundingTransaction(
-      multisigAddress,
-      userChangeAddress,
-      utxos,
-      btcAmount,
-      btcNetwork
-    );
-    const fundingTransactionHex = await signPSBT(fundingTransaction);
-    const transaction = btc.Transaction.fromPSBT(hexToBytes(fundingTransactionHex));
-    transaction.finalize();
+  /**
+   * Broadcasts the funding transaction. The PSBTs are only signed by the user's wallet, the broadcast happens here.
+   *
+   * @param transaction - The transaction to broadcast.
+   * @returns A promise that resolves to the response from the broadcast request.
+   */
+  async function broadcastTransaction(transaction: btc.Transaction): Promise<string> {
+    try {
+      const response = await fetch(`${bitcoinBlockchainAPIURL}/tx`, {
+        method: 'POST',
+        body: bytesToHex(transaction.extract()),
+      });
 
-    let fundingTransactionID = '';
-    await fetch(`${bitcoinBlockchainAPIURL}/tx`, {
-      method: 'POST',
-      body: bytesToHex(transaction.extract()),
-    }).then(async response => {
-      fundingTransactionID = await response.text();
-    });
-    return fundingTransactionID;
+      const transactionID = await response.text();
+      return transactionID;
+    } catch (error) {
+      throw new BitcoinError(`Error broadcasting transaction: ${error}`);
+    }
   }
 
-  async function handleClosingTransaction(
-    fundingTransactionID: string,
-    multisigTransaction: btc.P2TROut,
-    userAddress: string,
-    uuid: string,
-    btcAmount: number,
-    btcNetwork: BitcoinNetwork
-  ): Promise<string> {
-    const closingTransaction = await createClosingTransaction(
-      fundingTransactionID,
-      multisigTransaction,
-      userAddress,
-      btcAmount,
-      btcNetwork
-    );
-    const closingTransactionHex = await signPSBT(closingTransaction);
-
-    await sendPSBT(closingTransactionHex, uuid, userAddress);
-    return closingTransactionHex;
-  }
-
-  async function signAndBroadcastFundingPSBT(btcAmount: number): Promise<{
-    fundingTransactionID: string;
+  /**
+   * This function is responsible for signing the funding PSBT using the user's wallet and then broadcasting the transaction.
+   *
+   * @param bitcoinAmount - The amount of bitcoin to be used in the transaction.
+   * @returns A promise that resolves when the transaction has been successfully broadcasted.
+   */
+  async function signAndBroadcastFundingPSBT(bitcoinAmount: number): Promise<{
+    fundingTransaction: btc.Transaction;
     multisigTransaction: btc.P2TROut;
     userNativeSegwitAddress: string;
-    btcAmount: number;
   }> {
     const userAddresses = await getBitcoinAddresses();
     const userNativeSegwitAccount = userAddresses[0] as BitcoinNativeSegwitAddress;
@@ -301,63 +318,70 @@ export function useBitcoin(): UseBitcoinReturnType {
     const userTaprootAddress = userAddresses[1] as BitcoinTaprootAddress;
     const userPublicKey = userTaprootAddress.tweakedPublicKey;
 
-    const attestorGetGroupPublicKeyURL = `${attestorAPIURLs[0]}/tss/get-group-publickey`;
-    const attestorPublicKey = await getAttestorPublicKey(attestorGetGroupPublicKeyURL);
+    const attestorPublicKey = await getAttestorGroupPublicKey();
 
-    const userUTXOs = await gatherUTXOs(userAddresses[0] as BitcoinNativeSegwitAddress);
-    const { multisigTransaction, multisigAddress } = createMultisigTransactionAndAddress(
+    const userUTXOs = await getUTXOs(userAddresses[0] as BitcoinNativeSegwitAddress);
+    const multisigTransaction = createMultisigTransaction(
       hex.decode(userPublicKey),
       hex.decode(attestorPublicKey),
       bitcoinNetwork
     );
 
-    const fundingTransactionID = await handleFundingTransaction(
+    const multisigAddress = multisigTransaction.address;
+    if (!multisigAddress) throw new BitcoinError('Could not create multisig address');
+
+    const fundingTransaction = createFundingTransaction(
       multisigAddress,
       userNativeSegwitAddress,
       userUTXOs,
-      btcAmount,
+      bitcoinAmount,
       bitcoinNetwork
     );
 
-    return { fundingTransactionID, multisigTransaction, userNativeSegwitAddress, btcAmount };
+    const fundingTransactionHex = await signPSBT(fundingTransaction);
+
+    const transaction = btc.Transaction.fromPSBT(hexToBytes(fundingTransactionHex));
+    transaction.finalize();
+
+    return {
+      fundingTransaction: transaction,
+      multisigTransaction,
+      userNativeSegwitAddress,
+    };
   }
 
-  async function signClosingPSBT(
+  /**
+   * This function is responsible for signing the closing PSBT using the user's wallet and then sending the closing transaction to the attestors.
+   *
+   * @param fundingTransactionID - The ID of the funding transaction.
+   * @param multisigTransaction - The multisig transaction.
+   * @param uuid - The UUID of the vault.
+   * @param userNativeSegwitAddress - The user's native segwit address.
+   * @param bitcoinAmount - The amount of bitcoin.
+   * @returns A promise that resolves when the transaction has been successfully sent to the attestors.
+   */
+  async function signAndSendClosingPSBT(
     fundingTransactionID: string,
     multisigTransaction: btc.P2TROut,
     uuid: string,
     userNativeSegwitAddress: string,
-    btcAmount: number
+    bitcoinAmount: number
   ): Promise<void> {
-    if (!fundingTransactionID || !multisigTransaction || !userNativeSegwitAddress || !btcAmount) {
-      throw new BitcoinError('Missing parameters to sign closing PSBT');
-    }
-    await handleClosingTransaction(
+    const closingTransaction = await createClosingTransaction(
       fundingTransactionID,
       multisigTransaction,
       userNativeSegwitAddress,
-      uuid,
-      btcAmount,
+      bitcoinAmount,
       bitcoinNetwork
     );
-  }
+    const closingTransactionHex = await signPSBT(closingTransaction);
 
-  async function fetchBitcoinPrice() {
-    try {
-      const response = await fetch('https://api.coindesk.com/v1/bpi/currentprice.json', {
-        headers: { Accept: 'application/json' },
-      });
-      const message = await response.json();
-      const bitcoinUSDPrice = message.bpi.USD.rate_float;
-      setBitcoinPrice(bitcoinUSDPrice);
-    } catch (error: any) {
-      throw new BitcoinError(`Could not fetch bitcoin price: ${error.message}`);
-    }
+    await sendClosingTransactionToAttestors(closingTransactionHex, uuid, userNativeSegwitAddress);
   }
 
   return {
     signAndBroadcastFundingPSBT,
-    signClosingPSBT,
-    bitcoinPrice,
+    signAndSendClosingPSBT,
+    broadcastTransaction,
   };
 }

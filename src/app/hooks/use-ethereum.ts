@@ -42,14 +42,13 @@ export function useEthereum(): UseEthereumReturnType {
 
   const [totalSupply, setTotalSupply] = useState<number | undefined>(undefined);
 
-  const fetchTotalSupplyIfReady = async () => {
-    if (network) {
-      await getTotalSupply();
-    }
+  const fetchTotalSupply = async () => {
+    await getTotalSupply();
   };
 
   useEffect(() => {
-    fetchTotalSupplyIfReady();
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    fetchTotalSupply();
   }, [network]);
 
   function formatVault(vault: any): Vault {
@@ -82,7 +81,7 @@ export function useEthereum(): UseEthereumReturnType {
       const totalSupply = await protocolContract.totalSupply();
       setTotalSupply(customShiftValue(parseInt(totalSupply), 8, true));
     } catch (error) {
-      throw new EthereumError(`Could not fetch total supply info: ${error}}`);
+      throw new EthereumError(`Could not fetch Total Supply Info: ${error}}`);
     }
   }
 
@@ -92,7 +91,7 @@ export function useEthereum(): UseEthereumReturnType {
       const btcMintFeeRate = await protocolContract.btcMintFeeRate();
       return customShiftValue(btcMintFeeRate.toNumber(), 4, true);
     } catch (error) {
-      throwEthereumError(`Could not fetch protocol fee: `, error);
+      throwEthereumError(`Could not fetch Protocol Fee: `, error);
     }
   }
 
@@ -137,7 +136,7 @@ export function useEthereum(): UseEthereumReturnType {
         })
       );
     } catch (error) {
-      throw new Error(`Could not fetch vaults: ${error}`);
+      throw new EthereumError(`Could not fetch Vaults: ${error}`);
     }
   }
 
@@ -164,11 +163,12 @@ export function useEthereum(): UseEthereumReturnType {
         );
         return;
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.log(`Error fetching vault ${vaultUUID}. Retrying...`);
       }
       await new Promise(resolve => setTimeout(resolve, retryInterval));
     }
-    throw new EthereumError(`Failed to fetch vault ${vaultUUID} after ${maxRetries} retries`);
+    throw new EthereumError(`Failed to fetch Vault ${vaultUUID} after ${maxRetries} retries`);
   }
 
   async function setupVault(btcDepositAmount: number): Promise<void> {
@@ -177,7 +177,7 @@ export function useEthereum(): UseEthereumReturnType {
       await protocolContract.callStatic.setupVault(btcDepositAmount);
       await protocolContract.setupVault(btcDepositAmount);
     } catch (error: any) {
-      throwEthereumError(`Could not setup vault: `, error);
+      throwEthereumError(`Could not setup Vault: `, error);
     }
   }
 
@@ -187,7 +187,7 @@ export function useEthereum(): UseEthereumReturnType {
       await protocolContract.callStatic.closeVault(vaultUUID);
       await protocolContract.closeVault(vaultUUID);
     } catch (error) {
-      throwEthereumError(`Could not close vault: `, error);
+      throwEthereumError(`Could not close Vault: `, error);
     }
   }
 

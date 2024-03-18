@@ -3,9 +3,8 @@ import { useDispatch } from 'react-redux';
 
 import { Button, VStack, useToast } from '@chakra-ui/react';
 import { VaultCard } from '@components/vault/vault-card';
-import { useBitcoin } from '@hooks/use-bitcoin';
+import { useBitcoinPrice } from '@hooks/use-bitcoin-price';
 import { useEthereum } from '@hooks/use-ethereum';
-import { usePSBT } from '@hooks/use-psbt';
 import { useVaults } from '@hooks/use-vaults';
 import { BitcoinError } from '@models/error-types';
 import { Vault } from '@models/vault';
@@ -13,18 +12,21 @@ import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 
 import { LockScreenProtocolFee } from './components/protocol-fee';
 
-interface LockScreenProps {
+interface SignClosingTransactionScreenProps {
   currentStep: [number, string];
+  handleSignFundingTransaction: (btcAmount: number, vaultUUID: string) => Promise<void>;
 }
 
-export function LockScreen({ currentStep }: LockScreenProps): React.JSX.Element {
+export function SignFundingTransactionScreen({
+  currentStep,
+  handleSignFundingTransaction,
+}: SignClosingTransactionScreenProps): React.JSX.Element {
   const toast = useToast();
   const dispatch = useDispatch();
 
-  const { bitcoinPrice } = useBitcoin();
+  const { bitcoinPrice } = useBitcoinPrice();
   const { getProtocolFee } = useEthereum();
   const { readyVaults } = useVaults();
-  const { handleSignFundingTransaction } = usePSBT();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [protocolFeePercentage, setProtocolFeePercentage] = useState<number | undefined>(undefined);
@@ -36,6 +38,7 @@ export function LockScreen({ currentStep }: LockScreenProps): React.JSX.Element 
       const currentProtocolFeePercentage = await getProtocolFee();
       setProtocolFeePercentage(currentProtocolFeePercentage);
     };
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     fetchProtocolFeePercentage();
   }, [getProtocolFee]);
 

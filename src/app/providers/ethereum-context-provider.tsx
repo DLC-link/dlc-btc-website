@@ -22,9 +22,9 @@ export const EthereumContext = createContext<any>({
   dlcBTCContract: undefined,
   getEthereumContracts: async (
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    ethereumSigner: ethers.providers.JsonRpcSigner,
+    _ethereumSigner: ethers.providers.JsonRpcSigner,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    ethereumNetwork: EthereumNetwork
+    _ethereumNetwork: EthereumNetwork
   ) => {},
   contractsLoaded: false,
 });

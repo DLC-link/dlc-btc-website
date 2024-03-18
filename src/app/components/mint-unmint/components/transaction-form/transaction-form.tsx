@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { Button, FormControl, FormErrorMessage, Text, VStack, useToast } from '@chakra-ui/react';
 import { customShiftValue } from '@common/utilities';
-import { useBitcoin } from '@hooks/use-bitcoin';
+import { useBitcoinPrice } from '@hooks/use-bitcoin-price';
 import { useEthereum } from '@hooks/use-ethereum';
 import { EthereumError } from '@models/error-types';
 import { Form, Formik } from 'formik';
@@ -19,11 +19,8 @@ const initialValues: TransactionFormValues = { amount: 0.001 };
 export function TransactionForm(): React.JSX.Element {
   const toast = useToast();
 
-  const ethereumHandler = useEthereum();
-  const bitcoinHandler = useBitcoin();
-
-  const { setupVault } = ethereumHandler;
-  const { bitcoinPrice } = bitcoinHandler;
+  const { setupVault } = useEthereum();
+  const { bitcoinPrice } = useBitcoinPrice();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 

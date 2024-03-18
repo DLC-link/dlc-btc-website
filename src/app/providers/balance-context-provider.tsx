@@ -16,9 +16,7 @@ export const BalanceContext = createContext<VaultContextType>({
 
 export function BalanceContextProvider({ children }: HasChildren): React.JSX.Element {
   const { contractsLoaded } = useEthereumContext();
-
-  const ethereumHandler = useEthereum();
-  const { getDLCBTCBalance, getLockedBTCBalance } = ethereumHandler;
+  const { getDLCBTCBalance, getLockedBTCBalance } = useEthereum();
 
   const [dlcBTCBalance, setDLCBTCBalance] = useState<number | undefined>(undefined);
   const [lockedBTCBalance, setLockedBTCBalance] = useState<number | undefined>(undefined);
@@ -37,7 +35,9 @@ export function BalanceContextProvider({ children }: HasChildren): React.JSX.Ele
   };
 
   useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     fetchBalancesIfReady();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contractsLoaded]);
 
   return (
