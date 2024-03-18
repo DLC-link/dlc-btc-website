@@ -10,12 +10,12 @@ import { vaultActions } from '@store/slices/vault/vault.actions';
 
 import { useBitcoin } from './use-bitcoin';
 
-export interface UseSignPSBTReturnType {
+interface UsePSBTReturnType {
   handleSignFundingTransaction: (btcAmount: number, vaultUUID: string) => Promise<void>;
   handleSignClosingTransaction: () => Promise<void>;
 }
 
-export function usePSBT(): UseSignPSBTReturnType {
+export function usePSBT(): UsePSBTReturnType {
   const dispatch = useDispatch();
   const { signAndBroadcastFundingPSBT, signAndSendClosingPSBT, broadcastTransaction } =
     useBitcoin();

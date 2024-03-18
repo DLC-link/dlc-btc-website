@@ -16,7 +16,7 @@ import { ethers } from 'ethers';
 import { throwEthereumError } from './use-ethereum';
 import { useEthereumContext } from './use-ethereum-context';
 
-export interface UseEthereumReturnType {
+interface UseEthereumAccountReturnType {
   connectEthereumAccount: (walletType: WalletType, network: EthereumNetwork) => Promise<void>;
   recommendTokenToMetamask: () => Promise<boolean>;
   isLoaded: boolean;
@@ -41,7 +41,7 @@ function alertNetworkNotSupported(ethereumNetworkID: string): void {
   throw new Error(`Unsupported Ethereum network, ID: ${ethereumNetworkID}`);
 }
 
-export function useEthereumAccount(): UseEthereumReturnType {
+export function useEthereumAccount(): UseEthereumAccountReturnType {
   const { dlcBTCContract, getEthereumContracts } = useEthereumContext();
 
   const { address, walletType, network } = useSelector((state: RootState) => state.account);

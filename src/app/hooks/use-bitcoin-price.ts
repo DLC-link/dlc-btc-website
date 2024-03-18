@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { BitcoinError } from '@models/error-types';
 
-export interface UseBitcoinPriceReturnType {
+interface UseBitcoinPriceReturnType {
   bitcoinPrice: number;
 }
 

@@ -13,7 +13,7 @@ import { Logger } from 'ethers/lib/utils';
 
 import { useEthereumContext } from './use-ethereum-context';
 
-export interface UseEthereumReturnType {
+interface UseEthereumReturnType {
   getDLCBTCBalance: () => Promise<number | undefined>;
   getLockedBTCBalance: () => Promise<number | undefined>;
   getProtocolFee: () => Promise<number | undefined>;

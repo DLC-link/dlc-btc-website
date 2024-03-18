@@ -5,7 +5,7 @@ import { EthereumError } from '@models/error-types';
 import { EthereumNetwork } from '@models/ethereum-network';
 import { Contract, ethers } from 'ethers';
 
-export interface UseEthereumContractsReturnType {
+interface UseEthereumContractsReturnType {
   getEthereumContracts: (
     ethereumSigner: ethers.providers.JsonRpcSigner,
     ethereumNetwork: EthereumNetwork

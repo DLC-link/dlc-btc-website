@@ -71,7 +71,7 @@ interface RpcResponse {
   result: RpcResult;
 }
 
-export interface UseBitcoinReturnType {
+interface UseBitcoinReturnType {
   signAndBroadcastFundingPSBT: (btcAmount: number) => Promise<{
     fundingTransaction: btc.Transaction;
     multisigTransaction: btc.P2TROut;

@@ -2,7 +2,7 @@ import { AttestorError } from '@models/error-types';
 
 import { useEndpoints } from './use-endpoints';
 
-export interface UseAttestorsReturnType {
+interface UseAttestorsReturnType {
   getAttestorGroupPublicKey: () => Promise<string>;
   sendClosingTransactionToAttestors: (
     closingPSBT: string,
