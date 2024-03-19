@@ -23,7 +23,7 @@ export function VaultExpandedInformationTransactionRow({
         color={'accent.cyan.01'}
         fontSize={'xs'}
         textDecoration={'underline'}
-        onClick={() => window.open(`${bitcoinExplorerAPIURL}${value}`, '_blank')}
+        onClick={() => window.open(`${bitcoinExplorerAPIURL}/tx/${value}`, '_blank')}
         _hover={{ cursor: 'pointer' }}
       >
         View in TX explorer
