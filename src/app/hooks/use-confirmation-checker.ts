@@ -4,8 +4,11 @@ import { Vault, VaultState } from '@models/vault';
 
 export function useConfirmationChecker(vault?: Vault): number {
   const txID = vault?.state === VaultState.FUNDING ? vault?.fundingTX : vault?.closingTX;
-  const bitcoinExplorerTXURL = `https://devnet.dlc.link/electrs/tx/${txID}`;
-  const bitcoinExplorerHeightURL = `https://devnet.dlc.link/electrs/blocks/tip/height`;
+
+  const bitcoinBlockchainAPIURL = import.meta.env.VITE_BITCOIN_BLOCKCHAIN_API_URL;
+
+  const bitcoinExplorerTXURL = `${bitcoinBlockchainAPIURL}/tx/${txID}`;
+  const bitcoinExplorerHeightURL = `${bitcoinBlockchainAPIURL}/blocks/tip/height`;
   const fetchInterval = useRef<number | undefined>(undefined);
 
   const [transactionProgress, setTransactionProgress] = useState(0);
