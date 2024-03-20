@@ -92,5 +92,6 @@ export function useEthereumObserver(): void {
         );
       });
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [protocolContract, dlcBTCContract, network]);
 }

@@ -35,7 +35,9 @@ export function useVaults(): UseVaultsReturnType {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     fetchVaultsIfReady();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contractsLoaded]);
 
   const allVaults = useMemo(
