@@ -3,7 +3,7 @@ import { createContext } from 'react';
 import { useBlockchainHeightQuery } from '@hooks/use-blockchain-height-query';
 import { HasChildren } from '@models/has-children';
 
-export interface BlockchainHeightContextProviderType {
+interface BlockchainHeightContextProviderType {
   blockHeight: number | undefined;
 }
 
