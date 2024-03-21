@@ -25,6 +25,7 @@ export function MintUnmint({ address }: MintUnmintContainerProps): React.JSX.Ele
     setTimeout(() => {
       setAnimate(false);
     }, 1000);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mintStep, unmintStep]);
 
   function handleTabsChange(index: number) {

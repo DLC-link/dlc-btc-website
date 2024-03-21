@@ -1,63 +1,69 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { useQuery } from 'react-query';
 
 import { Vault, VaultState } from '@models/vault';
+import { BlockchainHeightContext } from '@providers/bitcoin-query-provider';
 
 export function useConfirmationChecker(vault?: Vault): number {
-  const txID = vault?.state === VaultState.FUNDING ? vault?.fundingTX : vault?.closingTX;
+  const { blockHeight } = useContext(BlockchainHeightContext);
+
+  let txID;
+  switch (vault?.state) {
+    case VaultState.FUNDING:
+      txID = vault?.fundingTX;
+      break;
+    case VaultState.CLOSED:
+      txID = vault?.closingTX;
+      break;
+    default:
+      txID = undefined;
+  }
+
+  const [blockHeightAtBroadcast, setBlockHeightAtBroadcast] = useState<number | undefined>(
+    undefined
+  );
+  const [transactionProgress, setTransactionProgress] = useState<number>(0);
 
   const bitcoinBlockchainAPIURL = import.meta.env.VITE_BITCOIN_BLOCKCHAIN_API_URL;
-
   const bitcoinExplorerTXURL = `${bitcoinBlockchainAPIURL}/tx/${txID}`;
-  const bitcoinExplorerHeightURL = `${bitcoinBlockchainAPIURL}/blocks/tip/height`;
-  const fetchInterval = useRef<number | undefined>(undefined);
 
-  const [transactionProgress, setTransactionProgress] = useState(0);
+  async function fetchTransactionDetails() {
+    const response = await fetch(bitcoinExplorerTXURL);
+    if (!response.ok) throw new Error('Network response was not ok');
+    const transactionDetails = await response.json();
+    return transactionDetails.status.block_height;
+  }
 
-  const memoizedTransactionProgress = useMemo(() => transactionProgress, [transactionProgress]);
-
-  const fetchTransactionDetails = async () => {
-    if (!txID || (vault?.state && ![VaultState.FUNDING, VaultState.CLOSED].includes(vault.state))) {
-      clearInterval(fetchInterval.current);
-      return;
+  const { data: txBlockHeightAtBroadcast } = useQuery(
+    ['transactionDetails', txID],
+    () => fetchTransactionDetails(),
+    {
+      enabled:
+        !!txID &&
+        (vault?.state === VaultState.FUNDING || vault?.state === VaultState.CLOSED) &&
+        !blockHeightAtBroadcast,
+      refetchInterval: 10000,
     }
-
-    let bitcoinCurrentBlockHeight;
-    try {
-      const response = await fetch(bitcoinExplorerHeightURL, {
-        headers: { Accept: 'application/json' },
-      });
-      bitcoinCurrentBlockHeight = await response.json();
-    } catch (error) {
-      console.error(error);
-    }
-
-    let bitcoinTransactionBlockHeight;
-
-    try {
-      const response = await fetch(bitcoinExplorerTXURL, {
-        headers: { Accept: 'application/json' },
-      });
-      const bitcoinTransactionDetails = await response.json();
-      bitcoinTransactionBlockHeight = bitcoinTransactionDetails.status.block_height;
-    } catch (error) {
-      console.error(error);
-    }
-
-    const difference = bitcoinCurrentBlockHeight - bitcoinTransactionBlockHeight;
-
-    setTransactionProgress(difference > 0 ? difference : 0);
-
-    if (difference > 6) {
-      clearInterval(fetchInterval.current);
-    }
-  };
-
-  fetchTransactionDetails();
+  );
 
   useEffect(() => {
-    fetchInterval.current = setInterval(fetchTransactionDetails, 10000) as unknown as number; // Cleanup the interval when the component unmounts
-    return () => clearInterval(fetchInterval.current);
-  }, [vault?.state, txID]);
+    if (txBlockHeightAtBroadcast && typeof txBlockHeightAtBroadcast === 'number') {
+      setBlockHeightAtBroadcast(txBlockHeightAtBroadcast);
+    }
+  }, [txBlockHeightAtBroadcast]);
 
-  return memoizedTransactionProgress;
+  useEffect(() => {
+    if (
+      (vault?.state != VaultState.FUNDING && vault?.state != VaultState.CLOSED) ||
+      transactionProgress > 6
+    )
+      return;
+
+    const blockHeightDifference = (blockHeight as number) - (blockHeightAtBroadcast as number);
+    if (typeof blockHeightDifference === 'number') {
+      setTransactionProgress(blockHeightDifference);
+    }
+  }, [blockHeightAtBroadcast, blockHeight, vault?.state, transactionProgress]);
+
+  return transactionProgress;
 }

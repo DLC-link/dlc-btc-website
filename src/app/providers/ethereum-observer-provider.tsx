@@ -4,6 +4,5 @@ import { HasChildren } from '@models/has-children';
 
 export function EthereumObserverProvider({ children }: HasChildren): React.JSX.Element {
   useEthereumObserver();
-
   return <Box>{children}</Box>;
 }

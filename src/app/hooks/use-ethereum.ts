@@ -24,6 +24,7 @@ interface UseEthereumReturnType {
   closeVault: (vaultUUID: string) => Promise<void>;
 }
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function throwEthereumError(message: string, error: any): void {
   if (error.code === Logger.errors.CALL_EXCEPTION) {
     throw new EthereumError(
