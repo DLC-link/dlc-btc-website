@@ -37,7 +37,7 @@ export function usePSBT(): UsePSBTReturnType {
 
     try {
       const { fundingTransaction, multisigTransaction, userNativeSegwitAddress } =
-        await signAndBroadcastFundingPSBT(shiftedBTCDepositAmount);
+        await signAndBroadcastFundingPSBT(shiftedBTCDepositAmount, vaultUUID);
 
       setVaultUUID(vaultUUID);
       setBitcoinAmount(shiftedBTCDepositAmount);
