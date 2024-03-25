@@ -3,6 +3,7 @@ import { BitcoinError } from '@models/error-types';
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
 import { hex } from '@scure/base';
 import * as btc from '@scure/btc-signer';
+import { Transaction, payments } from 'bitcoinjs-lib';
 
 import { useAttestors } from './use-attestors';
 import { useEndpoints } from './use-endpoints';
@@ -271,6 +272,8 @@ export function useBitcoin(): UseBitcoinReturnType {
   ): Promise<Uint8Array> {
     const closingTransaction = new btc.Transaction({ PSBTVersion: 0 });
 
+    // Create a Dummy PSBT to get the bytes size of the closing transaction
+    const closingTransactionDummy = new Transaction();
     const fundingInput = {
       txid: hexToBytes(fundingTransactionID),
       index: 0,
@@ -278,10 +281,26 @@ export function useBitcoin(): UseBitcoinReturnType {
       ...multisigTransaction,
     };
 
+    // Add the input and output to the Dummy PSBT
+    closingTransactionDummy.addInput(Buffer.from(fundingTransactionID, 'hex'), 0);
+    closingTransactionDummy.addOutput(
+      payments.p2wpkh({ address: userNativeSegwitAddress, network: bitcoinNetwork }).output!,
+      bitcoinAmount
+    );
+
+    // Get the closing transaction size from the Dummy PSBT
+    const closingTransactionSize = closingTransactionDummy.virtualSize();
+
+    // Get the fee rate
+    const feeRate = BigInt(await getFeeRate());
+
+    // Calculate the fee
+    const fee = feeRate * BigInt(closingTransactionSize);
+
     closingTransaction.addInput(fundingInput);
     closingTransaction.addOutputAddress(
       userNativeSegwitAddress,
-      BigInt(bitcoinAmount - 10000),
+      BigInt(bitcoinAmount) - fee,
       bitcoinNetwork
     );
 
