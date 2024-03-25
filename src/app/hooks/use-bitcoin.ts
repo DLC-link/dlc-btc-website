@@ -293,7 +293,7 @@ export function useBitcoin(): UseBitcoinReturnType {
   ): Promise<Uint8Array> {
     const closingTransaction = new btc.Transaction({ PSBTVersion: 0 });
 
-    // Create a Dummy PSBT to get the bytes size of the closing transaction
+    // Create a Dummy Transaction to get the virtual size of the closing transaction
     const closingTransactionDummy = new Transaction();
     const fundingInput = {
       txid: hexToBytes(fundingTransactionID),
