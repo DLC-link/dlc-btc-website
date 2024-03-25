@@ -72,7 +72,10 @@ interface RpcResponse {
 }
 
 interface UseBitcoinReturnType {
-  signAndBroadcastFundingPSBT: (btcAmount: number) => Promise<{
+  signAndBroadcastFundingPSBT: (
+    btcAmount: number,
+    uuid: string
+  ) => Promise<{
     fundingTransaction: btc.Transaction;
     multisigTransaction: btc.P2TROut;
     userNativeSegwitAddress: string;
@@ -179,10 +182,28 @@ export function useBitcoin(): UseBitcoinReturnType {
   function createMultisigTransaction(
     userPublicKey: Uint8Array,
     attestorGroupPublicKey: Uint8Array,
+    uuid: string,
     bitcoinNetwork: BitcoinNetwork
   ): btc.P2TROut {
     const multisig = btc.p2tr_ns(2, [userPublicKey, attestorGroupPublicKey]);
-    const multisigTransaction = btc.p2tr(undefined, multisig, bitcoinNetwork);
+
+    // The following is taken from the https://github.com/paulmillr/scure-btc-signer
+    // Another stupid decision, where lack of standard affects security.
+    // Multisig needs to be generated with some key.
+    // We are using approach from BIP 341/bitcoinjs-lib: SHA256(uncompressedDER(SECP256K1_GENERATOR_POINT))
+    // It is possible to switch SECP256K1_GENERATOR_POINT with some random point;
+    // but it's too complex to prove.
+    // Also used by bitcoin-core and bitcoinjs-lib
+    const TAPROOT_UNSPENDABLE_KEY_STR =
+      '50929b74c1a04954b78b4b6035e97a5e078a5a0f28ec96d547bfee9ace803ac0';
+    const TAPROOT_UNSPENDABLE_KEY = hexToBytes(TAPROOT_UNSPENDABLE_KEY_STR);
+
+    const tweakedUnspendableWithUUID = btc.taprootTweakPubkey(
+      TAPROOT_UNSPENDABLE_KEY,
+      Buffer.from(uuid)
+    )[0];
+    const multisigTransaction = btc.p2tr(tweakedUnspendableWithUUID, multisig, bitcoinNetwork);
+    multisigTransaction.tapInternalKey = tweakedUnspendableWithUUID;
 
     return multisigTransaction;
   }
@@ -256,7 +277,6 @@ export function useBitcoin(): UseBitcoinReturnType {
       BigInt(bitcoinAmount - 10000),
       bitcoinNetwork
     );
-
     const closingPSBT = closingTransaction.toPSBT();
 
     return closingPSBT;
@@ -307,7 +327,10 @@ export function useBitcoin(): UseBitcoinReturnType {
    * @param bitcoinAmount - The amount of bitcoin to be used in the transaction.
    * @returns A promise that resolves when the transaction has been successfully broadcasted.
    */
-  async function signAndBroadcastFundingPSBT(bitcoinAmount: number): Promise<{
+  async function signAndBroadcastFundingPSBT(
+    bitcoinAmount: number,
+    uuid: string
+  ): Promise<{
     fundingTransaction: btc.Transaction;
     multisigTransaction: btc.P2TROut;
     userNativeSegwitAddress: string;
@@ -324,6 +347,7 @@ export function useBitcoin(): UseBitcoinReturnType {
     const multisigTransaction = createMultisigTransaction(
       hex.decode(userPublicKey),
       hex.decode(attestorPublicKey),
+      uuid,
       bitcoinNetwork
     );
 
