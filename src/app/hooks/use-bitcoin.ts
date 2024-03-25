@@ -42,6 +42,14 @@ interface UTXO {
   value: number;
 }
 
+interface FeeRates {
+  fastestFee: number;
+  halfHourFee: number;
+  hourFee: number;
+  economyFee: number;
+  minimumFee: number;
+}
+
 interface BitcoinNativeSegwitAddress {
   address: string;
   derivationPath: string;
@@ -88,7 +96,8 @@ interface UseBitcoinReturnType {
 }
 
 export function useBitcoin(): UseBitcoinReturnType {
-  const { bitcoinNetwork, bitcoinNetworkName, bitcoinBlockchainAPIURL } = useEndpoints();
+  const { bitcoinNetwork, bitcoinNetworkName, bitcoinBlockchainAPIURL, mempoolSpaceAPIFeeURL } =
+    useEndpoints();
   const { getAttestorGroupPublicKey, sendClosingTransactionToAttestors } = useAttestors();
 
   /**
@@ -129,6 +138,22 @@ export function useBitcoin(): UseBitcoinReturnType {
       return userAddresses;
     } catch (error) {
       throw new BitcoinError(`Error getting bitcoin addresses: ${error}`);
+    }
+  }
+
+  /**
+   * Fetches the fee rate from the mempool.space API.
+   *
+   * @returns A promise that resolves to the hour fee rate.
+   */
+  async function getFeeRate(): Promise<number> {
+    try {
+      const response = await fetch(mempoolSpaceAPIFeeURL);
+      const feeRates: FeeRates = await response.json();
+
+      return feeRates.hourFee;
+    } catch (error) {
+      throw new BitcoinError(`Error getting Fee Rate: ${error}`);
     }
   }
 
@@ -174,6 +199,7 @@ export function useBitcoin(): UseBitcoinReturnType {
    *
    * @param userPublicKey - The user's public key.
    * @param attestorGroupPublicKey - The attestor group's public key.
+   * @param bitcoinNetwork - The bitcoin network.
    * @returns A promise that resolves to the multisig transaction.
    */
   function createMultisigTransaction(
@@ -191,15 +217,17 @@ export function useBitcoin(): UseBitcoinReturnType {
    * Creates the first PSBT, which is the funding transaction.
    * Uses the selected UTXOs to fund the transaction.
    *
-   * @param selectedUTXOs - The UTXOs selected for funding the transaction.
-   * @param multisigAddress - The multisig address.
-   * @param bitcoinAmount - The amount of bitcoin.
+   * @param multisigAddress - The multisig address created from the multisig transaction between the user and the attestor group.
+   * @param utxos - The user's UTXOs.
+   * @param feeRate - The fee rate.
+   * @param bitcoinAmount - The amount of bitcoin to be used in the transaction.
    * @param bitcoinNetwork - The bitcoin network.
    * @returns A promise that resolves to the funding PSBT.
    */ function createFundingTransaction(
     multisigAddress: string,
     userChangeAddress: string,
     utxos: any[],
+    feeRate: bigint,
     bitcoinAmount: number,
     bitcoinNetwork: BitcoinNetwork
   ): Uint8Array {
@@ -207,7 +235,7 @@ export function useBitcoin(): UseBitcoinReturnType {
 
     const selected = btc.selectUTXO(utxos, outputs, 'default', {
       changeAddress: userChangeAddress,
-      feePerByte: 2n,
+      feePerByte: feeRate,
       bip69: false,
       createTx: true,
       network: bitcoinNetwork,
@@ -228,9 +256,9 @@ export function useBitcoin(): UseBitcoinReturnType {
    * The closing transaction is sent to the user's native segwit address.
    *
    * @param fundingTransactionID - The ID of the funding transaction.
-   * @param multisigTransaction - The multisig transaction.
+   * @param multisigTransaction - The multisig transaction between the user and the attestor group.
    * @param userNativeSegwitAddress - The user's native segwit address.
-   * @param bitcoinAmount - The amount of bitcoin.
+   * @param bitcoinAmount - The amount of bitcoin to be used in the transaction.
    * @param bitcoinNetwork - The bitcoin network.
    * @returns A promise that resolves to the closing PSBT.
    */
@@ -294,6 +322,10 @@ export function useBitcoin(): UseBitcoinReturnType {
         body: bytesToHex(transaction.extract()),
       });
 
+      if (!response.ok) {
+        throw new Error(`HTTP Error! Status: ${response.status}`);
+      }
+
       const transactionID = await response.text();
       return transactionID;
     } catch (error) {
@@ -330,10 +362,13 @@ export function useBitcoin(): UseBitcoinReturnType {
     const multisigAddress = multisigTransaction.address;
     if (!multisigAddress) throw new BitcoinError('Could not create multisig address');
 
+    const feeRate = BigInt(await getFeeRate());
+
     const fundingTransaction = createFundingTransaction(
       multisigAddress,
       userNativeSegwitAddress,
       userUTXOs,
+      feeRate,
       bitcoinAmount,
       bitcoinNetwork
     );
