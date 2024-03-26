@@ -1,20 +1,61 @@
-# VITE_ATTESTOR_API_URLS_EXAMPLE: https://example/attestor-1,https://example/attestor-2,https://example/attestor-3
+## Environment Variables
+## This file is a template for the environment variables that need to be set in the `.env` file.
+## Copy the contents of this file into the different environments' `.env` files and fill in the values.
 
-# Regtest
+## .env files should be named as follows: 
+## `.env.localhost` for **locally run attestors / regtest bitcoin** => yarn localhost
+## `.env.devnet` for **deployed devnet attestors / regtest bitcoin** => yarn devnet
+## `.env.testnet` for **deployed testnet attestors / testnet bitcoin** => yarn testnet
+## `.env.mainnet` for **deployed mainnet attestors / mainnet bitcoin** => yarn mainnet
 
-VITE_ETHEREUM_DEPLOYMENT_BRANCH=dev
-VITE_ETHEREUM_DEPLOYMENT_VERSION=1
-VITE_ENABLED_ETHEREUM_NETWORKS='11155111'
-VITE_ATTESTOR_API_URLS=
-VITE_BITCOIN_NETWORK=regtest
-VITE_BITCOIN_EXPLORER_API_URL=https://devnet.dlc.link/electrs/tx/
-VITE_BITCOIN_BLOCKCHAIN_API_URL=https://devnet.dlc.link/electrs
+## Example values for missing variables:
 
-# # Testnet
+## Endpoints of the Attestor Group API
+## VITE_ATTESTOR_API_URLS=https://example/attestor-1,https://example/attestor-2,https://example/attestor-3
+
+## Address to which the redemption fee is sent
+## VITE_BITCOIN_REDEMPTION_FEE_ADDRESS=bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq
+
+## Locally Run Attestors / Regtest Bitcoin
+
 # VITE_ETHEREUM_DEPLOYMENT_BRANCH=dev
 # VITE_ETHEREUM_DEPLOYMENT_VERSION=1
 # VITE_ENABLED_ETHEREUM_NETWORKS='11155111'
 # VITE_ATTESTOR_API_URLS=
+# VITE_BITCOIN_NETWORK=regtest
+# VITE_BITCOIN_EXPLORER_API_URL=https://devnet.dlc.link/electrs
+# VITE_BITCOIN_BLOCKCHAIN_API_URL=https://devnet.dlc.link/electrs
+# VITE_BITCOIN_REDEMPTION_FEE_ADDRESS=
+
+## Deployed Devnet Attestors / Regtest Bitcoin
+
+# VITE_ETHEREUM_DEPLOYMENT_BRANCH=dev
+# VITE_ETHEREUM_DEPLOYMENT_VERSION=1
+# VITE_ENABLED_ETHEREUM_NETWORKS='11155111'
+# VITE_ATTESTOR_API_URLS=
+# VITE_BITCOIN_NETWORK=regtest
+# VITE_BITCOIN_EXPLORER_API_URL=https://devnet.dlc.link/electrs
+# VITE_BITCOIN_BLOCKCHAIN_API_URL=https://devnet.dlc.link/electrs
+# VITE_BITCOIN_REDEMPTION_FEE_ADDRESS=
+
+## Deployed Testnet Attestors / Testnet Bitcoin
+
+# VITE_ETHEREUM_DEPLOYMENT_BRANCH=testnet
+# VITE_ETHEREUM_DEPLOYMENT_VERSION=1
+# VITE_ENABLED_ETHEREUM_NETWORKS='11155111'
+# VITE_ATTESTOR_API_URLS=
 # VITE_BITCOIN_NETWORK=testnet
-# VITE_BITCOIN_EXPLORER_API_URL=https://mempool.space/testnet/tx/
+# VITE_BITCOIN_EXPLORER_API_URL=https://mempool.space/testnet
 # VITE_BITCOIN_BLOCKCHAIN_API_URL=https://testnet.dlc.link/electrs
+# VITE_BITCOIN_REDEMPTION_FEE_ADDRESS=
+
+## Deployed Mainnet Attestors / Mainnet Bitcoin
+
+# VITE_ETHEREUM_DEPLOYMENT_BRANCH=mainnet
+# VITE_ETHEREUM_DEPLOYMENT_VERSION=1
+# VITE_ENABLED_ETHEREUM_NETWORKS='11155111'
+# VITE_ATTESTOR_API_URLS=
+# VITE_BITCOIN_NETWORK=mainnet
+# VITE_BITCOIN_EXPLORER_API_URL=https://mempool.space
+# VITE_BITCOIN_BLOCKCHAIN_API_URL=https://mainnet.dlc.link/electrs
+# VITE_BITCOIN_REDEMPTION_FEE_ADDRESS=

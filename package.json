@@ -3,7 +3,10 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "dev": "vite",
+    "localhost": "vite --mode localhost",
+    "devnet": "vite --mode devnet",
+    "testnet": "vite --mode testnet",
+    "mainnet": "vite --mode mainnet",
     "build": "tsc && vite build",
     "lint": "concurrently -g 'yarn lint:prettier' 'yarn lint:unused-exports' 'yarn run lint:eslint' 'yarn run lint:filename'",
     "lint:eslint": "eslint \"src/**/*.{ts,tsx}\"",

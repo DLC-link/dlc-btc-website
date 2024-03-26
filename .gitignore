@@ -29,4 +29,7 @@ dist-ssr
 
 # Environment variables
 .env
-.env.development
+.env.localhost
+.env.devnet
+.env.testnet
+.env.mainnet
