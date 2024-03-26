@@ -3,7 +3,6 @@ import { BitcoinError } from '@models/error-types';
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
 import { hex } from '@scure/base';
 import * as btc from '@scure/btc-signer';
-import { Transaction, payments } from 'bitcoinjs-lib';
 
 import { useAttestors } from './use-attestors';
 import { useEndpoints } from './use-endpoints';
@@ -95,7 +94,6 @@ interface UseBitcoinReturnType {
     multisigTransaction: btc.P2TROut,
     uuid: string,
     userNativeSegwitAddress: string,
-    attestorGroupPublicKey: string,
     bitcoinAmount: number
   ) => Promise<void>;
   broadcastTransaction: (transaction: btc.Transaction) => Promise<string>;
@@ -290,7 +288,6 @@ export function useBitcoin(): UseBitcoinReturnType {
     fundingTransactionID: string,
     multisigTransaction: any,
     userNativeSegwitAddress: string,
-    attestorGroupPublicKey: string,
     bitcoinAmount: number,
     bitcoinNetwork: BitcoinNetwork
   ): Promise<Uint8Array> {
@@ -312,11 +309,12 @@ export function useBitcoin(): UseBitcoinReturnType {
       },
     ];
 
-    const feeRate = BigInt(await getFeeRate());
+    // TODO: Replace 2n with the fee rate from the mempool.space API
+    // const feeRate = BigInt(await getFeeRate());
 
     const selected = btc.selectUTXO(inputs, outputs, 'default', {
       changeAddress: userNativeSegwitAddress,
-      feePerByte: feeRate,
+      feePerByte: 2n,
       bip69: false,
       createTx: true,
       network: bitcoinNetwork,
@@ -445,14 +443,12 @@ export function useBitcoin(): UseBitcoinReturnType {
     multisigTransaction: btc.P2TROut,
     uuid: string,
     userNativeSegwitAddress: string,
-    attestorGroupPublicKey: string,
     bitcoinAmount: number
   ): Promise<void> {
     const closingTransaction = await createClosingTransaction(
       fundingTransactionID,
       multisigTransaction,
       userNativeSegwitAddress,
-      attestorGroupPublicKey,
       bitcoinAmount,
       bitcoinNetwork
     );
