@@ -88,12 +88,14 @@ interface UseBitcoinReturnType {
     fundingTransaction: btc.Transaction;
     multisigTransaction: btc.P2TROut;
     userNativeSegwitAddress: string;
+    attestorGroupPublicKey: string;
   }>;
   signAndSendClosingPSBT: (
     fundingTransactionID: string,
     multisigTransaction: btc.P2TROut,
     uuid: string,
     userNativeSegwitAddress: string,
+    attestorGroupPublicKey: string,
     bitcoinAmount: number
   ) => Promise<void>;
   broadcastTransaction: (transaction: btc.Transaction) => Promise<string>;
@@ -288,13 +290,10 @@ export function useBitcoin(): UseBitcoinReturnType {
     fundingTransactionID: string,
     multisigTransaction: any,
     userNativeSegwitAddress: string,
+    attestorGroupPublicKey: string,
     bitcoinAmount: number,
     bitcoinNetwork: BitcoinNetwork
   ): Promise<Uint8Array> {
-    const closingTransaction = new btc.Transaction({ PSBTVersion: 0 });
-
-    // Create a Dummy Transaction to get the virtual size of the closing transaction
-    const closingTransactionDummy = new Transaction();
     const fundingInput = {
       txid: hexToBytes(fundingTransactionID),
       index: 0,
@@ -302,29 +301,41 @@ export function useBitcoin(): UseBitcoinReturnType {
       ...multisigTransaction,
     };
 
-    // Add the input and output to the Dummy PSBT
-    closingTransactionDummy.addInput(Buffer.from(fundingTransactionID, 'hex'), 0);
-    closingTransactionDummy.addOutput(
-      payments.p2wpkh({ address: userNativeSegwitAddress, network: bitcoinNetwork }).output!,
-      bitcoinAmount
-    );
+    console.log('attestorGroupPublicKey', attestorGroupPublicKey);
 
-    // Get the closing transaction size from the Dummy PSBT
-    const closingTransactionSize = closingTransactionDummy.virtualSize();
+    const attestorGroupPublicKeyBuffer = Buffer.from(hexToBytes(attestorGroupPublicKey));
 
-    // Get the fee rate
+    console.log('attestorGroupPublicKeyBuffer', attestorGroupPublicKeyBuffer);
+
+    const tweakedAttestorGroupPublicKeyBuffer = Buffer.concat([
+      Buffer.from([1, 32]),
+      attestorGroupPublicKeyBuffer,
+    ]);
+
+    console.log('tweakedAttestorGroupPublicKeyBuffer', tweakedAttestorGroupPublicKeyBuffer);
+
+    const feeOutput = {
+      script: new Uint8Array(tweakedAttestorGroupPublicKeyBuffer),
+      amount: BigInt(bitcoinAmount) / 100n,
+    };
+
+    console.log('feeOutput', feeOutput);
+
     const feeRate = BigInt(await getFeeRate());
 
-    // Calculate the fee
-    const fee = feeRate * BigInt(closingTransactionSize);
+    const selected = btc.selectUTXO([fundingInput], [feeOutput], 'default', {
+      changeAddress: userNativeSegwitAddress,
+      feePerByte: feeRate,
+      bip69: false,
+      createTx: true,
+      network: bitcoinNetwork,
+    });
 
-    closingTransaction.addInput(fundingInput);
-    closingTransaction.addOutputAddress(
-      userNativeSegwitAddress,
-      BigInt(bitcoinAmount) - fee,
-      bitcoinNetwork
-    );
-    const closingPSBT = closingTransaction.toPSBT();
+    console.log('selected', selected);
+
+    if (!selected?.tx) throw new BitcoinError('Could not create Closing Transaction');
+
+    const closingPSBT = selected.tx.toPSBT();
 
     return closingPSBT;
   }
@@ -385,6 +396,7 @@ export function useBitcoin(): UseBitcoinReturnType {
     fundingTransaction: btc.Transaction;
     multisigTransaction: btc.P2TROut;
     userNativeSegwitAddress: string;
+    attestorGroupPublicKey: string;
   }> {
     const userAddresses = await getBitcoinAddresses();
     const userNativeSegwitAccount = userAddresses[0] as BitcoinNativeSegwitAddress;
@@ -392,12 +404,12 @@ export function useBitcoin(): UseBitcoinReturnType {
     const userTaprootAddress = userAddresses[1] as BitcoinTaprootAddress;
     const userPublicKey = userTaprootAddress.tweakedPublicKey;
 
-    const attestorPublicKey = await getAttestorGroupPublicKey();
+    const attestorGroupPublicKey = await getAttestorGroupPublicKey();
 
     const userUTXOs = await getUTXOs(userAddresses[0] as BitcoinNativeSegwitAddress);
     const multisigTransaction = createMultisigTransaction(
       hex.decode(userPublicKey),
-      hex.decode(attestorPublicKey),
+      hex.decode(attestorGroupPublicKey),
       uuid,
       bitcoinNetwork
     );
@@ -425,6 +437,7 @@ export function useBitcoin(): UseBitcoinReturnType {
       fundingTransaction: transaction,
       multisigTransaction,
       userNativeSegwitAddress,
+      attestorGroupPublicKey,
     };
   }
 
@@ -443,12 +456,14 @@ export function useBitcoin(): UseBitcoinReturnType {
     multisigTransaction: btc.P2TROut,
     uuid: string,
     userNativeSegwitAddress: string,
+    attestorGroupPublicKey: string,
     bitcoinAmount: number
   ): Promise<void> {
     const closingTransaction = await createClosingTransaction(
       fundingTransactionID,
       multisigTransaction,
       userNativeSegwitAddress,
+      attestorGroupPublicKey,
       bitcoinAmount,
       bitcoinNetwork
     );
