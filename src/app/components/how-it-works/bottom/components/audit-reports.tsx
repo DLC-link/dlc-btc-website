@@ -15,7 +15,7 @@ export function AuditReports(): React.JSX.Element {
               <Link
                 href={'https://docs.dlc.link/resources#security-audit-reports'}
                 isExternal
-                color={'accent.cyan.01'}
+                color={'accent.lightBlue.01'}
               >
                 Read the report...
               </Link>

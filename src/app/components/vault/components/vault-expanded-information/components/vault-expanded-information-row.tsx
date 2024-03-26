@@ -33,9 +33,9 @@ export function VaultExpandedInformationUUIDRow({
             variant={'ghost'}
           >
             {hasCopied ? (
-              <CheckCircleIcon color={'accent.cyan.01'} fontSize={'xs'} />
+              <CheckCircleIcon color={'accent.lightBlue.01'} fontSize={'xs'} />
             ) : (
-              <CopyIcon color={'accent.cyan.01'} fontSize={'xs'} />
+              <CopyIcon color={'accent.lightBlue.01'} fontSize={'xs'} />
             )}
           </Button>
         </Tooltip>

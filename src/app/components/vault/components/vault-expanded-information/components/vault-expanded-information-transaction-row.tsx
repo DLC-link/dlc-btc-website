@@ -20,7 +20,7 @@ export function VaultExpandedInformationTransactionRow({
       <Text
         textAlign={'right'}
         w={'75%'}
-        color={'accent.cyan.01'}
+        color={'accent.lightBlue.01'}
         fontSize={'xs'}
         textDecoration={'underline'}
         onClick={() => window.open(`${bitcoinExplorerAPIURL}/tx/${value}`, '_blank')}

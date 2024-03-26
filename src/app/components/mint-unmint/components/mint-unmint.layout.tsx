@@ -10,12 +10,12 @@ export function MintUnmintLayout({ children, animate }: MintUnmintLayoutProps): 
   return (
     <VStack
       px={'15px'}
-      w={'650px'}
+      w={'930px'}
       h={'625px'}
       bg={'background.container.01'}
       border={'1px solid'}
       borderRadius={'md'}
-      borderColor={'border.cyan.01'}
+      borderColor={'border.lightBlue.01'}
       css={{
         animation: animate ? `${boxShadowAnimation} 0.5s 2 ease-in-out` : 'none',
       }}

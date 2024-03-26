@@ -15,7 +15,7 @@ export function TransactionFormWarning({
         <Link
           isExternal
           href={'https://leather.io/'}
-          color={'accent.orange.01'}
+          color={'accent.lightBlue.01'}
           textDecoration={'underline'}
         >
           Leather Wallet

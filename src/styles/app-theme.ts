@@ -8,6 +8,9 @@ import { selectTheme } from './select-theme';
 import { tabsTheme } from './tabs-theme';
 import { textTheme } from './text-theme';
 
+// Supports weights 100-900
+import '@fontsource-variable/onest';
+
 export const appTheme = extendTheme({
   components: {
     Menu: menuTheme,
@@ -23,7 +26,7 @@ export const appTheme = extendTheme({
           bg: 'white.03',
         },
         filledTrack: {
-          bg: 'border.cyan.01',
+          bg: 'border.lightBlue.01',
         },
       },
     },
@@ -31,27 +34,26 @@ export const appTheme = extendTheme({
   styles: {
     global: () => ({
       body: {
-        bgGradient: 'linear(to-r, background.website.01, background.website.02)',
-      },
+        bg: 'background.website.01',
+        bgImage: '././public/images/bg_with_dots_op30.png',
+        bgSize: 'cover',
+        width: '100%',
+        bgPosition: 'top'
+      }
     }),
   },
   colors: {
-    'background.website.01': 'rgba(50,3,69,1)',
-    'background.website.02': 'rgba(0,9,51,1)',
-    'background.container.01': 'rgba(40,7,78,1)',
-    'background.content.01': 'rgba(31,9,78,0.25)',
-    'background.content.02': 'rgba(4,13,72,0.25)',
-    'border.cyan.01': 'rgba(7,232,216,0.75)',
+    'background.website.01': 'rgba(0, 0, 0, 1)',
+    'background.container.01': 'rgba(18, 18, 18, 1)',
+    'background.content.01': 'rgba(51, 51, 51, 1)',
+    'border.lightBlue.01': 'rgba(50, 201, 247,0.75)',
     'border.white.01': 'rgba(255,255,255,0.25)',
-    'accent.cyan.01': 'rgba(7,232,216,1)',
-    'accent.blue.01': 'rgba(0,40,187,1)',
-    'accent.orange.01': 'rgba(247,147,26,1)',
+    'accent.lightBlue.01': 'rgba(50, 201, 247, 1)',
     'white.01': 'rgba(255,255,255,1)',
     'white.02': 'rgba(255,255,255,0.75)',
     'white.03': 'rgba(255,255,255,0.35)',
-    'light.blue.01': 'rgba(154, 201, 255, 1)',
   },
   fonts: {
-    body: "'Poppins', poppins",
+    body: "'Onest', onest, sans-serif",
   },
 });

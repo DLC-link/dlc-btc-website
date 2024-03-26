@@ -55,8 +55,8 @@ export function TransactionSummary({
   return (
     <VStack alignItems={'start'} w={'300px'} spacing={'15px'}>
       <HStack w={'100%'}>
-        {showProcessing && <Spinner color={'accent.cyan.01'} size={'md'} />}
-        <Text color={'accent.cyan.01'}>{flowPropertyMap[flow][currentStep[0]].title}:</Text>
+        {showProcessing && <Spinner color={'accent.lightBlue.01'} size={'md'} />}
+        <Text color={'accent.lightBlue.01'}>{flowPropertyMap[flow][currentStep[0]].title}:</Text>
       </HStack>
       <VaultCard vault={currentVault} />
       {showProcessing && (

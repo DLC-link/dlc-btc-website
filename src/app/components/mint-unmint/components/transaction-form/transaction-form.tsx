@@ -53,7 +53,7 @@ export function TransactionForm(): React.JSX.Element {
           <Form onSubmit={handleSubmit}>
             <FormControl isInvalid={!!errors.amount && touched.amount}>
               <VStack spacing={'15px'} w={'300px'}>
-                <Text w={'100%'} color={'accent.cyan.01'}>
+                <Text w={'100%'} color={'accent.lightBlue.01'}>
                   Amount of dlcBTC you want to mint:
                 </Text>
                 <TransactionFormInput values={values} bitcoinPrice={bitcoinPrice} />

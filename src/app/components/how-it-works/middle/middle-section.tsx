@@ -10,8 +10,6 @@ export function MiddleSection(): React.JSX.Element {
       h={'362px'}
       pl={'130px'}
       pr={'130px'}
-      background={'rgba(255,255,255,0.06)'}
-      boxShadow={'6px 6px 12px #0000004D'}
       mixBlendMode={'screen'}
       display={'flex'}
       justifyContent={'center'}

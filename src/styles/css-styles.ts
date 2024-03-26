@@ -9,7 +9,7 @@ export const scrollBarCSS = {
     width: '2.5px',
   },
   '&::-webkit-scrollbar-thumb': {
-    background: 'rgba(7,232,216,1)',
+    background: 'rgba(50,201,247,1)',
   },
 };
 

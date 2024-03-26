@@ -24,7 +24,7 @@ export function HowToMint(): React.JSX.Element {
             content={
               <Text color={'white'}>
                 Select an amount of Bitcoin you would like to lock and confirm it in your{' '}
-                <Text as={'span'} color={'light.blue.01'}>
+                <Text as={'span'} color={'accent.lightBlue.01'}>
                   Ethereum Wallet.{' '}
                 </Text>
                 You will receive your deposit token dlcBTC to the same address.
@@ -38,7 +38,7 @@ export function HowToMint(): React.JSX.Element {
             content={
               <Text color={'white'}>
                 Confirm the transaction in your{' '}
-                <Text as={'span'} color={'light.blue.01'}>
+                <Text as={'span'} color={'accent.lightBlue.01'}>
                   Bitcoin Wallet
                 </Text>{' '}
                 which will lock your Bitcoin on-chain.
@@ -52,11 +52,11 @@ export function HowToMint(): React.JSX.Element {
             content={
               <Text color={'white'}>
                 Wait for Bitcoin to get locked on chain
-                <Text as={'span'} color={'light.blue.01'}>
+                <Text as={'span'} color={'accent.lightBlue.01'}>
                   (~1 hour).{' '}
                 </Text>
                 After confirmation dlcBTC tokens will automatically appear in your{' '}
-                <Text as={'span'} color={'light.blue.01'}>
+                <Text as={'span'} color={'accent.lightBlue.01'}>
                   Ethereum Wallet.{' '}
                 </Text>{' '}
                 You can use dlcBTC in big{' '}
