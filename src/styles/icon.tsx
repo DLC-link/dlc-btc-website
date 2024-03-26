@@ -47,3 +47,16 @@ export const StepIconThree: React.FC<SVGProps<SVGSVGElement>> = props => (
     />
   </svg>
 );
+
+export const StepIconFour: React.FC<SVGProps<SVGSVGElement>> = props => (
+  <svg
+    data-name="Layer 4"
+    xmlns="http://www.w3.org/2000/svg"
+    width="35px"
+    height="35px"
+    viewBox="0 0 113.445 113.444"
+    {...props}
+  >
+    <path d="M56.722-.195C25.395-.195 0 25.201 0 56.527s25.395 56.722 56.722 56.722 56.723-25.395 56.723-56.722S88.049-.195 56.722-.195Zm20.459 74.296h-5.875v9.315H59.054V74.1H34.98v-9.888L57.62 31.828h13.685v31.669h5.875V74.1Z" />
+  </svg>
+);
