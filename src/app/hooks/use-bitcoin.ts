@@ -294,44 +294,33 @@ export function useBitcoin(): UseBitcoinReturnType {
     bitcoinAmount: number,
     bitcoinNetwork: BitcoinNetwork
   ): Promise<Uint8Array> {
-    const fundingInput = {
-      txid: hexToBytes(fundingTransactionID),
-      index: 0,
-      witnessUtxo: { amount: BigInt(bitcoinAmount), script: multisigTransaction.script },
-      ...multisigTransaction,
-    };
+    const redemptionFeeAddress = import.meta.env.VITE_REDEMPTION_FEE_ADDRESS as string;
 
-    console.log('attestorGroupPublicKey', attestorGroupPublicKey);
+    const inputs = [
+      {
+        txid: hexToBytes(fundingTransactionID),
+        index: 0,
+        witnessUtxo: { amount: BigInt(bitcoinAmount), script: multisigTransaction.script },
+        ...multisigTransaction,
+      },
+    ];
 
-    const attestorGroupPublicKeyBuffer = Buffer.from(hexToBytes(attestorGroupPublicKey));
-
-    console.log('attestorGroupPublicKeyBuffer', attestorGroupPublicKeyBuffer);
-
-    const tweakedAttestorGroupPublicKeyBuffer = Buffer.concat([
-      Buffer.from([1, 32]),
-      attestorGroupPublicKeyBuffer,
-    ]);
-
-    console.log('tweakedAttestorGroupPublicKeyBuffer', tweakedAttestorGroupPublicKeyBuffer);
-
-    const feeOutput = {
-      script: new Uint8Array(tweakedAttestorGroupPublicKeyBuffer),
-      amount: BigInt(bitcoinAmount) / 100n,
-    };
-
-    console.log('feeOutput', feeOutput);
+    const outputs = [
+      {
+        address: redemptionFeeAddress,
+        amount: BigInt(bitcoinAmount) / 100n,
+      },
+    ];
 
     const feeRate = BigInt(await getFeeRate());
 
-    const selected = btc.selectUTXO([fundingInput], [feeOutput], 'default', {
+    const selected = btc.selectUTXO(inputs, outputs, 'default', {
       changeAddress: userNativeSegwitAddress,
       feePerByte: feeRate,
       bip69: false,
       createTx: true,
       network: bitcoinNetwork,
     });
-
-    console.log('selected', selected);
 
     if (!selected?.tx) throw new BitcoinError('Could not create Closing Transaction');
 
