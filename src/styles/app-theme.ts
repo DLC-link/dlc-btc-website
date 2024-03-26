@@ -1,4 +1,6 @@
 import { extendTheme } from '@chakra-ui/react';
+// Supports weights 100-900
+import '@fontsource-variable/onest';
 
 import { buttonTheme } from './button-theme';
 import { dividerTheme } from './divider-theme';
@@ -7,9 +9,6 @@ import { modalTheme } from './modal-theme';
 import { selectTheme } from './select-theme';
 import { tabsTheme } from './tabs-theme';
 import { textTheme } from './text-theme';
-
-// Supports weights 100-900
-import '@fontsource-variable/onest';
 
 export const appTheme = extendTheme({
   components: {
@@ -38,8 +37,8 @@ export const appTheme = extendTheme({
         bgImage: '././public/images/new_background_dots_remake_test.jpeg',
         bgSize: 'cover',
         width: '100%',
-        bgPosition: 'top'
-      }
+        bgPosition: 'top',
+      },
     }),
   },
   colors: {
