@@ -34,7 +34,7 @@ export const appTheme = extendTheme({
     global: () => ({
       body: {
         bg: 'background.website.01',
-        bgImage: '././public/images/new_background_dots_remake_test.jpeg',
+        bgImage: './images/new_background_dots_remake_test.jpeg',
         bgSize: 'cover',
         width: '100%',
         bgPosition: 'top',
