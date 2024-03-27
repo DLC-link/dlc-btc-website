@@ -10,6 +10,8 @@ import { selectTheme } from './select-theme';
 import { tabsTheme } from './tabs-theme';
 import { textTheme } from './text-theme';
 
+import bgImage from '../../public/images/new_background_dots_remake_test.jpeg';
+
 export const appTheme = extendTheme({
   components: {
     Menu: menuTheme,
@@ -34,7 +36,7 @@ export const appTheme = extendTheme({
     global: () => ({
       body: {
         bg: 'background.website.01',
-        bgImage: '././public/images/new_background_dots_remake_test.jpeg',
+        bgImage: `url(${bgImage})`,
         bgSize: 'cover',
         width: '100%',
         bgPosition: 'top',
