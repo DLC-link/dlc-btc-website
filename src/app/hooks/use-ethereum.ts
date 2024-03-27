@@ -16,7 +16,6 @@ import { useEthereumContext } from './use-ethereum-context';
 interface UseEthereumReturnType {
   getDLCBTCBalance: () => Promise<number | undefined>;
   getLockedBTCBalance: () => Promise<number | undefined>;
-  getProtocolFee: () => Promise<number | undefined>;
   totalSupply: number | undefined;
   getAllVaults: () => Promise<void>;
   getVault: (vaultUUID: string, vaultState: VaultState) => Promise<void>;
@@ -52,14 +51,17 @@ export function useEthereum(): UseEthereumReturnType {
     fetchTotalSupply();
   }, [network]);
 
-  function formatVault(vault: any): Vault {
+  function formatVault(vault: RawVault): Vault {
     return {
       uuid: vault.uuid,
-      collateral: customShiftValue(parseInt(vault.valueLocked), 8, true),
+      timestamp: vault.timestamp.toNumber(),
+      collateral: customShiftValue(vault.valueLocked.toNumber(), 8, true),
       state: vault.status,
       fundingTX: vault.fundingTxId,
       closingTX: vault.closingTxId,
-      timestamp: parseInt(vault.timestamp),
+      btcFeeRecipient: vault.btcFeeRecipient,
+      btcMintFeeBasisPoints: customShiftValue(vault.btcMintFeeBasisPoints.toNumber(), 4, true),
+      btcRedeemFeeBasisPoints: customShiftValue(vault.btcRedeemFeeBasisPoints.toNumber(), 4, true),
     };
   }
 
@@ -80,19 +82,9 @@ export function useEthereum(): UseEthereumReturnType {
         provider
       );
       const totalSupply = await protocolContract.totalSupply();
-      setTotalSupply(customShiftValue(parseInt(totalSupply), 8, true));
+      setTotalSupply(customShiftValue(totalSupply, 8, true));
     } catch (error) {
       throw new EthereumError(`Could not fetch Total Supply Info: ${error}}`);
-    }
-  }
-
-  async function getProtocolFee(): Promise<number | undefined> {
-    if (!protocolContract) throw new Error('Protocol contract not initialized');
-    try {
-      const btcMintFeeRate = await protocolContract.btcMintFeeRate();
-      return customShiftValue(btcMintFeeRate.toNumber(), 4, true);
-    } catch (error) {
-      throwEthereumError(`Could not fetch Protocol Fee: `, error);
     }
   }
 
@@ -112,11 +104,7 @@ export function useEthereum(): UseEthereumReturnType {
     try {
       if (!dlcBTCContract) throw new Error('Protocol contract not initialized');
       await dlcBTCContract.callStatic.balanceOf(address);
-      const dlcBTCBalance = customShiftValue(
-        parseInt(await dlcBTCContract.balanceOf(address)),
-        8,
-        true
-      );
+      const dlcBTCBalance = customShiftValue(await dlcBTCContract.balanceOf(address), 8, true);
       return dlcBTCBalance;
     } catch (error) {
       throwEthereumError(`Could not fetch dlcBTC balance: `, error);
@@ -129,6 +117,7 @@ export function useEthereum(): UseEthereumReturnType {
       await protocolContract.callStatic.getAllVaultsForAddress(address);
       const vaults: RawVault[] = await protocolContract.getAllVaultsForAddress(address);
       const formattedVaults: Vault[] = vaults.map(formatVault);
+      console.log('formattedVaults', formattedVaults);
       if (!network) return;
       store.dispatch(
         vaultActions.setVaults({
@@ -194,7 +183,6 @@ export function useEthereum(): UseEthereumReturnType {
 
   return {
     getDLCBTCBalance,
-    getProtocolFee,
     totalSupply,
     getLockedBTCBalance,
     getAllVaults,
