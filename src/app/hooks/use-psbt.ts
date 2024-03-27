@@ -55,14 +55,15 @@ export function usePSBT(): UsePSBTReturnType {
           'Missing information for Closing Transaction, Funding Transaction must be signed before Closing Transaction can be signed'
         );
       }
-      await broadcastTransaction(fundingTransaction);
 
       await signAndSendClosingPSBT(
-        fundingTransaction.id,
+        fundingTransaction,
         multisigTransaction,
         userNativeSegwitAddress,
         vault
       );
+
+      await broadcastTransaction(fundingTransaction);
 
       dispatch(
         vaultActions.setVaultToFunding({

@@ -117,7 +117,6 @@ export function useEthereum(): UseEthereumReturnType {
       await protocolContract.callStatic.getAllVaultsForAddress(address);
       const vaults: RawVault[] = await protocolContract.getAllVaultsForAddress(address);
       const formattedVaults: Vault[] = vaults.map(formatVault);
-      console.log('formattedVaults', formattedVaults);
       if (!network) return;
       store.dispatch(
         vaultActions.setVaults({

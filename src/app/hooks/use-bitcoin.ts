@@ -90,7 +90,7 @@ interface UseBitcoinReturnType {
     attestorGroupPublicKey: string;
   }>;
   signAndSendClosingPSBT: (
-    fundingTransactionID: string,
+    fundingTransaction: btc.Transaction,
     multisigTransaction: btc.P2TROut,
     userNativeSegwitAddress: string,
     vault: Vault
@@ -138,7 +138,6 @@ export function useBitcoin(): UseBitcoinReturnType {
       const rpcResponse: RpcResponse = await window.btc?.request('getAddresses');
       const userAddresses = rpcResponse.result.addresses;
       checkUserWalletNetwork(userAddresses[0]);
-      console.log('User Addresses:', userAddresses);
       return userAddresses;
     } catch (error) {
       throw new BitcoinError(`Error getting bitcoin addresses: ${error}`);
@@ -461,13 +460,13 @@ export function useBitcoin(): UseBitcoinReturnType {
    * @returns A promise that resolves when the transaction has been successfully sent to the attestors.
    */
   async function signAndSendClosingPSBT(
-    fundingTransactionID: string,
+    fundingTransaction: btc.Transaction,
     multisigTransaction: btc.P2TROut,
     userNativeSegwitAddress: string,
     vault: Vault
   ): Promise<void> {
     const closingTransaction = await createClosingTransaction(
-      fundingTransactionID,
+      fundingTransaction.id,
       multisigTransaction,
       userNativeSegwitAddress,
       vault.btcFeeRecipient,
@@ -478,6 +477,7 @@ export function useBitcoin(): UseBitcoinReturnType {
     const closingTransactionHex = await signPSBT(closingTransaction);
 
     await sendClosingTransactionToAttestors(
+      fundingTransaction.hex,
       closingTransactionHex,
       vault.uuid,
       userNativeSegwitAddress
