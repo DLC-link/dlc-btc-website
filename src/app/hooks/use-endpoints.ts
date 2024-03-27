@@ -11,6 +11,7 @@ interface NetworkEndpoints {
   ethereumAttestorChainID: string;
   bitcoinExplorerAPIURL: string;
   bitcoinBlockchainAPIURL: string;
+  mempoolSpaceAPIFeeURL: string;
   bitcoinNetwork: BitcoinNetwork;
   bitcoinNetworkName: string;
 }
@@ -23,6 +24,8 @@ export function useEndpoints(): NetworkEndpoints {
   const [ethereumAttestorChainID, setEthereumAttestorChainID] = useState<string>('');
   const [bitcoinExplorerAPIURL, setBitcoinExplorerAPIURL] = useState<string>('');
   const [bitcoinBlockchainAPIURL, setBitcoinBlockchainAPIURL] = useState<string>('');
+  const [mempoolSpaceAPIFeeURL, setMempoolSpaceAPIFeeURL] = useState<string>('');
+
   const [bitcoinNetwork, setBitcoinNetwork] = useState<BitcoinNetwork>(regtest);
   const [bitcoinNetworkName, setBitcoinNetworkName] = useState<string>('');
 
@@ -35,6 +38,7 @@ export function useEndpoints(): NetworkEndpoints {
       ethereumAttestorChainID,
       bitcoinExplorerAPIURL,
       bitcoinBlockchainAPIURL,
+      mempoolSpaceAPIFeeURL,
       bitcoinNetwork,
       bitcoinNetworkName,
     } = getEndpoints();
@@ -44,6 +48,7 @@ export function useEndpoints(): NetworkEndpoints {
     setEthereumAttestorChainID(ethereumAttestorChainID);
     setBitcoinExplorerAPIURL(bitcoinExplorerAPIURL);
     setBitcoinBlockchainAPIURL(bitcoinBlockchainAPIURL);
+    setMempoolSpaceAPIFeeURL(mempoolSpaceAPIFeeURL);
     setBitcoinNetwork(bitcoinNetwork);
     setBitcoinNetworkName(bitcoinNetworkName);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -55,17 +60,22 @@ export function useEndpoints(): NetworkEndpoints {
     const bitcoinNetworkName = import.meta.env.VITE_BITCOIN_NETWORK;
     const bitcoinBlockchainAPIURL = import.meta.env.VITE_BITCOIN_BLOCKCHAIN_API_URL;
     const bitcoinExplorerAPIURL = import.meta.env.VITE_BITCOIN_EXPLORER_API_URL;
-    let bitcoinNetwork;
+
+    let bitcoinNetwork: BitcoinNetwork;
+    let mempoolSpaceAPIFeeURL: string;
 
     switch (bitcoinNetworkName) {
       case 'mainnet':
         bitcoinNetwork = bitcoin;
+        mempoolSpaceAPIFeeURL = 'https://mempool.space/api/v1/fees/recommended';
         break;
       case 'testnet':
         bitcoinNetwork = testnet;
+        mempoolSpaceAPIFeeURL = 'https://mempool.space/testnet/api/v1/fees/recommended';
         break;
       default:
         bitcoinNetwork = regtest;
+        mempoolSpaceAPIFeeURL = 'https://mempool.space/testnet/api/v1/fees/recommended';
     }
 
     switch (network?.id) {
@@ -76,6 +86,7 @@ export function useEndpoints(): NetworkEndpoints {
           ethereumAttestorChainID: 'evm-sepolia',
           bitcoinExplorerAPIURL,
           bitcoinBlockchainAPIURL,
+          mempoolSpaceAPIFeeURL,
           bitcoinNetwork,
           bitcoinNetworkName,
         };
@@ -86,6 +97,7 @@ export function useEndpoints(): NetworkEndpoints {
           ethereumAttestorChainID: 'evm-goerli',
           bitcoinExplorerAPIURL,
           bitcoinBlockchainAPIURL,
+          mempoolSpaceAPIFeeURL,
           bitcoinNetwork,
           bitcoinNetworkName,
         };
@@ -96,6 +108,7 @@ export function useEndpoints(): NetworkEndpoints {
           ethereumAttestorChainID: 'evm-x1-test',
           bitcoinExplorerAPIURL,
           bitcoinBlockchainAPIURL,
+          mempoolSpaceAPIFeeURL,
           bitcoinNetwork,
           bitcoinNetworkName,
         };
@@ -109,6 +122,7 @@ export function useEndpoints(): NetworkEndpoints {
     ethereumAttestorChainID,
     bitcoinExplorerAPIURL,
     bitcoinBlockchainAPIURL,
+    mempoolSpaceAPIFeeURL,
     bitcoinNetwork,
     bitcoinNetworkName,
   };

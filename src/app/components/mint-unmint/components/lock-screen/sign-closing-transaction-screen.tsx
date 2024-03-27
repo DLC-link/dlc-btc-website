@@ -1,10 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { Button, VStack, useToast } from '@chakra-ui/react';
 import { VaultCard } from '@components/vault/vault-card';
 import { useBitcoinPrice } from '@hooks/use-bitcoin-price';
-import { useEthereum } from '@hooks/use-ethereum';
 import { useVaults } from '@hooks/use-vaults';
 import { BitcoinError } from '@models/error-types';
 import { Vault } from '@models/vault';
@@ -27,21 +26,10 @@ export function SignClosingTransactionScreen({
   const { readyVaults } = useVaults();
 
   const { bitcoinPrice } = useBitcoinPrice();
-  const { getProtocolFee } = useEthereum();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [protocolFeePercentage, setProtocolFeePercentage] = useState<number | undefined>(undefined);
 
   const currentVault = readyVaults.find(vault => vault.uuid === currentStep[1]);
-
-  useEffect(() => {
-    const fetchProtocolFeePercentage = async () => {
-      const currentProtocolFeePercentage = await getProtocolFee();
-      setProtocolFeePercentage(currentProtocolFeePercentage);
-    };
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    fetchProtocolFeePercentage();
-  }, [getProtocolFee]);
 
   async function handleClick(currentVault?: Vault) {
     if (!currentVault) return;
@@ -68,7 +56,7 @@ export function SignClosingTransactionScreen({
       <LockScreenProtocolFee
         assetAmount={currentVault?.collateral}
         bitcoinPrice={bitcoinPrice}
-        protocolFeePercentage={protocolFeePercentage}
+        protocolFeePercentage={currentVault?.btcRedeemFeeBasisPoints}
       />
       <Button
         isLoading={isSubmitting}

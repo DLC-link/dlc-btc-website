@@ -5,6 +5,7 @@ import { useEndpoints } from './use-endpoints';
 interface UseAttestorsReturnType {
   getAttestorGroupPublicKey: () => Promise<string>;
   sendClosingTransactionToAttestors: (
+    fundingTransaction: string,
     closingPSBT: string,
     uuid: string,
     userNativeSegwitAddress: string
@@ -31,6 +32,7 @@ export function useAttestors(): UseAttestorsReturnType {
   }
 
   async function sendClosingTransactionToAttestors(
+    fundingTransaction: string,
     closingPSBT: string,
     uuid: string,
     userNativeSegwitAddress: string
@@ -43,6 +45,7 @@ export function useAttestors(): UseAttestorsReturnType {
           headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
           body: JSON.stringify({
             uuid,
+            funding_transaction: fundingTransaction,
             closing_psbt: closingPSBT,
             mint_address: userNativeSegwitAddress,
             chain: ethereumAttestorChainID,
