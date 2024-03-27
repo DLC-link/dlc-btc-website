@@ -28,7 +28,7 @@ export function VaultsListGroupContainer({
         <HStack pt={'15px'} justifyContent={'space-between'} w={'100%'}>
           <HStack>
             {['Locking BTC in Progress', 'Unlocking BTC in Progress'].includes(label) && (
-              <Spinner color={'accent.cyan.01'} size={'md'} />
+              <Spinner color={'accent.lightBlue.01'} size={'md'} />
             )}
             <Text color={'white'}>{label}</Text>
           </HStack>
@@ -36,7 +36,7 @@ export function VaultsListGroupContainer({
             <Button
               variant={'ghost'}
               size={'xs'}
-              _hover={{ backgroundColor: 'accent.cyan.01' }}
+              _hover={{ backgroundColor: 'accent.lightBlue.01' }}
               onClick={async () => await recommendTokenToMetamask()}
             >
               <HStack>

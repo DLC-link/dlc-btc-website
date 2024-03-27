@@ -27,7 +27,7 @@ export function TransactionSummaryPreviewCard({
       p={'7.5px'}
       h={'50px'}
       w={'100%'}
-      bgGradient={'linear(to-r, background.content.01, background.content.02)'}
+      bg={'background.content.01'}
       blendMode={'screen'}
       border={'1px solid'}
       borderColor={'border.white.01'}

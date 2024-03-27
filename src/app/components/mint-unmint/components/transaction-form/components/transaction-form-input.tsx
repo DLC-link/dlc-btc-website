@@ -31,7 +31,7 @@ export function TransactionFormInput({
       bgColor={'white.01'}
       border={'2.5px solid'}
       borderRadius={'md'}
-      borderColor={'border.cyan.01'}
+      borderColor={'border.lightBlue.01'}
     >
       <HStack>
         <Image src={'/images/logos/dlc-btc-logo.svg'} alt={'dlcBTC'} boxSize={'20px'} />

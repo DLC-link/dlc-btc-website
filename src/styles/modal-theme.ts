@@ -11,7 +11,7 @@ const baseStyle = definePartsStyle({
     padding: '15px',
     width: '350px',
     border: '1.5px solid',
-    borderColor: 'border.cyan.01',
+    borderColor: 'border.lightBlue.01',
     borderRadius: 'md',
     backgroundColor: 'background.container.01',
     color: 'white',

@@ -3,7 +3,7 @@ import { HasChildren } from '@models/has-children';
 
 export function HeaderLayout({ children }: HasChildren): React.JSX.Element {
   return (
-    <HStack justifyContent={'space-between'} px={'130px'} w={'1280px'}>
+    <HStack justifyContent={'space-between'} w={'1280px'}>
       {children}
     </HStack>
   );

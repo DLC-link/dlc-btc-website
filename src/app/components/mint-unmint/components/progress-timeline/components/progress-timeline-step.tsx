@@ -1,6 +1,11 @@
 import { Divider, Stack, Text } from '@chakra-ui/react';
 
-import { StepIconOne, StepIconThree, StepIconTwo } from '../../../../../../styles/icon';
+import {
+  StepIconFour,
+  StepIconOne,
+  StepIconThree,
+  StepIconTwo,
+} from '../../../../../../styles/icon';
 
 interface StepProps {
   width?: string;
@@ -13,7 +18,7 @@ interface StepProps {
 
 function getIconForStep(currentStep: number, stepIndex: number): React.JSX.Element {
   const properties = {
-    fill: currentStep >= stepIndex ? 'rgba(7,232,216,1)' : 'rgba(255,255,255,1)',
+    fill: currentStep >= stepIndex ? 'rgba(50, 201, 247, 1)' : 'rgba(255,255,255,1)',
     opacity: currentStep > stepIndex ? '50%' : '100%',
     height: '15px',
   };
@@ -26,7 +31,7 @@ function getIconForStep(currentStep: number, stepIndex: number): React.JSX.Eleme
     case 2:
       return <StepIconThree {...properties} />;
     default:
-      return <StepIconOne {...properties} />;
+      return <StepIconFour {...properties} />;
   }
 }
 
@@ -41,7 +46,7 @@ export function StepGraphics({
       {!isLastStep && (
         <Divider
           orientation="horizontal"
-          borderColor={currentStep > stepIndex ? 'accent.cyan.01' : 'white.03'}
+          borderColor={currentStep > stepIndex ? 'accent.lightBlue.01' : 'white.03'}
           variant={currentStep > stepIndex ? 'thick' : 'thickDotted'}
           opacity={currentStep > stepIndex ? '50%' : '100%'}
         />
@@ -62,7 +67,7 @@ export function StepText({
     <Stack h={'25px'} w={width}>
       <Text
         textAlign={isFirstStep ? 'left' : isLastStep ? 'right' : 'center'}
-        color={currentStep >= stepIndex ? 'accent.cyan.01' : 'white.01'}
+        color={currentStep >= stepIndex ? 'accent.lightBlue.01' : 'white.01'}
         fontSize={'xs'}
         fontWeight={currentStep === stepIndex ? 800 : 400}
         opacity={currentStep > stepIndex ? '50%' : '100%'}

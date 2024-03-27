@@ -30,7 +30,7 @@ export function LockScreenProtocolFee({
       w={'100%'}
       border={'1px solid'}
       borderRadius={'md'}
-      borderColor={'border.cyan.01'}
+      borderColor={'border.lightBlue.01'}
     >
       <HStack justifyContent={'space-between'} w={'100%'}>
         <Text color={'white.02'} fontSize={'sm'}>

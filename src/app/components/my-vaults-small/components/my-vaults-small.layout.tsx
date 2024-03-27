@@ -11,7 +11,7 @@ export function MyVaultsSmallLayout({ children }: HasChildren): React.JSX.Elemen
       bg={'background.container.01'}
       border={'1px solid'}
       borderRadius={'md'}
-      borderColor={'border.cyan.01'}
+      borderColor={'border.lightBlue.01'}
     >
       {children}
     </VStack>
