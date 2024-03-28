@@ -35,6 +35,21 @@ const navigate = defineStyle({
   },
 });
 
+const merchantHistory = defineStyle({
+  py: '10px',
+  px: '25px',
+  h: '50px',
+  w: '100%',
+  fontSize: 'md',
+  fontWeight: 400,
+  bg: 'none',
+  border: '1px solid',
+  borderColor: 'accent.lightBlue.01',
+  _hover: {
+    bg: 'accent.lightBlue.01',
+  },
+});
+
 const account = defineStyle({
   py: '10px',
   px: '50px',
@@ -85,5 +100,5 @@ const wallet = defineStyle({
 
 export const buttonTheme = defineStyleConfig({
   baseStyle: basestyle,
-  variants: { tab, company, wallet, account, vault, navigate },
+  variants: { tab, company, wallet, account, vault, navigate, merchantHistory },
 });

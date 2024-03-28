@@ -128,6 +128,7 @@ export function useBitcoin(): UseBitcoinReturnType {
     try {
       const rpcResponse: RpcResponse = await window.btc?.request('getAddresses');
       const userAddresses = rpcResponse.result.addresses;
+      console.log('userAddresses', userAddresses);
       checkUserWalletNetwork(userAddresses[0]);
       return userAddresses;
     } catch (error) {
@@ -257,7 +258,7 @@ export function useBitcoin(): UseBitcoinReturnType {
    */
   async function createClosingTransaction(
     fundingTransactionID: string,
-    multisigTransaction: any,
+    multisigTransaction: btc.P2TROut,
     userNativeSegwitAddress: string,
     bitcoinAmount: number,
     bitcoinNetwork: BitcoinNetwork
@@ -277,6 +278,7 @@ export function useBitcoin(): UseBitcoinReturnType {
       BigInt(bitcoinAmount - 10000),
       bitcoinNetwork
     );
+
     const closingPSBT = closingTransaction.toPSBT();
 
     return closingPSBT;
