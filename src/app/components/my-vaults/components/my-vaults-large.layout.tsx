@@ -5,12 +5,12 @@ export function MyVaultsLargeLayout({ children }: HasChildren): React.JSX.Elemen
   return (
     <VStack
       px={'25px'}
-      w={'1020px'}
+      w={'1280px'}
       h={'625px'}
       bg={'background.container.01'}
       border={'1px solid'}
       borderRadius={'md'}
-      borderColor={'border.cyan.01'}
+      borderColor={'border.lightBlue.01'}
     >
       {children}
     </VStack>

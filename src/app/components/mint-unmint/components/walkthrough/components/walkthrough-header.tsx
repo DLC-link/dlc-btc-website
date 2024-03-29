@@ -16,7 +16,7 @@ export function WalkthroughHeader({
   return (
     <VStack alignItems={'start'}>
       <HStack>
-        <Text color={'accent.cyan.01'} fontSize={'lg'}>
+        <Text color={'accent.lightBlue.01'} fontSize={'lg'}>
           Step {currentStep !== undefined && currentStep + 1}
         </Text>
         <WalkthroughBlockchainTag blockchain={blockchain} />

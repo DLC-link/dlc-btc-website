@@ -13,7 +13,7 @@ const welcome = defineStyle({
 });
 
 const navigate = defineStyle({
-  color: 'accent.cyan.01',
+  color: 'accent.lightBlue.01',
   fontSize: 'lg',
   fontWeight: 'regular',
   textDecoration: 'underline',
@@ -23,7 +23,7 @@ const navigate = defineStyle({
 });
 
 const step = defineStyle({
-  color: 'accent.cyan.01',
+  color: 'accent.lightBlue.01',
   fontSize: 'lg',
   fontWeight: 'regular',
 });

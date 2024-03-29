@@ -34,7 +34,7 @@ export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps):
         ) : (
           <HStack>
             <Text variant={'header'}>Network Selected</Text>
-            <CheckIcon color={'accent.cyan.01'} />
+            <CheckIcon color={'accent.lightBlue.01'} />
           </HStack>
         )}
         <SelectNetworkButton handleClick={handleNetworkChange} currentNetwork={currentNetwork} />

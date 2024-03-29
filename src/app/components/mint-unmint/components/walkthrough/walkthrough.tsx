@@ -27,7 +27,7 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
               <Text color={'white.01'} fontSize={'md'}>
                 Select an amount of dlcBTC you would like to mint and confirm it in your{' '}
                 <Link
-                  color={'accent.cyan.01'}
+                  color={'accent.lightBlue.01'}
                   href="https://metamask.io/"
                   isExternal
                   textDecoration={'underline'}
@@ -53,7 +53,7 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
               <Text color={'white.01'} fontSize={'md'}>
                 Confirm the transaction in your{' '}
                 <Link
-                  color={'accent.cyan.01'}
+                  color={'accent.lightBlue.01'}
                   href="https://leather.io/"
                   isExternal
                   textDecoration={'underline'}
@@ -75,7 +75,7 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
               <Text color={'white.01'} fontSize={'md'}>
                 Sign the closing transaction in your{' '}
                 <Link
-                  color={'accent.cyan.01'}
+                  color={'accent.lightBlue.01'}
                   href="https://leather.io/"
                   isExternal
                   textDecoration={'underline'}
@@ -97,7 +97,7 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
               <Text color={'white.01'} fontSize={'sm'}>
                 Wait for Bitcoin to get locked on chain{' '}
                 <Link
-                  color={'accent.cyan.01'}
+                  color={'accent.lightBlue.01'}
                   href="https://ethereum.org/"
                   isExternal
                   textDecoration={'underline'}
@@ -156,8 +156,9 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
                 blockchain={'bitcoin'}
               />
               <Text color={'white.01'} fontSize={'md'}>
-                After a successful unmint (<span style={{ color: 'accent.cyan.01' }}>~1 hour</span>)
-                your will receive BTC in your bitcoin wallet.
+                After a successful unmint (
+                <span style={{ color: 'accent.lightBlue.01' }}>~1 hour</span>) your will receive BTC
+                in your bitcoin wallet.
               </Text>
             </WalkthroughLayout>
           );

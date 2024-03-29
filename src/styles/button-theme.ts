@@ -14,9 +14,9 @@ const vault = defineStyle({
   fontWeight: 'normal',
   bg: 'none',
   border: '1px solid',
-  borderColor: 'accent.cyan.01',
+  borderColor: 'accent.lightBlue.01',
   _hover: {
-    bg: 'accent.cyan.01',
+    bg: 'accent.lightBlue.01',
   },
 });
 
@@ -29,9 +29,9 @@ const navigate = defineStyle({
   fontWeight: 600,
   bg: 'none',
   border: '1px solid',
-  borderColor: 'accent.cyan.01',
+  borderColor: 'accent.lightBlue.01',
   _hover: {
-    bg: 'accent.cyan.01',
+    bg: 'accent.lightBlue.01',
   },
 });
 
@@ -44,7 +44,7 @@ const account = defineStyle({
   fontWeight: 600,
   bgSize: '400%',
   bgPosition: 'left',
-  bgGradient: 'linear(to-r, accent.cyan.01, accent.blue.01, accent.blue.01, accent.cyan.01)',
+  bg: 'accent.lightBlue.01',
   transition: 'background-position 500ms ease, color 500ms ease',
   _hover: {
     bgPosition: 'right',
@@ -61,7 +61,7 @@ const tab = defineStyle({
   bgColor: 'none',
   borderBottom: '3.5px solid',
   borderRadius: 'none',
-  borderColor: 'accent.cyan.01',
+  borderColor: 'accent.lightBlue.01',
 });
 
 const company = defineStyle({
@@ -75,7 +75,7 @@ const wallet = defineStyle({
   p: '10px',
   h: '50px',
   w: '275px',
-  bgGradient: 'linear(to-b, background.content.01, background.content.02)',
+  bg: 'background.content.01',
   border: '0.5px solid',
   borderColor: 'border.white.01',
   _hover: {
