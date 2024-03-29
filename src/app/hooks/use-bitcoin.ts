@@ -3,7 +3,6 @@ import { BitcoinError } from '@models/error-types';
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
 import { hex } from '@scure/base';
 import * as btc from '@scure/btc-signer';
-import { Transaction, payments } from 'bitcoinjs-lib';
 
 import { useAttestors } from './use-attestors';
 import { useEndpoints } from './use-endpoints';

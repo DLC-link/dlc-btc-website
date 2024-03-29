@@ -28,8 +28,5 @@ dist-ssr
 /playwright/.cache/
 
 # Environment variables
-.env
-.env.localhost
-.env.devnet
-.env.testnet
-.env.mainnet
+.env*
+!.env.example

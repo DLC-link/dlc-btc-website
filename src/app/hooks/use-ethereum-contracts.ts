@@ -72,8 +72,8 @@ export function useEthereumContracts(): UseEthereumContractsReturnType {
     contractName: string,
     ethereumNetwork: EthereumNetwork
   ) {
-    const branchName = import.meta.env.VITE_ETHEREUM_DEPLOYMENT_BRANCH;
-    const contractVersion = import.meta.env.VITE_ETHEREUM_DEPLOYMENT_VERSION;
+    const branchName = import.meta.env.ETHEREUM_DEPLOYMENT_BRANCH;
+    const contractVersion = import.meta.env.ETHEREUM_DEPLOYMENT_VERSION;
     const deploymentPlanURL = `https://raw.githubusercontent.com/DLC-link/dlc-solidity/${branchName}/deploymentFiles/${ethereumNetwork.name.toLowerCase()}/v${contractVersion}/${contractName}.json`;
 
     // eslint-disable-next-line no-console
