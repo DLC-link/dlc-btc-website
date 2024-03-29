@@ -1,5 +1,6 @@
-import { HStack, Image, Link, Text } from '@chakra-ui/react';
+import { HStack, Link, Text } from '@chakra-ui/react';
 import { CustomCard } from '@components/how-it-works/components/custom-card';
+import { AuditReportIcon } from '@styles/icon';
 
 export function AuditReports(): React.JSX.Element {
   return (
@@ -8,14 +9,14 @@ export function AuditReports(): React.JSX.Element {
         <>
           <Text variant={'title'}>Audit Reports</Text>
           <HStack align={'start'} spacing={'15px'}>
-            <Image src={'/images/report.png'} w={'34px'} h={'42px'} pt={'5px'}></Image>
+            <AuditReportIcon fill={'rgba(50, 201, 247, 1)'} />
             <Text color={'white'}>
               The following is a security audit report, completed by the team at CoinFabrik on
               November 29, 2023.{' '}
               <Link
                 href={'https://docs.dlc.link/resources#security-audit-reports'}
                 isExternal
-                color={'accent.cyan.01'}
+                color={'accent.lightBlue.01'}
               >
                 Read the report...
               </Link>

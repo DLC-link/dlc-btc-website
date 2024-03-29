@@ -51,9 +51,9 @@ export function VaultInformation({
           bgColor={'white.03'}
           border={'1px solid'}
           borderRadius={'full'}
-          borderColor={'border.cyan.01'}
+          borderColor={'border.lightBlue.01'}
         >
-          {isSelected && <CheckIcon color={'accent.cyan.01'} boxSize={'15px'} />}
+          {isSelected && <CheckIcon color={'accent.lightBlue.01'} boxSize={'15px'} />}
         </VStack>
       ) : (
         <VaultExpandButton isExpanded={isExpanded} handleClick={() => handleClick()} />

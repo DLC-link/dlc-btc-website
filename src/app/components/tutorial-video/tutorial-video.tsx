@@ -21,7 +21,7 @@ export function TutorialVideo(): React.JSX.Element {
 
   return (
     <VStack alignItems={'start'}>
-      <Text color={'accent.cyan.01'} fontSize={'md'}>
+      <Text color={'accent.lightBlue.01'} fontSize={'md'}>
         Watch explainer video:
       </Text>
       <Skeleton

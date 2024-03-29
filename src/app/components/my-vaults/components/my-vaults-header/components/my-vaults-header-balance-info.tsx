@@ -17,7 +17,7 @@ export function MyVaultsHeaderBalanceInfo({
 }: MyVaultsHeaderBalanceInfoProps): React.JSX.Element {
   return (
     <VStack justifyContent={'center'} alignItems={'start'} w={'35%'} h={'100%'}>
-      <Text color={'accent.cyan.01'} fontWeight={600} fontSize={'md'}>
+      <Text color={'accent.lightBlue.01'} fontWeight={600} fontSize={'md'}>
         {title}
       </Text>
       <Skeleton isLoaded={assetAmount !== undefined} h={'auto'} w={'100%'}>
