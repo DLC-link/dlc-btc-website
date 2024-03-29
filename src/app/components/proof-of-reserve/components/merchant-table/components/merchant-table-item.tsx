@@ -13,8 +13,7 @@ export function MerchantTableItem({
   dlcBTCAmount,
 }: MerchantTableItemProps): React.ReactElement {
   //TODO: replace name with logo when the logo is available
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { name, logo } = merchant;
+  const { name } = merchant;
 
   return (
     <HStack px={'25px'} w={'100%'}>

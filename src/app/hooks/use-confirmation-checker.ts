@@ -31,7 +31,6 @@ export function useConfirmationChecker(vault?: Vault): number {
     const response = await fetch(bitcoinExplorerTXURL);
     if (!response.ok) throw new Error('Network response was not ok');
     const transactionDetails = await response.json();
-    console.log('transactionDetails', transactionDetails);
     return transactionDetails.status.block_height;
   }
 

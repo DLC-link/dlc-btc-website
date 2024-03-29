@@ -128,7 +128,6 @@ export function useBitcoin(): UseBitcoinReturnType {
     try {
       const rpcResponse: RpcResponse = await window.btc?.request('getAddresses');
       const userAddresses = rpcResponse.result.addresses;
-      console.log('userAddresses', userAddresses);
       checkUserWalletNetwork(userAddresses[0]);
       return userAddresses;
     } catch (error) {
