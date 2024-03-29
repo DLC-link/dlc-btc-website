@@ -99,6 +99,16 @@ export function useEndpoints(): NetworkEndpoints {
           bitcoinNetwork,
           bitcoinNetworkName,
         };
+      case EthereumNetworkID.ArbSepolia:
+        return {
+          attestorAPIURLs,
+          ethereumExplorerAPIURL: 'https://sepolia.arbiscan.io/tx/',
+          ethereumAttestorChainID: 'evm-arbsepolia',
+          bitcoinExplorerAPIURL,
+          bitcoinBlockchainAPIURL,
+          bitcoinNetwork,
+          bitcoinNetworkName,
+        };
       default:
         throw new Error(`Unsupported network: ${network?.name}`);
     }

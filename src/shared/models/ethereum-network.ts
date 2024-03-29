@@ -1,6 +1,7 @@
 export interface EthereumNetwork {
   id: EthereumNetworkID;
   name: string;
+  displayName: string;
 }
 
 export enum EthereumNetworkID {
@@ -8,26 +9,37 @@ export enum EthereumNetworkID {
   Goerli = '5',
   Sepolia = '11155111',
   X1Testnet = '195',
+  ArbSepolia = '421614',
 }
 
 const ethereumOKXTestnet: EthereumNetwork = {
   name: 'X1Test',
+  displayName: 'X1 Testnet',
   id: EthereumNetworkID.X1Testnet,
 };
 
 const ethereumMainnet: EthereumNetwork = {
   name: 'Mainnet',
+  displayName: 'ETH Mainnet',
   id: EthereumNetworkID.Mainnet,
 };
 
 const ethereumGoerli: EthereumNetwork = {
   name: 'Goerli',
+  displayName: 'Goerli',
   id: EthereumNetworkID.Goerli,
 };
 
 const ethereumSepolia: EthereumNetwork = {
   name: 'Sepolia',
+  displayName: 'Sepolia',
   id: EthereumNetworkID.Sepolia,
+};
+
+const ethereumArbSepolia: EthereumNetwork = {
+  name: 'ArbSepolia',
+  displayName: 'Arbitrum Sepolia',
+  id: EthereumNetworkID.ArbSepolia,
 };
 
 export const ethereumNetworks: EthereumNetwork[] = [
@@ -35,6 +47,7 @@ export const ethereumNetworks: EthereumNetwork[] = [
   ethereumGoerli,
   ethereumSepolia,
   ethereumOKXTestnet,
+  ethereumArbSepolia,
 ];
 
 export const hexChainIDs: { [key in EthereumNetworkID]: string } = {
@@ -42,9 +55,24 @@ export const hexChainIDs: { [key in EthereumNetworkID]: string } = {
   [EthereumNetworkID.Goerli]: '0x5',
   [EthereumNetworkID.Sepolia]: '0xAA36A7',
   [EthereumNetworkID.X1Testnet]: '0x3C',
+  [EthereumNetworkID.ArbSepolia]: '0x66eee',
 };
 
 export const addNetworkParams = {
+  [EthereumNetworkID.ArbSepolia]: [
+    {
+      chainId: '0x66eee',
+      rpcUrls: ['https://sepolia-rollup.arbitrum.io/rpc', 'https://arb-sepolia.infura.io/v3/'],
+      chainName: 'Arbitrum Sepolia Testnet',
+      nativeCurrency: {
+        name: 'ETH',
+        symbol: 'ETH',
+        decimals: 18,
+      },
+      blockExplorerUrls: ['https://sepolia.arbiscan.io/'],
+    },
+  ],
+
   [EthereumNetworkID.X1Testnet]: [
     {
       chainId: '0xC3',
