@@ -339,7 +339,6 @@ export function useBitcoin(): UseBitcoinReturnType {
     fundingTransaction: btc.Transaction;
     multisigTransaction: btc.P2TROut;
     userNativeSegwitAddress: string;
-    attestorGroupPublicKey: string;
   }> {
     const userAddresses = await getBitcoinAddresses();
     const userNativeSegwitAccount = userAddresses[0] as BitcoinNativeSegwitAddress;

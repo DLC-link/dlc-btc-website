@@ -51,6 +51,8 @@ export function useEndpoints(): NetworkEndpoints {
   }, [network]);
 
   function getEndpoints(): NetworkEndpoints {
+    const attestorAPIURLs: string[] = import.meta.env.VITE_ATTESTOR_API_URLS.split(',');
+
     const bitcoinNetworkName = import.meta.env.VITE_BITCOIN_NETWORK;
     const bitcoinBlockchainAPIURL = import.meta.env.VITE_BITCOIN_BLOCKCHAIN_API_URL;
     const bitcoinExplorerAPIURL = import.meta.env.VITE_BITCOIN_EXPLORER_API_URL;

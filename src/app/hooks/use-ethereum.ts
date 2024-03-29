@@ -67,8 +67,8 @@ export function useEthereum(): UseEthereumReturnType {
     const provider = ethers.providers.getDefaultProvider(
       'https://ethereum-sepolia.publicnode.com/'
     );
-    const branchName = import.meta.env.ETHEREUM_DEPLOYMENT_BRANCH;
-    const contractVersion = import.meta.env.ETHEREUM_DEPLOYMENT_VERSION;
+    const branchName = import.meta.env.VITE_ETHEREUM_DEPLOYMENT_BRANCH;
+    const contractVersion = import.meta.env.VITE_ETHEREUM_DEPLOYMENT_VERSION;
     const deploymentPlanURL = `https://raw.githubusercontent.com/DLC-link/dlc-solidity/${branchName}/deploymentFiles/sepolia/v${contractVersion}/DLCBTC.json`;
 
     try {

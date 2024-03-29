@@ -1,28 +1,56 @@
-# React + TypeScript + Vite
+# DLC.Link - dlcBTC Bridge
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Installation
 
-Currently, two official plugins are available:
+To install all the dependencies, run the following command:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-   parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-   },
+```bash
+yarn install
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
-# dlc-btc-website
+or
+
+```bash
+npm install
+```
+
+## Setup Environment Variables
+
+This application uses environment variables for configuration. These are stored in `.env` files. There are different `.env` files for different environments:
+
+- `.env.localhost`: For locally run attestors / regtest bitcoin.
+- `.env.devnet`: For deployed devnet attestors / regtest bitcoin.
+- `.env.testnet`: For deployed testnet attestors / testnet bitcoin.
+- `.env.mainnet`: For deployed mainnet attestors / mainnet bitcoin.
+
+Copy the contents of the `.env` template file into the appropriate `.env` file for your environment and fill in the values. The template for the environment variables can be found in the `.env.template` file in the root directory of this project.
+
+Please ensure that you replace the placeholders with your actual values.
+
+## Running the Application
+
+According to the environment you want to run the application in, you can run the following commands:
+
+- For locally ran attestors / regtest bitcoin:
+
+```bash
+  yarn localhost
+```
+
+- For deployed devnet attestors / regtest bitcoin:
+
+```bash
+   yarn devnet
+```
+
+- For deployed testnet attestors / testnet bitcoin:
+
+```bash
+  yarn testnet
+```
+
+- For deployed mainnet attestors / mainnet bitcoin:
+
+```bash
+   yarn mainnet
+```
