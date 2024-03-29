@@ -42,14 +42,6 @@ interface UTXO {
   value: number;
 }
 
-interface FeeRates {
-  fastestFee: number;
-  halfHourFee: number;
-  hourFee: number;
-  economyFee: number;
-  minimumFee: number;
-}
-
 interface BitcoinNativeSegwitAddress {
   address: string;
   derivationPath: string;
@@ -87,22 +79,19 @@ interface UseBitcoinReturnType {
     fundingTransaction: btc.Transaction;
     multisigTransaction: btc.P2TROut;
     userNativeSegwitAddress: string;
-    attestorGroupPublicKey: string;
   }>;
   signAndSendClosingPSBT: (
     fundingTransactionID: string,
     multisigTransaction: btc.P2TROut,
     uuid: string,
     userNativeSegwitAddress: string,
-    attestorGroupPublicKey: string,
     bitcoinAmount: number
   ) => Promise<void>;
   broadcastTransaction: (transaction: btc.Transaction) => Promise<string>;
 }
 
 export function useBitcoin(): UseBitcoinReturnType {
-  const { bitcoinNetwork, bitcoinNetworkName, bitcoinBlockchainAPIURL, mempoolSpaceAPIFeeURL } =
-    useEndpoints();
+  const { bitcoinNetwork, bitcoinNetworkName, bitcoinBlockchainAPIURL } = useEndpoints();
   const { getAttestorGroupPublicKey, sendClosingTransactionToAttestors } = useAttestors();
 
   /**
@@ -143,22 +132,6 @@ export function useBitcoin(): UseBitcoinReturnType {
       return userAddresses;
     } catch (error) {
       throw new BitcoinError(`Error getting bitcoin addresses: ${error}`);
-    }
-  }
-
-  /**
-   * Fetches the fee rate from the mempool.space API.
-   *
-   * @returns A promise that resolves to the hour fee rate.
-   */
-  async function getFeeRate(): Promise<number> {
-    try {
-      const response = await fetch(mempoolSpaceAPIFeeURL);
-      const feeRates: FeeRates = await response.json();
-
-      return feeRates.hourFee;
-    } catch (error) {
-      throw new BitcoinError(`Error getting Fee Rate: ${error}`);
     }
   }
 
@@ -242,7 +215,6 @@ export function useBitcoin(): UseBitcoinReturnType {
    *
    * @param multisigAddress - The multisig address created from the multisig transaction between the user and the attestor group.
    * @param utxos - The user's UTXOs.
-   * @param feeRate - The fee rate.
    * @param bitcoinAmount - The amount of bitcoin to be used in the transaction.
    * @param bitcoinNetwork - The bitcoin network.
    * @returns A promise that resolves to the funding PSBT.
@@ -250,7 +222,6 @@ export function useBitcoin(): UseBitcoinReturnType {
     multisigAddress: string,
     userChangeAddress: string,
     utxos: any[],
-    feeRate: bigint,
     bitcoinAmount: number,
     bitcoinNetwork: BitcoinNetwork
   ): Uint8Array {
@@ -258,7 +229,7 @@ export function useBitcoin(): UseBitcoinReturnType {
 
     const selected = btc.selectUTXO(utxos, outputs, 'default', {
       changeAddress: userChangeAddress,
-      feePerByte: feeRate,
+      feePerByte: 2n,
       bip69: false,
       createTx: true,
       network: bitcoinNetwork,
@@ -289,41 +260,25 @@ export function useBitcoin(): UseBitcoinReturnType {
     fundingTransactionID: string,
     multisigTransaction: any,
     userNativeSegwitAddress: string,
-    attestorGroupPublicKey: string,
     bitcoinAmount: number,
     bitcoinNetwork: BitcoinNetwork
   ): Promise<Uint8Array> {
-    const redemptionFeeAddress = import.meta.env.VITE_REDEMPTION_FEE_ADDRESS as string;
+    const closingTransaction = new btc.Transaction({ PSBTVersion: 0 });
 
-    const inputs = [
-      {
-        txid: hexToBytes(fundingTransactionID),
-        index: 0,
-        witnessUtxo: { amount: BigInt(bitcoinAmount), script: multisigTransaction.script },
-        ...multisigTransaction,
-      },
-    ];
+    const fundingInput = {
+      txid: hexToBytes(fundingTransactionID),
+      index: 0,
+      witnessUtxo: { amount: BigInt(bitcoinAmount), script: multisigTransaction.script },
+      ...multisigTransaction,
+    };
 
-    const outputs = [
-      {
-        address: redemptionFeeAddress,
-        amount: BigInt(bitcoinAmount) / 100n,
-      },
-    ];
-
-    const feeRate = BigInt(await getFeeRate());
-
-    const selected = btc.selectUTXO(inputs, outputs, 'default', {
-      changeAddress: userNativeSegwitAddress,
-      feePerByte: feeRate,
-      bip69: false,
-      createTx: true,
-      network: bitcoinNetwork,
-    });
-
-    if (!selected?.tx) throw new BitcoinError('Could not create Closing Transaction');
-
-    const closingPSBT = selected.tx.toPSBT();
+    closingTransaction.addInput(fundingInput);
+    closingTransaction.addOutputAddress(
+      userNativeSegwitAddress,
+      BigInt(bitcoinAmount - 10000),
+      bitcoinNetwork
+    );
+    const closingPSBT = closingTransaction.toPSBT();
 
     return closingPSBT;
   }
@@ -405,13 +360,10 @@ export function useBitcoin(): UseBitcoinReturnType {
     const multisigAddress = multisigTransaction.address;
     if (!multisigAddress) throw new BitcoinError('Could not create multisig address');
 
-    const feeRate = BigInt(await getFeeRate());
-
     const fundingTransaction = createFundingTransaction(
       multisigAddress,
       userNativeSegwitAddress,
       userUTXOs,
-      feeRate,
       bitcoinAmount,
       bitcoinNetwork
     );
@@ -425,7 +377,6 @@ export function useBitcoin(): UseBitcoinReturnType {
       fundingTransaction: transaction,
       multisigTransaction,
       userNativeSegwitAddress,
-      attestorGroupPublicKey,
     };
   }
 
@@ -444,14 +395,12 @@ export function useBitcoin(): UseBitcoinReturnType {
     multisigTransaction: btc.P2TROut,
     uuid: string,
     userNativeSegwitAddress: string,
-    attestorGroupPublicKey: string,
     bitcoinAmount: number
   ): Promise<void> {
     const closingTransaction = await createClosingTransaction(
       fundingTransactionID,
       multisigTransaction,
       userNativeSegwitAddress,
-      attestorGroupPublicKey,
       bitcoinAmount,
       bitcoinNetwork
     );

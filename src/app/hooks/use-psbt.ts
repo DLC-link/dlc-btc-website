@@ -28,7 +28,6 @@ export function usePSBT(): UsePSBTReturnType {
   const [userNativeSegwitAddress, setUserNativeSegwitAddress] = useState<string | undefined>();
   const [fundingTransaction, setFundingTransaction] = useState<btc.Transaction | undefined>();
   const [multisigTransaction, setMultisigTransaction] = useState<btc.P2TROut | undefined>();
-  const [attestorGroupPublicKey, setAttestorGroupPublicKey] = useState<string | undefined>();
 
   async function handleSignFundingTransaction(
     bitcoinAmount: number,
@@ -37,17 +36,12 @@ export function usePSBT(): UsePSBTReturnType {
     const shiftedBTCDepositAmount = customShiftValue(bitcoinAmount, 8, false);
 
     try {
-      const {
-        fundingTransaction,
-        multisigTransaction,
-        userNativeSegwitAddress,
-        attestorGroupPublicKey,
-      } = await signAndBroadcastFundingPSBT(shiftedBTCDepositAmount, vaultUUID);
+      const { fundingTransaction, multisigTransaction, userNativeSegwitAddress } =
+        await signAndBroadcastFundingPSBT(shiftedBTCDepositAmount, vaultUUID);
 
       setVaultUUID(vaultUUID);
       setBitcoinAmount(shiftedBTCDepositAmount);
       setUserNativeSegwitAddress(userNativeSegwitAddress);
-      setAttestorGroupPublicKey(attestorGroupPublicKey);
       setFundingTransaction(fundingTransaction);
       setMultisigTransaction(multisigTransaction);
     } catch (error) {
@@ -61,7 +55,6 @@ export function usePSBT(): UsePSBTReturnType {
         !fundingTransaction ||
         !multisigTransaction ||
         !userNativeSegwitAddress ||
-        !attestorGroupPublicKey ||
         !bitcoinAmount ||
         !vaultUUID ||
         !network
@@ -76,7 +69,6 @@ export function usePSBT(): UsePSBTReturnType {
         multisigTransaction,
         vaultUUID,
         userNativeSegwitAddress,
-        attestorGroupPublicKey,
         bitcoinAmount
       );
 
