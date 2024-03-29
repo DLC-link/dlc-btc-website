@@ -14,6 +14,7 @@ const initialVaultState: VaultSliceState = {
     [EthereumNetworkID.Goerli]: [],
     [EthereumNetworkID.Sepolia]: [],
     [EthereumNetworkID.X1Testnet]: [],
+    [EthereumNetworkID.ArbSepolia]: [],
   },
   status: 'idle',
   error: null,

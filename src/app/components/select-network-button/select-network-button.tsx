@@ -28,7 +28,7 @@ export function SelectNetworkButton({
         {enabledEthereumNetworks.map((network, id) => {
           return (
             <MenuItem key={id} value={network.id} onClick={() => handleClick(network)}>
-              {network.name}
+              {network.displayName}
             </MenuItem>
           );
         })}
