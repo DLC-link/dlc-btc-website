@@ -2,6 +2,7 @@ import { Divider, HStack } from '@chakra-ui/react';
 import { ProtocolHistoryTable } from '@components/protocol-history-table/protocol-history-table';
 import { useBitcoinPrice } from '@hooks/use-bitcoin-price';
 import { useEthereum } from '@hooks/use-ethereum';
+import { useProofOfReserve } from '@hooks/use-proof-of-reserve';
 import { bitcoin, dlcBTC } from '@models/token';
 
 import { exampleMerchantTableItems } from '@shared/examples/example-merchant-table-items';
@@ -17,6 +18,7 @@ import { TokenStatsBoardLayout } from './components/token-stats-board/token-stat
 export function ProofOfReserve(): React.JSX.Element {
   const { totalSupply } = useEthereum();
   const { bitcoinPrice } = useBitcoinPrice();
+  const { proofOfReserve } = useProofOfReserve();
 
   return (
     <ProofOfReserveLayout>
@@ -25,7 +27,7 @@ export function ProofOfReserve(): React.JSX.Element {
         <HStack w={'50%'} pl={'25px'}>
           <TokenStatsBoardToken token={dlcBTC} totalSupply={totalSupply} />
           <Divider orientation={'vertical'} px={'15px'} variant={'thick'} />
-          <TokenStatsBoardToken token={bitcoin} totalSupply={totalSupply} />
+          <TokenStatsBoardToken token={bitcoin} totalSupply={proofOfReserve} />
         </HStack>
       </TokenStatsBoardLayout>
       <HStack w={'100%'} spacing={'20px'}>

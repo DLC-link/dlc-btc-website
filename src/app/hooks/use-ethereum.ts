@@ -20,6 +20,7 @@ interface UseEthereumReturnType {
   totalSupply: number | undefined;
   getAllVaults: () => Promise<void>;
   getVault: (vaultUUID: string, vaultState: VaultState) => Promise<void>;
+  getAllFundedVaults: () => Promise<RawVault[]>;
   setupVault: (btcDepositAmount: number) => Promise<void>;
   closeVault: (vaultUUID: string) => Promise<void>;
 }
@@ -37,7 +38,7 @@ export function throwEthereumError(message: string, error: any): void {
 
 export function useEthereum(): UseEthereumReturnType {
   const { vaults } = useContext(VaultContext);
-  const { protocolContract, dlcBTCContract } = useEthereumContext();
+  const { protocolContract, dlcBTCContract, dlcManagerContract } = useEthereumContext();
 
   const { address, network } = useSelector((state: RootState) => state.account);
 
@@ -57,6 +58,7 @@ export function useEthereum(): UseEthereumReturnType {
       uuid: vault.uuid,
       collateral: customShiftValue(parseInt(vault.valueLocked), 8, true),
       state: vault.status,
+      userPublicKey: vault.taprootPubKey,
       fundingTX: vault.fundingTxId,
       closingTX: vault.closingTxId,
       timestamp: parseInt(vault.timestamp),
@@ -172,6 +174,16 @@ export function useEthereum(): UseEthereumReturnType {
     throw new EthereumError(`Failed to fetch Vault ${vaultUUID} after ${maxRetries} retries`);
   }
 
+  async function getAllFundedVaults(): Promise<RawVault[]> {
+    try {
+      if (!dlcManagerContract) throw new Error('DLC Manager contract not initialized');
+      const vaults: RawVault[] = await dlcManagerContract.getFundedDLCs(0, 1000000);
+      return vaults;
+    } catch (error) {
+      throw new EthereumError(`Could not fetch Funded Vaults: ${error}`);
+    }
+  }
+
   async function setupVault(btcDepositAmount: number): Promise<void> {
     try {
       if (!protocolContract) throw new Error('Protocol contract not initialized');
@@ -199,6 +211,7 @@ export function useEthereum(): UseEthereumReturnType {
     getLockedBTCBalance,
     getAllVaults,
     getVault,
+    getAllFundedVaults,
     setupVault,
     closeVault,
   };

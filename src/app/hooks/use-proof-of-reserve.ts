@@ -1,18 +1,31 @@
+import { useState } from 'react';
+import { useQuery } from 'react-query';
+
+import { customShiftValue } from '@common/utilities';
 import { BitcoinNetwork } from '@models/bitcoin-network';
 import { BitcoinTransaction, BitcoinTransactionVectorOutput } from '@models/bitcoin-transaction';
+import { RawVault } from '@models/vault';
 import { hex } from '@scure/base';
 import { p2tr, p2tr_ns, taprootTweakPubkey } from '@scure/btc-signer';
 
 import { useAttestors } from './use-attestors';
 import { useEndpoints } from './use-endpoints';
+import { useEthereum } from './use-ethereum';
 
 interface UseProofOfReserveReturnType {
-  verifyVaultDeposit(): Promise<void>;
+  proofOfReserve: number | undefined;
 }
 
 export function useProofOfReserve(): UseProofOfReserveReturnType {
   const { bitcoinBlockchainAPIURL, bitcoinNetwork } = useEndpoints();
+  const { getAllFundedVaults } = useEthereum();
   const { getAttestorGroupPublicKey } = useAttestors();
+
+  const [proofOfReserve, setProofOfReserve] = useState<number | undefined>(undefined);
+
+  useQuery(['proofOfReserve'], () => calculateProofOfReserve, {
+    refetchInterval: 10000,
+  });
 
   async function fetchFundingTransaction(txID: string): Promise<BitcoinTransaction> {
     try {
@@ -104,17 +117,14 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
     );
   }
 
-  async function verifyVaultDeposit() {
-    // This is an existing Funded Vault's Funding Transaction ID [Regtest]
-    const TEST_FUNDING_TXID = 'fae0caeb413a009a049c2168d14cd5591fe3781b1494f2ed32c23c87dde929bf';
-    // This is the value of the locked Bitcoin in the Funded Vault
-    const TEST_VALUE = 100000;
-    // This is the UUID of the Funded Vault
-    const TEST_UUID = '0xc31f853e0216afc6c90a818fcc5be92ee84f789dba3dcf28b0b6b6691b0bdda1';
+  async function verifyVaultDeposit(vault: RawVault): Promise<boolean> {
+    if (!vault.fundingTxId || !vault.taprootPubKey || !vault.valueLocked || !vault.uuid) {
+      return false;
+    }
 
     try {
       // Fetch the Funding Transaction by its ID
-      const fundingTransaction = await fetchFundingTransaction(TEST_FUNDING_TXID);
+      const fundingTransaction = await fetchFundingTransaction(vault.fundingTxId);
 
       // Fetch the current Bitcoin Block Height
       const bitcoinBlockHeight = await fetchBitcoinBlockHeight();
@@ -123,19 +133,14 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
       const isConfirmed = await checkConfirmations(fundingTransaction, bitcoinBlockHeight);
 
       if (!isConfirmed) {
-        throw new Error('Funding Transaction has not enough Confirmations.');
+        return false;
       }
 
       // Get the Closing Transaction Input from the Funding Transaction by the locked Bitcoin value
       const closingTransactionInput = getClosingTransactionInputFromFundingTransaction(
         fundingTransaction,
-        TEST_VALUE
+        vault.valueLocked.toNumber()
       );
-
-      // Get the User Public Key from the Funding Transaction, assuming it is a P2WPKH script
-      // const userPublicKey = getPublicKeyFromBitcoinTransaction(fundingTransaction);
-      // TODO: Use the following hardcoded Taproot User Public Key for now, because the above function is retrieving the user's Native SegWit Public Key, not the Taproot Public Key, which is needed for the MultiSig Transaction
-      const userPublicKey = 'c3bf9946d51cf18e4711bd004be784b1b184103f1596f7a98ec4c2063b38ffd1';
 
       // Get the Attestor Public Key from the Attestor Group
       const attestorPublicKey = await getAttestorGroupPublicKey();
@@ -143,18 +148,17 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
       // Create two MultiSig Transactions, because the User and Attestor can sign in any order
       // Create the MultiSig Transaction A
       const multisigTransactionA = createMultiSigTransaction(
-        userPublicKey,
+        vault.taprootPubKey,
         attestorPublicKey,
-        TEST_UUID,
+        vault.uuid,
         bitcoinNetwork
       );
 
       // Create the MultiSig Transaction B
       const multisigTransactionB = createMultiSigTransaction(
         attestorPublicKey,
-        userPublicKey,
-        TEST_UUID,
-
+        vault.taprootPubKey,
+        vault.uuid,
         bitcoinNetwork
       );
 
@@ -165,14 +169,38 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
       );
 
       if (!acceptedScript) {
-        throw new Error('Funding Transaction does not match the expected MultiSig Script.');
+        return false;
       }
+
+      return true;
     } catch (error) {
       throw new Error(`Error verifying Vault Deposit: ${error}`);
     }
   }
 
+  async function calculateProofOfReserve() {
+    const fundedVaults = await getAllFundedVaults();
+
+    const results = await Promise.all(
+      fundedVaults.map(async vault => {
+        try {
+          if (await verifyVaultDeposit(vault)) {
+            return vault.valueLocked.toNumber();
+          }
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.error('Error while verifying Deposit for Vault:', vault.uuid, error);
+        }
+        return 0;
+      })
+    );
+
+    const currentProofOfReserve = results.reduce((sum, collateral) => sum + collateral, 0);
+
+    setProofOfReserve(customShiftValue(currentProofOfReserve, 8, true));
+  }
+
   return {
-    verifyVaultDeposit,
+    proofOfReserve,
   };
 }

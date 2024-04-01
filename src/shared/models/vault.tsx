@@ -12,6 +12,7 @@ export interface Vault {
   uuid: string;
   collateral: number;
   state: number;
+  userPublicKey: string;
   fundingTX: string;
   closingTX: string;
   timestamp: number;
@@ -24,6 +25,7 @@ export interface RawVault {
   timestamp: BigNumber;
   valueLocked: BigNumber;
   creator: string;
+  taprootPubKey: string;
   outcome: string;
   status: number;
   fundingTxId: string;
