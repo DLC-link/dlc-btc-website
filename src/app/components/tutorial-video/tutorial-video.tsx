@@ -11,8 +11,8 @@ export function TutorialVideo(): React.JSX.Element {
   };
 
   const opts: YouTubeProps['opts'] = {
-    height: '100',
-    width: '200',
+    height: '220',
+    width: '400',
     playerVars: {
       autoplay: 0,
       controls: 1,
@@ -28,17 +28,17 @@ export function TutorialVideo(): React.JSX.Element {
         isLoaded={!isLoading}
         startColor={'white.02'}
         endColor={'white.03'}
-        h={'100px'}
-        w={'205px'}
+        h={'220px'}
+        w={'410px'}
       >
         <VStack
           justifyContent={'center'}
-          w={'205px'}
+          w={'410px'}
           border={'2.5px solid'}
           borderColor={'border.white.01'}
           borderRadius={'lg'}
         >
-          <YouTube videoId="x9D1owU1tB8" opts={opts} onReady={onPlayerReady} />
+          <YouTube videoId="n4lIVEujhH4" opts={opts} onReady={onPlayerReady} />
         </VStack>
       </Skeleton>
     </VStack>
