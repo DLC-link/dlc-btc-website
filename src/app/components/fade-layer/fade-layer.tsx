@@ -2,23 +2,23 @@ import { VStack } from '@chakra-ui/react';
 
 interface FadeLayerProps {
   children: React.ReactNode;
-  height: string;
-  fadeHeight: string;
+  h: string;
+  fh: string;
 }
 
-export function FadeLayer({ children, height, fadeHeight }: FadeLayerProps): React.JSX.Element {
+export function FadeLayer({ children, h, fh }: FadeLayerProps): React.JSX.Element {
   const afterStyles = {
-    content: '""',
-    position: 'absolute',
+    height: fh,
     bottom: 0,
     left: 0,
     right: 0,
-    height: fadeHeight,
+    position: 'absolute',
+    content: '""',
     backgroundImage: 'linear-gradient(to top, background.container.01, transparent)',
   };
 
   return (
-    <VStack alignItems={'start'} position="relative" w={'100%'} h={height} _after={afterStyles}>
+    <VStack w={'100%'} h={h} position="relative" _after={afterStyles}>
       {children}
     </VStack>
   );

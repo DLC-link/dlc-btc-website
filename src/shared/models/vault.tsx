@@ -13,12 +13,13 @@ export interface Vault {
   timestamp: number;
   collateral: number;
   state: number;
+  userPublicKey: string;
   fundingTX: string;
   closingTX: string;
   btcFeeRecipient: string;
   btcMintFeeBasisPoints: number;
   btcRedeemFeeBasisPoints: number;
-  taprootPubkey: string;
+  taprootPubKey: string;
 }
 
 export interface RawVault {
@@ -33,5 +34,5 @@ export interface RawVault {
   btcFeeRecipient: string;
   btcMintFeeBasisPoints: BigNumber;
   btcRedeemFeeBasisPoints: BigNumber;
-  taprootPubkey: string;
+  taprootPubKey: string;
 }

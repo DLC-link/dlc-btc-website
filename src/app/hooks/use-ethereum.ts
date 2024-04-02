@@ -17,8 +17,10 @@ interface UseEthereumReturnType {
   getDLCBTCBalance: () => Promise<number | undefined>;
   getLockedBTCBalance: () => Promise<number | undefined>;
   totalSupply: number | undefined;
+  getAttestorGroupPublicKey: () => Promise<string>;
   getAllVaults: () => Promise<void>;
   getVault: (vaultUUID: string, vaultState: VaultState) => Promise<void>;
+  getAllFundedVaults: () => Promise<RawVault[]>;
   setupVault: (btcDepositAmount: number) => Promise<void>;
   closeVault: (vaultUUID: string) => Promise<void>;
 }
@@ -36,7 +38,7 @@ export function throwEthereumError(message: string, error: any): void {
 
 export function useEthereum(): UseEthereumReturnType {
   const { vaults } = useContext(VaultContext);
-  const { protocolContract, dlcBTCContract } = useEthereumContext();
+  const { protocolContract, dlcBTCContract, dlcManagerContract } = useEthereumContext();
 
   const { address, network } = useSelector((state: RootState) => state.account);
 
@@ -57,12 +59,13 @@ export function useEthereum(): UseEthereumReturnType {
       timestamp: vault.timestamp.toNumber(),
       collateral: customShiftValue(vault.valueLocked.toNumber(), 8, true),
       state: vault.status,
+      userPublicKey: vault.taprootPubKey,
       fundingTX: vault.fundingTxId,
       closingTX: vault.closingTxId,
       btcFeeRecipient: vault.btcFeeRecipient,
       btcMintFeeBasisPoints: customShiftValue(vault.btcMintFeeBasisPoints.toNumber(), 4, true),
       btcRedeemFeeBasisPoints: customShiftValue(vault.btcRedeemFeeBasisPoints.toNumber(), 4, true),
-      taprootPubkey: vault.taprootPubkey,
+      taprootPubKey: vault.taprootPubKey,
     };
   }
 
@@ -109,6 +112,15 @@ export function useEthereum(): UseEthereumReturnType {
       return dlcBTCBalance;
     } catch (error) {
       throwEthereumError(`Could not fetch dlcBTC balance: `, error);
+    }
+  }
+
+  async function getAttestorGroupPublicKey(): Promise<string> {
+    try {
+      if (!dlcManagerContract) throw new Error('Protocol contract not initialized');
+      return await dlcManagerContract.attestorGroupPubKey();
+    } catch (error) {
+      throw new EthereumError(`Could not fetch Attestor Public Key: ${error}`);
     }
   }
 
@@ -161,6 +173,16 @@ export function useEthereum(): UseEthereumReturnType {
     throw new EthereumError(`Failed to fetch Vault ${vaultUUID} after ${maxRetries} retries`);
   }
 
+  async function getAllFundedVaults(): Promise<RawVault[]> {
+    try {
+      if (!dlcManagerContract) throw new Error('DLC Manager contract not initialized');
+      const vaults: RawVault[] = await dlcManagerContract.getFundedDLCs(0, 1000000);
+      return vaults;
+    } catch (error) {
+      throw new EthereumError(`Could not fetch Funded Vaults: ${error}`);
+    }
+  }
+
   async function setupVault(btcDepositAmount: number): Promise<void> {
     try {
       if (!protocolContract) throw new Error('Protocol contract not initialized');
@@ -184,9 +206,11 @@ export function useEthereum(): UseEthereumReturnType {
   return {
     getDLCBTCBalance,
     totalSupply,
+    getAttestorGroupPublicKey,
     getLockedBTCBalance,
     getAllVaults,
     getVault,
+    getAllFundedVaults,
     setupVault,
     closeVault,
   };
