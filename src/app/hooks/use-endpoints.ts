@@ -23,6 +23,7 @@ export function useEndpoints(): NetworkEndpoints {
   const [ethereumAttestorChainID, setEthereumAttestorChainID] = useState<string>('');
   const [bitcoinExplorerAPIURL, setBitcoinExplorerAPIURL] = useState<string>('');
   const [bitcoinBlockchainAPIURL, setBitcoinBlockchainAPIURL] = useState<string>('');
+
   const [bitcoinNetwork, setBitcoinNetwork] = useState<BitcoinNetwork>(regtest);
   const [bitcoinNetworkName, setBitcoinNetworkName] = useState<string>('');
 
@@ -55,7 +56,8 @@ export function useEndpoints(): NetworkEndpoints {
     const bitcoinNetworkName = import.meta.env.VITE_BITCOIN_NETWORK;
     const bitcoinBlockchainAPIURL = import.meta.env.VITE_BITCOIN_BLOCKCHAIN_API_URL;
     const bitcoinExplorerAPIURL = import.meta.env.VITE_BITCOIN_EXPLORER_API_URL;
-    let bitcoinNetwork;
+
+    let bitcoinNetwork: BitcoinNetwork;
 
     switch (bitcoinNetworkName) {
       case 'mainnet':
