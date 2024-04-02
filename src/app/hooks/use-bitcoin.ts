@@ -299,7 +299,7 @@ export function useBitcoin(): UseBitcoinReturnType {
    */
   async function createClosingTransaction(
     fundingTransactionID: string,
-    multisigTransaction: any,
+    multisigTransaction: btc.P2TROut,
     userNativeSegwitAddress: string,
     feePublicKey: string,
     feeBasisPoints: number,

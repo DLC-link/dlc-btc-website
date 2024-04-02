@@ -27,6 +27,11 @@ export function NavigationTabs({
         isActive={activeTab === '/how-it-works'}
         handleClick={() => handleTabClick('/how-it-works')}
       />
+      <TabButton
+        title={'Proof of Reserve'}
+        isActive={activeTab === '/proof-of-reserve'}
+        handleClick={() => handleTabClick('/proof-of-reserve')}
+      />
     </HStack>
   );
 }

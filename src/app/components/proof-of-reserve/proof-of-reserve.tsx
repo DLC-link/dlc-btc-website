@@ -1,31 +1,43 @@
-import { useEffect, useState } from 'react';
+import { useContext } from 'react';
 
-import { Text, VStack } from '@chakra-ui/react';
+import { Divider, HStack, Text } from '@chakra-ui/react';
+import { useBitcoinPrice } from '@hooks/use-bitcoin-price';
+import { useEthereum } from '@hooks/use-ethereum';
+import { bitcoin, dlcBTC } from '@models/token';
+import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
 
 import { ProofOfReserveLayout } from './components/proof-of-reserve-layout';
+import { TokenStatsBoardToken } from './components/token-stats-board/components/token-stats-board-token';
+import { TokenStatsBoardTVL } from './components/token-stats-board/components/token-stats-board-tvl';
+import { TokenStatsBoardLayout } from './components/token-stats-board/token-stats-board.layout';
 
 export function ProofOfReserve(): React.JSX.Element {
-  const [content, setContent] = useState('');
+  const { totalSupply } = useEthereum();
+  const { bitcoinPrice } = useBitcoinPrice();
+  const { proofOfReserve } = useContext(ProofOfReserveContext);
 
-  useEffect(() => {
-    fetch('http://localhost:8811/get-proof-of-reserve')
-      .then(response => response.json())
-      .then(data => {
-        setContent(data);
-      })
-      .catch(error => {
-        // eslint-disable-next-line no-console
-        console.error('Error fetching data:', error);
-      });
-  }, []);
   return (
     <ProofOfReserveLayout>
-      {
-        <VStack spacing={'10px'}>
-          <Text color={'white'}>BTC Reserve</Text>
-          <Text color={'white'}>{content}</Text>
-        </VStack>
-      }
+      <Text w={'100%'} px={'35px'} color={'white'} fontSize={'4xl'} fontWeight={600}>
+        My Vaults
+      </Text>
+      <TokenStatsBoardLayout>
+        <TokenStatsBoardTVL totalSupply={totalSupply} bitcoinPrice={bitcoinPrice} />
+        <HStack w={'50%'} pl={'25px'}>
+          <TokenStatsBoardToken token={dlcBTC} totalSupply={totalSupply} />
+          <Divider orientation={'vertical'} px={'15px'} variant={'thick'} />
+          <TokenStatsBoardToken token={bitcoin} totalSupply={proofOfReserve} />
+        </HStack>
+      </TokenStatsBoardLayout>
+      {/* <HStack w={'100%'} spacing={'20px'}>
+        <MerchantTableLayout>
+          <MerchantTableHeader />
+          {exampleMerchantTableItems.map(item => (
+            <MerchantTableItem key={item.merchant.name} {...item} />
+          ))}
+        </MerchantTableLayout>
+        <ProtocolHistoryTable />
+      </HStack> */}
     </ProofOfReserveLayout>
   );
 }
