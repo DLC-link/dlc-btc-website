@@ -19,7 +19,7 @@ export interface Vault {
   btcFeeRecipient: string;
   btcMintFeeBasisPoints: number;
   btcRedeemFeeBasisPoints: number;
-  taprootPubkey: string;
+  taprootPubKey: string;
 }
 
 export interface RawVault {
@@ -34,5 +34,5 @@ export interface RawVault {
   btcFeeRecipient: string;
   btcMintFeeBasisPoints: BigNumber;
   btcRedeemFeeBasisPoints: BigNumber;
-  taprootPubkey: string;
+  taprootPubKey: string;
 }

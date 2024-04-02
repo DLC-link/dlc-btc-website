@@ -1,8 +1,10 @@
+import { useContext } from 'react';
+
 import { Divider, HStack, Text } from '@chakra-ui/react';
 import { useBitcoinPrice } from '@hooks/use-bitcoin-price';
 import { useEthereum } from '@hooks/use-ethereum';
-import { useProofOfReserve } from '@hooks/use-proof-of-reserve';
 import { bitcoin, dlcBTC } from '@models/token';
+import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
 
 import { ProofOfReserveLayout } from './components/proof-of-reserve-layout';
 import { TokenStatsBoardToken } from './components/token-stats-board/components/token-stats-board-token';
@@ -12,7 +14,7 @@ import { TokenStatsBoardLayout } from './components/token-stats-board/token-stat
 export function ProofOfReserve(): React.JSX.Element {
   const { totalSupply } = useEthereum();
   const { bitcoinPrice } = useBitcoinPrice();
-  const { proofOfReserve } = useProofOfReserve();
+  const { proofOfReserve } = useContext(ProofOfReserveContext);
 
   return (
     <ProofOfReserveLayout>

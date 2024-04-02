@@ -7,6 +7,7 @@ import { ProofOfReservePage } from '@pages/proof-of-reserve/proof-of-reserve-pag
 import { BalanceContextProvider } from '@providers/balance-context-provider';
 import { BlockchainHeightContextProvider } from '@providers/bitcoin-query-provider';
 import { EthereumObserverProvider } from '@providers/ethereum-observer-provider';
+import { ProofOfReserveContextProvider } from '@providers/proof-of-reserve-context-provider';
 
 import { About } from './pages/about/about';
 import { Dashboard } from './pages/dashboard/dashboard';
@@ -23,12 +24,14 @@ export function App(): React.JSX.Element {
           <VaultContextProvider>
             <BlockchainHeightContextProvider>
               <BalanceContextProvider>
-                <AppLayout>
-                  <Route path="/" element={<Dashboard />} />
-                  <Route path="/my-vaults" element={<MyVaults />} />
-                  <Route path="/how-it-works" element={<About />} />
-                  <Route path="/proof-of-reserve" element={<ProofOfReservePage />} />
-                </AppLayout>
+                <ProofOfReserveContextProvider>
+                  <AppLayout>
+                    <Route path="/" element={<Dashboard />} />
+                    <Route path="/my-vaults" element={<MyVaults />} />
+                    <Route path="/how-it-works" element={<About />} />
+                    <Route path="/proof-of-reserve" element={<ProofOfReservePage />} />
+                  </AppLayout>
+                </ProofOfReserveContextProvider>
               </BalanceContextProvider>
             </BlockchainHeightContextProvider>
           </VaultContextProvider>
