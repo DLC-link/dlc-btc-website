@@ -10,24 +10,29 @@ export enum VaultState {
 
 export interface Vault {
   uuid: string;
+  timestamp: number;
   collateral: number;
   state: number;
   userPublicKey: string;
   fundingTX: string;
   closingTX: string;
-  timestamp: number;
+  btcFeeRecipient: string;
+  btcMintFeeBasisPoints: number;
+  btcRedeemFeeBasisPoints: number;
+  taprootPubkey: string;
 }
 
 export interface RawVault {
   uuid: string;
-  protocolWallet: string;
   protocolContract: string;
   timestamp: BigNumber;
   valueLocked: BigNumber;
   creator: string;
-  taprootPubKey: string;
-  outcome: string;
   status: number;
   fundingTxId: string;
   closingTxId: string;
+  btcFeeRecipient: string;
+  btcMintFeeBasisPoints: BigNumber;
+  btcRedeemFeeBasisPoints: BigNumber;
+  taprootPubkey: string;
 }

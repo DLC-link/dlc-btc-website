@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { customShiftValue } from '@common/utilities';
 import { BitcoinError } from '@models/error-types';
+import { Vault } from '@models/vault';
 import * as btc from '@scure/btc-signer';
 import { RootState } from '@store/index';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
@@ -11,7 +11,7 @@ import { vaultActions } from '@store/slices/vault/vault.actions';
 import { useBitcoin } from './use-bitcoin';
 
 interface UsePSBTReturnType {
-  handleSignFundingTransaction: (btcAmount: number, vaultUUID: string) => Promise<void>;
+  handleSignFundingTransaction: (vault: Vault) => Promise<void>;
   handleSignClosingTransaction: () => Promise<void>;
 }
 
@@ -22,25 +22,18 @@ export function usePSBT(): UsePSBTReturnType {
 
   const { network } = useSelector((state: RootState) => state.account);
 
-  const [vaultUUID, setVaultUUID] = useState<string | undefined>();
-  const [bitcoinAmount, setBitcoinAmount] = useState<number | undefined>();
+  const [vault, setVault] = useState<Vault | undefined>();
 
   const [userNativeSegwitAddress, setUserNativeSegwitAddress] = useState<string | undefined>();
   const [fundingTransaction, setFundingTransaction] = useState<btc.Transaction | undefined>();
   const [multisigTransaction, setMultisigTransaction] = useState<btc.P2TROut | undefined>();
 
-  async function handleSignFundingTransaction(
-    bitcoinAmount: number,
-    vaultUUID: string
-  ): Promise<void> {
-    const shiftedBTCDepositAmount = customShiftValue(bitcoinAmount, 8, false);
-
+  async function handleSignFundingTransaction(vault: Vault): Promise<void> {
     try {
       const { fundingTransaction, multisigTransaction, userNativeSegwitAddress } =
-        await signAndBroadcastFundingPSBT(shiftedBTCDepositAmount, vaultUUID);
+        await signAndBroadcastFundingPSBT(vault);
 
-      setVaultUUID(vaultUUID);
-      setBitcoinAmount(shiftedBTCDepositAmount);
+      setVault(vault);
       setUserNativeSegwitAddress(userNativeSegwitAddress);
       setFundingTransaction(fundingTransaction);
       setMultisigTransaction(multisigTransaction);
@@ -55,8 +48,7 @@ export function usePSBT(): UsePSBTReturnType {
         !fundingTransaction ||
         !multisigTransaction ||
         !userNativeSegwitAddress ||
-        !bitcoinAmount ||
-        !vaultUUID ||
+        !vault ||
         !network
       ) {
         throw new BitcoinError(
@@ -65,24 +57,23 @@ export function usePSBT(): UsePSBTReturnType {
       }
 
       await signAndSendClosingPSBT(
-        fundingTransaction.id,
+        fundingTransaction,
         multisigTransaction,
-        vaultUUID,
         userNativeSegwitAddress,
-        bitcoinAmount
+        vault
       );
 
       await broadcastTransaction(fundingTransaction);
 
       dispatch(
         vaultActions.setVaultToFunding({
-          vaultUUID,
+          vaultUUID: vault.uuid,
           fundingTX: fundingTransaction.id,
           networkID: network.id,
         })
       );
 
-      dispatch(mintUnmintActions.setMintStep([3, vaultUUID]));
+      dispatch(mintUnmintActions.setMintStep([3, vault.uuid]));
     } catch (error) {
       throw new BitcoinError(`Error signing Closing Transaction: ${error}`);
     }
