@@ -62,6 +62,7 @@ export function useEthereum(): UseEthereumReturnType {
       btcFeeRecipient: vault.btcFeeRecipient,
       btcMintFeeBasisPoints: customShiftValue(vault.btcMintFeeBasisPoints.toNumber(), 4, true),
       btcRedeemFeeBasisPoints: customShiftValue(vault.btcRedeemFeeBasisPoints.toNumber(), 4, true),
+      taprootPubkey: vault.taprootPubkey,
     };
   }
 
