@@ -54,6 +54,7 @@ export function useEthereumObserver(): void {
     });
 
     protocolContract.on('SetStatusFunded', async (...args: any[]) => {
+      console.log('SetStatusFunded', args);
       const vaultOwner = args[2];
 
       if (vaultOwner.toLowerCase() !== address) return;
