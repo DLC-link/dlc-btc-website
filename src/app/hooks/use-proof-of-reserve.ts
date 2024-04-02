@@ -8,7 +8,6 @@ import { RawVault } from '@models/vault';
 import { hex } from '@scure/base';
 import { p2tr, p2tr_ns, taprootTweakPubkey } from '@scure/btc-signer';
 
-import { useAttestors } from './use-attestors';
 import { useEndpoints } from './use-endpoints';
 import { useEthereum } from './use-ethereum';
 
@@ -18,8 +17,7 @@ interface UseProofOfReserveReturnType {
 
 export function useProofOfReserve(): UseProofOfReserveReturnType {
   const { bitcoinBlockchainAPIURL, bitcoinNetwork } = useEndpoints();
-  const { getAllFundedVaults } = useEthereum();
-  const { getAttestorGroupPublicKey } = useAttestors();
+  const { getAllFundedVaults, getAttestorGroupPublicKey } = useEthereum();
 
   const [proofOfReserve, setProofOfReserve] = useState<number | undefined>(undefined);
 

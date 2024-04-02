@@ -18,6 +18,7 @@ interface UseEthereumReturnType {
   getLockedBTCBalance: () => Promise<number | undefined>;
   getProtocolFee: () => Promise<number | undefined>;
   totalSupply: number | undefined;
+  getAttestorGroupPublicKey: () => Promise<string>;
   getAllVaults: () => Promise<void>;
   getVault: (vaultUUID: string, vaultState: VaultState) => Promise<void>;
   getAllFundedVaults: () => Promise<RawVault[]>;
@@ -125,6 +126,15 @@ export function useEthereum(): UseEthereumReturnType {
     }
   }
 
+  async function getAttestorGroupPublicKey(): Promise<string> {
+    try {
+      if (!dlcManagerContract) throw new Error('Protocol contract not initialized');
+      return await dlcManagerContract.attestorGroupPubKey();
+    } catch (error) {
+      throw new EthereumError(`Could not fetch Attestor Public Key: ${error}`);
+    }
+  }
+
   async function getAllVaults(): Promise<void> {
     try {
       if (!protocolContract) throw new Error('Protocol contract not initialized');
@@ -208,6 +218,7 @@ export function useEthereum(): UseEthereumReturnType {
     getDLCBTCBalance,
     getProtocolFee,
     totalSupply,
+    getAttestorGroupPublicKey,
     getLockedBTCBalance,
     getAllVaults,
     getVault,
