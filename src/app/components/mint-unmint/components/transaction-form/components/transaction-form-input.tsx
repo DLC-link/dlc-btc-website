@@ -48,6 +48,7 @@ export function TransactionFormInput({
           fontSize={'xl'}
           fontWeight={800}
           validate={validateTokenAmount}
+          onWheel={(e: React.WheelEvent<HTMLInputElement>) => (e.target as HTMLInputElement).blur()}
         />
         <Text fontSize={'xl'}>dlcBTC</Text>
       </HStack>

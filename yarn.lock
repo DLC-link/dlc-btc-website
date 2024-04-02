@@ -3295,7 +3295,7 @@ formik@^2.4.5:
     tiny-warning "^1.0.2"
     tslib "^2.0.0"
 
-framer-motion@^11.0.20, framer-motion@>=4.0.0:
+framer-motion@^11.0.23, framer-motion@>=4.0.0:
   version "11.0.23"
   resolved "https://registry.npmjs.org/framer-motion/-/framer-motion-11.0.23.tgz"
   integrity sha512-V2xdf9hYJKPml7412Ghmh3LZYjiCAEDIIxR9JOb/ni4GHLQFLE+51wG89/3NhheX1vfYBI1SnicXSyHtzfTPqg==
