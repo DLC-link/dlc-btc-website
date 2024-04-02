@@ -2,6 +2,7 @@ import { createContext, useEffect, useState } from 'react';
 
 import { useEthereum } from '@hooks/use-ethereum';
 import { useEthereumContext } from '@hooks/use-ethereum-context';
+import { useVaults } from '@hooks/use-vaults';
 import { HasChildren } from '@models/has-children';
 
 interface VaultContextType {
@@ -17,6 +18,7 @@ export const BalanceContext = createContext<VaultContextType>({
 export function BalanceContextProvider({ children }: HasChildren): React.JSX.Element {
   const { contractsLoaded } = useEthereumContext();
   const { getDLCBTCBalance, getLockedBTCBalance } = useEthereum();
+  const { fundedVaults } = useVaults();
 
   const [dlcBTCBalance, setDLCBTCBalance] = useState<number | undefined>(undefined);
   const [lockedBTCBalance, setLockedBTCBalance] = useState<number | undefined>(undefined);
@@ -38,7 +40,7 @@ export function BalanceContextProvider({ children }: HasChildren): React.JSX.Ele
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     fetchBalancesIfReady();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contractsLoaded]);
+  }, [contractsLoaded, fundedVaults]);
 
   return (
     <BalanceContext.Provider value={{ dlcBTCBalance, lockedBTCBalance }}>
