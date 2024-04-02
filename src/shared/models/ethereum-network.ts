@@ -30,13 +30,13 @@ const ethereumGoerli: EthereumNetwork = {
   id: EthereumNetworkID.Goerli,
 };
 
-const ethereumSepolia: EthereumNetwork = {
+export const ethereumSepolia: EthereumNetwork = {
   name: 'Sepolia',
   displayName: 'Sepolia',
   id: EthereumNetworkID.Sepolia,
 };
 
-const ethereumArbSepolia: EthereumNetwork = {
+export const ethereumArbSepolia: EthereumNetwork = {
   name: 'ArbSepolia',
   displayName: 'Arbitrum Sepolia',
   id: EthereumNetworkID.ArbSepolia,

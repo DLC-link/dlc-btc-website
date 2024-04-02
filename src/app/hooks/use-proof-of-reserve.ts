@@ -4,6 +4,7 @@ import { useQuery } from 'react-query';
 import { customShiftValue } from '@common/utilities';
 import { BitcoinNetwork } from '@models/bitcoin-network';
 import { BitcoinTransaction, BitcoinTransactionVectorOutput } from '@models/bitcoin-transaction';
+import { ethereumArbSepolia, ethereumSepolia } from '@models/ethereum-network';
 import { RawVault } from '@models/vault';
 import { hex } from '@scure/base';
 import { p2tr, p2tr_ns, taprootTweakPubkey } from '@scure/btc-signer';
@@ -141,7 +142,7 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
       );
 
       // Get the Attestor Public Key from the Attestor Group
-      const attestorPublicKey = await getAttestorGroupPublicKey();
+      const attestorPublicKey = await getAttestorGroupPublicKey(ethereumSepolia);
 
       // Create two MultiSig Transactions, because the User and Attestor can sign in any order
       // Create the MultiSig Transaction A
@@ -177,10 +178,13 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
   }
 
   async function calculateProofOfReserve() {
-    const fundedVaults = await getAllFundedVaults();
+    const sepoliaFundedVaults = await getAllFundedVaults(ethereumSepolia);
+    const arbSepoliaFundedVaults = await getAllFundedVaults(ethereumArbSepolia);
+
+    const allVaults = [...sepoliaFundedVaults, ...arbSepoliaFundedVaults];
 
     const results = await Promise.all(
-      fundedVaults.map(async vault => {
+      allVaults.map(async vault => {
         try {
           if (await verifyVaultDeposit(vault)) {
             return vault.valueLocked.toNumber();

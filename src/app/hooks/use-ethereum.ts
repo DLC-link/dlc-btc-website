@@ -4,6 +4,12 @@ import { useSelector } from 'react-redux';
 
 import { customShiftValue } from '@common/utilities';
 import { EthereumError } from '@models/error-types';
+import {
+  EthereumNetwork,
+  EthereumNetworkID,
+  ethereumArbSepolia,
+  ethereumSepolia,
+} from '@models/ethereum-network';
 import { RawVault, Vault, VaultState } from '@models/vault';
 import { VaultContext } from '@providers/vault-context-provider';
 import { RootState, store } from '@store/index';
@@ -17,10 +23,10 @@ interface UseEthereumReturnType {
   getDLCBTCBalance: () => Promise<number | undefined>;
   getLockedBTCBalance: () => Promise<number | undefined>;
   totalSupply: number | undefined;
-  getAttestorGroupPublicKey: () => Promise<string>;
+  getAttestorGroupPublicKey: (ethereumNetwork: EthereumNetwork) => Promise<string>;
   getAllVaults: () => Promise<void>;
   getVault: (vaultUUID: string, vaultState: VaultState) => Promise<void>;
-  getAllFundedVaults: () => Promise<RawVault[]>;
+  getAllFundedVaults: (thereumNetwork: EthereumNetwork) => Promise<RawVault[]>;
   setupVault: (btcDepositAmount: number) => Promise<void>;
   closeVault: (vaultUUID: string) => Promise<void>;
 }
@@ -38,14 +44,18 @@ export function throwEthereumError(message: string, error: any): void {
 
 export function useEthereum(): UseEthereumReturnType {
   const { vaults } = useContext(VaultContext);
-  const { protocolContract, dlcBTCContract, dlcManagerContract } = useEthereumContext();
+  const { protocolContract, dlcBTCContract } = useEthereumContext();
 
   const { address, network } = useSelector((state: RootState) => state.account);
 
   const [totalSupply, setTotalSupply] = useState<number | undefined>(undefined);
 
   const fetchTotalSupply = async () => {
-    await getTotalSupply();
+    const sepoliaTotalSupply = await getTotalSupply(ethereumSepolia);
+    console.log('sepoliaTotalSupply', sepoliaTotalSupply);
+    const arbSepoliaTotalSupply = await getTotalSupply(ethereumArbSepolia);
+    console.log('arbSepoliaTotalSupply', arbSepoliaTotalSupply);
+    setTotalSupply(customShiftValue(sepoliaTotalSupply + arbSepoliaTotalSupply, 8, true));
   };
 
   useEffect(() => {
@@ -69,15 +79,27 @@ export function useEthereum(): UseEthereumReturnType {
     };
   }
 
-  async function getTotalSupply() {
-    const provider = ethers.providers.getDefaultProvider(
-      'https://ethereum-sepolia.publicnode.com/'
-    );
-    const branchName = import.meta.env.VITE_ETHEREUM_DEPLOYMENT_BRANCH;
-    const contractVersion = import.meta.env.VITE_ETHEREUM_DEPLOYMENT_VERSION;
-    const deploymentPlanURL = `https://raw.githubusercontent.com/DLC-link/dlc-solidity/${branchName}/deploymentFiles/sepolia/v${contractVersion}/DLCBTC.json`;
+  async function getDefaultProvider(
+    ethereumNetwork: EthereumNetwork,
+    contractName: string
+  ): Promise<ethers.Contract> {
+    let nodeURL: string;
+    switch (ethereumNetwork.id) {
+      case EthereumNetworkID.Sepolia:
+        nodeURL = 'https://ethereum-sepolia.publicnode.com/';
+        break;
+      case EthereumNetworkID.ArbSepolia:
+        nodeURL = 'https://sepolia-rollup.arbitrum.io/rpc';
+        break;
+      default:
+        throw new EthereumError(`Invalid Ethereum Network ID: ${ethereumNetwork.id}`);
+    }
 
     try {
+      const provider = ethers.providers.getDefaultProvider(nodeURL);
+      const branchName = import.meta.env.VITE_ETHEREUM_DEPLOYMENT_BRANCH;
+      const contractVersion = import.meta.env.VITE_ETHEREUM_DEPLOYMENT_VERSION;
+      const deploymentPlanURL = `https://raw.githubusercontent.com/DLC-link/dlc-solidity/${branchName}/deploymentFiles/${ethereumNetwork.name.toLowerCase()}/v${contractVersion}/${contractName}.json`;
       const response = await fetch(deploymentPlanURL);
       const contractData = await response.json();
       const protocolContract = new ethers.Contract(
@@ -85,8 +107,17 @@ export function useEthereum(): UseEthereumReturnType {
         contractData.contract.abi,
         provider
       );
+      return protocolContract;
+    } catch (error) {
+      throw new EthereumError(`Could not get Default Provider: ${error}}`);
+    }
+  }
+
+  async function getTotalSupply(ethereumNetwork: EthereumNetwork): Promise<number> {
+    try {
+      const protocolContract = await getDefaultProvider(ethereumNetwork, 'DLCBTC');
       const totalSupply = await protocolContract.totalSupply();
-      setTotalSupply(customShiftValue(totalSupply, 8, true));
+      return totalSupply.toNumber();
     } catch (error) {
       throw new EthereumError(`Could not fetch Total Supply Info: ${error}}`);
     }
@@ -115,10 +146,11 @@ export function useEthereum(): UseEthereumReturnType {
     }
   }
 
-  async function getAttestorGroupPublicKey(): Promise<string> {
+  async function getAttestorGroupPublicKey(ethereumNetwork: EthereumNetwork): Promise<string> {
     try {
-      if (!dlcManagerContract) throw new Error('Protocol contract not initialized');
-      return await dlcManagerContract.attestorGroupPubKey();
+      const dlcManagerContract = await getDefaultProvider(ethereumNetwork, 'DLCManager');
+      const attestorGroupPubKey = await dlcManagerContract.attestorGroupPubKey();
+      return attestorGroupPubKey;
     } catch (error) {
       throw new EthereumError(`Could not fetch Attestor Public Key: ${error}`);
     }
@@ -173,9 +205,9 @@ export function useEthereum(): UseEthereumReturnType {
     throw new EthereumError(`Failed to fetch Vault ${vaultUUID} after ${maxRetries} retries`);
   }
 
-  async function getAllFundedVaults(): Promise<RawVault[]> {
+  async function getAllFundedVaults(ethereumNetwork: EthereumNetwork): Promise<RawVault[]> {
     try {
-      if (!dlcManagerContract) throw new Error('DLC Manager contract not initialized');
+      const dlcManagerContract = await getDefaultProvider(ethereumNetwork, 'DLCManager');
       const vaults: RawVault[] = await dlcManagerContract.getFundedDLCs(0, 1000000);
       return vaults;
     } catch (error) {
