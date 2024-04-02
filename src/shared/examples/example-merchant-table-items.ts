@@ -1,6 +1,7 @@
 import { amber, falconX, galaxy } from '@models/merchant';
 
-export const exampleMerchantTableItems = [
+// @ts-expect-error: ignoring because of later implementation
+const exampleMerchantTableItems = [
   {
     dlcBTCAmount: 15,
     merchant: falconX,

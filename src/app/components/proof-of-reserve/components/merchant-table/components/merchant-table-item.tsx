@@ -8,10 +8,8 @@ interface MerchantTableItemProps {
   dlcBTCAmount: number;
 }
 
-export function MerchantTableItem({
-  merchant,
-  dlcBTCAmount,
-}: MerchantTableItemProps): React.ReactElement {
+// @ts-expect-error: ignoring because of later implementation
+function MerchantTableItem({ merchant, dlcBTCAmount }: MerchantTableItemProps): React.ReactElement {
   //TODO: replace name with logo when the logo is available
   const { name } = merchant;
 

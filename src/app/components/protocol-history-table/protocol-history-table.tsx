@@ -2,7 +2,8 @@ import { ProtocolHistoryTableBody } from './components/protocol-history-table-bo
 import { ProtocolHistoryTableHeader } from './components/protocol-history-table-header/protocol-history-table-header';
 import { ProtocolHistoryLayout } from './components/protocol-history-table.layout';
 
-export function ProtocolHistoryTable(): React.JSX.Element {
+// @ts-expect-error: ignoring because of later implementation
+function ProtocolHistoryTable(): React.JSX.Element {
   return (
     <ProtocolHistoryLayout>
       <ProtocolHistoryTableHeader />

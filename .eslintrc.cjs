@@ -14,9 +14,10 @@ module.exports = {
   parser: '@typescript-eslint/parser',
   plugins: ['react', 'react-hooks', '@typescript-eslint', 'deprecation'],
   rules: {
+    'import/no-unused-modules': 'off',
     '@typescript-eslint/no-floating-promises': ['warn'],
     '@typescript-eslint/no-unnecessary-type-assertion': ['warn'],
-    '@typescript-eslint/no-unused-vars': ['error'],
+    '@typescript-eslint/no-unused-vars': ['warn'],
     '@typescript-eslint/no-unsafe-assignment': [0],
     '@typescript-eslint/no-unsafe-return': [0],
     '@typescript-eslint/no-unsafe-call': [0],

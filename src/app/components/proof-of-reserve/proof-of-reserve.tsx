@@ -1,15 +1,9 @@
-import { Divider, HStack } from '@chakra-ui/react';
-import { ProtocolHistoryTable } from '@components/protocol-history-table/protocol-history-table';
+import { Divider, HStack, Text } from '@chakra-ui/react';
 import { useBitcoinPrice } from '@hooks/use-bitcoin-price';
 import { useEthereum } from '@hooks/use-ethereum';
 import { useProofOfReserve } from '@hooks/use-proof-of-reserve';
 import { bitcoin, dlcBTC } from '@models/token';
 
-import { exampleMerchantTableItems } from '@shared/examples/example-merchant-table-items';
-
-import { MerchantTableHeader } from './components/merchant-table/components/merchant-table-header';
-import { MerchantTableItem } from './components/merchant-table/components/merchant-table-item';
-import { MerchantTableLayout } from './components/merchant-table/merchant-table-layout';
 import { ProofOfReserveLayout } from './components/proof-of-reserve-layout';
 import { TokenStatsBoardToken } from './components/token-stats-board/components/token-stats-board-token';
 import { TokenStatsBoardTVL } from './components/token-stats-board/components/token-stats-board-tvl';
@@ -22,6 +16,9 @@ export function ProofOfReserve(): React.JSX.Element {
 
   return (
     <ProofOfReserveLayout>
+      <Text w={'100%'} px={'35px'} color={'white'} fontSize={'4xl'} fontWeight={600}>
+        My Vaults
+      </Text>
       <TokenStatsBoardLayout>
         <TokenStatsBoardTVL totalSupply={totalSupply} bitcoinPrice={bitcoinPrice} />
         <HStack w={'50%'} pl={'25px'}>
@@ -30,7 +27,7 @@ export function ProofOfReserve(): React.JSX.Element {
           <TokenStatsBoardToken token={bitcoin} totalSupply={proofOfReserve} />
         </HStack>
       </TokenStatsBoardLayout>
-      <HStack w={'100%'} spacing={'20px'}>
+      {/* <HStack w={'100%'} spacing={'20px'}>
         <MerchantTableLayout>
           <MerchantTableHeader />
           {exampleMerchantTableItems.map(item => (
@@ -38,7 +35,7 @@ export function ProofOfReserve(): React.JSX.Element {
           ))}
         </MerchantTableLayout>
         <ProtocolHistoryTable />
-      </HStack>
+      </HStack> */}
     </ProofOfReserveLayout>
   );
 }
