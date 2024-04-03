@@ -2,6 +2,7 @@ export interface EthereumNetwork {
   id: EthereumNetworkID;
   name: string;
   displayName: string;
+  defaultNodeURL: string;
 }
 
 export enum EthereumNetworkID {
@@ -16,30 +17,35 @@ const ethereumOKXTestnet: EthereumNetwork = {
   name: 'X1Test',
   displayName: 'X1 Testnet',
   id: EthereumNetworkID.X1Testnet,
+  defaultNodeURL: 'https://testrpc.x1.tech',
 };
 
 const ethereumMainnet: EthereumNetwork = {
   name: 'Mainnet',
   displayName: 'ETH Mainnet',
   id: EthereumNetworkID.Mainnet,
+  defaultNodeURL: 'https://mainnet.infura.io/v3/',
 };
 
 const ethereumGoerli: EthereumNetwork = {
   name: 'Goerli',
   displayName: 'Goerli',
   id: EthereumNetworkID.Goerli,
+  defaultNodeURL: 'https://ethereum-goerli.publicnode.com',
 };
 
-const ethereumSepolia: EthereumNetwork = {
+export const ethereumSepolia: EthereumNetwork = {
   name: 'Sepolia',
   displayName: 'Sepolia',
   id: EthereumNetworkID.Sepolia,
+  defaultNodeURL: 'https://ethereum-sepolia.publicnode.com/',
 };
 
 const ethereumArbSepolia: EthereumNetwork = {
   name: 'ArbSepolia',
   displayName: 'Arbitrum Sepolia',
   id: EthereumNetworkID.ArbSepolia,
+  defaultNodeURL: 'https://sepolia-rollup.arbitrum.io/rpc',
 };
 
 export const ethereumNetworks: EthereumNetwork[] = [

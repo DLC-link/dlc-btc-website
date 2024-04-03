@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 
 import { customShiftValue } from '@common/utilities';
 import { BitcoinNetwork } from '@models/bitcoin-network';
 import { BitcoinTransaction, BitcoinTransactionVectorOutput } from '@models/bitcoin-transaction';
+import { ethereumSepolia } from '@models/ethereum-network';
 import { RawVault } from '@models/vault';
 import { hex } from '@scure/base';
 import { p2tr, p2tr_ns, taprootTweakPubkey } from '@scure/btc-signer';
@@ -16,14 +17,21 @@ interface UseProofOfReserveReturnType {
 }
 
 export function useProofOfReserve(): UseProofOfReserveReturnType {
-  const { bitcoinBlockchainAPIURL, bitcoinNetwork } = useEndpoints();
+  const { bitcoinBlockchainAPIURL, bitcoinNetwork, enabledEthereumNetworks } = useEndpoints();
   const { getAllFundedVaults, getAttestorGroupPublicKey } = useEthereum();
 
-  const [proofOfReserve, setProofOfReserve] = useState<number | undefined>(undefined);
+  const [refetchInterval, setRefetchInterval] = useState(2500);
 
-  useQuery(['proofOfReserve'], () => calculateProofOfReserve, {
-    refetchInterval: 10000,
+  const { data: proofOfReserve } = useQuery(['proofOfReserve'], calculateProofOfReserve, {
+    refetchInterval: refetchInterval,
   });
+
+  useEffect(() => {
+    const timeoutID = setTimeout(() => {
+      setRefetchInterval(360000);
+    }, 5000);
+    return () => clearTimeout(timeoutID);
+  }, []);
 
   async function fetchFundingTransaction(txID: string): Promise<BitcoinTransaction> {
     try {
@@ -141,7 +149,7 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
       );
 
       // Get the Attestor Public Key from the Attestor Group
-      const attestorPublicKey = await getAttestorGroupPublicKey();
+      const attestorPublicKey = await getAttestorGroupPublicKey(ethereumSepolia);
 
       // Create two MultiSig Transactions, because the User and Attestor can sign in any order
       // Create the MultiSig Transaction A
@@ -176,11 +184,13 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
     }
   }
 
-  async function calculateProofOfReserve() {
-    const fundedVaults = await getAllFundedVaults();
+  async function calculateProofOfReserve(): Promise<number> {
+    const allFundedVaults = await Promise.all(
+      enabledEthereumNetworks.map(network => getAllFundedVaults(network))
+    ).then(vaultsArrays => vaultsArrays.flat());
 
     const results = await Promise.all(
-      fundedVaults.map(async vault => {
+      allFundedVaults.map(async vault => {
         try {
           if (await verifyVaultDeposit(vault)) {
             return vault.valueLocked.toNumber();
@@ -195,7 +205,7 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
 
     const currentProofOfReserve = results.reduce((sum, collateral) => sum + collateral, 0);
 
-    setProofOfReserve(customShiftValue(currentProofOfReserve, 8, true));
+    return customShiftValue(currentProofOfReserve, 8, true);
   }
 
   return {

@@ -18,9 +18,9 @@ const queryClient = new QueryClient();
 
 export function App(): React.JSX.Element {
   return (
-    <EthereumContextProvider>
-      <EthereumObserverProvider>
-        <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <EthereumContextProvider>
+        <EthereumObserverProvider>
           <VaultContextProvider>
             <BlockchainHeightContextProvider>
               <BalanceContextProvider>
@@ -35,8 +35,8 @@ export function App(): React.JSX.Element {
               </BalanceContextProvider>
             </BlockchainHeightContextProvider>
           </VaultContextProvider>
-        </QueryClientProvider>
-      </EthereumObserverProvider>
-    </EthereumContextProvider>
+        </EthereumObserverProvider>
+      </EthereumContextProvider>
+    </QueryClientProvider>
   );
 }
