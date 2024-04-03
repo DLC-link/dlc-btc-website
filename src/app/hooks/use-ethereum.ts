@@ -1,15 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useContext, useEffect, useState } from 'react';
+import { useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
 
 import { customShiftValue } from '@common/utilities';
 import { EthereumError } from '@models/error-types';
-import {
-  EthereumNetwork,
-  EthereumNetworkID,
-  ethereumArbSepolia,
-  ethereumSepolia,
-} from '@models/ethereum-network';
+import { EthereumNetwork } from '@models/ethereum-network';
 import { RawVault, Vault, VaultState } from '@models/vault';
 import { VaultContext } from '@providers/vault-context-provider';
 import { RootState, store } from '@store/index';
@@ -17,6 +13,7 @@ import { vaultActions } from '@store/slices/vault/vault.actions';
 import { ethers } from 'ethers';
 import { Logger } from 'ethers/lib/utils';
 
+import { useEndpoints } from './use-endpoints';
 import { useEthereumContext } from './use-ethereum-context';
 
 interface UseEthereumReturnType {
@@ -44,24 +41,32 @@ export function throwEthereumError(message: string, error: any): void {
 
 export function useEthereum(): UseEthereumReturnType {
   const { vaults } = useContext(VaultContext);
+  const { enabledEthereumNetworks } = useEndpoints();
   const { protocolContract, dlcBTCContract } = useEthereumContext();
 
   const { address, network } = useSelector((state: RootState) => state.account);
 
-  const [totalSupply, setTotalSupply] = useState<number | undefined>(undefined);
+  const [refetchInterval, setRefetchInterval] = useState(2500);
 
   const fetchTotalSupply = async () => {
-    const sepoliaTotalSupply = await getTotalSupply(ethereumSepolia);
-    console.log('sepoliaTotalSupply', sepoliaTotalSupply);
-    const arbSepoliaTotalSupply = await getTotalSupply(ethereumArbSepolia);
-    console.log('arbSepoliaTotalSupply', arbSepoliaTotalSupply);
-    setTotalSupply(customShiftValue(sepoliaTotalSupply + arbSepoliaTotalSupply, 8, true));
+    let totalSupply = 0;
+    for (const network of enabledEthereumNetworks) {
+      const supply = await getTotalSupply(network);
+      totalSupply += supply;
+    }
+    return customShiftValue(totalSupply, 8, true);
   };
 
+  const { data: totalSupply } = useQuery(['totalSupply'], fetchTotalSupply, {
+    refetchInterval: refetchInterval,
+  });
+
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    fetchTotalSupply();
-  }, [network]);
+    const timeoutID = setTimeout(() => {
+      setRefetchInterval(360000);
+    }, 5000);
+    return () => clearTimeout(timeoutID);
+  }, []);
 
   function formatVault(vault: RawVault): Vault {
     return {
@@ -83,20 +88,8 @@ export function useEthereum(): UseEthereumReturnType {
     ethereumNetwork: EthereumNetwork,
     contractName: string
   ): Promise<ethers.Contract> {
-    let nodeURL: string;
-    switch (ethereumNetwork.id) {
-      case EthereumNetworkID.Sepolia:
-        nodeURL = 'https://ethereum-sepolia.publicnode.com/';
-        break;
-      case EthereumNetworkID.ArbSepolia:
-        nodeURL = 'https://sepolia-rollup.arbitrum.io/rpc';
-        break;
-      default:
-        throw new EthereumError(`Invalid Ethereum Network ID: ${ethereumNetwork.id}`);
-    }
-
     try {
-      const provider = ethers.providers.getDefaultProvider(nodeURL);
+      const provider = ethers.providers.getDefaultProvider(ethereumNetwork.defaultNodeURL);
       const branchName = import.meta.env.VITE_ETHEREUM_DEPLOYMENT_BRANCH;
       const contractVersion = import.meta.env.VITE_ETHEREUM_DEPLOYMENT_VERSION;
       const deploymentPlanURL = `https://raw.githubusercontent.com/DLC-link/dlc-solidity/${branchName}/deploymentFiles/${ethereumNetwork.name.toLowerCase()}/v${contractVersion}/${contractName}.json`;

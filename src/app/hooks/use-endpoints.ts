@@ -2,18 +2,27 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { BitcoinNetwork, bitcoin, regtest, testnet } from '@models/bitcoin-network';
-import { EthereumNetworkID } from '@models/ethereum-network';
+import { EthereumNetwork, EthereumNetworkID, ethereumNetworks } from '@models/ethereum-network';
 import { RootState } from '@store/index';
 
 interface NetworkEndpoints {
   attestorAPIURLs: string[];
   ethereumExplorerAPIURL: string;
   ethereumAttestorChainID: string;
+  enabledEthereumNetworks: EthereumNetwork[];
   bitcoinExplorerAPIURL: string;
   bitcoinBlockchainAPIURL: string;
   mempoolSpaceAPIFeeURL: string;
   bitcoinNetwork: BitcoinNetwork;
   bitcoinNetworkName: string;
+}
+
+function getEthereumNetworkByID(ethereumNetworkID: EthereumNetworkID): EthereumNetwork {
+  const ethereumNetwork = ethereumNetworks.find(network => network.id === ethereumNetworkID);
+  if (!ethereumNetwork) {
+    throw new Error(`Unsupported Ethereum network: ${ethereumNetworkID}`);
+  }
+  return ethereumNetwork;
 }
 
 export function useEndpoints(): NetworkEndpoints {
@@ -25,6 +34,7 @@ export function useEndpoints(): NetworkEndpoints {
   const [bitcoinExplorerAPIURL, setBitcoinExplorerAPIURL] = useState<string>('');
   const [bitcoinBlockchainAPIURL, setBitcoinBlockchainAPIURL] = useState<string>('');
   const [mempoolSpaceAPIFeeURL, setMempoolSpaceAPIFeeURL] = useState<string>('');
+  const [enabledEthereumNetworks, setEnabledEthereumNetworks] = useState<EthereumNetwork[]>([]);
 
   const [bitcoinNetwork, setBitcoinNetwork] = useState<BitcoinNetwork>(regtest);
   const [bitcoinNetworkName, setBitcoinNetworkName] = useState<string>('');
@@ -36,6 +46,7 @@ export function useEndpoints(): NetworkEndpoints {
       attestorAPIURLs,
       ethereumExplorerAPIURL,
       ethereumAttestorChainID,
+      enabledEthereumNetworks,
       bitcoinExplorerAPIURL,
       bitcoinBlockchainAPIURL,
       mempoolSpaceAPIFeeURL,
@@ -46,6 +57,7 @@ export function useEndpoints(): NetworkEndpoints {
     setAttestorAPIURLs(attestorAPIURLs);
     setEthereumExplorerAPIURL(ethereumExplorerAPIURL);
     setEthereumAttestorChainID(ethereumAttestorChainID);
+    setEnabledEthereumNetworks(enabledEthereumNetworks);
     setBitcoinExplorerAPIURL(bitcoinExplorerAPIURL);
     setBitcoinBlockchainAPIURL(bitcoinBlockchainAPIURL);
     setMempoolSpaceAPIFeeURL(mempoolSpaceAPIFeeURL);
@@ -56,6 +68,12 @@ export function useEndpoints(): NetworkEndpoints {
 
   function getEndpoints(): NetworkEndpoints {
     const attestorAPIURLs: string[] = import.meta.env.VITE_ATTESTOR_API_URLS.split(',');
+    const enableEthereumNetworkIDs: string[] = import.meta.env.VITE_ENABLED_ETHEREUM_NETWORKS.split(
+      ','
+    );
+    const enabledEthereumNetworks: EthereumNetwork[] = enableEthereumNetworkIDs.map(id =>
+      getEthereumNetworkByID(id as EthereumNetworkID)
+    );
 
     const bitcoinNetworkName = import.meta.env.VITE_BITCOIN_NETWORK;
     const bitcoinBlockchainAPIURL = import.meta.env.VITE_BITCOIN_BLOCKCHAIN_API_URL;
@@ -84,6 +102,7 @@ export function useEndpoints(): NetworkEndpoints {
           attestorAPIURLs,
           ethereumExplorerAPIURL: 'https://sepolia.etherscan.io/tx/',
           ethereumAttestorChainID: 'evm-sepolia',
+          enabledEthereumNetworks,
           bitcoinExplorerAPIURL,
           bitcoinBlockchainAPIURL,
           mempoolSpaceAPIFeeURL,
@@ -95,6 +114,7 @@ export function useEndpoints(): NetworkEndpoints {
           attestorAPIURLs,
           ethereumExplorerAPIURL: 'https://goerli.etherscan.io/tx/',
           ethereumAttestorChainID: 'evm-goerli',
+          enabledEthereumNetworks,
           bitcoinExplorerAPIURL,
           bitcoinBlockchainAPIURL,
           mempoolSpaceAPIFeeURL,
@@ -106,6 +126,7 @@ export function useEndpoints(): NetworkEndpoints {
           attestorAPIURLs,
           ethereumExplorerAPIURL: 'https://www.oklink.com/x1-test/tx/',
           ethereumAttestorChainID: 'evm-x1-test',
+          enabledEthereumNetworks,
           bitcoinExplorerAPIURL,
           bitcoinBlockchainAPIURL,
           mempoolSpaceAPIFeeURL,
@@ -117,6 +138,7 @@ export function useEndpoints(): NetworkEndpoints {
           attestorAPIURLs,
           ethereumExplorerAPIURL: 'https://sepolia.arbiscan.io/tx/',
           ethereumAttestorChainID: 'evm-arbsepolia',
+          enabledEthereumNetworks,
           bitcoinExplorerAPIURL,
           bitcoinBlockchainAPIURL,
           mempoolSpaceAPIFeeURL,
@@ -131,6 +153,7 @@ export function useEndpoints(): NetworkEndpoints {
     attestorAPIURLs,
     ethereumExplorerAPIURL,
     ethereumAttestorChainID,
+    enabledEthereumNetworks,
     bitcoinExplorerAPIURL,
     bitcoinBlockchainAPIURL,
     mempoolSpaceAPIFeeURL,
