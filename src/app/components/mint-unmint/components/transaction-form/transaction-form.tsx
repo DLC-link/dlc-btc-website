@@ -14,7 +14,7 @@ export interface TransactionFormValues {
   amount: number;
 }
 
-const initialValues: TransactionFormValues = { amount: 0.001 };
+const initialValues: TransactionFormValues = { amount: 0.01 };
 
 export function TransactionForm(): React.JSX.Element {
   const toast = useToast();
