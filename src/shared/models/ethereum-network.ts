@@ -34,14 +34,14 @@ const ethereumGoerli: EthereumNetwork = {
   defaultNodeURL: 'https://ethereum-goerli.publicnode.com',
 };
 
-export const ethereumSepolia: EthereumNetwork = {
+const ethereumSepolia: EthereumNetwork = {
   name: 'Sepolia',
   displayName: 'Sepolia',
   id: EthereumNetworkID.Sepolia,
   defaultNodeURL: 'https://ethereum-sepolia.publicnode.com/',
 };
 
-const ethereumArbSepolia: EthereumNetwork = {
+export const ethereumArbSepolia: EthereumNetwork = {
   name: 'ArbSepolia',
   displayName: 'Arbitrum Sepolia',
   id: EthereumNetworkID.ArbSepolia,

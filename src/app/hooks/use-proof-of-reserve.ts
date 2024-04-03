@@ -4,7 +4,7 @@ import { useQuery } from 'react-query';
 import { customShiftValue } from '@common/utilities';
 import { BitcoinNetwork } from '@models/bitcoin-network';
 import { BitcoinTransaction, BitcoinTransactionVectorOutput } from '@models/bitcoin-transaction';
-import { ethereumSepolia } from '@models/ethereum-network';
+import { ethereumArbSepolia } from '@models/ethereum-network';
 import { RawVault } from '@models/vault';
 import { hex } from '@scure/base';
 import { p2tr, p2tr_ns, taprootTweakPubkey } from '@scure/btc-signer';
@@ -149,7 +149,7 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
       );
 
       // Get the Attestor Public Key from the Attestor Group
-      const attestorPublicKey = await getAttestorGroupPublicKey(ethereumSepolia);
+      const attestorPublicKey = await getAttestorGroupPublicKey(ethereumArbSepolia);
 
       // Create two MultiSig Transactions, because the User and Attestor can sign in any order
       // Create the MultiSig Transaction A
