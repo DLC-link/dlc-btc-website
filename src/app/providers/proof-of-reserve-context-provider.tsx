@@ -1,7 +1,7 @@
 import { createContext } from 'react';
 
-import { useEthereum } from '@hooks/use-ethereum';
 import { useProofOfReserve } from '@hooks/use-proof-of-reserve';
+import { useTotalSupply } from '@hooks/use-total-supply';
 import { HasChildren } from '@models/has-children';
 
 interface ProofOfReserveContextProviderType {
@@ -16,7 +16,7 @@ export const ProofOfReserveContext = createContext<ProofOfReserveContextProvider
 
 export function ProofOfReserveContextProvider({ children }: HasChildren): React.JSX.Element {
   const { proofOfReserve } = useProofOfReserve();
-  const { totalSupply } = useEthereum();
+  const { totalSupply } = useTotalSupply();
 
   return (
     <ProofOfReserveContext.Provider value={{ proofOfReserve, totalSupply }}>

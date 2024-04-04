@@ -20,17 +20,18 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
   const { bitcoinBlockchainAPIURL, bitcoinNetwork, enabledEthereumNetworks } = useEndpoints();
   const { getAllFundedVaults, getAttestorGroupPublicKey } = useEthereum();
 
-  const [refetchInterval, setRefetchInterval] = useState(2500);
+  const [shouldFetch, setShouldFetch] = useState(false);
 
   const { data: proofOfReserve } = useQuery(['proofOfReserve'], calculateProofOfReserve, {
-    refetchInterval: refetchInterval,
+    enabled: shouldFetch,
+    refetchInterval: 60000,
   });
 
   useEffect(() => {
-    const timeoutID = setTimeout(() => {
-      setRefetchInterval(360000);
-    }, 5000);
-    return () => clearTimeout(timeoutID);
+    const delayFetching = setTimeout(() => {
+      setShouldFetch(true);
+    }, 3500);
+    return () => clearTimeout(delayFetching);
   }, []);
 
   async function fetchFundingTransaction(txID: string): Promise<BitcoinTransaction> {
@@ -40,6 +41,7 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
       const response = await fetch(bitcoinExplorerTXURL);
       if (!response.ok) throw new Error('Network response was not ok');
       const bitcoinTransaction = await response.json();
+
       return bitcoinTransaction;
     } catch (error) {
       throw new Error(`Error fetching Bitcoin Transaction: ${error}`);

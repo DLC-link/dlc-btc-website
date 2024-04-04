@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useContext, useEffect, useState } from 'react';
-import { useQuery } from 'react-query';
+import { useContext } from 'react';
 import { useSelector } from 'react-redux';
 
 import { customShiftValue } from '@common/utilities';
@@ -13,13 +12,17 @@ import { vaultActions } from '@store/slices/vault/vault.actions';
 import { ethers } from 'ethers';
 import { Logger } from 'ethers/lib/utils';
 
-import { useEndpoints } from './use-endpoints';
 import { useEthereumContext } from './use-ethereum-context';
 
+const SOLIDITY_CONTRACT_URL = 'https://raw.githubusercontent.com/DLC-link/dlc-solidity';
+
 interface UseEthereumReturnType {
+  getDefaultProvider: (
+    ethereumNetwork: EthereumNetwork,
+    contractName: string
+  ) => Promise<ethers.Contract>;
   getDLCBTCBalance: () => Promise<number | undefined>;
   getLockedBTCBalance: () => Promise<number | undefined>;
-  totalSupply: number | undefined;
   getAttestorGroupPublicKey: (ethereumNetwork: EthereumNetwork) => Promise<string>;
   getAllVaults: () => Promise<void>;
   getVault: (vaultUUID: string, vaultState: VaultState) => Promise<void>;
@@ -41,32 +44,9 @@ export function throwEthereumError(message: string, error: any): void {
 
 export function useEthereum(): UseEthereumReturnType {
   const { vaults } = useContext(VaultContext);
-  const { enabledEthereumNetworks } = useEndpoints();
   const { protocolContract, dlcBTCContract } = useEthereumContext();
 
   const { address, network } = useSelector((state: RootState) => state.account);
-
-  const [refetchInterval, setRefetchInterval] = useState(2500);
-
-  const fetchTotalSupply = async () => {
-    let totalSupply = 0;
-    for (const network of enabledEthereumNetworks) {
-      const supply = await getTotalSupply(network);
-      totalSupply += supply;
-    }
-    return customShiftValue(totalSupply, 8, true);
-  };
-
-  const { data: totalSupply } = useQuery(['totalSupply'], fetchTotalSupply, {
-    refetchInterval: refetchInterval,
-  });
-
-  useEffect(() => {
-    const timeoutID = setTimeout(() => {
-      setRefetchInterval(360000);
-    }, 5000);
-    return () => clearTimeout(timeoutID);
-  }, []);
 
   function formatVault(vault: RawVault): Vault {
     return {
@@ -89,30 +69,26 @@ export function useEthereum(): UseEthereumReturnType {
     contractName: string
   ): Promise<ethers.Contract> {
     try {
+      const ethereumNetworkName = ethereumNetwork.name.toLowerCase();
       const provider = ethers.providers.getDefaultProvider(ethereumNetwork.defaultNodeURL);
-      const branchName = import.meta.env.VITE_ETHEREUM_DEPLOYMENT_BRANCH;
+
+      const deploymentBranchName = import.meta.env.VITE_ETHEREUM_DEPLOYMENT_BRANCH;
       const contractVersion = import.meta.env.VITE_ETHEREUM_DEPLOYMENT_VERSION;
-      const deploymentPlanURL = `https://raw.githubusercontent.com/DLC-link/dlc-solidity/${branchName}/deploymentFiles/${ethereumNetwork.name.toLowerCase()}/v${contractVersion}/${contractName}.json`;
+
+      const deploymentPlanURL = `${SOLIDITY_CONTRACT_URL}/${deploymentBranchName}/deploymentFiles/${ethereumNetworkName}/v${contractVersion}/${contractName}.json`;
+
       const response = await fetch(deploymentPlanURL);
       const contractData = await response.json();
+
       const protocolContract = new ethers.Contract(
         contractData.contract.address,
         contractData.contract.abi,
         provider
       );
+
       return protocolContract;
     } catch (error) {
       throw new EthereumError(`Could not get Default Provider: ${error}}`);
-    }
-  }
-
-  async function getTotalSupply(ethereumNetwork: EthereumNetwork): Promise<number> {
-    try {
-      const protocolContract = await getDefaultProvider(ethereumNetwork, 'DLCBTC');
-      const totalSupply = await protocolContract.totalSupply();
-      return totalSupply.toNumber();
-    } catch (error) {
-      throw new EthereumError(`Could not fetch Total Supply Info: ${error}}`);
     }
   }
 
@@ -229,8 +205,8 @@ export function useEthereum(): UseEthereumReturnType {
   }
 
   return {
+    getDefaultProvider,
     getDLCBTCBalance,
-    totalSupply,
     getAttestorGroupPublicKey,
     getLockedBTCBalance,
     getAllVaults,

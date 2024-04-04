@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 
 import { Divider, HStack, Text } from '@chakra-ui/react';
 import { useBitcoinPrice } from '@hooks/use-bitcoin-price';
@@ -14,10 +14,6 @@ export function ProofOfReserve(): React.JSX.Element {
   const { bitcoinPrice } = useBitcoinPrice();
 
   const { proofOfReserve, totalSupply } = useContext(ProofOfReserveContext);
-
-  useEffect(() => {
-    console.log('totalSupply', totalSupply);
-  }, [totalSupply]);
 
   return (
     <ProofOfReserveLayout>
