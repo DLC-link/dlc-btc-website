@@ -19,7 +19,7 @@ export function TokenStatsBoardTVL({
       >
         TVL
       </Text>
-      <Skeleton w={'100%'} isLoaded={!!totalSupply}>
+      <Skeleton w={'100%'} isLoaded={totalSupply !== undefined}>
         <Text color={'white'} fontSize={'3xl'}>
           $
           {totalSupply && bitcoinPrice ? `${(totalSupply * bitcoinPrice).toLocaleString()} USD` : 0}
