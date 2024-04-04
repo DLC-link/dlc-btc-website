@@ -11,6 +11,7 @@ interface UseEthereumContractsReturnType {
     ethereumNetwork: EthereumNetwork
   ) => Promise<void>;
   protocolContract: Contract | undefined;
+  observerProtocolContract: Contract | undefined;
   dlcManagerContract: Contract | undefined;
   dlcBTCContract: Contract | undefined;
   contractsLoaded: boolean;
@@ -18,6 +19,7 @@ interface UseEthereumContractsReturnType {
 
 export function useEthereumContracts(): UseEthereumContractsReturnType {
   const protocolContract = useRef<Contract | undefined>(undefined);
+  const observerProtocolContract = useRef<Contract | undefined>(undefined);
   const dlcManagerContract = useRef<Contract | undefined>(undefined);
   const dlcBTCContract = useRef<Contract | undefined>(undefined);
 
@@ -40,6 +42,21 @@ export function useEthereumContracts(): UseEthereumContractsReturnType {
         ethereumSigner
       );
       protocolContract.current = contract;
+    }
+
+    if (!observerProtocolContract.current) {
+      const observerProtocolContractData = await fetchEthereumDeploymentPlan(
+        'TokenManager',
+        ethereumNetwork
+      );
+      const contract = new ethers.Contract(
+        observerProtocolContractData.contract.address,
+        observerProtocolContractData.contract.abi,
+        new ethers.providers.WebSocketProvider(
+          import.meta.env.VITE_ETHEREUM_ARB_SEPOLIA_OBSERVER_NODE
+        )
+      );
+      observerProtocolContract.current = contract;
     }
 
     if (!dlcManagerContract.current) {
@@ -95,6 +112,7 @@ export function useEthereumContracts(): UseEthereumContractsReturnType {
   return {
     getEthereumContracts,
     protocolContract: protocolContract.current,
+    observerProtocolContract: observerProtocolContract.current,
     dlcManagerContract: dlcManagerContract.current,
     dlcBTCContract: dlcBTCContract.current,
     contractsLoaded,

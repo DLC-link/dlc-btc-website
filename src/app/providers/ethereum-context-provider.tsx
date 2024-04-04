@@ -7,6 +7,7 @@ import { ethers } from 'ethers';
 
 export interface EthereumContextProviderType {
   protocolContract: any;
+  observerProtocolContract: any;
   dlcManagerContract: any;
   dlcBTCContract: any;
   getEthereumContracts: (
@@ -18,6 +19,7 @@ export interface EthereumContextProviderType {
 
 export const EthereumContext = createContext<any>({
   protocolContract: undefined,
+  observerProtocolContract: undefined,
   dlcManagerContract: undefined,
   dlcBTCContract: undefined,
   getEthereumContracts: async (
@@ -32,6 +34,7 @@ export const EthereumContext = createContext<any>({
 export function EthereumContextProvider({ children }: HasChildren): React.JSX.Element {
   const {
     protocolContract,
+    observerProtocolContract,
     dlcManagerContract,
     dlcBTCContract,
     getEthereumContracts,
@@ -42,6 +45,7 @@ export function EthereumContextProvider({ children }: HasChildren): React.JSX.El
     <EthereumContext.Provider
       value={{
         protocolContract,
+        observerProtocolContract,
         dlcManagerContract,
         dlcBTCContract,
         getEthereumContracts,
