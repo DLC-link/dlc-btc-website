@@ -13,19 +13,18 @@ import { useEthereumContext } from './use-ethereum-context';
 export function useEthereumObserver(): void {
   const dispatch = useDispatch();
 
-  const { protocolContract, dlcBTCContract } = useEthereumContext();
+  const { observerProtocolContract } = useEthereumContext();
   const { getVault } = useEthereum();
 
   const { address, network } = useSelector((state: RootState) => state.account);
 
   useEffect(() => {
-    if (!protocolContract || !dlcBTCContract) return;
+    if (!observerProtocolContract) return;
 
     console.log(`Listening to [${network?.name}]`);
-    console.log(`Listening to [${protocolContract.address}]`);
-    console.log(`Listening to [${dlcBTCContract.address}]`);
+    console.log(`Listening to [${observerProtocolContract.address}]`);
 
-    protocolContract.on('SetupVault', async (...args: any[]) => {
+    observerProtocolContract.on('SetupVault', async (...args: any[]) => {
       const vaultOwner: string = args[2];
 
       if (vaultOwner.toLowerCase() !== address) return;
@@ -39,7 +38,7 @@ export function useEthereumObserver(): void {
       });
     });
 
-    protocolContract.on('CloseVault', async (...args: any[]) => {
+    observerProtocolContract.on('CloseVault', async (...args: any[]) => {
       const vaultOwner: string = args[1];
 
       if (vaultOwner.toLowerCase() !== address) return;
@@ -53,8 +52,7 @@ export function useEthereumObserver(): void {
       });
     });
 
-    protocolContract.on('SetStatusFunded', async (...args: any[]) => {
-      console.log('SetStatusFunded', args);
+    observerProtocolContract.on('SetStatusFunded', async (...args: any[]) => {
       const vaultOwner = args[2];
 
       if (vaultOwner.toLowerCase() !== address) return;
@@ -74,7 +72,7 @@ export function useEthereumObserver(): void {
       });
     });
 
-    protocolContract.on('PostCloseDLCHandler', async (...args: any[]) => {
+    observerProtocolContract.on('PostCloseDLCHandler', async (...args: any[]) => {
       const vaultOwner = args[2];
 
       if (vaultOwner.toLowerCase() !== address) return;
@@ -94,5 +92,5 @@ export function useEthereumObserver(): void {
       });
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [protocolContract, dlcBTCContract, network]);
+  }, [observerProtocolContract, network]);
 }

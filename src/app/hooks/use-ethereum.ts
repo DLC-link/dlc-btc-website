@@ -191,7 +191,7 @@ export function useEthereum(): UseEthereumReturnType {
         return;
       } catch (error) {
         // eslint-disable-next-line no-console
-        console.log(`Error fetching vault ${vaultUUID}. Retrying...`);
+        console.log(`Vault with uuid: ${vaultUUID} is not yet updated. Retrying...`);
       }
       await new Promise(resolve => setTimeout(resolve, retryInterval));
     }
