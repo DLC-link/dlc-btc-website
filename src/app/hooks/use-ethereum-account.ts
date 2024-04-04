@@ -215,8 +215,7 @@ export function useEthereumAccount(): UseEthereumAccountReturnType {
             address: dlcBTCContract?.address,
             symbol: 'dlcBTC',
             decimals: 8,
-            image:
-              'https://cdn.discordapp.com/attachments/994505799902691348/1035507437748367360/DLC.Link_Emoji.png',
+            image: 'https://dlc-public-assets.s3.amazonaws.com/dlcBTC_Token.png',
           },
         },
       });
