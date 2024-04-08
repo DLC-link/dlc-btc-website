@@ -18,7 +18,7 @@ export function ProofOfReserve(): React.JSX.Element {
   return (
     <ProofOfReserveLayout>
       <Text w={'100%'} px={'35px'} color={'white'} fontSize={'4xl'} fontWeight={600}>
-        My Vaults
+        Proof of Reserve
       </Text>
       <TokenStatsBoardLayout>
         <TokenStatsBoardTVL totalSupply={totalSupply} bitcoinPrice={bitcoinPrice} />
