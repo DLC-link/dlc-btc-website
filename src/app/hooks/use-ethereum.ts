@@ -44,7 +44,7 @@ export function throwEthereumError(message: string, error: any): void {
 
 export function useEthereum(): UseEthereumReturnType {
   const { vaults } = useContext(VaultContext);
-  const { protocolContract, dlcBTCContract } = useEthereumContext();
+  const { protocolContract, dlcBTCContract, observerProtocolContract } = useEthereumContext();
 
   const { address, network } = useSelector((state: RootState) => state.account);
 
@@ -127,9 +127,9 @@ export function useEthereum(): UseEthereumReturnType {
 
   async function getAllVaults(): Promise<void> {
     try {
-      if (!protocolContract) throw new Error('Protocol contract not initialized');
-      await protocolContract.callStatic.getAllVaultsForAddress(address);
-      const vaults: RawVault[] = await protocolContract.getAllVaultsForAddress(address);
+      if (!observerProtocolContract) throw new Error('Protocol contract not initialized');
+      await observerProtocolContract.callStatic.getAllVaultsForAddress(address);
+      const vaults: RawVault[] = await observerProtocolContract.getAllVaultsForAddress(address);
       const formattedVaults: Vault[] = vaults.map(formatVault);
       if (!network) return;
       store.dispatch(
@@ -151,8 +151,8 @@ export function useEthereum(): UseEthereumReturnType {
   ): Promise<void> {
     for (let i = 0; i < maxRetries; i++) {
       try {
-        if (!protocolContract) throw new Error('Protocol contract not initialized');
-        const vault: RawVault = await protocolContract.getVault(vaultUUID);
+        if (!observerProtocolContract) throw new Error('Protocol contract not initialized');
+        const vault: RawVault = await observerProtocolContract.getVault(vaultUUID);
         if (!vault) throw new Error('Vault is undefined');
         if (vault.status !== vaultState) throw new Error('Vault is not in the correct state');
         const formattedVault: Vault = formatVault(vault);
@@ -177,8 +177,11 @@ export function useEthereum(): UseEthereumReturnType {
   async function getAllFundedVaults(ethereumNetwork: EthereumNetwork): Promise<RawVault[]> {
     try {
       const dlcManagerContract = await getDefaultProvider(ethereumNetwork, 'DLCManager');
-      const vaults: RawVault[] = await dlcManagerContract.getFundedDLCs(0, 1000000);
-      return vaults;
+      const vaults: RawVault[] = await dlcManagerContract.getFundedDLCs(0, 10000);
+      const filteredVaults = vaults.filter(
+        vault => vault.uuid != '0x0000000000000000000000000000000000000000000000000000000000000000'
+      );
+      return filteredVaults;
     } catch (error) {
       throw new EthereumError(`Could not fetch Funded Vaults: ${error}`);
     }
