@@ -2,7 +2,7 @@ import { extendTheme } from '@chakra-ui/react';
 // Supports weights 100-900
 import '@fontsource-variable/onest';
 
-import bgImage from '../../public/images/new_background_dots_remake_test.jpeg';
+import bgImage from '../../src/assets/images/new_background_dots_remake_test.jpeg';
 import { buttonTheme } from './button-theme';
 import { dividerTheme } from './divider-theme';
 import { menuTheme } from './menu-theme';
