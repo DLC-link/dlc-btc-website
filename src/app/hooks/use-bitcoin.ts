@@ -1,6 +1,7 @@
 import { customShiftValue } from '@common/utilities';
 import { BitcoinNetwork } from '@models/bitcoin-network';
 import { BitcoinError } from '@models/error-types';
+import { ethereumArbSepolia } from '@models/ethereum-network';
 import { Vault } from '@models/vault';
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
 import { hex } from '@scure/base';
@@ -9,6 +10,7 @@ import { payments } from 'bitcoinjs-lib';
 
 import { useAttestors } from './use-attestors';
 import { useEndpoints } from './use-endpoints';
+import { useEthereum } from './use-ethereum';
 
 const networkModes = ['mainnet', 'testnet', 'regtest'] as const;
 
@@ -101,7 +103,8 @@ interface UseBitcoinReturnType {
 export function useBitcoin(): UseBitcoinReturnType {
   const { bitcoinNetwork, bitcoinNetworkName, bitcoinBlockchainAPIURL, mempoolSpaceAPIFeeURL } =
     useEndpoints();
-  const { getAttestorGroupPublicKey, sendClosingTransactionToAttestors } = useAttestors();
+  const { sendClosingTransactionToAttestors } = useAttestors();
+  const { getAttestorGroupPublicKey } = useEthereum();
 
   /**
    * Checks if the user's wallet is on the same network as the app.
@@ -410,7 +413,7 @@ export function useBitcoin(): UseBitcoinReturnType {
     const userTaprootAddress = userAddresses[1] as BitcoinTaprootAddress;
     const userPublicKey = userTaprootAddress.tweakedPublicKey;
 
-    const attestorGroupPublicKey = await getAttestorGroupPublicKey();
+    const attestorGroupPublicKey = await getAttestorGroupPublicKey(ethereumArbSepolia);
 
     const userUTXOs = await getUTXOs(userAddresses[0] as BitcoinNativeSegwitAddress);
     const multisigTransaction = createMultisigTransaction(
