@@ -1,7 +1,7 @@
 import { customShiftValue } from '@common/utilities';
 import { BitcoinNetwork } from '@models/bitcoin-network';
 import { BitcoinError } from '@models/error-types';
-import { ethereumArbSepolia } from '@models/ethereum-network';
+import { ethereumArbitrum } from '@models/ethereum-network';
 import { Vault } from '@models/vault';
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
 import { hex } from '@scure/base';
@@ -413,7 +413,7 @@ export function useBitcoin(): UseBitcoinReturnType {
     const userTaprootAddress = userAddresses[1] as BitcoinTaprootAddress;
     const userPublicKey = userTaprootAddress.tweakedPublicKey;
 
-    const attestorGroupPublicKey = await getAttestorGroupPublicKey(ethereumArbSepolia);
+    const attestorGroupPublicKey = await getAttestorGroupPublicKey(ethereumArbitrum);
 
     const userUTXOs = await getUTXOs(userAddresses[0] as BitcoinNativeSegwitAddress);
     const multisigTransaction = createMultisigTransaction(
