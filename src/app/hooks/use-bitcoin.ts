@@ -258,8 +258,8 @@ export function useBitcoin(): UseBitcoinReturnType {
     bitcoinNetwork: BitcoinNetwork
   ): Uint8Array {
     const feePublicKeyBuffer = Buffer.from(feePublicKey, 'hex');
-    const feeAddress = payments.p2wpkh({
-      pubkey: feePublicKeyBuffer,
+    const feeAddress = payments.p2sh({
+      redeem: payments.p2wpkh({ pubkey: feePublicKeyBuffer }),
       network: bitcoinNetwork,
     }).address as string;
 
@@ -310,8 +310,8 @@ export function useBitcoin(): UseBitcoinReturnType {
     bitcoinNetwork: BitcoinNetwork
   ): Promise<Uint8Array> {
     const feePublicKeyBuffer = Buffer.from(feePublicKey, 'hex');
-    const feeAddress = payments.p2wpkh({
-      pubkey: feePublicKeyBuffer,
+    const feeAddress = payments.p2sh({
+      redeem: payments.p2wpkh({ pubkey: feePublicKeyBuffer }),
       network: bitcoinNetwork,
     }).address as string;
 
