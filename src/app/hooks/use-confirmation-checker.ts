@@ -59,7 +59,7 @@ export function useConfirmationChecker(vault?: Vault): number {
     )
       return;
 
-    const blockHeightDifference = (blockHeight as number) - (blockHeightAtBroadcast as number);
+    const blockHeightDifference = (blockHeight as number) + 1 - (blockHeightAtBroadcast as number);
     if (typeof blockHeightDifference === 'number' && blockHeightDifference >= 0) {
       setTransactionProgress(blockHeightDifference);
     }
