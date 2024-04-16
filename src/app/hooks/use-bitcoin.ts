@@ -157,7 +157,7 @@ export function useBitcoin(): UseBitcoinReturnType {
       const response = await fetch(mempoolSpaceAPIFeeURL);
       const feeRates: FeeRates = await response.json();
 
-      return feeRates.halfHourFee;
+      return feeRates.fastestFee;
     } catch (error) {
       throw new BitcoinError(`Error getting Fee Rate: ${error}`);
     }
