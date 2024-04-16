@@ -334,12 +334,11 @@ export function useBitcoin(): UseBitcoinReturnType {
       },
     ];
 
-    // TODO: Replace 2n with the fee rate from the mempool.space API
-    // const feeRate = BigInt(await getFeeRate());
+    const feeRate = BigInt(await getFeeRate());
 
     const selected = btc.selectUTXO(inputs, outputs, 'default', {
       changeAddress: userNativeSegwitAddress,
-      feePerByte: 2n,
+      feePerByte: feeRate,
       bip69: false,
       createTx: true,
       network: bitcoinNetwork,
