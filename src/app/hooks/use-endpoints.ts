@@ -97,47 +97,23 @@ export function useEndpoints(): NetworkEndpoints {
     }
 
     switch (network?.id) {
-      case EthereumNetworkID.Sepolia:
-        return {
-          attestorAPIURLs,
-          ethereumExplorerAPIURL: 'https://sepolia.etherscan.io/tx/',
-          ethereumAttestorChainID: 'evm-sepolia',
-          enabledEthereumNetworks,
-          bitcoinExplorerAPIURL,
-          bitcoinBlockchainAPIURL,
-          mempoolSpaceAPIFeeURL,
-          bitcoinNetwork,
-          bitcoinNetworkName,
-        };
-      case EthereumNetworkID.Goerli:
-        return {
-          attestorAPIURLs,
-          ethereumExplorerAPIURL: 'https://goerli.etherscan.io/tx/',
-          ethereumAttestorChainID: 'evm-goerli',
-          enabledEthereumNetworks,
-          bitcoinExplorerAPIURL,
-          bitcoinBlockchainAPIURL,
-          mempoolSpaceAPIFeeURL,
-          bitcoinNetwork,
-          bitcoinNetworkName,
-        };
-      case EthereumNetworkID.X1Testnet:
-        return {
-          attestorAPIURLs,
-          ethereumExplorerAPIURL: 'https://www.oklink.com/x1-test/tx/',
-          ethereumAttestorChainID: 'evm-x1-test',
-          enabledEthereumNetworks,
-          bitcoinExplorerAPIURL,
-          bitcoinBlockchainAPIURL,
-          mempoolSpaceAPIFeeURL,
-          bitcoinNetwork,
-          bitcoinNetworkName,
-        };
       case EthereumNetworkID.ArbSepolia:
         return {
           attestorAPIURLs,
           ethereumExplorerAPIURL: 'https://sepolia.arbiscan.io/tx/',
           ethereumAttestorChainID: 'evm-arbsepolia',
+          enabledEthereumNetworks,
+          bitcoinExplorerAPIURL,
+          bitcoinBlockchainAPIURL,
+          mempoolSpaceAPIFeeURL,
+          bitcoinNetwork,
+          bitcoinNetworkName,
+        };
+      case EthereumNetworkID.Arbitrum:
+        return {
+          attestorAPIURLs,
+          ethereumExplorerAPIURL: 'https://arbiscan.io/tx/',
+          ethereumAttestorChainID: 'evm-arbitrum',
           enabledEthereumNetworks,
           bitcoinExplorerAPIURL,
           bitcoinBlockchainAPIURL,

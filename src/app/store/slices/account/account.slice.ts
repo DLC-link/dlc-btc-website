@@ -1,4 +1,4 @@
-import { EthereumNetwork, ethereumArbSepolia } from '@models/ethereum-network';
+import { EthereumNetwork, ethereumArbitrum } from '@models/ethereum-network';
 import { WalletType } from '@models/wallet';
 import { createSlice } from '@reduxjs/toolkit';
 
