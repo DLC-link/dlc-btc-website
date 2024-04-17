@@ -157,14 +157,27 @@ export function useBitcoin(): UseBitcoinReturnType {
    * @returns A promise that resolves to the hour fee rate.
    */
   async function getFeeRate(): Promise<number> {
-    try {
-      const response = await fetch(bitcoinBlockchainAPIFeeURL);
-      const feeRates: FeeRates = await response.json();
+    const response = await fetch(bitcoinBlockchainAPIFeeURL);
 
-      return feeRates.fastestFee;
-    } catch (error) {
-      throw new BitcoinError(`Error getting Fee Rate: ${error}`);
+    if (!response.ok) {
+      throw new BitcoinError(
+        `Bitcoin Blockchain Fee Rate Response was not OK: ${response.statusText}`
+      );
     }
+
+    let feeRates: FeeRates;
+
+    try {
+      feeRates = await response.json();
+    } catch (error) {
+      throw new BitcoinError(`Error parsing Bitcoin Blockchain Fee Rate Response JSON: ${error}`);
+    }
+
+    if (bitcoinNetworkName === 'regtest' && (!feeRates.fastestFee || feeRates.fastestFee < 2)) {
+      return 2;
+    }
+
+    return feeRates.fastestFee;
   }
 
   /**

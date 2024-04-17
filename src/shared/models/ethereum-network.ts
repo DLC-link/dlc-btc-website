@@ -17,7 +17,7 @@ export const ethereumArbSepolia: EthereumNetwork = {
   defaultNodeURL: 'https://sepolia-rollup.arbitrum.io/rpc',
 };
 
-const ethereumArbitrum: EthereumNetwork = {
+export const ethereumArbitrum: EthereumNetwork = {
   name: 'Arbitrum',
   displayName: 'Arbitrum',
   id: EthereumNetworkID.Arbitrum,

@@ -47,35 +47,35 @@ export function useVaults(): UseVaultsReturnType {
 
   const readyVaults = useMemo(
     () =>
-      vaults[network ? network.id : '42161']
+      vaults[network.id]
         .filter(vault => vault.state === VaultState.READY)
         .sort((a, b) => b.timestamp - a.timestamp),
     [vaults, network]
   );
   const fundedVaults = useMemo(
     () =>
-      vaults[network ? network.id : '42161']
+      vaults[network.id]
         .filter(vault => vault.state === VaultState.FUNDED)
         .sort((a, b) => b.timestamp - a.timestamp),
     [vaults, network]
   );
   const fundingVaults = useMemo(
     () =>
-      vaults[network ? network.id : '42161']
+      vaults[network.id]
         .filter(vault => vault.state === VaultState.FUNDING)
         .sort((a, b) => b.timestamp - a.timestamp),
     [vaults, network]
   );
   const closingVaults = useMemo(
     () =>
-      vaults[network ? network.id : '42161']
+      vaults[network.id]
         .filter(vault => vault.state === VaultState.CLOSING)
         .sort((a, b) => b.timestamp - a.timestamp),
     [vaults, network]
   );
   const closedVaults = useMemo(
     () =>
-      vaults[network ? network.id : '42161']
+      vaults[network.id]
         .filter(vault => vault.state === VaultState.CLOSED)
         .sort((a, b) => b.timestamp - a.timestamp),
     [vaults, network]
