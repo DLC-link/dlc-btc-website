@@ -101,8 +101,12 @@ interface UseBitcoinReturnType {
 }
 
 export function useBitcoin(): UseBitcoinReturnType {
-  const { bitcoinNetwork, bitcoinNetworkName, bitcoinBlockchainAPIURL, mempoolSpaceAPIFeeURL } =
-    useEndpoints();
+  const {
+    bitcoinNetwork,
+    bitcoinNetworkName,
+    bitcoinBlockchainAPIURL,
+    bitcoinBlockchainAPIFeeURL,
+  } = useEndpoints();
   const { sendClosingTransactionToAttestors } = useAttestors();
   const { getAttestorGroupPublicKey } = useEthereum();
 
@@ -148,13 +152,13 @@ export function useBitcoin(): UseBitcoinReturnType {
   }
 
   /**
-   * Fetches the fee rate from the mempool.space API.
+   * Fetches the fee rate from the bitcoin blockchain API.
    *
    * @returns A promise that resolves to the hour fee rate.
    */
   async function getFeeRate(): Promise<number> {
     try {
-      const response = await fetch(mempoolSpaceAPIFeeURL);
+      const response = await fetch(bitcoinBlockchainAPIFeeURL);
       const feeRates: FeeRates = await response.json();
 
       return feeRates.fastestFee;

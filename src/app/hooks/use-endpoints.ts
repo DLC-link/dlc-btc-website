@@ -12,7 +12,7 @@ interface NetworkEndpoints {
   enabledEthereumNetworks: EthereumNetwork[];
   bitcoinExplorerAPIURL: string;
   bitcoinBlockchainAPIURL: string;
-  mempoolSpaceAPIFeeURL: string;
+  bitcoinBlockchainAPIFeeURL: string;
   bitcoinNetwork: BitcoinNetwork;
   bitcoinNetworkName: string;
 }
@@ -33,7 +33,7 @@ export function useEndpoints(): NetworkEndpoints {
   const [ethereumAttestorChainID, setEthereumAttestorChainID] = useState<string>('');
   const [bitcoinExplorerAPIURL, setBitcoinExplorerAPIURL] = useState<string>('');
   const [bitcoinBlockchainAPIURL, setBitcoinBlockchainAPIURL] = useState<string>('');
-  const [mempoolSpaceAPIFeeURL, setMempoolSpaceAPIFeeURL] = useState<string>('');
+  const [bitcoinBlockchainAPIFeeURL, setbitcoinBlockchainAPIFeeURL] = useState<string>('');
   const [enabledEthereumNetworks, setEnabledEthereumNetworks] = useState<EthereumNetwork[]>([]);
 
   const [bitcoinNetwork, setBitcoinNetwork] = useState<BitcoinNetwork>(regtest);
@@ -49,7 +49,7 @@ export function useEndpoints(): NetworkEndpoints {
       enabledEthereumNetworks,
       bitcoinExplorerAPIURL,
       bitcoinBlockchainAPIURL,
-      mempoolSpaceAPIFeeURL,
+      bitcoinBlockchainAPIFeeURL,
       bitcoinNetwork,
       bitcoinNetworkName,
     } = getEndpoints();
@@ -60,7 +60,7 @@ export function useEndpoints(): NetworkEndpoints {
     setEnabledEthereumNetworks(enabledEthereumNetworks);
     setBitcoinExplorerAPIURL(bitcoinExplorerAPIURL);
     setBitcoinBlockchainAPIURL(bitcoinBlockchainAPIURL);
-    setMempoolSpaceAPIFeeURL(mempoolSpaceAPIFeeURL);
+    setbitcoinBlockchainAPIFeeURL(bitcoinBlockchainAPIFeeURL);
     setBitcoinNetwork(bitcoinNetwork);
     setBitcoinNetworkName(bitcoinNetworkName);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -80,20 +80,20 @@ export function useEndpoints(): NetworkEndpoints {
     const bitcoinExplorerAPIURL = import.meta.env.VITE_BITCOIN_EXPLORER_API_URL;
 
     let bitcoinNetwork: BitcoinNetwork;
-    let mempoolSpaceAPIFeeURL: string;
+    let bitcoinBlockchainAPIFeeURL: string;
 
     switch (bitcoinNetworkName) {
       case 'mainnet':
         bitcoinNetwork = bitcoin;
-        mempoolSpaceAPIFeeURL = 'https://mempool.space/api/v1/fees/recommended';
+        bitcoinBlockchainAPIFeeURL = 'https://mempool.space/api/v1/fees/recommended';
         break;
       case 'testnet':
         bitcoinNetwork = testnet;
-        mempoolSpaceAPIFeeURL = 'https://mempool.space/testnet/api/v1/fees/recommended';
+        bitcoinBlockchainAPIFeeURL = 'https://mempool.space/testnet/api/v1/fees/recommended';
         break;
       default:
         bitcoinNetwork = regtest;
-        mempoolSpaceAPIFeeURL = 'https://mempool.space/testnet/api/v1/fees/recommended';
+        bitcoinBlockchainAPIFeeURL = 'https://devnet.dlc.link/electrs/fee-estimates';
     }
 
     switch (network?.id) {
@@ -105,7 +105,7 @@ export function useEndpoints(): NetworkEndpoints {
           enabledEthereumNetworks,
           bitcoinExplorerAPIURL,
           bitcoinBlockchainAPIURL,
-          mempoolSpaceAPIFeeURL,
+          bitcoinBlockchainAPIFeeURL,
           bitcoinNetwork,
           bitcoinNetworkName,
         };
@@ -117,7 +117,7 @@ export function useEndpoints(): NetworkEndpoints {
           enabledEthereumNetworks,
           bitcoinExplorerAPIURL,
           bitcoinBlockchainAPIURL,
-          mempoolSpaceAPIFeeURL,
+          bitcoinBlockchainAPIFeeURL,
           bitcoinNetwork,
           bitcoinNetworkName,
         };
@@ -132,7 +132,7 @@ export function useEndpoints(): NetworkEndpoints {
     enabledEthereumNetworks,
     bitcoinExplorerAPIURL,
     bitcoinBlockchainAPIURL,
-    mempoolSpaceAPIFeeURL,
+    bitcoinBlockchainAPIFeeURL,
     bitcoinNetwork,
     bitcoinNetworkName,
   };
