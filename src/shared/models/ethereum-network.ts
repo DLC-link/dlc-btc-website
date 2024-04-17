@@ -10,14 +10,14 @@ export enum EthereumNetworkID {
   Arbitrum = '42161',
 }
 
-const ethereumArbSepolia: EthereumNetwork = {
+export const ethereumArbSepolia: EthereumNetwork = {
   name: 'ArbSepolia',
   displayName: 'Arbitrum Sepolia',
   id: EthereumNetworkID.ArbSepolia,
   defaultNodeURL: 'https://sepolia-rollup.arbitrum.io/rpc',
 };
 
-export const ethereumArbitrum: EthereumNetwork = {
+const ethereumArbitrum: EthereumNetwork = {
   name: 'Arbitrum',
   displayName: 'Arbitrum',
   id: EthereumNetworkID.Arbitrum,
