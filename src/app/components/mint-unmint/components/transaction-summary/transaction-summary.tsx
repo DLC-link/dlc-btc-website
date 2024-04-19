@@ -75,20 +75,38 @@ export function TransactionSummary({
           View vault statuses in the My Vaults tab.
         </Text>
       </Stack>
-      <Button
-        variant={'navigate'}
-        onClick={() => {
-          dispatch(
-            flow === 'mint'
-              ? mintUnmintActions.setMintStep([0, ''])
-              : mintUnmintActions.setUnmintStep([0, ''])
-          );
-          navigate('/my-vaults');
-          handleClose && handleClose();
-        }}
-      >
-        View in My Vaults
-      </Button>
+      <HStack w={'100%'} spacing={'10px'}>
+        <Button
+          variant={'navigateSmall'}
+          onClick={() => {
+            dispatch(
+              flow === 'mint'
+                ? mintUnmintActions.setMintStep([0, ''])
+                : mintUnmintActions.setUnmintStep([0, ''])
+            );
+            navigate('/my-vaults');
+            handleClose && handleClose();
+          }}
+        >
+          View in My Vaults
+        </Button>
+        {((flow === 'mint' && currentStep[0] === 3) ||
+          (flow === 'unmint' && currentStep[0] === 1)) && (
+          <Button
+            variant={'navigateSmall'}
+            onClick={() => {
+              dispatch(
+                flow === 'mint'
+                  ? mintUnmintActions.setMintStep([0, ''])
+                  : mintUnmintActions.setUnmintStep([0, ''])
+              );
+              handleClose && handleClose();
+            }}
+          >
+            {flow === 'mint' ? 'Create Another Vault' : 'Close Another Vault'}
+          </Button>
+        )}
+      </HStack>
     </VStack>
   );
 }
