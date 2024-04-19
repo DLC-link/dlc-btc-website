@@ -25,7 +25,7 @@ const flowPropertyMap: FlowPropertyMap = {
   unmint: {
     1: {
       title: 'a) Closing vault in progress',
-      subtitle: 'Your BTC is being unlocked',
+      subtitle: 'BTC is being unlocked',
     },
     2: { title: 'Vault closed' },
   },
@@ -35,6 +35,7 @@ interface TransactionSummaryProps {
   currentStep: [number, string];
   flow: 'mint' | 'unmint';
   blockchain: 'ethereum' | 'bitcoin';
+  w: string;
   handleClose?: () => void;
 }
 
@@ -42,6 +43,7 @@ export function TransactionSummary({
   currentStep,
   flow,
   blockchain,
+  w,
   handleClose,
 }: TransactionSummaryProps): React.JSX.Element {
   const navigate = useNavigate();
@@ -53,7 +55,7 @@ export function TransactionSummary({
     (flow === 'mint' && currentStep[0] === 3) || (flow === 'unmint' && currentStep[0] === 1);
 
   return (
-    <VStack alignItems={'start'} w={'300px'} spacing={'15px'}>
+    <VStack alignItems={'start'} w={w} spacing={'15px'}>
       <HStack w={'100%'}>
         {showProcessing && <Spinner color={'accent.lightBlue.01'} size={'md'} />}
         <Text color={'accent.lightBlue.01'}>{flowPropertyMap[flow][currentStep[0]].title}:</Text>
@@ -75,20 +77,38 @@ export function TransactionSummary({
           View vault statuses in the My Vaults tab.
         </Text>
       </Stack>
-      <Button
-        variant={'navigate'}
-        onClick={() => {
-          dispatch(
-            flow === 'mint'
-              ? mintUnmintActions.setMintStep([0, ''])
-              : mintUnmintActions.setUnmintStep([0, ''])
-          );
-          navigate('/my-vaults');
-          handleClose && handleClose();
-        }}
-      >
-        View in My Vaults
-      </Button>
+      <HStack w={'100%'} spacing={'10px'}>
+        <Button
+          variant={'navigate'}
+          onClick={() => {
+            dispatch(
+              flow === 'mint'
+                ? mintUnmintActions.setMintStep([0, ''])
+                : mintUnmintActions.setUnmintStep([0, ''])
+            );
+            navigate('/my-vaults');
+            handleClose && handleClose();
+          }}
+        >
+          View in My Vaults
+        </Button>
+        {((flow === 'mint' && currentStep[0] === 3) ||
+          (flow === 'unmint' && currentStep[0] === 1)) && (
+          <Button
+            variant={'navigate'}
+            onClick={() => {
+              dispatch(
+                flow === 'mint'
+                  ? mintUnmintActions.setMintStep([0, ''])
+                  : mintUnmintActions.setUnmintStep([0, ''])
+              );
+              handleClose && handleClose();
+            }}
+          >
+            {flow === 'mint' ? 'Create Another Vault' : 'Close Another Vault'}
+          </Button>
+        )}
+      </HStack>
     </VStack>
   );
 }

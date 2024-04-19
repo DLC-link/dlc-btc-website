@@ -51,7 +51,7 @@ export function SignClosingTransactionScreen({
   }
 
   return (
-    <VStack w={'300px'} spacing={'15px'}>
+    <VStack w={'45%'} spacing={'15px'}>
       <VaultCard vault={currentVault} isSelected />
       <LockScreenProtocolFee
         assetAmount={currentVault?.collateral}

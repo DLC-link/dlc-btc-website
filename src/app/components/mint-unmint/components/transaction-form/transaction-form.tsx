@@ -42,7 +42,7 @@ export function TransactionForm(): React.JSX.Element {
   }
 
   return (
-    <VStack w={'300px'}>
+    <VStack w={'45%'}>
       <Formik
         initialValues={initialValues}
         onSubmit={async values => {
@@ -52,7 +52,7 @@ export function TransactionForm(): React.JSX.Element {
         {({ handleSubmit, errors, touched, values }) => (
           <Form onSubmit={handleSubmit}>
             <FormControl isInvalid={!!errors.amount && touched.amount}>
-              <VStack spacing={'15px'} w={'300px'}>
+              <VStack spacing={'15px'} w={'100%'}>
                 <Text w={'100%'} color={'accent.lightBlue.01'}>
                   Amount of dlcBTC you want to mint:
                 </Text>
