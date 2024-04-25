@@ -73,9 +73,8 @@ export function useEthereum(): UseEthereumReturnType {
       const provider = ethers.providers.getDefaultProvider(ethereumNetwork.defaultNodeURL);
 
       const deploymentBranchName = import.meta.env.VITE_ETHEREUM_DEPLOYMENT_BRANCH;
-      const contractVersion = import.meta.env.VITE_ETHEREUM_DEPLOYMENT_VERSION;
 
-      const deploymentPlanURL = `${SOLIDITY_CONTRACT_URL}/${deploymentBranchName}/deploymentFiles/${ethereumNetworkName}/v${contractVersion}/${contractName}.json`;
+      const deploymentPlanURL = `${SOLIDITY_CONTRACT_URL}/${deploymentBranchName}/deploymentFiles/${ethereumNetworkName}/${contractName}.json`;
 
       const response = await fetch(deploymentPlanURL);
       const contractData = await response.json();
