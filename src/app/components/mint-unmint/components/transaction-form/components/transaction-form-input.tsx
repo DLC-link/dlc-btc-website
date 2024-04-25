@@ -42,7 +42,7 @@ export function TransactionFormInput({
           type="number"
           px={'1.5px'}
           h={'25px'}
-          w={'75px'}
+          w={'100%'}
           borderColor={'white.01'}
           focusBorderColor={'white.01'}
           fontSize={'xl'}

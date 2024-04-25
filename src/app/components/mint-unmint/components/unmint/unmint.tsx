@@ -19,7 +19,12 @@ export function Unmint(): React.JSX.Element {
         <Walkthrough flow={'unmint'} currentStep={unmintStep[0]} />
         {[0].includes(unmintStep[0]) && <UnmintVaultSelector />}
         {[1, 2].includes(unmintStep[0]) && (
-          <TransactionSummary currentStep={unmintStep} flow={'unmint'} blockchain={'bitcoin'} />
+          <TransactionSummary
+            currentStep={unmintStep}
+            flow={'unmint'}
+            blockchain={'bitcoin'}
+            width="45%"
+          />
         )}
       </HStack>
     </UnmintLayout>

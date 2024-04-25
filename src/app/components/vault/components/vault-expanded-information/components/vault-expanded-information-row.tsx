@@ -15,7 +15,7 @@ export function VaultExpandedInformationUUIDRow({
   return (
     <HStack pl={'35px'} w={'100%'} alignItems={'start'} spacing={'15px'}>
       <HStack w={'50%'} spacing={'0px'}>
-        <Text w={'50%'} color={'white'} fontSize={'xs'}>
+        <Text pr={'20px'} color={'white'} fontSize={'xs'}>
           UUID
         </Text>
         <Tooltip

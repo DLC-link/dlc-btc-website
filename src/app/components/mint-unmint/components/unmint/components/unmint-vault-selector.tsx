@@ -42,7 +42,7 @@ export function UnmintVaultSelector(): React.JSX.Element {
   }
 
   return (
-    <VStack alignItems={'start'} py={'2.5px'} px={'15px'} w={'300px'} h={'445px'} spacing={'15px'}>
+    <VStack alignItems={'start'} py={'2.5px'} px={'15px'} w={'45%'} h={'445px'} spacing={'15px'}>
       <Text color={'accent.lightBlue.01'} fontSize={'md'} fontWeight={600}>
         Select vault to redeem dlcBTC:
       </Text>
