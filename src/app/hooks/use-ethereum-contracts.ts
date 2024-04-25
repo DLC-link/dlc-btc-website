@@ -5,6 +5,8 @@ import { EthereumError } from '@models/error-types';
 import { EthereumNetwork } from '@models/ethereum-network';
 import { Contract, ethers } from 'ethers';
 
+const SOLIDITY_CONTRACT_URL = 'https://raw.githubusercontent.com/DLC-link/dlc-solidity';
+
 interface UseEthereumContractsReturnType {
   getEthereumContracts: (
     ethereumSigner: ethers.providers.JsonRpcSigner,
@@ -88,8 +90,7 @@ export function useEthereumContracts(): UseEthereumContractsReturnType {
     ethereumNetwork: EthereumNetwork
   ) {
     const branchName = import.meta.env.VITE_ETHEREUM_DEPLOYMENT_BRANCH;
-    const contractVersion = import.meta.env.VITE_ETHEREUM_DEPLOYMENT_VERSION;
-    const deploymentPlanURL = `https://raw.githubusercontent.com/DLC-link/dlc-solidity/${branchName}/deploymentFiles/${ethereumNetwork.name.toLowerCase()}/v${contractVersion}/${contractName}.json`;
+    const deploymentPlanURL = `${SOLIDITY_CONTRACT_URL}/${branchName}/deploymentFiles/${ethereumNetwork.name.toLowerCase()}/${contractName}.json`;
 
     // eslint-disable-next-line no-console
     console.log(
