@@ -36,7 +36,12 @@ export function Mint(): React.JSX.Element {
           />
         )}
         {[3, 4].includes(mintStep[0]) && (
-          <TransactionSummary currentStep={mintStep} flow={'mint'} blockchain={'ethereum'} />
+          <TransactionSummary
+            currentStep={mintStep}
+            flow={'mint'}
+            blockchain={'ethereum'}
+            width="45%"
+          />
         )}
       </HStack>
     </MintLayout>
