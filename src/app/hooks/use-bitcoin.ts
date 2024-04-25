@@ -101,8 +101,12 @@ interface UseBitcoinReturnType {
 }
 
 export function useBitcoin(): UseBitcoinReturnType {
-  const { bitcoinNetwork, bitcoinNetworkName, bitcoinBlockchainAPIURL, mempoolSpaceAPIFeeURL } =
-    useEndpoints();
+  const {
+    bitcoinNetwork,
+    bitcoinNetworkName,
+    bitcoinBlockchainAPIURL,
+    bitcoinBlockchainAPIFeeURL,
+  } = useEndpoints();
   const { sendClosingTransactionToAttestors } = useAttestors();
   const { getAttestorGroupPublicKey } = useEthereum();
 
@@ -148,19 +152,42 @@ export function useBitcoin(): UseBitcoinReturnType {
   }
 
   /**
-   * Fetches the fee rate from the mempool.space API.
+   * Evaluates the fee rate from the bitcoin blockchain API.
+   *
+   * @returns The fee rate.
+   */
+  function checkFeeRate(feeRate: number | undefined): number {
+    if (!feeRate || feeRate < 2) {
+      return 2;
+    }
+    return feeRate;
+  }
+
+  /**
+   * Fetches the fee rate from the bitcoin blockchain API.
    *
    * @returns A promise that resolves to the hour fee rate.
    */
   async function getFeeRate(): Promise<number> {
-    try {
-      const response = await fetch(mempoolSpaceAPIFeeURL);
-      const feeRates: FeeRates = await response.json();
+    const response = await fetch(bitcoinBlockchainAPIFeeURL);
 
-      return feeRates.hourFee;
-    } catch (error) {
-      throw new BitcoinError(`Error getting Fee Rate: ${error}`);
+    if (!response.ok) {
+      throw new BitcoinError(
+        `Bitcoin Blockchain Fee Rate Response was not OK: ${response.statusText}`
+      );
     }
+
+    let feeRates: FeeRates;
+
+    try {
+      feeRates = await response.json();
+    } catch (error) {
+      throw new BitcoinError(`Error parsing Bitcoin Blockchain Fee Rate Response JSON: ${error}`);
+    }
+
+    const feeRate = checkFeeRate(feeRates.fastestFee);
+
+    return feeRate;
   }
 
   /**
@@ -334,12 +361,11 @@ export function useBitcoin(): UseBitcoinReturnType {
       },
     ];
 
-    // TODO: Replace 2n with the fee rate from the mempool.space API
-    // const feeRate = BigInt(await getFeeRate());
+    const feeRate = BigInt(await getFeeRate());
 
     const selected = btc.selectUTXO(inputs, outputs, 'default', {
       changeAddress: userNativeSegwitAddress,
-      feePerByte: 2n,
+      feePerByte: feeRate,
       bip69: false,
       createTx: true,
       network: bitcoinNetwork,

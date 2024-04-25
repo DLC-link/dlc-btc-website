@@ -54,9 +54,7 @@ export function useEthereumContracts(): UseEthereumContractsReturnType {
       const contract = new ethers.Contract(
         observerProtocolContractData.contract.address,
         observerProtocolContractData.contract.abi,
-        new ethers.providers.WebSocketProvider(
-          import.meta.env.VITE_ETHEREUM_ARB_SEPOLIA_OBSERVER_NODE
-        )
+        new ethers.providers.WebSocketProvider(import.meta.env.VITE_ARBITRUM_OBSERVER_NODE)
       );
       observerProtocolContract.current = contract;
     }

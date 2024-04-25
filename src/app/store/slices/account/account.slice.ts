@@ -1,20 +1,33 @@
-import { EthereumNetwork, ethereumArbSepolia } from '@models/ethereum-network';
+import { EthereumNetwork, ethereumArbSepolia, ethereumArbitrum } from '@models/ethereum-network';
 import { WalletType } from '@models/wallet';
 import { createSlice } from '@reduxjs/toolkit';
 
 interface AccountState {
   address: string | undefined;
   walletType: WalletType | undefined;
-  network: EthereumNetwork | undefined;
+  network: EthereumNetwork;
   dlcBTCBalance: number | undefined;
   lockedBTCBalance: number | undefined;
   loadedAt: string | undefined;
 }
 
+const bitcoinNetworkName = import.meta.env.VITE_BITCOIN_NETWORK;
+let ethereumNetwork: EthereumNetwork;
+switch (bitcoinNetworkName) {
+  case 'mainnet':
+    ethereumNetwork = ethereumArbitrum;
+    break;
+  case 'regtest':
+    ethereumNetwork = ethereumArbSepolia;
+    break;
+  default:
+    ethereumNetwork = ethereumArbSepolia;
+}
+
 export const initialAccountState: AccountState = {
   address: undefined,
   walletType: WalletType.Metamask,
-  network: ethereumArbSepolia,
+  network: ethereumNetwork,
   dlcBTCBalance: 0,
   lockedBTCBalance: 0,
   loadedAt: undefined,
@@ -35,7 +48,7 @@ export const accountSlice = createSlice({
       state.walletType = undefined;
       state.dlcBTCBalance = 0;
       state.lockedBTCBalance = 0;
-      state.network = undefined;
+      state.network = ethereumNetwork;
     },
   },
 });
