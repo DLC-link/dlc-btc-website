@@ -1,11 +1,13 @@
+import { useSelector } from 'react-redux';
+
 import { customShiftValue } from '@common/utilities';
 import { BitcoinNetwork } from '@models/bitcoin-network';
 import { BitcoinError } from '@models/error-types';
-import { ethereumArbSepolia } from '@models/ethereum-network';
 import { Vault } from '@models/vault';
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
 import { hex } from '@scure/base';
 import * as btc from '@scure/btc-signer';
+import { RootState } from '@store/index';
 import { payments } from 'bitcoinjs-lib';
 
 import { useAttestors } from './use-attestors';
@@ -109,6 +111,7 @@ export function useBitcoin(): UseBitcoinReturnType {
   } = useEndpoints();
   const { sendClosingTransactionToAttestors } = useAttestors();
   const { getAttestorGroupPublicKey } = useEthereum();
+  const { network } = useSelector((state: RootState) => state.account);
 
   /**
    * Checks if the user's wallet is on the same network as the app.
@@ -439,7 +442,7 @@ export function useBitcoin(): UseBitcoinReturnType {
     const userTaprootAddress = userAddresses[1] as BitcoinTaprootAddress;
     const userPublicKey = userTaprootAddress.tweakedPublicKey;
 
-    const attestorGroupPublicKey = await getAttestorGroupPublicKey(ethereumArbSepolia);
+    const attestorGroupPublicKey = await getAttestorGroupPublicKey(network);
 
     const userUTXOs = await getUTXOs(userAddresses[0] as BitcoinNativeSegwitAddress);
     const multisigTransaction = createMultisigTransaction(

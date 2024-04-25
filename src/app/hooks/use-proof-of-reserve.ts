@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
+import { useSelector } from 'react-redux';
 
 import { customShiftValue } from '@common/utilities';
 import { BitcoinNetwork } from '@models/bitcoin-network';
 import { BitcoinTransaction, BitcoinTransactionVectorOutput } from '@models/bitcoin-transaction';
-import { ethereumArbSepolia } from '@models/ethereum-network';
 import { RawVault } from '@models/vault';
 import { hex } from '@scure/base';
 import { p2tr, p2tr_ns, taprootTweakPubkey } from '@scure/btc-signer';
+import { RootState } from '@store/index';
 
 import { useEndpoints } from './use-endpoints';
 import { useEthereum } from './use-ethereum';
@@ -19,6 +20,7 @@ interface UseProofOfReserveReturnType {
 export function useProofOfReserve(): UseProofOfReserveReturnType {
   const { bitcoinBlockchainAPIURL, bitcoinNetwork, enabledEthereumNetworks } = useEndpoints();
   const { getAllFundedVaults, getAttestorGroupPublicKey } = useEthereum();
+  const { network } = useSelector((state: RootState) => state.account);
 
   const [shouldFetch, setShouldFetch] = useState(false);
 
@@ -151,7 +153,7 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
       );
 
       // Get the Attestor Public Key from the Attestor Group
-      const attestorPublicKey = await getAttestorGroupPublicKey(ethereumArbSepolia);
+      const attestorPublicKey = await getAttestorGroupPublicKey(network);
 
       // Create two MultiSig Transactions, because the User and Attestor can sign in any order
       // Create the MultiSig Transaction A
