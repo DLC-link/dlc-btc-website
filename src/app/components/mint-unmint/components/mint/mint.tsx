@@ -40,7 +40,7 @@ export function Mint(): React.JSX.Element {
             currentStep={mintStep}
             flow={'mint'}
             blockchain={'ethereum'}
-            w="45%"
+            width="45%"
           />
         )}
       </HStack>

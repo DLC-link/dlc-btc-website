@@ -35,7 +35,7 @@ interface TransactionSummaryProps {
   currentStep: [number, string];
   flow: 'mint' | 'unmint';
   blockchain: 'ethereum' | 'bitcoin';
-  w: string;
+  width: string;
   handleClose?: () => void;
 }
 
@@ -43,7 +43,7 @@ export function TransactionSummary({
   currentStep,
   flow,
   blockchain,
-  w,
+  width,
   handleClose,
 }: TransactionSummaryProps): React.JSX.Element {
   const navigate = useNavigate();
@@ -55,7 +55,7 @@ export function TransactionSummary({
     (flow === 'mint' && currentStep[0] === 3) || (flow === 'unmint' && currentStep[0] === 1);
 
   return (
-    <VStack alignItems={'start'} w={w} spacing={'15px'}>
+    <VStack alignItems={'start'} w={width} spacing={'15px'}>
       <HStack w={'100%'}>
         {showProcessing && <Spinner color={'accent.lightBlue.01'} size={'md'} />}
         <Text color={'accent.lightBlue.01'}>{flowPropertyMap[flow][currentStep[0]].title}:</Text>

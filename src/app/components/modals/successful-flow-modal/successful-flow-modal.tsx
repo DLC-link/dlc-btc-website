@@ -20,7 +20,7 @@ export function SuccessfulFlowModal({
         currentStep={[flow === 'mint' ? 4 : 2, vaultUUID]}
         flow={flow}
         blockchain={'ethereum'}
-        w="100%"
+        width="100%"
         handleClose={() => handleClose()}
       />
     </ModalLayout>

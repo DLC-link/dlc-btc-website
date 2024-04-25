@@ -23,7 +23,7 @@ export function Unmint(): React.JSX.Element {
             currentStep={unmintStep}
             flow={'unmint'}
             blockchain={'bitcoin'}
-            w="45%"
+            width="45%"
           />
         )}
       </HStack>
