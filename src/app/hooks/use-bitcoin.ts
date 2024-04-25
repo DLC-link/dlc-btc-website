@@ -152,6 +152,19 @@ export function useBitcoin(): UseBitcoinReturnType {
   }
 
   /**
+   * Evaluates the fee rate from the bitcoin blockchain API.
+   *
+   * @returns The fee rate.
+   */
+  function checkFeeRate(feeRate: number): number {
+    if (!feeRate || feeRate < 2) {
+      return 2;
+    } else {
+      return feeRate;
+    }
+  }
+
+  /**
    * Fetches the fee rate from the bitcoin blockchain API.
    *
    * @returns A promise that resolves to the hour fee rate.
@@ -173,11 +186,9 @@ export function useBitcoin(): UseBitcoinReturnType {
       throw new BitcoinError(`Error parsing Bitcoin Blockchain Fee Rate Response JSON: ${error}`);
     }
 
-    if (bitcoinNetworkName === 'regtest' && (!feeRates.fastestFee || feeRates.fastestFee < 2)) {
-      return 2;
-    }
+    const feeRate = checkFeeRate(feeRates.fastestFee);
 
-    return feeRates.fastestFee;
+    return feeRate;
   }
 
   /**
