@@ -156,12 +156,11 @@ export function useBitcoin(): UseBitcoinReturnType {
    *
    * @returns The fee rate.
    */
-  function checkFeeRate(feeRate: number): number {
+  function checkFeeRate(feeRate: number | undefined): number {
     if (!feeRate || feeRate < 2) {
       return 2;
-    } else {
-      return feeRate;
     }
+    return feeRate;
   }
 
   /**
