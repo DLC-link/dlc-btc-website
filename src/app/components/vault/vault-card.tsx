@@ -41,10 +41,7 @@ export function VaultCard({
       />
       {isExpanded && (
         <VaultExpandedInformation
-          uuid={vault.uuid}
-          state={vault.state}
-          fundingTX={vault.fundingTX}
-          closingTX={vault.closingTX}
+          vault={vault}
           isExpanded={isExpanded}
           isSelected={isSelected}
           close={() => setIsExpanded(false)}

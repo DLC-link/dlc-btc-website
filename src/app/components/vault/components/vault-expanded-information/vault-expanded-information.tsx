@@ -2,33 +2,29 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 import { Button, Divider, SlideFade, Stack, VStack } from '@chakra-ui/react';
-import { VaultState } from '@models/vault';
+import { useBitcoin } from '@hooks/use-bitcoin';
+import { Vault, VaultState } from '@models/vault';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 
 import { VaultExpandedInformationUUIDRow } from './components/vault-expanded-information-row';
 import { VaultExpandedInformationTransactionRow } from './components/vault-expanded-information-transaction-row';
 
 interface VaultExpandedInformationProps {
-  uuid: string;
-  state: VaultState;
-  fundingTX: string;
-  closingTX: string;
+  vault: Vault;
   isExpanded: boolean;
   isSelected?: boolean;
   close: () => void;
 }
 
 export function VaultExpandedInformation({
-  uuid,
-  state,
-  fundingTX,
-  closingTX,
+  vault,
   isExpanded,
   isSelected,
   close,
 }: VaultExpandedInformationProps): React.JSX.Element {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { signAndSendReplacementClosingTransaction } = useBitcoin();
 
   return (
     <Stack w={'100%'}>
@@ -37,19 +33,25 @@ export function VaultExpandedInformation({
           <Divider w={'100%'} borderStyle={'dashed'} />
           <VStack w={'100%'} spacing={'25px'}>
             <VStack w={'100%'} justifyContent={'space-between'}>
-              <VaultExpandedInformationUUIDRow uuid={uuid} />
-              {Boolean(fundingTX) && (
-                <VaultExpandedInformationTransactionRow label={'Funding TX'} value={fundingTX} />
+              <VaultExpandedInformationUUIDRow uuid={vault.uuid} />
+              {Boolean(vault.fundingTX) && (
+                <VaultExpandedInformationTransactionRow
+                  label={'Funding TX'}
+                  value={vault.fundingTX}
+                />
               )}
-              {Boolean(closingTX) && (
-                <VaultExpandedInformationTransactionRow label={'Closing TX'} value={closingTX} />
+              {Boolean(vault.closingTX) && (
+                <VaultExpandedInformationTransactionRow
+                  label={'Closing TX'}
+                  value={vault.closingTX}
+                />
               )}
             </VStack>
-            {state === VaultState.READY && !isSelected && (
+            {vault.state === VaultState.READY && !isSelected && (
               <Button
                 onClick={() => {
                   navigate('/');
-                  dispatch(mintUnmintActions.setMintStep([1, uuid]));
+                  dispatch(mintUnmintActions.setMintStep([1, vault.uuid]));
                   close();
                 }}
                 variant={'account'}
@@ -57,11 +59,11 @@ export function VaultExpandedInformation({
                 Lock BTC
               </Button>
             )}
-            {state === VaultState.FUNDED && !isSelected && (
+            {vault.state === VaultState.FUNDED && !isSelected && (
               <Button
                 onClick={() => {
                   navigate('/');
-                  dispatch(mintUnmintActions.setUnmintStep([0, uuid]));
+                  dispatch(mintUnmintActions.setUnmintStep([0, vault.uuid]));
                   close();
                 }}
                 variant={'account'}
@@ -69,6 +71,15 @@ export function VaultExpandedInformation({
                 Redeem dlcBTC
               </Button>
             )}
+            {vault.state === VaultState.CLOSING ||
+              (vault.state === VaultState.FUNDED && (
+                <Button
+                  onClick={() => signAndSendReplacementClosingTransaction(vault)}
+                  variant={'account'}
+                >
+                  Update Closing Transaction
+                </Button>
+              ))}
           </VStack>
         </VStack>
       </SlideFade>

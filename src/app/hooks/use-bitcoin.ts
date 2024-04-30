@@ -100,6 +100,7 @@ interface UseBitcoinReturnType {
     vault: Vault
   ) => Promise<void>;
   broadcastTransaction: (transaction: btc.Transaction) => Promise<string>;
+  signAndSendReplacementClosingTransaction: (vault: Vault) => Promise<void>;
 }
 
 export function useBitcoin(): UseBitcoinReturnType {
@@ -109,7 +110,8 @@ export function useBitcoin(): UseBitcoinReturnType {
     bitcoinBlockchainAPIURL,
     bitcoinBlockchainAPIFeeURL,
   } = useEndpoints();
-  const { sendClosingTransactionToAttestors } = useAttestors();
+  const { sendClosingTransactionToAttestors, sendReplacementClosingTransactionToAttestors } =
+    useAttestors();
   const { getAttestorGroupPublicKey } = useEthereum();
   const { network } = useSelector((state: RootState) => state.account);
 
@@ -516,9 +518,99 @@ export function useBitcoin(): UseBitcoinReturnType {
     );
   }
 
+  async function getFeeRecipientAddressFromPublicKey(publicKey: string): Promise<string> {
+    const feePublicKeyBuffer = Buffer.from(publicKey, 'hex');
+    const feeAddress = payments.p2wpkh({
+      pubkey: feePublicKeyBuffer,
+      network: bitcoinNetwork,
+    }).address as string;
+
+    return feeAddress;
+  }
+
+  async function createReplacementClosingTransaction(
+    bitcoinAmount: number,
+    fundingTransactionID: string,
+    userNativeSegwitAddress: string,
+    userPublicKey: Uint8Array,
+    feePublicKey: string,
+    feeBasisPoints: number,
+    attestorGroupPublicKey: Uint8Array,
+    uuid: string
+  ) {
+    const feeRecipientAddress = await getFeeRecipientAddressFromPublicKey(feePublicKey);
+    const multisigTransaction = createMultisigTransaction(
+      userPublicKey,
+      attestorGroupPublicKey,
+      uuid,
+      bitcoinNetwork
+    );
+
+    const inputs = [
+      {
+        txid: hexToBytes(fundingTransactionID),
+        index: 0,
+        witnessUtxo: {
+          amount: BigInt(customShiftValue(bitcoinAmount, 8, false)),
+          script: multisigTransaction.script,
+        },
+        ...multisigTransaction,
+      },
+    ];
+
+    const outputs = [
+      {
+        address: feeRecipientAddress,
+        amount: BigInt(customShiftValue(bitcoinAmount, 8, false) * feeBasisPoints),
+      },
+    ];
+
+    const feeRate = BigInt(await getFeeRate());
+
+    const selected = btc.selectUTXO(inputs, outputs, 'default', {
+      changeAddress: userNativeSegwitAddress,
+      feePerByte: feeRate,
+      bip69: false,
+      createTx: true,
+      network: bitcoinNetwork,
+    });
+
+    if (!selected?.tx) throw new BitcoinError('Could not create Closing Transaction');
+
+    const closingPSBT = selected.tx.toPSBT();
+
+    return closingPSBT;
+  }
+
+  async function signAndSendReplacementClosingTransaction(vault: Vault): Promise<void> {
+    const attestorGroupPublicKeyString = await getAttestorGroupPublicKey(network);
+    const userAddresses = await getBitcoinAddresses();
+
+    const userTaprootAddress = userAddresses[1] as BitcoinTaprootAddress;
+    const userPublicKeyString = userTaprootAddress.tweakedPublicKey;
+
+    const userPublicKey = Buffer.from(userPublicKeyString, 'hex');
+    const attestorGroupPubKey = Buffer.from(attestorGroupPublicKeyString, 'hex');
+
+    const closingTransaction = await createReplacementClosingTransaction(
+      vault.collateral,
+      vault.fundingTX,
+      userAddresses[0].address,
+      userPublicKey,
+      vault.btcFeeRecipient,
+      vault.btcRedeemFeeBasisPoints,
+      attestorGroupPubKey,
+      vault.uuid
+    );
+    const closingTransactionHex = await signPSBT(closingTransaction);
+
+    await sendReplacementClosingTransactionToAttestors(vault.uuid, closingTransactionHex);
+  }
+
   return {
     signAndBroadcastFundingPSBT,
     signAndSendClosingPSBT,
+    signAndSendReplacementClosingTransaction,
     broadcastTransaction,
   };
 }
