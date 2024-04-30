@@ -378,6 +378,10 @@ export function useBitcoin(): UseBitcoinReturnType {
 
     if (!selected?.tx) throw new BitcoinError('Could not create Closing Transaction');
 
+    selected.tx.updateInput(0, {
+      sequence: 0xfffffff0,
+    });
+
     const closingPSBT = selected.tx.toPSBT();
 
     return closingPSBT;
