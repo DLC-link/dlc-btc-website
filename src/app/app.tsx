@@ -23,16 +23,16 @@ export function App(): React.JSX.Element {
         <EthereumObserverProvider>
           <VaultContextProvider>
             <BlockchainHeightContextProvider>
-              <BalanceContextProvider>
-                <ProofOfReserveContextProvider>
-                  <AppLayout>
-                    <Route path="/" element={<Dashboard />} />
-                    <Route path="/my-vaults" element={<MyVaults />} />
-                    <Route path="/how-it-works" element={<About />} />
-                    <Route path="/proof-of-reserve" element={<ProofOfReservePage />} />
-                  </AppLayout>
-                </ProofOfReserveContextProvider>
-              </BalanceContextProvider>
+              {/* <BalanceContextProvider> */}
+              {/* <ProofOfReserveContextProvider> */}
+              <AppLayout>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/my-vaults" element={<MyVaults />} />
+                <Route path="/how-it-works" element={<About />} />
+                <Route path="/proof-of-reserve" element={<ProofOfReservePage />} />
+              </AppLayout>
+              {/* </ProofOfReserveContextProvider> */}
+              {/* </BalanceContextProvider> */}
             </BlockchainHeightContextProvider>
           </VaultContextProvider>
         </EthereumObserverProvider>

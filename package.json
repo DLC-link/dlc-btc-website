@@ -37,6 +37,7 @@
     "@types/chrome": "^0.0.248",
     "bitcoinjs-lib": "^6.1.5",
     "buffer": "^6.0.3",
+    "coinselect": "^3.1.13",
     "concurrently": "^8.2.2",
     "decimal.js": "^10.4.3",
     "dotenv": "^16.3.1",
@@ -59,6 +60,7 @@
     "redux": "^4.2.1",
     "redux-persist": "^6.0.0",
     "redux-persist-expire": "^1.1.1",
+    "tiny-secp256k1": "^2.2.3",
     "ts-unused-exports": "^10.0.1",
     "vitest": "^0.34.6"
   },
@@ -75,6 +77,7 @@
     "eslint-plugin-react-refresh": "^0.4.3",
     "react-router-dom": "^6.18.0",
     "typescript": "^5.2.2",
-    "vite": "^4.4.5"
+    "vite": "^4.4.5",
+    "vite-plugin-wasm": "^3.3.0"
   }
 }

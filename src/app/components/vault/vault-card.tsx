@@ -24,7 +24,7 @@ export function VaultCard({
 }: VaultCardProps): React.JSX.Element {
   const [isExpanded, setIsExpanded] = useState(isSelected ? true : false);
 
-  const confirmations = useConfirmationChecker(vault);
+  // const confirmations = useConfirmationChecker(vault);
 
   if (!vault) return <CustomSkeleton height={'65px'} />;
 
@@ -50,9 +50,9 @@ export function VaultCard({
           close={() => setIsExpanded(false)}
         />
       )}
-      {[VaultState.FUNDING, VaultState.CLOSED].includes(vault.state) && (
+      {/* {[VaultState.FUNDING, VaultState.CLOSED].includes(vault.state) && (
         <VaultProgressBar confirmedBlocks={confirmations} vaultState={vault.state} />
-      )}
+      )} */}
     </VaultCardLayout>
   );
 }

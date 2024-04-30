@@ -8,13 +8,18 @@ import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
 import { hex } from '@scure/base';
 import * as btc from '@scure/btc-signer';
 import { RootState } from '@store/index';
-import { payments } from 'bitcoinjs-lib';
+import { Psbt, initEccLib, payments } from 'bitcoinjs-lib';
+import { p2wpkh } from 'bitcoinjs-lib/src/payments';
+import * as coinSelect from 'coinselect';
+import * as ecc from 'tiny-secp256k1';
 
 import { useAttestors } from './use-attestors';
 import { useEndpoints } from './use-endpoints';
 import { useEthereum } from './use-ethereum';
 
 const networkModes = ['mainnet', 'testnet', 'regtest'] as const;
+
+initEccLib(ecc);
 
 type NetworkModes = (typeof networkModes)[number];
 
@@ -172,25 +177,25 @@ export function useBitcoin(): UseBitcoinReturnType {
    * @returns A promise that resolves to the hour fee rate.
    */
   async function getFeeRate(): Promise<number> {
-    const response = await fetch(bitcoinBlockchainAPIFeeURL);
+    // const response = await fetch(bitcoinBlockchainAPIFeeURL);
 
-    if (!response.ok) {
-      throw new BitcoinError(
-        `Bitcoin Blockchain Fee Rate Response was not OK: ${response.statusText}`
-      );
-    }
+    // if (!response.ok) {
+    //   throw new BitcoinError(
+    //     `Bitcoin Blockchain Fee Rate Response was not OK: ${response.statusText}`
+    //   );
+    // }
 
-    let feeRates: FeeRates;
+    // let feeRates: FeeRates;
 
-    try {
-      feeRates = await response.json();
-    } catch (error) {
-      throw new BitcoinError(`Error parsing Bitcoin Blockchain Fee Rate Response JSON: ${error}`);
-    }
+    // try {
+    //   feeRates = await response.json();
+    // } catch (error) {
+    //   throw new BitcoinError(`Error parsing Bitcoin Blockchain Fee Rate Response JSON: ${error}`);
+    // }
 
-    const feeRate = checkFeeRate(feeRates.fastestFee);
+    // const feeRate = checkFeeRate(feeRates.fastestFee);
 
-    return feeRate;
+    return 147;
   }
 
   /**
@@ -200,14 +205,14 @@ export function useBitcoin(): UseBitcoinReturnType {
    * @param bitcoinNativeSegwitAddress - The user's native segwit address.
    * @returns A promise that resolves to the UTXOs.
    */
-  async function getUTXOs(bitcoinNativeSegwitAddress: BitcoinNativeSegwitAddress): Promise<any> {
+  async function getUTXOs(bitcoinNativeSegwitAddress: BitcoinNativeSegwitAddress): Promise<any[]> {
     try {
       const response = await fetch(
         `${bitcoinBlockchainAPIURL}/address/${bitcoinNativeSegwitAddress.address}/utxo`
       );
       const allUTXOs = await response.json();
-      const userPublicKey = hexToBytes(bitcoinNativeSegwitAddress.publicKey);
-      const spend = btc.p2wpkh(userPublicKey, bitcoinNetwork);
+      const userPublicKey = Buffer.from(bitcoinNativeSegwitAddress.publicKey, 'hex');
+      const spend = p2wpkh({ pubkey: userPublicKey, network: bitcoinNetwork });
 
       const utxos = await Promise.all(
         allUTXOs.map(async (utxo: UTXO) => {
@@ -219,10 +224,11 @@ export function useBitcoin(): UseBitcoinReturnType {
             txid: utxo.txid,
             index: utxo.vout,
             value: utxo.value,
-            nonWitnessUtxo: hex.decode(txHex),
+            witnessUtxo: { script: spend.output, value: utxo.value },
           };
         })
       );
+      console.log('utxos', utxos);
       return utxos;
     } catch (error) {
       throw new BitcoinError(`Error getting UTXOs: ${error}`);
@@ -280,42 +286,59 @@ export function useBitcoin(): UseBitcoinReturnType {
    */ function createFundingTransaction(
     multisigAddress: string,
     userChangeAddress: string,
+    userPublicKey: string,
     utxos: any[],
-    feeRate: bigint,
+    feeRate: number,
     feePublicKey: string,
     feeBasisPoints: number,
     bitcoinAmount: number,
     bitcoinNetwork: BitcoinNetwork
-  ): Uint8Array {
+  ): string {
     const feePublicKeyBuffer = Buffer.from(feePublicKey, 'hex');
     const feeAddress = payments.p2wpkh({
       pubkey: feePublicKeyBuffer,
       network: bitcoinNetwork,
     }).address as string;
 
-    const outputs = [
-      { address: multisigAddress, amount: BigInt(customShiftValue(bitcoinAmount, 8, false)) },
+    const targets = [
+      { address: multisigAddress, value: customShiftValue(bitcoinAmount, 8, false) },
       {
         address: feeAddress,
-        amount: BigInt(customShiftValue(bitcoinAmount, 8, false) * feeBasisPoints),
+        value: customShiftValue(bitcoinAmount, 8, false) * feeBasisPoints,
       },
     ];
 
-    const selected = btc.selectUTXO(utxos, outputs, 'default', {
-      changeAddress: userChangeAddress,
-      feePerByte: feeRate,
-      bip69: false,
-      createTx: true,
-      network: bitcoinNetwork,
+    console.log('before coinselect', utxos, targets, feeRate);
+
+    const { inputs, outputs, fee } = coinSelect(utxos, targets, feeRate);
+
+    console.log('outputs', outputs);
+
+    console.log('after coinselect', inputs, outputs, fee);
+    if (!inputs || !outputs || !fee) throw new BitcoinError('Could not create Funding Transaction');
+
+    const fundingPSBT = new Psbt({ network: bitcoinNetwork });
+    inputs.forEach(input => {
+      console.log('input', input);
+      fundingPSBT.addInput({
+        hash: input.txid,
+        index: input.index,
+        witnessUtxo: input.witnessUtxo,
+      });
     });
 
-    const fundingTX = selected?.tx;
+    outputs.forEach(output => {
+      console.log('output', output);
+      if (!output.address) {
+        output.address = userChangeAddress;
+      }
+      fundingPSBT.addOutput({
+        address: output.address,
+        value: output.value,
+      });
+    });
 
-    if (!fundingTX) throw new BitcoinError('Could not create Funding Transaction');
-
-    const fundingPSBT = fundingTX.toPSBT();
-
-    return fundingPSBT;
+    return fundingPSBT.toHex();
   }
 
   /**
@@ -338,47 +361,56 @@ export function useBitcoin(): UseBitcoinReturnType {
     feeBasisPoints: number,
     bitcoinAmount: number,
     bitcoinNetwork: BitcoinNetwork
-  ): Promise<Uint8Array> {
+  ): Promise<string> {
     const feePublicKeyBuffer = Buffer.from(feePublicKey, 'hex');
     const feeAddress = payments.p2wpkh({
       pubkey: feePublicKeyBuffer,
       network: bitcoinNetwork,
     }).address as string;
 
-    const inputs = [
+    const utxos = [
       {
-        txid: hexToBytes(fundingTransactionID),
+        txid: fundingTransactionID,
         index: 0,
+        value: customShiftValue(bitcoinAmount, 8, false),
         witnessUtxo: {
-          amount: BigInt(customShiftValue(bitcoinAmount, 8, false)),
+          value: customShiftValue(bitcoinAmount, 8, false),
           script: multisigTransaction.script,
         },
         ...multisigTransaction,
       },
     ];
 
-    const outputs = [
+    const targets = [
+      {
+        address: userNativeSegwitAddress,
+        value: customShiftValue(bitcoinAmount, 8, false) - 1500,
+      },
       {
         address: feeAddress,
-        amount: BigInt(customShiftValue(bitcoinAmount, 8, false) * feeBasisPoints),
+        value: customShiftValue(bitcoinAmount, 8, false) * feeBasisPoints,
       },
     ];
+    const feeRate = await getFeeRate();
 
-    const feeRate = BigInt(await getFeeRate());
+    const { inputs, outputs, fee } = coinSelect(utxos, targets, feeRate);
 
-    const selected = btc.selectUTXO(inputs, outputs, 'default', {
-      changeAddress: userNativeSegwitAddress,
-      feePerByte: feeRate,
-      bip69: false,
-      createTx: true,
-      network: bitcoinNetwork,
+    console.log('after coinselect', inputs, outputs, fee);
+    if (!inputs || !outputs || !fee) throw new BitcoinError('Could not create Funding Transaction');
+
+    const closingPSBT = new Psbt({ network: bitcoinNetwork });
+    closingPSBT.addInput({
+      hash: fundingTransactionID,
+      index: 0,
+      witnessUtxo: {
+        value: customShiftValue(bitcoinAmount, 8, false),
+        script: Buffer.from(multisigTransaction.script),
+      },
     });
 
-    if (!selected?.tx) throw new BitcoinError('Could not create Closing Transaction');
+    closingPSBT.addOutputs(targets);
 
-    const closingPSBT = selected.tx.toPSBT();
-
-    return closingPSBT;
+    return closingPSBT.toHex();
   }
 
   /**
@@ -388,10 +420,10 @@ export function useBitcoin(): UseBitcoinReturnType {
    * @param psbt - The PSBT to sign.
    * @returns A promise that resolves to the signed PSBT.
    */
-  async function signPSBT(psbt: Uint8Array): Promise<string> {
+  async function signPSBT(psbt: string): Promise<string> {
     try {
       const requestParams: SignPsbtRequestParams = {
-        hex: bytesToHex(psbt),
+        hex: psbt,
       };
       const result = await window.btc.request('signPsbt', requestParams);
       return result.result.hex;
@@ -455,11 +487,12 @@ export function useBitcoin(): UseBitcoinReturnType {
     const multisigAddress = multisigTransaction.address;
     if (!multisigAddress) throw new BitcoinError('Could not create multisig address');
 
-    const feeRate = BigInt(await getFeeRate());
+    const feeRate = await getFeeRate();
 
     const fundingTransaction = createFundingTransaction(
       multisigAddress,
       userNativeSegwitAddress,
+      userNativeSegwitAccount.publicKey,
       userUTXOs,
       feeRate,
       vault.btcFeeRecipient,
@@ -467,6 +500,8 @@ export function useBitcoin(): UseBitcoinReturnType {
       vault.collateral,
       bitcoinNetwork
     );
+
+    console.log('fundingTransaction', fundingTransaction);
 
     const fundingTransactionHex = await signPSBT(fundingTransaction);
 
