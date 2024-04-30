@@ -71,15 +71,14 @@ export function VaultExpandedInformation({
                 Redeem dlcBTC
               </Button>
             )}
-            {vault.state === VaultState.CLOSING ||
-              (vault.state === VaultState.FUNDED && (
-                <Button
-                  onClick={() => signAndSendReplacementClosingTransaction(vault)}
-                  variant={'account'}
-                >
-                  Update Closing Transaction
-                </Button>
-              ))}
+            {(vault.state === VaultState.CLOSING || vault.state === VaultState.FUNDED) && (
+              <Button
+                onClick={() => signAndSendReplacementClosingTransaction(vault)}
+                variant={'account'}
+              >
+                Update Closing Transaction
+              </Button>
+            )}
           </VStack>
         </VStack>
       </SlideFade>
