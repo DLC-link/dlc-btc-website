@@ -189,7 +189,7 @@ export function useBitcoin(): UseBitcoinReturnType {
     }
 
     const feeRate = checkFeeRate(feeRates.fastestFee);
-    const feeRateMultiplier = import.meta.env.VITE_FEE_RATE_MULTIPLIER || 1;
+    const feeRateMultiplier: number = import.meta.env.VITE_FEE_RATE_MULTIPLIER || 1;
     const doubledFeeRate = feeRate * feeRateMultiplier;
 
     return doubledFeeRate;
