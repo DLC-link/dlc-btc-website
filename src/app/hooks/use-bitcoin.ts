@@ -189,8 +189,9 @@ export function useBitcoin(): UseBitcoinReturnType {
     }
 
     const feeRate = checkFeeRate(feeRates.fastestFee);
+    const doubledFeeRate = feeRate * 2;
 
-    return feeRate;
+    return doubledFeeRate;
   }
 
   /**
