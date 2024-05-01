@@ -9,7 +9,7 @@ import { hex } from '@scure/base';
 import * as btc from '@scure/btc-signer';
 import { RootState } from '@store/index';
 import { Psbt, initEccLib, payments } from 'bitcoinjs-lib';
-import { p2wpkh } from 'bitcoinjs-lib/src/payments';
+import { Payment, p2ms, p2wpkh } from 'bitcoinjs-lib/src/payments';
 import * as coinSelect from 'coinselect';
 import * as ecc from 'tiny-secp256k1';
 
@@ -94,7 +94,7 @@ interface RpcResponse {
 interface UseBitcoinReturnType {
   signAndBroadcastFundingPSBT: (vault: Vault) => Promise<{
     fundingTransaction: btc.Transaction;
-    multisigTransaction: btc.P2TROut;
+    multisigTransaction: Payment;
     userNativeSegwitAddress: string;
     attestorGroupPublicKey: string;
   }>;
@@ -152,6 +152,7 @@ export function useBitcoin(): UseBitcoinReturnType {
     try {
       const rpcResponse: RpcResponse = await window.btc?.request('getAddresses');
       const userAddresses = rpcResponse.result.addresses;
+      console.log('userAddresses', userAddresses);
       checkUserWalletNetwork(userAddresses[0]);
       return userAddresses;
     } catch (error) {
@@ -308,18 +309,12 @@ export function useBitcoin(): UseBitcoinReturnType {
       },
     ];
 
-    console.log('before coinselect', utxos, targets, feeRate);
-
     const { inputs, outputs, fee } = coinSelect(utxos, targets, feeRate);
 
-    console.log('outputs', outputs);
-
-    console.log('after coinselect', inputs, outputs, fee);
     if (!inputs || !outputs || !fee) throw new BitcoinError('Could not create Funding Transaction');
 
     const fundingPSBT = new Psbt({ network: bitcoinNetwork });
     inputs.forEach(input => {
-      console.log('input', input);
       fundingPSBT.addInput({
         hash: input.txid,
         index: input.index,
@@ -328,7 +323,6 @@ export function useBitcoin(): UseBitcoinReturnType {
     });
 
     outputs.forEach(output => {
-      console.log('output', output);
       if (!output.address) {
         output.address = userChangeAddress;
       }
@@ -375,17 +369,13 @@ export function useBitcoin(): UseBitcoinReturnType {
         value: customShiftValue(bitcoinAmount, 8, false),
         witnessUtxo: {
           value: customShiftValue(bitcoinAmount, 8, false),
-          script: multisigTransaction.script,
+          script: Buffer.from(multisigTransaction.script),
         },
         ...multisigTransaction,
       },
     ];
 
     const targets = [
-      {
-        address: userNativeSegwitAddress,
-        value: customShiftValue(bitcoinAmount, 8, false) - 1500,
-      },
       {
         address: feeAddress,
         value: customShiftValue(bitcoinAmount, 8, false) * feeBasisPoints,
@@ -399,16 +389,25 @@ export function useBitcoin(): UseBitcoinReturnType {
     if (!inputs || !outputs || !fee) throw new BitcoinError('Could not create Funding Transaction');
 
     const closingPSBT = new Psbt({ network: bitcoinNetwork });
-    closingPSBT.addInput({
-      hash: fundingTransactionID,
-      index: 0,
-      witnessUtxo: {
-        value: customShiftValue(bitcoinAmount, 8, false),
-        script: Buffer.from(multisigTransaction.script),
-      },
+    inputs.forEach(input => {
+      closingPSBT.addInput({
+        hash: input.txid,
+        index: input.index,
+        witnessUtxo: input.witnessUtxo,
+      });
     });
 
-    closingPSBT.addOutputs(targets);
+    outputs.forEach(output => {
+      if (!output.address) {
+        output.address = userNativeSegwitAddress;
+      }
+      closingPSBT.addOutput({
+        address: output.address,
+        value: output.value,
+      });
+    });
+
+    console.log('closingPSBT', closingPSBT);
 
     return closingPSBT.toHex();
   }
@@ -495,7 +494,7 @@ export function useBitcoin(): UseBitcoinReturnType {
       userNativeSegwitAccount.publicKey,
       userUTXOs,
       feeRate,
-      vault.btcFeeRecipient,
+      '038ae51a5bed4f5591370290894c9807a2a98838ebecd8f4aa8fd2e8af4dd1b912',
       vault.btcMintFeeBasisPoints,
       vault.collateral,
       bitcoinNetwork
@@ -536,7 +535,7 @@ export function useBitcoin(): UseBitcoinReturnType {
       fundingTransaction.id,
       multisigTransaction,
       userNativeSegwitAddress,
-      vault.btcFeeRecipient,
+      '038ae51a5bed4f5591370290894c9807a2a98838ebecd8f4aa8fd2e8af4dd1b912',
       vault.btcRedeemFeeBasisPoints,
       vault.collateral,
       bitcoinNetwork
