@@ -174,13 +174,23 @@ export function useEthereum(): UseEthereumReturnType {
   }
 
   async function getAllFundedVaults(ethereumNetwork: EthereumNetwork): Promise<RawVault[]> {
+    const FUNDED_STATUS = 1;
     try {
       const dlcManagerContract = await getDefaultProvider(ethereumNetwork, 'DLCManager');
-      const vaults: RawVault[] = await dlcManagerContract.getFundedDLCs(0, 10000);
-      const filteredVaults = vaults.filter(
-        vault => vault.uuid != '0x0000000000000000000000000000000000000000000000000000000000000000'
-      );
-      return filteredVaults;
+      const numToFetch = 50;
+      let totalFetched = 0;
+      const fundedVaults: RawVault[] = [];
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        const fetchedVaults: RawVault[] = await dlcManagerContract.getAllDLCs(
+          totalFetched,
+          totalFetched + numToFetch
+        );
+        fundedVaults.push(...fetchedVaults.filter(vault => vault.status === FUNDED_STATUS));
+        totalFetched += numToFetch;
+        if (fetchedVaults.length !== numToFetch) break;
+      }
+      return fundedVaults;
     } catch (error) {
       throw new EthereumError(`Could not fetch Funded Vaults: ${error}`);
     }
