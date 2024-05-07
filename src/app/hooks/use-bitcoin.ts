@@ -311,9 +311,13 @@ export function useBitcoin(): UseBitcoinReturnType {
       network: bitcoinNetwork,
     });
 
-    const fundingTX = selected?.tx;
+    if (!selected?.tx) throw new BitcoinError('Could not create Funding Transaction');
 
-    if (!fundingTX) throw new BitcoinError('Could not create Funding Transaction');
+    selected.tx.updateInput(0, {
+      sequence: 0xfffffff0,
+    });
+
+    const fundingTX = selected?.tx;
 
     const fundingPSBT = fundingTX.toPSBT();
 
@@ -377,6 +381,10 @@ export function useBitcoin(): UseBitcoinReturnType {
     });
 
     if (!selected?.tx) throw new BitcoinError('Could not create Closing Transaction');
+
+    selected.tx.updateInput(0, {
+      sequence: 0xfffffff0,
+    });
 
     const closingPSBT = selected.tx.toPSBT();
 
