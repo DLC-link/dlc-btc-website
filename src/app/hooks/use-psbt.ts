@@ -63,7 +63,7 @@ export function usePSBT(): UsePSBTReturnType {
         vault
       );
 
-      await broadcastTransaction(fundingTransaction);
+      // await broadcastTransaction(fundingTransaction);
 
       dispatch(
         vaultActions.setVaultToFunding({

@@ -63,3 +63,17 @@ export interface BitcoinTransaction {
   vout: BitcoinTransactionVectorOutput[];
   weight: number;
 }
+
+interface TransactionStatus {
+  confirmed: boolean;
+  block_height: number;
+  block_hash: string;
+  block_time: number;
+}
+
+export interface UTXO {
+  txid: string;
+  vout: number;
+  status: TransactionStatus;
+  value: number;
+}

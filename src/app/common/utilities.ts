@@ -16,3 +16,23 @@ export function customShiftValue(value: number, shift: number, unshift: boolean)
 
   return decimalShiftedValue;
 }
+
+export function shiftValue(value: number): number {
+  const decimalPoweredShift = new Decimal(10 ** 8);
+  const decimalValue = new Decimal(Number(value));
+  const decimalShiftedValue = decimalValue.mul(decimalPoweredShift).toNumber();
+
+  return decimalShiftedValue;
+}
+
+export function unshiftValue(value: number): number {
+  const decimalPoweredShift = new Decimal(10 ** 8);
+  const decimalValue = new Decimal(Number(value));
+  const decimalShiftedValue = decimalValue.div(decimalPoweredShift).toNumber();
+
+  return decimalShiftedValue;
+}
+
+export async function delay(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}

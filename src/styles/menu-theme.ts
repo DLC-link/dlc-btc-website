@@ -84,6 +84,45 @@ const network = definePartsStyle({
   },
 });
 
+const ledgerAddress = definePartsStyle({
+  button: {
+    justifyContent: 'center',
+    p: '10px',
+    h: '50px',
+    w: '375px',
+    bg: 'background.content.01',
+    border: '1.5px solid',
+    borderColor: 'border.white.01',
+    borderRadius: 'md',
+    color: 'white',
+    fontSize: 'sm',
+    fontWeight: 600,
+    _hover: {
+      background: 'white.03',
+    },
+  },
+  list: {
+    p: '10px',
+    w: '375px',
+    bgColor: 'background.container.01',
+    border: '1.5px solid',
+    borderColor: 'border.white.01',
+    borderRadius: 'md',
+  },
+  item: {
+    justifyContent: 'center',
+    bgColor: 'inherit',
+    borderRadius: 'md',
+    color: 'white',
+    fontSize: 'xs',
+    fontWeight: 400,
+    _hover: {
+      background: 'white.03',
+    },
+    transition: 'all 0.05s ease-in-out',
+  },
+});
+
 const lg = defineStyle({
   width: '200px',
 });
@@ -102,6 +141,7 @@ const sizes = {
 const variants = {
   network,
   account,
+  ledgerAddress,
 };
 
 export const menuTheme = defineMultiStyleConfig({ sizes, variants });

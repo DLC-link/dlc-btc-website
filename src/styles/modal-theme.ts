@@ -19,6 +19,28 @@ const baseStyle = definePartsStyle({
   },
 });
 
+const ledgerModalStyle = definePartsStyle({
+  dialogContainer: {
+    top: '19.5%',
+  },
+  dialog: {
+    padding: '15px',
+    fontFamily: 'Inter',
+    width: '500px',
+    border: '1.5px solid',
+    borderColor: 'border.lightBlue.01',
+    borderRadius: 'md',
+    backgroundColor: 'black',
+    color: 'white',
+    alignItems: 'center',
+  },
+});
+
+const variants = {
+  ledger: ledgerModalStyle,
+};
+
 export const modalTheme = defineMultiStyleConfig({
   baseStyle,
+  variants,
 });

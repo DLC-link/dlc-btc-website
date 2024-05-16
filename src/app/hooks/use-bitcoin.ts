@@ -1,14 +1,16 @@
 import { useSelector } from 'react-redux';
 
-import { customShiftValue } from '@common/utilities';
-import { BitcoinNetwork } from '@models/bitcoin-network';
+import { customShiftValue, unshiftValue } from '@common/utilities';
+import { BitcoinNetwork, BitcoinNetworkName } from '@models/bitcoin-network';
 import { BitcoinError } from '@models/error-types';
+import { LEDGER_APPS_MAP } from '@models/ledger';
 import { Vault } from '@models/vault';
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
 import { hex } from '@scure/base';
 import * as btc from '@scure/btc-signer';
 import { RootState } from '@store/index';
-import { payments } from 'bitcoinjs-lib';
+import { Network, payments } from 'bitcoinjs-lib';
+import { bitcoin, testnet } from 'bitcoinjs-lib/src/networks';
 
 import { useAttestors } from './use-attestors';
 import { useEndpoints } from './use-endpoints';
@@ -244,7 +246,7 @@ export function useBitcoin(): UseBitcoinReturnType {
     userPublicKey: Uint8Array,
     attestorGroupPublicKey: Uint8Array,
     uuid: string,
-    bitcoinNetwork: BitcoinNetwork
+    bitcoinNetwork: Network
   ): btc.P2TROut {
     const multisig = btc.p2tr_ns(2, [userPublicKey, attestorGroupPublicKey]);
 
@@ -287,7 +289,7 @@ export function useBitcoin(): UseBitcoinReturnType {
     feePublicKey: string,
     feeBasisPoints: number,
     bitcoinAmount: number,
-    bitcoinNetwork: BitcoinNetwork
+    bitcoinNetwork: Network
   ): Uint8Array {
     const feePublicKeyBuffer = Buffer.from(feePublicKey, 'hex');
     const feeAddress = payments.p2wpkh({
@@ -343,7 +345,7 @@ export function useBitcoin(): UseBitcoinReturnType {
     feePublicKey: string,
     feeBasisPoints: number,
     bitcoinAmount: number,
-    bitcoinNetwork: BitcoinNetwork
+    bitcoinNetwork: Network
   ): Promise<Uint8Array> {
     const feePublicKeyBuffer = Buffer.from(feePublicKey, 'hex');
     const feeAddress = payments.p2wpkh({

@@ -3,6 +3,8 @@ interface Bip32 {
   private: number;
 }
 
+export type BitcoinNetworkName = 'Mainnet' | 'Testnet' | 'Regtest';
+
 export interface BitcoinNetwork {
   messagePrefix: string;
   bech32: string;

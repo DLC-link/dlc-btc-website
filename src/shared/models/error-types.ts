@@ -18,3 +18,10 @@ export class AttestorError extends Error {
     this.name = 'AttestorError';
   }
 }
+
+export class LedgerError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'LedgerError';
+  }
+}
