@@ -460,8 +460,7 @@ export function useLedger() {
       const vault: RawVault = await getRawVault(vaultUUID);
 
       const { ledgerApp, masterFingerprint } = currentLedgerInformation;
-      const { nativeSegwitPayment, nativeSegwitDerivedPublicKey, nativeSegwitAccountPolicy } =
-        nativeSegwitAddressInformation!;
+      const { nativeSegwitPayment } = nativeSegwitAddressInformation!;
       const {
         taprootMultisigPayment,
         taprootMultisigAccountPolicy,

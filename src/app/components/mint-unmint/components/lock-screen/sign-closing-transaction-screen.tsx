@@ -14,13 +14,13 @@ import { LockScreenProtocolFee } from './components/protocol-fee';
 interface SignClosingTransactionScreenProps {
   currentStep: [number, string];
   handleSignClosingTransaction: () => Promise<void>;
-  isLedgerLoading: [boolean, string];
+  isLoading: [boolean, string];
 }
 
 export function SignClosingTransactionScreen({
   currentStep,
   handleSignClosingTransaction,
-  isLedgerLoading,
+  isLoading,
 }: SignClosingTransactionScreenProps): React.JSX.Element {
   const toast = useToast();
   const dispatch = useDispatch();
@@ -60,7 +60,7 @@ export function SignClosingTransactionScreen({
         bitcoinPrice={bitcoinPrice}
         protocolFeePercentage={currentVault?.btcRedeemFeeBasisPoints}
       />
-      {isLedgerLoading[0] && (
+      {isLoading[0] && (
         <HStack
           p={'5%'}
           w={'100%'}
@@ -69,7 +69,7 @@ export function SignClosingTransactionScreen({
           justifyContent={'space-between'}
         >
           <Text fontSize={'sm'} color={'white.01'}>
-            {isLedgerLoading[1]}
+            {isLoading[1]}
           </Text>
           <Spinner size="xs" color="accent.lightBlue.01" />
         </HStack>

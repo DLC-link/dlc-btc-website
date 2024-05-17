@@ -4,52 +4,71 @@ import { useDispatch, useSelector } from 'react-redux';
 import { broadcastTransaction } from '@functions/bitcoin-functions';
 import { BitcoinError } from '@models/error-types';
 import { Vault } from '@models/vault';
-import { BitcoinWalletContext } from '@providers/ledger-context-provider';
+import { BitcoinWalletType } from '@models/wallet';
+import {
+  BitcoinWalletContext,
+  BitcoinWalletContextState,
+} from '@providers/ledger-context-provider';
 import * as btc from '@scure/btc-signer';
 import { RootState } from '@store/index';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { vaultActions } from '@store/slices/vault/vault.actions';
 
 import { useAttestors } from './use-attestors';
-import { useBitcoin } from './use-bitcoin';
 import { useEndpoints } from './use-endpoints';
+import { useLeather } from './use-leather';
 import { useLedger } from './use-ledger';
 
 interface UsePSBTReturnType {
   handleSignFundingTransaction: (vault: Vault) => Promise<void>;
   handleSignClosingTransaction: () => Promise<void>;
-  isLedgerLoading: [boolean, string];
+  isLoading: [boolean, string];
 }
 
 export function usePSBT(): UsePSBTReturnType {
   const dispatch = useDispatch();
-  // const { signAndBroadcastFundingPSBT, signAndSendClosingPSBT, broadcastTransaction } =
-  //   useBitcoin();
   const {
-    handleFundingTransaction,
-    handleClosingTransaction,
+    handleFundingTransaction: handleFundingTransactionWithLedger,
+    handleClosingTransaction: handleClosingTransactionWithLedger,
     isLoading: isLedgerLoading,
   } = useLedger();
-  const { bitcoinWalletType, nativeSegwitAddressInformation } = useContext(BitcoinWalletContext);
+  const {
+    handleFundingTransaction: handleFundingTransactionWithLeather,
+    handleClosingTransaction: handleClosingTransactionWithLeather,
+    isLoading: isLeatherLoading,
+  } = useLeather();
+  const {
+    bitcoinWalletType,
+    nativeSegwitAddressInformation,
+    setBitcoinWalletContextState,
+    setNativeSegwitAddressInformation,
+    setBitcoinWalletType,
+    setTaprootMultisigAddressInformation,
+  } = useContext(BitcoinWalletContext);
 
   const { network } = useSelector((state: RootState) => state.account);
 
-  const [vault, setVault] = useState<Vault | undefined>();
+  const { mintStep } = useSelector((state: RootState) => state.mintunmint);
   const { bitcoinBlockchainAPIURL } = useEndpoints();
 
-  const [userNativeSegwitAddress, setUserNativeSegwitAddress] = useState<string | undefined>();
   const [fundingTransaction, setFundingTransaction] = useState<btc.Transaction | undefined>();
-  const [multisigTransaction, setMultisigTransaction] = useState<btc.P2TROut | undefined>();
   const { sendClosingTransactionToAttestors } = useAttestors();
 
-  async function handleSignFundingTransaction(vault: Vault): Promise<void> {
+  async function handleSignFundingTransaction(): Promise<void> {
     try {
+      let handleFundingTransaction;
       switch (bitcoinWalletType) {
         case 'Ledger':
-          setVault(vault);
-          setFundingTransaction(await handleFundingTransaction(vault.uuid));
+          handleFundingTransaction = handleFundingTransactionWithLedger;
           break;
+        case 'Leather':
+          handleFundingTransaction = handleFundingTransactionWithLeather;
+          break;
+        default:
+          throw new BitcoinError('Invalid Bitcoin Wallet Type');
       }
+
+      setFundingTransaction(await handleFundingTransaction(mintStep[1]));
     } catch (error) {
       throw new BitcoinError(`Error signing Funding Transaction: ${error}`);
     }
@@ -57,33 +76,45 @@ export function usePSBT(): UsePSBTReturnType {
 
   async function handleSignClosingTransaction() {
     try {
-      if (!vault || !network || !fundingTransaction) {
-        throw new BitcoinError(
-          'Missing information for Closing Transaction, Funding Transaction must be signed before Closing Transaction can be signed'
-        );
-      }
-
+      if (!fundingTransaction) throw new BitcoinError('Funding Transaction is not yet signed.');
+      let handleClosingTransaction;
       switch (bitcoinWalletType) {
         case 'Ledger':
-          await sendClosingTransactionToAttestors(
-            fundingTransaction.hex,
-            await handleClosingTransaction(vault.uuid, fundingTransaction?.id),
-            vault.uuid,
-            nativeSegwitAddressInformation?.nativeSegwitPayment.address!
-          );
-          await broadcastTransaction(fundingTransaction.hex, bitcoinBlockchainAPIURL);
+          handleClosingTransaction = handleClosingTransactionWithLedger;
           break;
+        case 'Leather':
+          handleClosingTransaction = handleClosingTransactionWithLeather;
+          break;
+        default:
+          throw new BitcoinError('Invalid Bitcoin Wallet Type');
       }
+
+      const closingTransactionHex = await handleClosingTransaction(
+        mintStep[1],
+        fundingTransaction?.id
+      );
+      await sendClosingTransactionToAttestors(
+        fundingTransaction?.hex,
+        closingTransactionHex,
+        mintStep[1],
+        nativeSegwitAddressInformation?.nativeSegwitPayment.address!
+      );
+
+      await broadcastTransaction(fundingTransaction.hex, bitcoinBlockchainAPIURL);
 
       dispatch(
         vaultActions.setVaultToFunding({
-          vaultUUID: vault.uuid,
+          vaultUUID: mintStep[1],
           fundingTX: fundingTransaction.id,
           networkID: network.id,
         })
       );
 
-      dispatch(mintUnmintActions.setMintStep([3, vault.uuid]));
+      dispatch(mintUnmintActions.setMintStep([3, mintStep[1]]));
+      setBitcoinWalletType(undefined);
+      setBitcoinWalletContextState(BitcoinWalletContextState.INITIAL);
+      setNativeSegwitAddressInformation(undefined);
+      setTaprootMultisigAddressInformation(undefined);
     } catch (error) {
       throw new BitcoinError(`Error signing Closing Transaction: ${error}`);
     }
@@ -92,6 +123,6 @@ export function usePSBT(): UsePSBTReturnType {
   return {
     handleSignFundingTransaction,
     handleSignClosingTransaction,
-    isLedgerLoading,
+    isLoading: bitcoinWalletType === BitcoinWalletType.Leather ? isLeatherLoading : isLedgerLoading,
   };
 }

@@ -13,10 +13,11 @@ import {
 } from '@chakra-ui/react';
 import { VaultCard } from '@components/vault/vault-card';
 import { useBitcoinPrice } from '@hooks/use-bitcoin-price';
+import { useLeather } from '@hooks/use-leather';
 import { useVaults } from '@hooks/use-vaults';
 import { BitcoinError } from '@models/error-types';
 import { Vault } from '@models/vault';
-import { bitcoinWallets } from '@models/wallet';
+import { BitcoinWalletType, bitcoinWallets } from '@models/wallet';
 import {
   BitcoinWalletContext,
   BitcoinWalletContextState,
@@ -29,13 +30,13 @@ import { LockScreenProtocolFee } from './components/protocol-fee';
 interface SignFundingTransactionScreenProps {
   currentStep: [number, string];
   handleSignFundingTransaction: (vault: Vault) => Promise<void>;
-  isLedgerLoading: [boolean, string];
+  isLoading: [boolean, string];
 }
 
 export function SignFundingTransactionScreen({
   currentStep,
   handleSignFundingTransaction,
-  isLedgerLoading,
+  isLoading,
 }: SignFundingTransactionScreenProps): React.JSX.Element {
   const toast = useToast();
   const dispatch = useDispatch();
@@ -46,7 +47,8 @@ export function SignFundingTransactionScreen({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const currentVault = readyVaults.find(vault => vault.uuid === currentStep[1]);
-  const { bitcoinWalletContextState } = useContext(BitcoinWalletContext);
+  const { bitcoinWalletContextState, bitcoinWalletType } = useContext(BitcoinWalletContext);
+  const { getLeatherWalletInformation } = useLeather();
 
   async function handleSign(currentVault?: Vault) {
     if (!currentVault) return;
@@ -70,10 +72,14 @@ export function SignFundingTransactionScreen({
     }
   }
 
-  async function handleClick(currentVault?: Vault) {
+  async function handleClick() {
     switch (bitcoinWalletContextState) {
       case BitcoinWalletContextState.SELECT_BITCOIN_WALLET_READY:
-        dispatch(modalActions.toggleLedgerModalVisibility());
+        if (bitcoinWalletType === BitcoinWalletType.Ledger) {
+          dispatch(modalActions.toggleLedgerModalVisibility());
+        } else {
+          await getLeatherWalletInformation(currentStep[1]);
+        }
         break;
       default:
         dispatch(modalActions.toggleSelectBitcoinWalletModalVisibility());
@@ -89,7 +95,7 @@ export function SignFundingTransactionScreen({
         bitcoinPrice={bitcoinPrice}
         protocolFeePercentage={currentVault?.btcMintFeeBasisPoints}
       />
-      {isLedgerLoading[0] && (
+      {isLoading[0] && (
         <HStack
           p={'5%'}
           w={'100%'}
@@ -98,7 +104,7 @@ export function SignFundingTransactionScreen({
           justifyContent={'space-between'}
         >
           <Text fontSize={'sm'} color={'white.01'}>
-            {isLedgerLoading[1]}
+            {isLoading[1]}
           </Text>
           <Spinner size="xs" color="accent.lightBlue.01" />
         </HStack>
@@ -109,7 +115,7 @@ export function SignFundingTransactionScreen({
         onClick={() =>
           bitcoinWalletContextState === BitcoinWalletContextState.TAPROOT_MULTISIG_ADDRESS_READY
             ? handleSign(currentVault)
-            : handleClick(currentVault)
+            : handleClick()
         }
       >
         {bitcoinWalletContextState === BitcoinWalletContextState.INITIAL

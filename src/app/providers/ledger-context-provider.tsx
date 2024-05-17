@@ -26,8 +26,8 @@ export interface NativeSegwitAddressInformation {
 }
 
 interface BitcoinWalletContextProviderType {
-  bitcoinWalletType: BitcoinWalletType;
-  setBitcoinWalletType: React.Dispatch<React.SetStateAction<BitcoinWalletType>>;
+  bitcoinWalletType: BitcoinWalletType | undefined;
+  setBitcoinWalletType: React.Dispatch<React.SetStateAction<BitcoinWalletType | undefined>>;
   bitcoinWalletContextState: BitcoinWalletContextState;
   setBitcoinWalletContextState: React.Dispatch<React.SetStateAction<BitcoinWalletContextState>>;
   taprootMultisigAddressInformation: TaprootMultisigAddressInformation | undefined;
@@ -41,7 +41,7 @@ interface BitcoinWalletContextProviderType {
 }
 
 export const BitcoinWalletContext = createContext<BitcoinWalletContextProviderType>({
-  bitcoinWalletType: BitcoinWalletType.Leather,
+  bitcoinWalletType: undefined,
   setBitcoinWalletType: () => {},
   bitcoinWalletContextState: BitcoinWalletContextState.INITIAL,
   setBitcoinWalletContextState: () => {},
@@ -54,7 +54,7 @@ export const BitcoinWalletContext = createContext<BitcoinWalletContextProviderTy
 export function BitcoinWalletContextProvider({ children }: HasChildren): React.JSX.Element {
   const [bitcoinWalletContextState, setBitcoinWalletContextState] =
     useState<BitcoinWalletContextState>(BitcoinWalletContextState.INITIAL);
-  const [bitcoinWalletType, setBitcoinWalletType] = useState<BitcoinWalletType>(
+  const [bitcoinWalletType, setBitcoinWalletType] = useState<BitcoinWalletType | undefined>(
     BitcoinWalletType.Leather
   );
   const [taprootMultisigAddressInformation, setTaprootMultisigAddressInformation] = useState<
