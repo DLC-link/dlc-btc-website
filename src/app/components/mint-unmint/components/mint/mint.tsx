@@ -13,7 +13,7 @@ import { Walkthrough } from '../walkthrough/walkthrough';
 import { MintLayout } from './components/mint.layout';
 
 export function Mint(): React.JSX.Element {
-  const { handleSignFundingTransaction, handleSignClosingTransaction } = usePSBT();
+  const { handleSignFundingTransaction, handleSignClosingTransaction, isLedgerLoading } = usePSBT();
 
   const { mintStep } = useSelector((state: RootState) => state.mintunmint);
 
@@ -27,12 +27,14 @@ export function Mint(): React.JSX.Element {
           <SignFundingTransactionScreen
             currentStep={mintStep}
             handleSignFundingTransaction={handleSignFundingTransaction}
+            isLedgerLoading={isLedgerLoading}
           />
         )}
         {[2].includes(mintStep[0]) && (
           <SignClosingTransactionScreen
             currentStep={mintStep}
             handleSignClosingTransaction={handleSignClosingTransaction}
+            isLedgerLoading={isLedgerLoading}
           />
         )}
         {[3, 4].includes(mintStep[0]) && (

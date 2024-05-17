@@ -26,6 +26,7 @@ interface UseEthereumReturnType {
   getAttestorGroupPublicKey: (ethereumNetwork: EthereumNetwork) => Promise<string>;
   getAllVaults: () => Promise<void>;
   getVault: (vaultUUID: string, vaultState: VaultState) => Promise<void>;
+  getRawVault: (vaultUUID: string) => Promise<RawVault>;
   getAllFundedVaults: (thereumNetwork: EthereumNetwork) => Promise<RawVault[]>;
   setupVault: (btcDepositAmount: number) => Promise<void>;
   closeVault: (vaultUUID: string) => Promise<void>;
@@ -142,6 +143,13 @@ export function useEthereum(): UseEthereumReturnType {
     }
   }
 
+  async function getRawVault(vaultUUID: string): Promise<RawVault> {
+    if (!observerProtocolContract) throw new Error('Protocol contract not initialized');
+    const vault: RawVault = await observerProtocolContract.getVault(vaultUUID);
+    if (!vault) throw new Error('Vault is undefined');
+    return vault;
+  }
+
   async function getVault(
     vaultUUID: string,
     vaultState: VaultState,
@@ -223,6 +231,7 @@ export function useEthereum(): UseEthereumReturnType {
     getLockedBTCBalance,
     getAllVaults,
     getVault,
+    getRawVault,
     getAllFundedVaults,
     setupVault,
     closeVault,

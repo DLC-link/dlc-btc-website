@@ -1,16 +1,13 @@
 import { useSelector } from 'react-redux';
 
-import { customShiftValue, unshiftValue } from '@common/utilities';
-import { BitcoinNetwork, BitcoinNetworkName } from '@models/bitcoin-network';
+import { customShiftValue } from '@common/utilities';
 import { BitcoinError } from '@models/error-types';
-import { LEDGER_APPS_MAP } from '@models/ledger';
 import { Vault } from '@models/vault';
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
 import { hex } from '@scure/base';
 import * as btc from '@scure/btc-signer';
 import { RootState } from '@store/index';
 import { Network, payments } from 'bitcoinjs-lib';
-import { bitcoin, testnet } from 'bitcoinjs-lib/src/networks';
 
 import { useAttestors } from './use-attestors';
 import { useEndpoints } from './use-endpoints';
@@ -28,6 +25,7 @@ declare enum SignatureHash {
   NONE_ANYONECANPAY = 130,
   SINGLE_ANYONECANPAY = 131,
 }
+
 interface SignPsbtRequestParams {
   hex: string;
   allowedSighash?: SignatureHash[];
@@ -59,35 +57,6 @@ interface FeeRates {
   minimumFee: number;
 }
 
-interface BitcoinNativeSegwitAddress {
-  address: string;
-  derivationPath: string;
-  publicKey: string;
-  symbol: string;
-  type: string;
-}
-
-interface BitcoinTaprootAddress extends BitcoinNativeSegwitAddress {
-  type: 'p2tr';
-  tweakedPublicKey: string;
-}
-
-interface StacksAddress {
-  address: string;
-  symbol: string;
-}
-
-type Address = BitcoinNativeSegwitAddress | BitcoinTaprootAddress | StacksAddress;
-interface RpcResult {
-  addresses: Address[];
-}
-
-interface RpcResponse {
-  id: string;
-  jsonrpc: string;
-  result: RpcResult;
-}
-
 interface UseBitcoinReturnType {
   signAndBroadcastFundingPSBT: (vault: Vault) => Promise<{
     fundingTransaction: btc.Transaction;
@@ -114,47 +83,6 @@ export function useBitcoin(): UseBitcoinReturnType {
   const { sendClosingTransactionToAttestors } = useAttestors();
   const { getAttestorGroupPublicKey } = useEthereum();
   const { network } = useSelector((state: RootState) => state.account);
-
-  /**
-   * Checks if the user's wallet is on the same network as the app.
-   *
-   * @param userNativeSegwitAddress - The user's native segwit address.
-   * @throws BitcoinError - If the user's wallet is not on the same network as the app.
-   */
-  function checkUserWalletNetwork(userNativeSegwitAddress: Address): void {
-    if (bitcoinNetworkName === 'mainnet' && !userNativeSegwitAddress.address.startsWith('bc1')) {
-      throw new BitcoinError('User wallet is not on Bitcoin Mainnet');
-    } else if (
-      bitcoinNetworkName === 'testnet' &&
-      !userNativeSegwitAddress.address.startsWith('tb1')
-    ) {
-      throw new BitcoinError('User wallet is not on Bitcoin Testnet');
-    } else if (
-      bitcoinNetworkName === 'regtest' &&
-      !userNativeSegwitAddress.address.startsWith('bcrt1')
-    ) {
-      throw new BitcoinError('User wallet is not on Bitcoin Regtest');
-    } else {
-      return;
-    }
-  }
-
-  /**
-   * Fetches the user's native segwit and taproot addresses from the user's wallet. Taproot address is required for the user's public key, which is used in the multisig transaction.
-   * Current implementation is using Leather Wallet.
-   *
-   * @returns A promise that resolves to the user's native segwit and taproot addresses.
-   */
-  async function getBitcoinAddresses(): Promise<Address[]> {
-    try {
-      const rpcResponse: RpcResponse = await window.btc?.request('getAddresses');
-      const userAddresses = rpcResponse.result.addresses;
-      checkUserWalletNetwork(userAddresses[0]);
-      return userAddresses;
-    } catch (error) {
-      throw new BitcoinError(`Error getting bitcoin addresses: ${error}`);
-    }
-  }
 
   /**
    * Evaluates the fee rate from the bitcoin blockchain API.
@@ -195,42 +123,6 @@ export function useBitcoin(): UseBitcoinReturnType {
     const doubledFeeRate = feeRate * feeRateMultiplier;
 
     return doubledFeeRate;
-  }
-
-  /**
-   * Fetches the UTXOs for the user's native segwit address.
-
-   *
-   * @param bitcoinNativeSegwitAddress - The user's native segwit address.
-   * @returns A promise that resolves to the UTXOs.
-   */
-  async function getUTXOs(bitcoinNativeSegwitAddress: BitcoinNativeSegwitAddress): Promise<any> {
-    try {
-      const response = await fetch(
-        `${bitcoinBlockchainAPIURL}/address/${bitcoinNativeSegwitAddress.address}/utxo`
-      );
-      const allUTXOs = await response.json();
-      const userPublicKey = hexToBytes(bitcoinNativeSegwitAddress.publicKey);
-      const spend = btc.p2wpkh(userPublicKey, bitcoinNetwork);
-
-      const utxos = await Promise.all(
-        allUTXOs.map(async (utxo: UTXO) => {
-          const txHex = await (
-            await fetch(`${bitcoinBlockchainAPIURL}/tx/${utxo.txid}/hex`)
-          ).text();
-          return {
-            ...spend,
-            txid: utxo.txid,
-            index: utxo.vout,
-            value: utxo.value,
-            nonWitnessUtxo: hex.decode(txHex),
-          };
-        })
-      );
-      return utxos;
-    } catch (error) {
-      throw new BitcoinError(`Error getting UTXOs: ${error}`);
-    }
   }
 
   /**

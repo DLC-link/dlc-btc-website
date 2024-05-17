@@ -26,6 +26,7 @@ const ledgerModalStyle = definePartsStyle({
   dialog: {
     padding: '15px',
     fontFamily: 'Inter',
+    height: '500px',
     width: '500px',
     border: '1.5px solid',
     borderColor: 'border.lightBlue.01',

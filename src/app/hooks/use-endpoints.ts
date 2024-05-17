@@ -90,7 +90,7 @@ export function useEndpoints(): NetworkEndpoints {
         break;
       case 'testnet':
         bitcoinNetwork = testnet;
-        bitcoinBlockchainAPIFeeURL = 'https://mempool.space/api/v1/fees/recommended';
+        bitcoinBlockchainAPIFeeURL = 'https://mempool.space/testnet/api/v1/fees/recommended';
         break;
       default:
         bitcoinNetwork = regtest;

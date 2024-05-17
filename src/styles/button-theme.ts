@@ -101,7 +101,7 @@ const wallet = defineStyle({
 const ledger = defineStyle({
   p: '10px',
   h: '50px',
-  w: '275px',
+  w: '375px',
   bg: 'transparent',
   border: '1.5px solid',
   borderColor: 'white.01',

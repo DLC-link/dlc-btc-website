@@ -3,19 +3,34 @@ import { useContext, useState } from 'react';
 
 import { delay, easyTruncateAddress } from '@common/utilities';
 import {
+  createBitcoinInputSigningConfiguration,
   createTaprootMultisigPayment,
   getBalance,
   getDerivedPublicKey,
+  getFeeRate,
+  getInputByPaymentTypeArray,
   getUnspendableKeyCommittedToUUID,
 } from '@functions/bitcoin-functions';
+import {
+  addNativeSegwitSignaturesToPSBT,
+  addTaprootInputSignaturesToPSBT,
+  createClosingTransaction,
+  createFundingTransaction,
+  getNativeSegwitInputsToSign,
+  getTaprootInputsToSign,
+  updateNativeSegwitInputs,
+  updateTaprootInputs,
+} from '@functions/psbt-functions';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { LedgerError } from '@models/error-types';
-import { LEDGER_APPS_MAP } from '@models/ledger';
+import { LEDGER_APPS_MAP, LedgerConnectionErrors } from '@models/ledger';
+import { RawVault } from '@models/vault';
 import {
   BitcoinWalletContext,
   BitcoinWalletContextState,
 } from '@providers/ledger-context-provider';
-import { p2wpkh } from '@scure/btc-signer';
+import { Transaction, p2wpkh } from '@scure/btc-signer';
+import { Psbt } from 'bitcoinjs-lib';
 import { bitcoin, testnet } from 'bitcoinjs-lib/src/networks';
 import { AppClient, DefaultWalletPolicy, WalletPolicy } from 'ledger-bitcoin';
 
@@ -26,6 +41,7 @@ import {
 
 import { useAttestors } from './use-attestors';
 import { useEndpoints } from './use-endpoints';
+import { useEthereum } from './use-ethereum';
 
 enum LedgerState {
   INITIAL = 0,
@@ -50,7 +66,7 @@ export interface LedgerInformation {
 }
 
 export function useLedger() {
-  const { bitcoinNetwork, bitcoinBlockchainAPIURL } = useEndpoints();
+  const { bitcoinNetwork, bitcoinBlockchainAPIURL, bitcoinBlockchainAPIFeeURL } = useEndpoints();
   const { getExtendedAttestorGroupPublicKey } = useAttestors();
   const {
     taprootMultisigAddressInformation,
@@ -62,9 +78,9 @@ export function useLedger() {
   const [ledgerInformation, setLedgerInformation] = useState<LedgerInformation | undefined>(
     undefined
   );
+  const { getRawVault } = useEthereum();
 
-  const [ledgerError, setLedgerError] = useState<string | undefined>(undefined);
-  const [isLoading, setIsLoading] = useState<[boolean, string]>([false, 'bazdmeg az anyad']);
+  const [isLoading, setIsLoading] = useState<[boolean, string]>([false, '']);
 
   /**
    * Gets the Bitcoin Network to use.
@@ -85,7 +101,6 @@ export function useLedger() {
           rootTaprootDerivationPath: `${TAPROOT_DERIVATION_PATH}/1'`,
         };
       default:
-        setLedgerError(`Unsupported Bitcoin Network: ${bitcoinNetwork}`);
         throw new LedgerError(`Unsupported Bitcoin Network: ${bitcoinNetwork}`);
     }
   }
@@ -104,7 +119,7 @@ export function useLedger() {
         rootTaprootDerivationPath,
       };
     } catch (error: any) {
-      setLedgerError(`Error getting Ledger App and Information: ${error}`);
+      setIsLoading([false, '']);
       throw new LedgerError(`Error getting Ledger App and Information: ${error}`);
     }
   }
@@ -148,312 +163,374 @@ export function useLedger() {
   async function getLedgerAddressesWithBalances(
     paymentType: 'wpkh' | 'tr'
   ): Promise<[string, number][]> {
-    setIsLoading([true, 'Loading Native Segwit Adresses']);
-    const currentLedgerInformation = await getLedgerAppAndInformation();
-    if (!currentLedgerInformation) {
-      throw new LedgerError(`Ledger Information is not available`);
-    }
-    setLedgerInformation(currentLedgerInformation);
-    const {
-      ledgerApp,
-      masterFingerprint,
-      rootNativeSegwitDerivationPath,
-      rootTaprootDerivationPath,
-    } = currentLedgerInformation;
+    try {
+      setIsLoading([true, 'Loading Native Segwit Adresses']);
+      const currentLedgerInformation = await getLedgerAppAndInformation();
+      if (!currentLedgerInformation) {
+        throw new LedgerError(`Ledger Information is not available`);
+      }
+      setLedgerInformation(currentLedgerInformation);
+      const {
+        ledgerApp,
+        masterFingerprint,
+        rootNativeSegwitDerivationPath,
+        rootTaprootDerivationPath,
+      } = currentLedgerInformation;
 
-    const indices = [0, 1, 2, 3, 4]; // Replace with your actual indices
-    const addresses = [];
+      const indices = [0, 1, 2, 3, 4]; // Replace with your actual indices
+      const addresses = [];
 
-    for (const index of indices) {
-      const derivationPath = `${paymentType === 'wpkh' ? rootNativeSegwitDerivationPath : rootTaprootDerivationPath}/${index}'`;
-      const extendedPublicKey = await ledgerApp.getExtendedPubkey(`m${derivationPath}`);
+      for (const index of indices) {
+        const derivationPath = `${paymentType === 'wpkh' ? rootNativeSegwitDerivationPath : rootTaprootDerivationPath}/${index}'`;
+        const extendedPublicKey = await ledgerApp.getExtendedPubkey(`m${derivationPath}`);
 
-      const accountPolicy = new DefaultWalletPolicy(
-        `${paymentType}(@0/**)`,
-        `[${masterFingerprint}/${derivationPath}]${extendedPublicKey}`
+        const accountPolicy = new DefaultWalletPolicy(
+          `${paymentType}(@0/**)`,
+          `[${masterFingerprint}/${derivationPath}]${extendedPublicKey}`
+        );
+
+        const address = await ledgerApp.getWalletAddress(accountPolicy, null, 0, 0, false);
+
+        addresses.push(address);
+      }
+
+      const addressesWithBalances = await Promise.all(
+        addresses.map(async address => {
+          const balance = await getBalance(address, bitcoinBlockchainAPIURL); // Replace with your actual function to get balance
+          return [address, balance] as [string, number];
+        })
       );
 
-      const address = await ledgerApp.getWalletAddress(accountPolicy, null, 0, 0, false);
-
-      addresses.push(address);
+      setIsLoading([false, '']);
+      return addressesWithBalances;
+    } catch (error: any) {
+      setIsLoading([false, '']);
+      throw new LedgerError(`Error getting Ledger Addresses with Balances: ${error}`);
     }
-
-    const addressesWithBalances = await Promise.all(
-      addresses.map(async address => {
-        const balance = await getBalance(address, bitcoinBlockchainAPIURL); // Replace with your actual function to get balance
-        return [address, balance] as [string, number];
-      })
-    );
-
-    setIsLoading([false, '']);
-    return addressesWithBalances;
   }
 
   async function getNativeSegwitAccount(nativeSegwitAddressIndex: number): Promise<void> {
-    let currentLedgerInformation: LedgerInformation | undefined;
-    if (!ledgerInformation) {
-      currentLedgerInformation = await getLedgerAppAndInformation();
-      setLedgerInformation(currentLedgerInformation);
-    } else {
-      currentLedgerInformation = ledgerInformation;
-    }
+    try {
+      let currentLedgerInformation: LedgerInformation | undefined;
+      if (!ledgerInformation) {
+        currentLedgerInformation = await getLedgerAppAndInformation();
+        setLedgerInformation(currentLedgerInformation);
+      } else {
+        currentLedgerInformation = ledgerInformation;
+      }
 
-    const { ledgerApp, masterFingerprint, rootNativeSegwitDerivationPath } =
-      currentLedgerInformation;
+      const { ledgerApp, masterFingerprint, rootNativeSegwitDerivationPath } =
+        currentLedgerInformation;
 
-    const derivationPath = `${rootNativeSegwitDerivationPath}/${nativeSegwitAddressIndex}'`;
+      const derivationPath = `${rootNativeSegwitDerivationPath}/${nativeSegwitAddressIndex}'`;
 
-    // ==> Get Ledger First Native Segwit Extended Public Key
-    const nativeSegwitExtendedPublicKey = await ledgerApp.getExtendedPubkey(`m/${derivationPath}`);
-
-    // ==> Get Ledger First Native Segwit Account Policy
-    const nativeSegwitAccountPolicy = new DefaultWalletPolicy(
-      'wpkh(@0/**)',
-      `[${masterFingerprint}/${derivationPath}]${nativeSegwitExtendedPublicKey}`
-    );
-
-    // ==> Get Ledger First Native Segwit Address
-    const nativeSegwitAddress = await ledgerApp.getWalletAddress(
-      nativeSegwitAccountPolicy,
-      null,
-      0,
-      0,
-      false
-    );
-
-    const nativeSegwitDerivedPublicKey = getDerivedPublicKey(
-      nativeSegwitExtendedPublicKey,
-      bitcoinNetwork
-    );
-
-    if (!nativeSegwitDerivedPublicKey) {
-      throw new Error(
-        `[Ledger] Could not derive Native Segwit Public Key from Ledger Extended Public Key`
+      // ==> Get Ledger First Native Segwit Extended Public Key
+      const nativeSegwitExtendedPublicKey = await ledgerApp.getExtendedPubkey(
+        `m/${derivationPath}`
       );
-    }
 
-    // ==> Get derivation path for Ledger Native Segwit Address
-    const nativeSegwitPayment = p2wpkh(nativeSegwitDerivedPublicKey, bitcoinNetwork);
-
-    if (nativeSegwitPayment.address !== nativeSegwitAddress) {
-      throw new Error(
-        `[Ledger] Recreated Native Segwit Address does not match the Ledger Native Segwit Address`
+      // ==> Get Ledger First Native Segwit Account Policy
+      const nativeSegwitAccountPolicy = new DefaultWalletPolicy(
+        'wpkh(@0/**)',
+        `[${masterFingerprint}/${derivationPath}]${nativeSegwitExtendedPublicKey}`
       );
-    }
 
-    setNativeSegwitAddressInformation({
-      nativeSegwitAccountPolicy,
-      nativeSegwitDerivedPublicKey,
-      nativeSegwitPayment,
-    });
-    setBitcoinWalletContextState(BitcoinWalletContextState.NATIVE_SEGWIT_ADDRESS_READY);
-    setIsLoading([false, '']);
+      // ==> Get Ledger First Native Segwit Address
+      const nativeSegwitAddress = await ledgerApp.getWalletAddress(
+        nativeSegwitAccountPolicy,
+        null,
+        0,
+        0,
+        false
+      );
+
+      const nativeSegwitDerivedPublicKey = getDerivedPublicKey(
+        nativeSegwitExtendedPublicKey,
+        bitcoinNetwork
+      );
+
+      if (!nativeSegwitDerivedPublicKey) {
+        throw new Error(
+          `[Ledger] Could not derive Native Segwit Public Key from Ledger Extended Public Key`
+        );
+      }
+
+      // ==> Get derivation path for Ledger Native Segwit Address
+      const nativeSegwitPayment = p2wpkh(nativeSegwitDerivedPublicKey, bitcoinNetwork);
+
+      if (nativeSegwitPayment.address !== nativeSegwitAddress) {
+        throw new Error(
+          `[Ledger] Recreated Native Segwit Address does not match the Ledger Native Segwit Address`
+        );
+      }
+
+      setNativeSegwitAddressInformation({
+        nativeSegwitAccountPolicy,
+        nativeSegwitDerivedPublicKey,
+        nativeSegwitPayment,
+      });
+      setBitcoinWalletContextState(BitcoinWalletContextState.NATIVE_SEGWIT_ADDRESS_READY);
+      setIsLoading([false, '']);
+    } catch (error: any) {
+      setIsLoading([false, '']);
+      throw new LedgerError(`Error getting Native Segwit Account: ${error}`);
+    }
   }
 
   async function getTaprootMultisigAccount(vaultUUID: string): Promise<void> {
-    let currentLedgerInformation: LedgerInformation | undefined;
-    if (!ledgerInformation) {
-      currentLedgerInformation = await getLedgerAppAndInformation();
-      setLedgerInformation(currentLedgerInformation);
-    } else {
-      currentLedgerInformation = ledgerInformation;
+    try {
+      let currentLedgerInformation: LedgerInformation | undefined;
+      if (!ledgerInformation) {
+        currentLedgerInformation = await getLedgerAppAndInformation();
+        setLedgerInformation(currentLedgerInformation);
+      } else {
+        currentLedgerInformation = ledgerInformation;
+      }
+      const { ledgerApp, masterFingerprint, rootTaprootDerivationPath } = currentLedgerInformation;
+
+      const derivationPath = `${rootTaprootDerivationPath}/0'`;
+
+      // ==> Get Ledger Derived Public Key
+      const ledgerExtendedPublicKey = await ledgerApp.getExtendedPubkey(`m/${derivationPath}`);
+
+      // ==> Get External Derived Public Keys
+      const unspendableExtendedPublicKey = getUnspendableKeyCommittedToUUID(
+        vaultUUID,
+        bitcoinNetwork
+      );
+
+      const attestorExtendedPublicKey = await getExtendedAttestorGroupPublicKey();
+
+      // ==> Create Key Info
+      const ledgerKeyInfo = `[${masterFingerprint}/${derivationPath}]${ledgerExtendedPublicKey}`;
+
+      // ==> Create Multisig Wallet Policy
+      const taprootMultisigAccountPolicy = new WalletPolicy(
+        `Taproot Multisig Wallet for Vault: ${easyTruncateAddress(vaultUUID)}`,
+        `tr(@0/**,and_v(v:pk(@1/**),pk(@2/**)))`,
+        [unspendableExtendedPublicKey, attestorExtendedPublicKey, ledgerKeyInfo]
+      );
+
+      setIsLoading([true, 'Accept Multisig Wallet Policy On Your Device']);
+
+      // ==> Register Wallet
+      const [_, taprootMultisigPolicyHMac] = await ledgerApp.registerWallet(
+        taprootMultisigAccountPolicy
+      );
+
+      // ==> Get Wallet Address from Ledger
+      const taprootMultisigAddress = await ledgerApp.getWalletAddress(
+        taprootMultisigAccountPolicy,
+        taprootMultisigPolicyHMac,
+        0,
+        0,
+        false
+      );
+      const attestorDerivedPublicKey = getDerivedPublicKey(
+        attestorExtendedPublicKey,
+        bitcoinNetwork
+      );
+
+      const unspendableDerivedPublicKey = getDerivedPublicKey(
+        unspendableExtendedPublicKey,
+        bitcoinNetwork
+      );
+
+      const userDerivedPublicKey = getDerivedPublicKey(ledgerExtendedPublicKey, bitcoinNetwork);
+
+      // ==> Recreate Multisig Address to retrieve script
+      const taprootMultisigPayment = createTaprootMultisigPayment(
+        unspendableDerivedPublicKey,
+        attestorDerivedPublicKey,
+        userDerivedPublicKey,
+        bitcoinNetwork
+      );
+
+      if (taprootMultisigAddress !== taprootMultisigPayment.address) {
+        throw new Error(`ecreated Multisig Address does not match the Ledger Multisig Address`);
+      }
+
+      setTaprootMultisigAddressInformation({
+        taprootMultisigAccountPolicy,
+        taprootMultisigPolicyHMac,
+        taprootMultisigPayment,
+        userTaprootMultisigDerivedPublicKey: userDerivedPublicKey,
+      });
+      setBitcoinWalletContextState(BitcoinWalletContextState.TAPROOT_MULTISIG_ADDRESS_READY);
+      setIsLoading([false, '']);
+    } catch (error: any) {
+      setIsLoading([false, '']);
+      throw new LedgerError(`Error getting Taproot Multisig Account: ${error}`);
     }
-    const { ledgerApp, masterFingerprint, rootTaprootDerivationPath } = currentLedgerInformation;
+  }
+  async function handleFundingTransaction(vaultUUID: string): Promise<Transaction> {
+    try {
+      setIsLoading([true, 'Creating Funding Transaction']);
+      let currentLedgerInformation: LedgerInformation | undefined;
+      if (!ledgerInformation) {
+        currentLedgerInformation = await getLedgerAppAndInformation();
+        setLedgerInformation(currentLedgerInformation);
+      } else {
+        currentLedgerInformation = ledgerInformation;
+      }
 
-    const derivationPath = `${rootTaprootDerivationPath}/0'`;
+      const vault: RawVault = await getRawVault(vaultUUID);
 
-    // ==> Get Ledger Derived Public Key
-    const ledgerExtendedPublicKey = await ledgerApp.getExtendedPubkey(`m/${derivationPath}`);
+      const { ledgerApp, masterFingerprint } = currentLedgerInformation;
+      const { nativeSegwitPayment, nativeSegwitDerivedPublicKey, nativeSegwitAccountPolicy } =
+        nativeSegwitAddressInformation!;
+      const { taprootMultisigPayment } = taprootMultisigAddressInformation!;
 
-    // ==> Get External Derived Public Keys
-    const unspendableExtendedPublicKey = getUnspendableKeyCommittedToUUID(
-      vaultUUID,
-      bitcoinNetwork
-    );
+      const feeRate = await getFeeRate(bitcoinBlockchainAPIFeeURL);
 
-    const attestorExtendedPublicKey = await getExtendedAttestorGroupPublicKey();
+      // ==> Create Funding Transaction
+      const fundingPSBT = await createFundingTransaction(
+        vault.valueLocked.toBigInt(),
+        bitcoinNetwork,
+        taprootMultisigPayment.address!,
+        nativeSegwitPayment,
+        BigInt(feeRate),
+        vault.btcFeeRecipient,
+        vault.btcMintFeeBasisPoints.toBigInt(),
+        bitcoinBlockchainAPIURL
+      );
 
-    // ==> Create Key Info
-    const ledgerKeyInfo = `[${masterFingerprint}/${derivationPath}]${ledgerExtendedPublicKey}`;
+      // ==> Update Funding PSBT with Ledger related information
+      const signingConfiguration = createBitcoinInputSigningConfiguration(
+        fundingPSBT,
+        bitcoinNetwork
+      );
 
-    // ==> Create Multisig Wallet Policy
-    const taprootMultisigAccountPolicy = new WalletPolicy(
-      `Taproot Multisig Wallet for Vault: ${easyTruncateAddress(vaultUUID)}`,
-      `tr(@0/**,and_v(v:pk(@1/**),pk(@2/**)))`,
-      [unspendableExtendedPublicKey, attestorExtendedPublicKey, ledgerKeyInfo]
-    );
+      const formattedFundingPSBT = Psbt.fromBuffer(Buffer.from(fundingPSBT), {
+        network: bitcoinNetwork,
+      });
 
-    setIsLoading([true, 'Accept Multisig Wallet Policy On Your Device']);
+      const inputByPaymentTypeArray = getInputByPaymentTypeArray(
+        signingConfiguration,
+        formattedFundingPSBT.toBuffer(),
+        bitcoinNetwork
+      );
 
-    // ==> Register Wallet
-    const [_, taprootMultisigPolicyHMac] = await ledgerApp.registerWallet(
-      taprootMultisigAccountPolicy
-    );
+      const nativeSegwitInputsToSign = getNativeSegwitInputsToSign(inputByPaymentTypeArray);
 
-    // ==> Get Wallet Address from Ledger
-    const taprootMultisigAddress = await ledgerApp.getWalletAddress(
-      taprootMultisigAccountPolicy,
-      taprootMultisigPolicyHMac,
-      0,
-      0,
-      false
-    );
-    const attestorDerivedPublicKey = getDerivedPublicKey(attestorExtendedPublicKey, bitcoinNetwork);
+      await updateNativeSegwitInputs(
+        nativeSegwitInputsToSign,
+        nativeSegwitDerivedPublicKey,
+        masterFingerprint,
+        formattedFundingPSBT,
+        bitcoinBlockchainAPIURL
+      );
 
-    const unspendableDerivedPublicKey = getDerivedPublicKey(
-      unspendableExtendedPublicKey,
-      bitcoinNetwork
-    );
+      setIsLoading([true, 'Sign Funding Transaction on your Ledger Device']);
+      // ==> Sign Funding PSBT with Ledger
+      const fundingTransactionSignatures = await ledgerApp.signPsbt(
+        formattedFundingPSBT.toBase64(),
+        nativeSegwitAccountPolicy!,
+        null
+      );
 
-    const userDerivedPublicKey = getDerivedPublicKey(ledgerExtendedPublicKey, bitcoinNetwork);
+      addNativeSegwitSignaturesToPSBT(formattedFundingPSBT, fundingTransactionSignatures);
 
-    // ==> Recreate Multisig Address to retrieve script
-    const taprootMultisigPayment = createTaprootMultisigPayment(
-      unspendableDerivedPublicKey,
-      attestorDerivedPublicKey,
-      userDerivedPublicKey,
-      bitcoinNetwork
-    );
+      // ==> Finalize Funding Transaction
+      const fundingTransaction = Transaction.fromPSBT(formattedFundingPSBT.toBuffer());
+      fundingTransaction.finalize();
 
-    if (taprootMultisigAddress !== taprootMultisigPayment.address) {
-      throw new Error(`ecreated Multisig Address does not match the Ledger Multisig Address`);
+      setIsLoading([false, '']);
+      return fundingTransaction;
+    } catch (error) {
+      setIsLoading([false, '']);
+      throw new LedgerError(`Error handling Funding Transaction: ${error}`);
     }
-
-    setTaprootMultisigAddressInformation({
-      taprootMultisigAccountPolicy,
-      taprootMultisigPolicyHMac,
-      taprootMultisigPayment,
-      userTaprootMultisigDerivedPublicKey: userDerivedPublicKey,
-    });
-    setBitcoinWalletContextState(BitcoinWalletContextState.TAPROOT_MULTISIG_ADDRESS_READY);
-    setIsLoading([false, '']);
   }
 
-  // export async function signFundingAndClosingTransactionWithLedger(userVault: RawVault) {
-  //   try {
-  //     // ==> Get Bitcoin Network
-  //     const [bitcoinNetworkName, bitcoinNetwork, bitcoinNetworkIndex, ledgerAppName] =
-  //       getBitcoinNetwork();
+  async function handleClosingTransaction(
+    vaultUUID: string,
+    fundingTransactionID: string
+  ): Promise<string> {
+    try {
+      setIsLoading([true, 'Creating Closing Transaction']);
+      let currentLedgerInformation: LedgerInformation | undefined;
+      if (!ledgerInformation) {
+        currentLedgerInformation = await getLedgerAppAndInformation();
+        setLedgerInformation(currentLedgerInformation);
+      } else {
+        currentLedgerInformation = ledgerInformation;
+      }
 
-  //     const rootTaprootDerivationPath = `${TAPROOT_DERIVATION_PATH}/${bitcoinNetworkIndex}/0'`;
+      const vault: RawVault = await getRawVault(vaultUUID);
 
-  //     // ==> Open Ledger App
-  //     const ledgerApp = await getLedgerApp(ledgerAppName);
+      const { ledgerApp, masterFingerprint } = currentLedgerInformation;
+      const { nativeSegwitPayment, nativeSegwitDerivedPublicKey, nativeSegwitAccountPolicy } =
+        nativeSegwitAddressInformation!;
+      const {
+        taprootMultisigPayment,
+        taprootMultisigAccountPolicy,
+        userTaprootMultisigDerivedPublicKey,
+        taprootMultisigPolicyHMac,
+      } = taprootMultisigAddressInformation!;
 
-  //     if (!ledgerApp) {
-  //       throw new Error(`[Ledger][${bitcoinNetworkName}] Could not open Ledger ${ledgerAppName} App`);
-  //     }
+      const feeRate = await getFeeRate(bitcoinBlockchainAPIFeeURL);
+      // ==> Create Closing PSBT
+      const closingPSBT = createClosingTransaction(
+        vault.valueLocked.toBigInt(),
+        bitcoinNetwork,
+        fundingTransactionID,
+        taprootMultisigPayment,
+        nativeSegwitPayment.address!,
+        BigInt(feeRate),
+        vault.btcFeeRecipient,
+        vault.btcRedeemFeeBasisPoints.toBigInt()
+      );
 
-  //     // ==> Get Ledger Master Fingerprint
-  //     const fpr = await ledgerApp.getMasterFingerprint();
+      // ==> Update Closing PSBT with Ledger related information
+      const closingTransactionSigningConfiguration = createBitcoinInputSigningConfiguration(
+        closingPSBT,
+        bitcoinNetwork
+      );
 
-  //     const {
-  //       addressIndex: nativeSegwitAddressIndex,
-  //       rootDerivationPath: rootNativeSegwitDerivationPath,
-  //     } = await getLedgerAddressIndexAndDerivationPath(
-  //       ledgerApp,
-  //       fpr,
-  //       bitcoinNetworkName,
-  //       bitcoinNetworkIndex,
-  //       'wpkh',
-  //       NATIVE_SEGWIT_DERIVATION_PATH
-  //     );
+      const formattedClosingPSBT = Psbt.fromBuffer(Buffer.from(closingPSBT), {
+        network: bitcoinNetwork,
+      });
 
-  //     console.log(
-  //       `[Ledger][${bitcoinNetworkName}] Selected Native Segwit Address Index: ${[nativeSegwitAddressIndex][0]}`
-  //     );
+      const closingInputByPaymentTypeArray = getInputByPaymentTypeArray(
+        closingTransactionSigningConfiguration,
+        formattedClosingPSBT.toBuffer(),
+        bitcoinNetwork
+      );
 
-  //     // ==> Get Native Segwit Account
-  //     const {
-  //       ledgerNativeSegwitAccountPolicy,
-  //       nativeSegwitAddress,
-  //       nativeSegwitDerivedPublicKey,
-  //       nativeSegwitPayment,
-  //     } = await getNativeSegwitAccount(
-  //       ledgerApp,
-  //       fpr,
-  //       bitcoinNetwork,
-  //       bitcoinNetworkName,
-  //       rootNativeSegwitDerivationPath
-  //     );
+      const taprootInputsToSign = getTaprootInputsToSign(closingInputByPaymentTypeArray);
 
-  //     // ==> Get Taproot Multisig Account
-  //     const {
-  //       ledgerTaprootMultisigAccountPolicy,
-  //       ledgerTaprootMultisigPolicyHMac,
-  //       taprootMultisigAddress,
-  //       taprootDerivedPublicKey,
-  //       taprootMultisigPayment,
-  //     } = await getTaprootMultisigAccount(
-  //       ledgerApp,
-  //       fpr,
-  //       bitcoinNetwork,
-  //       bitcoinNetworkName,
-  //       rootTaprootDerivationPath,
-  //       userVault.uuid
-  //     );
+      await updateTaprootInputs(
+        taprootInputsToSign,
+        userTaprootMultisigDerivedPublicKey,
+        masterFingerprint,
+        formattedClosingPSBT
+      );
 
-  //     // ==> Handle Funding Transaction
-  //     const fundingTransaction = await handleFundingTransaction(
-  //       ledgerApp,
-  //       bitcoinNetwork,
-  //       bitcoinNetworkName,
-  //       userVault.valueLocked.toBigInt(),
-  //       fpr,
-  //       taprootMultisigPayment,
-  //       nativeSegwitDerivedPublicKey,
-  //       nativeSegwitPayment,
-  //       ledgerNativeSegwitAccountPolicy,
-  //       TEST_FEE_RATE,
-  //       userVault.btcFeeRecipient,
-  //       userVault.btcMintFeeBasisPoints.toBigInt()
-  //     );
+      setIsLoading([true, 'Sign Closing Transaction on your Ledger Device']);
+      // ==> Sign Closing PSBT with Ledger
+      const closingTransactionSignatures = await ledgerApp.signPsbt(
+        formattedClosingPSBT.toBase64(),
+        taprootMultisigAccountPolicy!,
+        taprootMultisigPolicyHMac!
+      );
 
-  //     // ==> Handle Closing Transaction
-  //     const closingTransaction = await handleClosingTransaction(
-  //       ledgerApp,
-  //       bitcoinNetwork,
-  //       bitcoinNetworkName,
-  //       userVault.valueLocked.toBigInt(),
-  //       fpr,
-  //       fundingTransaction,
-  //       taprootMultisigPayment,
-  //       taprootDerivedPublicKey,
-  //       ledgerTaprootMultisigAccountPolicy,
-  //       ledgerTaprootMultisigPolicyHMac,
-  //       nativeSegwitPayment,
-  //       TEST_FEE_RATE,
-  //       userVault.btcFeeRecipient,
-  //       userVault.btcRedeemFeeBasisPoints.toBigInt()
-  //     );
-  //     console.log(`[Ledger][${bitcoinNetworkName}] Signed Funding and Closing Transaction`);
+      addTaprootInputSignaturesToPSBT(formattedClosingPSBT, closingTransactionSignatures);
 
-  //     // ==> Send PSBT to Attestors
-  //     const attestorURLs = getAttestorURLs();
+      setIsLoading([false, '']);
+      return formattedClosingPSBT.toHex();
+    } catch (error) {
+      setIsLoading([false, '']);
+      throw new LedgerError(`Error handling Closing Transaction: ${error}`);
+    }
+  }
 
-  //     await createPSBTEvent(
-  //       attestorURLs,
-  //       userVault.uuid,
-  //       fundingTransaction.hex,
-  //       closingTransaction,
-  //       nativeSegwitAddress
-  //     );
-
-  //     const fundingTransactionID = await broadcastTransaction(fundingTransaction.hex);
-
-  //     console.log(
-  //       `[Ledger][${bitcoinNetworkName}] Broadcasted Funding Transaction: ${fundingTransactionID}`
-  //     );
-
-  //     ledgerApp.transport.close();
-  //   } catch (error) {
-  //     throw new LedgerError(`Error running PSBT signing flow with Ledger: ${error}`);
-  //   }
-  // }
   return {
     getLedgerAddressesWithBalances,
     getNativeSegwitAccount,
     getTaprootMultisigAccount,
     isLoading,
+    handleFundingTransaction,
+    handleClosingTransaction,
   };
 }

@@ -1,3 +1,27 @@
+interface TransactionStatus {
+  confirmed: boolean;
+  block_height: number;
+  block_hash: string;
+  block_time: number;
+}
+
+export interface BitcoinInputSigningConfig {
+  derivationPath: string;
+  index: number;
+}
+
+export type PaymentTypes = 'p2pkh' | 'p2sh' | 'p2wpkh-p2sh' | 'p2wpkh' | 'p2tr';
+
+export type BitcoinNetworkName = 'Mainnet' | 'Testnet' | 'Regtest';
+
+export interface FeeRates {
+  fastestFee: number;
+  halfHourFee: number;
+  hourFee: number;
+  economyFee: number;
+  minimumFee: number;
+}
+
 interface BitcoinTransactionIssuance {
   asset_id: string;
   is_reissuance: boolean;

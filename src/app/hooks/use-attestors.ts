@@ -48,16 +48,20 @@ export function useAttestors(): UseAttestorsReturnType {
   }
 
   async function getExtendedAttestorGroupPublicKey(): Promise<string> {
-    const attestorExtendedPublicKeyEndpoint = `${attestorAPIURLs[0]}/tss/get-extended-group-publickey`;
-    const response = await fetch(attestorExtendedPublicKeyEndpoint);
+    try {
+      const attestorExtendedPublicKeyEndpoint = `${attestorAPIURLs[0]}/tss/get-extended-group-publickey`;
+      const response = await fetch(attestorExtendedPublicKeyEndpoint);
 
-    if (!response.ok) {
-      throw new Error(`Failed to get Extended Attestor Group Public Key: ${response.statusText}`);
+      if (!response.ok) {
+        throw new Error(`Failed to get Extended Attestor Group Public Key: ${response.statusText}`);
+      }
+
+      const extendedAttestorGroupPublicKey = await response.text();
+
+      return extendedAttestorGroupPublicKey;
+    } catch (error) {
+      throw new AttestorError(`Error getting Extended Attestor Group Public Key: ${error}`);
     }
-
-    const extendedAttestorGroupPublicKey = await response.text();
-
-    return extendedAttestorGroupPublicKey;
   }
 
   return {
