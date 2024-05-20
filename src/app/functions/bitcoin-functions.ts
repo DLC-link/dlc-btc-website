@@ -1,29 +1,28 @@
 /** @format */
 import { createRangeFromLength, isDefined, isUndefined, unshiftValue } from '@common/utilities';
-import { LEDGER_APPS_MAP } from '@models/ledger.js';
 import { hexToBytes } from '@noble/hashes/utils';
-import { Transaction } from '@scure/btc-signer';
+import { hex } from '@scure/base';
 import {
   Address,
   OutScript,
   P2Ret,
   P2TROut,
+  Transaction,
+  TransactionInput,
   p2ms,
   p2pk,
   p2tr,
   p2tr_ns,
   p2wpkh,
+  taprootTweakPubkey,
 } from '@scure/btc-signer';
-import { TransactionInput } from '@scure/btc-signer';
-import { taprootTweakPubkey } from '@scure/btc-signer';
 import { BIP32Factory } from 'bip32';
-import { Network, initEccLib } from 'bitcoinjs-lib';
+import { Network } from 'bitcoinjs-lib';
 import { bitcoin, testnet } from 'bitcoinjs-lib/src/networks.js';
 import * as ellipticCurveCryptography from 'tiny-secp256k1';
 
 import {
   BitcoinInputSigningConfig,
-  BitcoinNetworkName,
   FeeRates,
   PaymentTypes,
   UTXO,
@@ -36,10 +35,24 @@ const ECDSA_PUBLIC_KEY_LENGTH = 33;
 
 const bip32 = BIP32Factory(ellipticCurveCryptography);
 
-export function getDerivedPublicKey(extendedPublicKey: string, bitcoinNetwork: Network) {
+/**
+ * Gets the derived public key from the extended public key.
+ * @param extendedPublicKey - The Extended Public Key.
+ * @param bitcoinNetwork - The Bitcoin Network to use.
+ * @returns The Derived Public Key.
+ */
+export function getDerivedPublicKey(extendedPublicKey: string, bitcoinNetwork: Network): Buffer {
   return bip32.fromBase58(extendedPublicKey, bitcoinNetwork).derivePath('0/0').publicKey;
 }
 
+/**
+ * Creates a Taproot Multisig Payment.
+ * @param unspendableDerivedPublicKey - The Unspendable Derived Public Key.
+ * @param attestorDerivedPublicKey - The Attestor Derived Public Key.
+ * @param userDerivedPublicKey - The User Derived Public Key.
+ * @param bitcoinNetwork - The Bitcoin Network to use.
+ * @returns The Taproot Multisig Payment.
+ */
 export function createTaprootMultisigPayment(
   unspendableDerivedPublicKey: Buffer,
   attestorDerivedPublicKey: Buffer,
@@ -72,27 +85,27 @@ function checkFeeRate(feeRate: number | undefined): number {
  * @returns A promise that resolves to the hour fee rate.
  */
 export async function getFeeRate(bitcoinBlockchainAPIFeeURL: string): Promise<number> {
-  // const response = await fetch(bitcoinBlockchainAPIFeeURL);
+  const response = await fetch(bitcoinBlockchainAPIFeeURL);
 
-  // if (!response.ok) {
-  //   throw new BitcoinError(
-  //     `Bitcoin Blockchain Fee Rate Response was not OK: ${response.statusText}`
-  //   );
-  // }
+  if (!response.ok) {
+    throw new BitcoinError(
+      `Bitcoin Blockchain Fee Rate Response was not OK: ${response.statusText}`
+    );
+  }
 
-  // let feeRates: FeeRates;
+  let feeRates: FeeRates;
 
-  // try {
-  //   feeRates = await response.json();
-  // } catch (error) {
-  //   throw new BitcoinError(`Error parsing Bitcoin Blockchain Fee Rate Response JSON: ${error}`);
-  // }
+  try {
+    feeRates = await response.json();
+  } catch (error) {
+    throw new BitcoinError(`Error parsing Bitcoin Blockchain Fee Rate Response JSON: ${error}`);
+  }
 
-  // const feeRate = checkFeeRate(feeRates.fastestFee);
-  // const feeRateMultiplier: number = import.meta.env.VITE_FEE_RATE_MULTIPLIER || 1;
-  // const doubledFeeRate = feeRate * feeRateMultiplier;
+  const feeRate = checkFeeRate(feeRates.fastestFee);
+  const feeRateMultiplier: number = import.meta.env.VITE_FEE_RATE_MULTIPLIER || 1;
+  const multipliedFeeRate = feeRate * feeRateMultiplier;
 
-  return 147;
+  return multipliedFeeRate;
 }
 
 /**
@@ -105,12 +118,8 @@ export async function getUTXOs(
   bitcoinNativeSegwitTransaction: P2Ret,
   bitcoinBlockchainAPIURL: string
 ): Promise<any> {
-  console.log('bitcoinNativeSegwitTransaction', bitcoinNativeSegwitTransaction);
   const utxoEndpoint = `${bitcoinBlockchainAPIURL}/address/${bitcoinNativeSegwitTransaction.address}/utxo`;
-  console.log('utxoEndpoint', utxoEndpoint);
   const utxoResponse = await fetch(utxoEndpoint);
-
-  console.log('utxoResponse', utxoResponse);
 
   if (!utxoResponse.ok) {
     throw new BitcoinError(`Error getting UTXOs: ${utxoResponse.statusText}`);
@@ -136,6 +145,12 @@ export async function getUTXOs(
   return modifiedUTXOs;
 }
 
+/**
+ * Gets the Balance of the User's Bitcoin Address.
+ *
+ * @param bitcoinAddress - The User's Bitcoin Address.
+ * @returns A Promise that resolves to the Balance of the User's Bitcoin Address.
+ */
 export async function getBalance(
   bitcoinAddress: string,
   bitcoinBlockchainAPIURL: string
@@ -207,6 +222,29 @@ export function createMultisigTransaction(
   return multisigTransaction;
 }
 
+export function createMultisigTransactionLegacy(
+  publicKeyA: string,
+  publicKeyB: string,
+  vaultUUID: string,
+  bitcoinNetwork: Network
+) {
+  const TAPROOT_UNSPENDABLE_KEY_STR =
+    '50929b74c1a04954b78b4b6035e97a5e078a5a0f28ec96d547bfee9ace803ac0';
+  const TAPROOT_UNSPENDABLE_KEY = hex.decode(TAPROOT_UNSPENDABLE_KEY_STR);
+
+  const tweakedUnspendableTaprootKey = taprootTweakPubkey(
+    TAPROOT_UNSPENDABLE_KEY,
+    Buffer.from(vaultUUID)
+  )[0];
+
+  const multisigPayment = p2tr_ns(2, [hex.decode(publicKeyA), hex.decode(publicKeyB)]);
+
+  const multisigTransaction = p2tr(tweakedUnspendableTaprootKey, multisigPayment, bitcoinNetwork);
+  multisigTransaction.tapInternalKey = tweakedUnspendableTaprootKey;
+
+  return multisigTransaction;
+}
+
 /**
  * Broadcasts the Transaction to the Bitcoin Network.
  *
@@ -237,16 +275,24 @@ export async function broadcastTransaction(
   }
 }
 
-// create extended public key from public key
-export function getUnspendableKeyCommittedToUUID(vaultUUID: string, bitcoinNetwork: Network) {
+/**
+ * Creates an Unspendable Key Committed to the Vault UUID.
+ * @param vaultUUID - The UUID of the Vault.
+ * @param bitcoinNetwork - The Bitcoin Network to use.
+ * @returns The Unspendable Key Committed to the Vault UUID.
+ */
+export function getUnspendableKeyCommittedToUUID(
+  vaultUUID: string,
+  bitcoinNetwork: Network
+): string {
   const publicKeyBuffer = Buffer.from(TAPROOT_UNSPENDABLE_KEY_HEX, 'hex');
   const chainCodeBuffer = Buffer.from(vaultUUID.slice(2), 'hex');
 
-  const derivedPublicKey = bip32
+  const unspendablePublicKey = bip32
     .fromPublicKey(publicKeyBuffer, chainCodeBuffer, bitcoinNetwork)
     .toBase58();
 
-  return derivedPublicKey;
+  return unspendablePublicKey;
 }
 
 /**
@@ -288,7 +334,7 @@ export function getBitcoinInputAddress(
   index: number,
   input: TransactionInput,
   bitcoinNetwork: Network
-) {
+): string {
   if (isDefined(input.witnessUtxo))
     return getAddressFromOutScript(input.witnessUtxo.script, bitcoinNetwork);
   if (isDefined(input.nonWitnessUtxo))
@@ -301,7 +347,7 @@ export function getBitcoinInputAddress(
  * @param script - The Output Script.
  * @param bitcoinNetwork - The Bitcoin Network to use.
  */
-export function getAddressFromOutScript(script: Uint8Array, bitcoinNetwork: Network) {
+export function getAddressFromOutScript(script: Uint8Array, bitcoinNetwork: Network): string {
   const outputScript = OutScript.decode(script);
 
   switch (outputScript.type) {
@@ -410,7 +456,7 @@ export function getInputByPaymentTypeArray(
  * Converts an ECDSA Public Key to a Schnorr Public Key.
  * @param publicKey - The ECDSA Public Key.
  */
-export function ecdsaPublicKeyToSchnorr(publicKey: Buffer) {
+export function ecdsaPublicKeyToSchnorr(publicKey: Buffer): Buffer {
   if (publicKey.byteLength !== ECDSA_PUBLIC_KEY_LENGTH)
     throw new Error('Invalid Public Key Length');
   return publicKey.subarray(1);

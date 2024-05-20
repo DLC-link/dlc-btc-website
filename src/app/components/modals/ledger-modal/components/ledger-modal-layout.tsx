@@ -8,6 +8,7 @@ import {
   ModalContent,
   ModalHeader,
   ModalOverlay,
+  VStack,
 } from '@chakra-ui/react';
 
 interface LedgerModalLayoutProps {
@@ -31,7 +32,11 @@ export function LedgerModalLayout({
           <Image src={logo} alt={'Ledger Logo'} width={'150px'} height={'100px'} />
         </ModalHeader>
         <ModalCloseButton />
-        <ModalBody>{children}</ModalBody>
+        <ModalBody>
+          <VStack spacing={25} h={'150px'}>
+            {children}
+          </VStack>
+        </ModalBody>
       </ModalContent>
     </Modal>
   );

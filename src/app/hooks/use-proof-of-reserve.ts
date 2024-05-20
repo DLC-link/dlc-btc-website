@@ -3,12 +3,16 @@ import { useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
 
 import { customShiftValue } from '@common/utilities';
-import { BitcoinNetwork } from '@models/bitcoin-network';
-import { BitcoinTransaction, BitcoinTransactionVectorOutput } from '@models/bitcoin-transaction';
+import {
+  createMultisigTransaction,
+  createMultisigTransactionLegacy,
+} from '@functions/bitcoin-functions';
+import { BitcoinTransaction, BitcoinTransactionVectorOutput } from '@models/bitcoin-models';
 import { RawVault } from '@models/vault';
 import { hex } from '@scure/base';
 import { p2tr, p2tr_ns, taprootTweakPubkey } from '@scure/btc-signer';
 import { RootState } from '@store/index';
+import { Network } from 'bitcoinjs-lib';
 
 import { useEndpoints } from './use-endpoints';
 import { useEthereum } from './use-ethereum';
@@ -96,29 +100,6 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
     return closingTransactionInput;
   }
 
-  function createMultiSigTransaction(
-    publicKeyA: string,
-    publicKeyB: string,
-    vaultUUID: string,
-    bitcoinNetwork: BitcoinNetwork
-  ) {
-    const TAPROOT_UNSPENDABLE_KEY_STR =
-      '50929b74c1a04954b78b4b6035e97a5e078a5a0f28ec96d547bfee9ace803ac0';
-    const TAPROOT_UNSPENDABLE_KEY = hex.decode(TAPROOT_UNSPENDABLE_KEY_STR);
-
-    const tweakedUnspendableTaprootKey = taprootTweakPubkey(
-      TAPROOT_UNSPENDABLE_KEY,
-      Buffer.from(vaultUUID)
-    )[0];
-
-    const multisigPayment = p2tr_ns(2, [hex.decode(publicKeyA), hex.decode(publicKeyB)]);
-
-    const multisigTransaction = p2tr(tweakedUnspendableTaprootKey, multisigPayment, bitcoinNetwork);
-    multisigTransaction.tapInternalKey = tweakedUnspendableTaprootKey;
-
-    return multisigTransaction;
-  }
-
   function matchScripts(multisigScripts: Uint8Array[], outputScript: Uint8Array): boolean {
     return multisigScripts.some(
       multisigScript =>
@@ -157,7 +138,7 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
 
       // Create two MultiSig Transactions, because the User and Attestor can sign in any order
       // Create the MultiSig Transaction A
-      const multisigTransactionA = createMultiSigTransaction(
+      const multisigTransactionA = createMultisigTransactionLegacy(
         vault.taprootPubKey,
         attestorPublicKey,
         vault.uuid,
@@ -165,16 +146,23 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
       );
 
       // Create the MultiSig Transaction B
-      const multisigTransactionB = createMultiSigTransaction(
+      const multisigTransactionB = createMultisigTransactionLegacy(
         attestorPublicKey,
         vault.taprootPubKey,
         vault.uuid,
         bitcoinNetwork
       );
 
+      const multisigTransactionC = createMultisigTransaction(
+        hex.decode(vault.taprootPubKey),
+        hex.decode(attestorPublicKey),
+        vault.uuid,
+        bitcoinNetwork
+      );
+
       // Verify that the Funding Transaction's Output Script matches the expected MultiSig Script
       const acceptedScript = matchScripts(
-        [multisigTransactionA.script, multisigTransactionB.script],
+        [multisigTransactionA.script, multisigTransactionB.script, multisigTransactionC.script],
         hex.decode(closingTransactionInput.scriptpubkey)
       );
 

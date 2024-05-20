@@ -45,14 +45,13 @@ export function usePSBT(): UsePSBTReturnType {
     setBitcoinWalletType,
     setTaprootMultisigAddressInformation,
   } = useContext(BitcoinWalletContext);
+  const { bitcoinBlockchainAPIURL } = useEndpoints();
+  const { sendClosingTransactionToAttestors } = useAttestors();
 
   const { network } = useSelector((state: RootState) => state.account);
-
   const { mintStep } = useSelector((state: RootState) => state.mintunmint);
-  const { bitcoinBlockchainAPIURL } = useEndpoints();
 
   const [fundingTransaction, setFundingTransaction] = useState<btc.Transaction | undefined>();
-  const { sendClosingTransactionToAttestors } = useAttestors();
 
   async function handleSignFundingTransaction(): Promise<void> {
     try {
@@ -93,6 +92,7 @@ export function usePSBT(): UsePSBTReturnType {
         mintStep[1],
         fundingTransaction?.id
       );
+
       await sendClosingTransactionToAttestors(
         fundingTransaction?.hex,
         closingTransactionHex,

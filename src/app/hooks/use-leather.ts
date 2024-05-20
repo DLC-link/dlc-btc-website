@@ -27,13 +27,14 @@ import { useAttestors } from './use-attestors';
 import { useEndpoints } from './use-endpoints';
 import { useEthereum } from './use-ethereum';
 
-export function useLeather() {
-  const {
-    bitcoinNetwork,
-    bitcoinNetworkName,
-    bitcoinBlockchainAPIURL,
-    bitcoinBlockchainAPIFeeURL,
-  } = useEndpoints();
+export interface UseLeatherReturnType {
+  getLeatherWalletInformation: (vaultUUID: string) => Promise<void>;
+  handleFundingTransaction: (vaultUUID: string) => Promise<Transaction>;
+  handleClosingTransaction: (vaultUUID: string, fundingTransactionID: string) => Promise<string>;
+  isLoading: [boolean, string];
+}
+
+export function useLeather(): UseLeatherReturnType {
   const {
     taprootMultisigAddressInformation,
     setTaprootMultisigAddressInformation,
@@ -41,15 +42,19 @@ export function useLeather() {
     setNativeSegwitAddressInformation,
     setBitcoinWalletContextState,
   } = useContext(BitcoinWalletContext);
-
+  const {
+    bitcoinNetwork,
+    bitcoinNetworkName,
+    bitcoinBlockchainAPIURL,
+    bitcoinBlockchainAPIFeeURL,
+  } = useEndpoints();
+  const { getExtendedAttestorGroupPublicKey } = useAttestors();
   const { getRawVault } = useEthereum();
 
   const [isLoading, setIsLoading] = useState<[boolean, string]>([false, '']);
-  const { getExtendedAttestorGroupPublicKey } = useAttestors();
 
   /**
-   * Signs the PSBTs. Requests the user's wallet to sign the PSBT.
-   * Current implementation is using Leather Wallet.
+   * Requests the user's Leather Wallet to sign the PSBT.
    *
    * @param psbt - The PSBT to sign.
    * @returns A promise that resolves to the signed PSBT.
@@ -67,7 +72,7 @@ export function useLeather() {
   }
 
   /**
-   * Checks if the user's wallet is on the same network as the app.
+   * Checks if the user's Leather Wallet is on the same network as the app.
    *
    * @param userNativeSegwitAddress - The user's native segwit address.
    * @throws BitcoinError - If the user's wallet is not on the same network as the app.
@@ -98,14 +103,11 @@ export function useLeather() {
    */
   async function getBitcoinAddresses(): Promise<Address[]> {
     try {
-      setIsLoading([true, 'Connecting To Leather Wallet']);
       const rpcResponse: RpcResponse = await window.btc?.request('getAddresses');
       const userAddresses = rpcResponse.result.addresses;
-      console.log(userAddresses);
       checkUserWalletNetwork(userAddresses[0]);
       return userAddresses;
     } catch (error) {
-      setIsLoading([false, '']);
       throw new LeatherError(`Error getting bitcoin addresses: ${error}`);
     }
   }
@@ -114,33 +116,33 @@ export function useLeather() {
     return p2wpkh(Buffer.from(nativeSegwitAdress.publicKey, 'hex'), bitcoinNetwork);
   }
 
+  /**
+   * Creates a Taproot Multisig Payment using the User's Taproot Public Key, the Attestor's Public Key, and the Unspendable Public Key.
+   *
+   * @param vaultUUID - The UUID of the vault.
+   * @param userTaprootPublicKey - The user's taproot public key.
+   * @returns A promise that resolves to the Taproot Multisig Payment.
+   */
   async function getTaprootMultisigPayment(
     vaultUUID: string,
     userTaprootPublicKey: string
   ): Promise<P2TROut> {
-    console.log('vaultUUID', vaultUUID);
-    console.log('userTaprootPublicKey', userTaprootPublicKey);
     const unspendableExtendedPublicKey = getUnspendableKeyCommittedToUUID(
       vaultUUID,
       bitcoinNetwork
     );
-    console.log('unspendableExtendedPublicKey', unspendableExtendedPublicKey);
 
     const attestorExtendedPublicKey = await getExtendedAttestorGroupPublicKey();
 
-    console.log('attestorExtendedPublicKey', attestorExtendedPublicKey);
     const unspendableDerivedPublicKey = getDerivedPublicKey(
       unspendableExtendedPublicKey,
       bitcoinNetwork
     );
 
-    console.log('unspendableDerivedPublicKey', unspendableDerivedPublicKey);
-
     const attestorDerivedPublicKey = getDerivedPublicKey(attestorExtendedPublicKey, bitcoinNetwork);
 
-    console.log('unspendableDerivedPublicKey', unspendableDerivedPublicKey);
     const userTaprootPublicKeyBuffer = Buffer.from(userTaprootPublicKey, 'hex');
-    console.log('userTaprootPublicKeyBuffer', userTaprootPublicKeyBuffer);
+
     const taprootMultisigPayment = createTaprootMultisigPayment(
       unspendableDerivedPublicKey,
       attestorDerivedPublicKey,
@@ -150,6 +152,12 @@ export function useLeather() {
     return taprootMultisigPayment;
   }
 
+  /**
+   * Fetches the User's Leather Wallet Information, including the User's Native Segwit and Taproot Addresses.
+   *
+   * @param vaultUUID - The UUID of the Vault.
+   * @returns A promise that resolves to the User's Native Segwit and Taproot Addresses.
+   */
   async function getLeatherWalletInformation(vaultUUID: string): Promise<void> {
     try {
       setIsLoading([true, 'Connecting To Leather Wallet']);
@@ -190,6 +198,11 @@ export function useLeather() {
     }
   }
 
+  /**
+   * Creates the Funding Transaction and signs it with Leather Wallet.
+   * @param vaultUUID The Vault UUID.
+   * @returns The Signed Funding Transaction.
+   */
   async function handleFundingTransaction(vaultUUID: string): Promise<Transaction> {
     try {
       setIsLoading([true, 'Creating Funding Transaction']);
@@ -229,6 +242,12 @@ export function useLeather() {
     }
   }
 
+  /**
+   * Creates the Closing Transaction and signs it with Leather Wallet.
+   * @param vaultUUID The Vault UUID.
+   * @param fundingTransactionID The Funding Transaction ID.
+   * @returns The Partially Signed Closing Transaction HEX.
+   */
   async function handleClosingTransaction(
     vaultUUID: string,
     fundingTransactionID: string

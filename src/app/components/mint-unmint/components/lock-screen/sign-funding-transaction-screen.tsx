@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 import {
@@ -24,6 +24,7 @@ import {
 } from '@providers/ledger-context-provider';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { modalActions } from '@store/slices/modal/modal.actions';
+import { boxShadowAnimation } from '@styles/css-styles';
 
 import { LockScreenProtocolFee } from './components/protocol-fee';
 
@@ -41,14 +42,30 @@ export function SignFundingTransactionScreen({
   const toast = useToast();
   const dispatch = useDispatch();
 
+  const { bitcoinWalletContextState, bitcoinWalletType } = useContext(BitcoinWalletContext);
+
   const { bitcoinPrice } = useBitcoinPrice();
   const { readyVaults } = useVaults();
+  const { getLeatherWalletInformation } = useLeather();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const currentVault = readyVaults.find(vault => vault.uuid === currentStep[1]);
-  const { bitcoinWalletContextState, bitcoinWalletType } = useContext(BitcoinWalletContext);
-  const { getLeatherWalletInformation } = useLeather();
+  const [buttonText, setButtonText] = useState('Select Bitcoin Wallet');
+
+  useEffect(() => {
+    switch (bitcoinWalletContextState) {
+      case BitcoinWalletContextState.SELECT_BITCOIN_WALLET_READY:
+        setButtonText('Connect Bitcoin Wallet');
+        break;
+      case BitcoinWalletContextState.TAPROOT_MULTISIG_ADDRESS_READY:
+        setButtonText('Sign Funding Transaction');
+        break;
+      default:
+        setButtonText('Select Bitcoin Wallet');
+        break;
+    }
+  }, [bitcoinWalletContextState]);
 
   async function handleSign(currentVault?: Vault) {
     if (!currentVault) return;
@@ -109,6 +126,7 @@ export function SignFundingTransactionScreen({
           <Spinner size="xs" color="accent.lightBlue.01" />
         </HStack>
       )}
+
       <Button
         isLoading={isSubmitting}
         variant={'account'}
@@ -118,11 +136,7 @@ export function SignFundingTransactionScreen({
             : handleClick()
         }
       >
-        {bitcoinWalletContextState === BitcoinWalletContextState.INITIAL
-          ? 'Select Bitcoin Wallet'
-          : bitcoinWalletContextState === BitcoinWalletContextState.SELECT_BITCOIN_WALLET_READY
-            ? 'Connect Bitcoin Wallet'
-            : 'Sign Funding Transaction'}
+        {buttonText}
       </Button>
       <Button
         isLoading={isSubmitting}

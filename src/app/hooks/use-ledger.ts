@@ -23,7 +23,7 @@ import {
 } from '@functions/psbt-functions';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { LedgerError } from '@models/error-types';
-import { LEDGER_APPS_MAP, LedgerConnectionErrors } from '@models/ledger';
+import { LEDGER_APPS_MAP } from '@models/ledger';
 import { RawVault } from '@models/vault';
 import {
   BitcoinWalletContext,
@@ -43,13 +43,6 @@ import { useAttestors } from './use-attestors';
 import { useEndpoints } from './use-endpoints';
 import { useEthereum } from './use-ethereum';
 
-enum LedgerState {
-  INITIAL = 0,
-  LEDGER_APP_READY = 1,
-  NATIVE_SEGWIT_ADDRESS_READY = 2,
-  TAPROOT_MULTISIG_ADDRESS_READY = 3,
-}
-
 type TransportInstance = Awaited<ReturnType<typeof Transport.create>>;
 
 interface LedgerBitcoinNetworkInformation {
@@ -65,9 +58,16 @@ export interface LedgerInformation {
   rootTaprootDerivationPath: string;
 }
 
-export function useLedger() {
-  const { bitcoinNetwork, bitcoinBlockchainAPIURL, bitcoinBlockchainAPIFeeURL } = useEndpoints();
-  const { getExtendedAttestorGroupPublicKey } = useAttestors();
+export interface UseLedgerReturnType {
+  getLedgerAddressesWithBalances: (paymentType: 'wpkh' | 'tr') => Promise<[string, number][]>;
+  getNativeSegwitAccount: (nativeSegwitAddressIndex: number) => Promise<void>;
+  getTaprootMultisigAccount: (vaultUUID: string) => Promise<void>;
+  isLoading: [boolean, string];
+  handleFundingTransaction: (vaultUUID: string) => Promise<Transaction>;
+  handleClosingTransaction: (vaultUUID: string, fundingTransactionID: string) => Promise<string>;
+}
+
+export function useLedger(): UseLedgerReturnType {
   const {
     taprootMultisigAddressInformation,
     setTaprootMultisigAddressInformation,
@@ -75,16 +75,18 @@ export function useLedger() {
     setNativeSegwitAddressInformation,
     setBitcoinWalletContextState,
   } = useContext(BitcoinWalletContext);
+  const { bitcoinNetwork, bitcoinBlockchainAPIURL, bitcoinBlockchainAPIFeeURL } = useEndpoints();
+  const { getExtendedAttestorGroupPublicKey } = useAttestors();
+  const { getRawVault } = useEthereum();
+
   const [ledgerInformation, setLedgerInformation] = useState<LedgerInformation | undefined>(
     undefined
   );
-  const { getRawVault } = useEthereum();
-
   const [isLoading, setIsLoading] = useState<[boolean, string]>([false, '']);
 
   /**
-   * Gets the Bitcoin Network to use.
-   * @returns The Bitcoin Network to use.
+   * Gets the Bitcoin Network information for the Ledger.
+   * @returns The Bitcoin Network information for the Ledger.
    */
   function getLedgerBitcoinNetworkInformation(): LedgerBitcoinNetworkInformation {
     switch (bitcoinNetwork) {
@@ -105,6 +107,10 @@ export function useLedger() {
     }
   }
 
+  /**
+   * Gets the Ledger App and related information.
+   * @returns The Ledger App and related information.
+   */
   async function getLedgerAppAndInformation(): Promise<LedgerInformation> {
     try {
       const { ledgerAppName, rootNativeSegwitDerivationPath, rootTaprootDerivationPath } =
@@ -119,11 +125,15 @@ export function useLedger() {
         rootTaprootDerivationPath,
       };
     } catch (error: any) {
-      setIsLoading([false, '']);
       throw new LedgerError(`Error getting Ledger App and Information: ${error}`);
     }
   }
 
+  /**
+   * Gets the Ledger App.
+   * @param appName The name of the Ledger App.
+   * @returns The Ledger App.
+   */
   async function getLedgerApp(appName: string): Promise<AppClient> {
     const transport = await Transport.create();
     const ledgerApp = new AppClient(transport);
@@ -150,16 +160,32 @@ export function useLedger() {
     throw new LedgerError(`Could not open Ledger ${appName} App`);
   }
 
-  // Reference: https://github.com/LedgerHQ/ledger-live/blob/v22.0.1/src/hw/quitApp.ts
+  // Reference: https://github.com/LedgerHQ/ledger-live/blob/v22.0.1/src/hw/quitApp.ts\
+  /**
+   * Quits the Ledger App.
+   * @param transport The Ledger Transport.
+   * @returns A Promise that resolves when the Ledger App is quit.
+   */
   async function quitApp(transport: TransportInstance): Promise<void> {
     await transport.send(0xb0, 0xa7, 0x00, 0x00);
   }
 
   // Reference: https://github.com/LedgerHQ/ledger-live/blob/v22.0.1/src/hw/openApp.ts
+  /**
+   * Opens the Ledger App.
+   * @param transport The Ledger Transport.
+   * @param name The name of the Ledger App.
+   * @returns A Promise that resolves when the Ledger App is opened.
+   */
   async function openApp(transport: TransportInstance, name: string): Promise<void> {
     await transport.send(0xe0, 0xd8, 0x00, 0x00, Buffer.from(name, 'ascii'));
   }
 
+  /**
+   * Gets the Ledger Addresses with Balances.
+   * @param paymentType The Payment Type.
+   * @returns The Ledger Addresses with Balances.
+   */
   async function getLedgerAddressesWithBalances(
     paymentType: 'wpkh' | 'tr'
   ): Promise<[string, number][]> {
@@ -209,8 +235,14 @@ export function useLedger() {
     }
   }
 
+  /**
+   * Gets the derived Native Segwit Account by the Native Segwit Address Index.
+   * @param nativeSegwitAddressIndex The Native Segwit Address Index.
+   * @returns A Promise that resolves when the Native Segwit Account is retrieved.
+   */
   async function getNativeSegwitAccount(nativeSegwitAddressIndex: number): Promise<void> {
     try {
+      setIsLoading([true, 'Retrieving Native Segwit Account']);
       let currentLedgerInformation: LedgerInformation | undefined;
       if (!ledgerInformation) {
         currentLedgerInformation = await getLedgerAppAndInformation();
@@ -277,8 +309,14 @@ export function useLedger() {
     }
   }
 
+  /**
+   * Gets the Taproot Multisig Account, using the User's Public Key, th Attetor's Public Key, and the Unspendable Public Key.
+   * @param vaultUUID The Vault UUID.
+   * @returns A Promise that resolves when the Taproot Multisig Account is retrieved.
+   */
   async function getTaprootMultisigAccount(vaultUUID: string): Promise<void> {
     try {
+      setIsLoading([true, 'Creating Taproot Multisig Account Policy']);
       let currentLedgerInformation: LedgerInformation | undefined;
       if (!ledgerInformation) {
         currentLedgerInformation = await getLedgerAppAndInformation();
@@ -347,7 +385,7 @@ export function useLedger() {
       );
 
       if (taprootMultisigAddress !== taprootMultisigPayment.address) {
-        throw new Error(`ecreated Multisig Address does not match the Ledger Multisig Address`);
+        throw new Error(`Recreated Multisig Address does not match the Ledger Multisig Address`);
       }
 
       setTaprootMultisigAddressInformation({
@@ -363,6 +401,12 @@ export function useLedger() {
       throw new LedgerError(`Error getting Taproot Multisig Account: ${error}`);
     }
   }
+
+  /**
+   * Creates the Funding Transaction and signs it with the Ledger Device.
+   * @param vaultUUID The Vault UUID.
+   * @returns The Signed Funding Transaction.
+   */
   async function handleFundingTransaction(vaultUUID: string): Promise<Transaction> {
     try {
       setIsLoading([true, 'Creating Funding Transaction']);
@@ -443,6 +487,12 @@ export function useLedger() {
     }
   }
 
+  /**
+   * Creates the Closing Transaction and signs it with the Ledger Device.
+   * @param vaultUUID The Vault UUID.
+   * @param fundingTransactionID The Funding Transaction ID.
+   * @returns The Partially Signed Closing Transaction HEX.
+   */
   async function handleClosingTransaction(
     vaultUUID: string,
     fundingTransactionID: string
