@@ -1,5 +1,6 @@
 /** @format */
 import { useContext, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 import { delay, easyTruncateAddress } from '@common/utilities';
 import {
@@ -28,8 +29,9 @@ import { RawVault } from '@models/vault';
 import {
   BitcoinWalletContext,
   BitcoinWalletContextState,
-} from '@providers/ledger-context-provider';
+} from '@providers/bitcoin-wallet-context-provider';
 import { Transaction, p2wpkh } from '@scure/btc-signer';
+import { RootState } from '@store/index';
 import { Psbt } from 'bitcoinjs-lib';
 import { bitcoin, testnet } from 'bitcoinjs-lib/src/networks';
 import { AppClient, DefaultWalletPolicy, WalletPolicy } from 'ledger-bitcoin';
@@ -39,7 +41,6 @@ import {
   TAPROOT_DERIVATION_PATH,
 } from '@shared/constants/bitcoin-constants';
 
-import { useAttestors } from './use-attestors';
 import { useEndpoints } from './use-endpoints';
 import { useEthereum } from './use-ethereum';
 
@@ -51,14 +52,14 @@ interface LedgerBitcoinNetworkInformation {
   rootTaprootDerivationPath: string;
 }
 
-export interface LedgerInformation {
+interface LedgerInformation {
   ledgerApp: AppClient;
   masterFingerprint: string;
   rootNativeSegwitDerivationPath: string;
   rootTaprootDerivationPath: string;
 }
 
-export interface UseLedgerReturnType {
+interface UseLedgerReturnType {
   getLedgerAddressesWithBalances: (paymentType: 'wpkh' | 'tr') => Promise<[string, number][]>;
   getNativeSegwitAccount: (nativeSegwitAddressIndex: number) => Promise<void>;
   getTaprootMultisigAccount: (vaultUUID: string) => Promise<void>;
@@ -76,8 +77,10 @@ export function useLedger(): UseLedgerReturnType {
     setBitcoinWalletContextState,
   } = useContext(BitcoinWalletContext);
   const { bitcoinNetwork, bitcoinBlockchainAPIURL, bitcoinBlockchainAPIFeeURL } = useEndpoints();
-  const { getExtendedAttestorGroupPublicKey } = useAttestors();
+  const { getAttestorGroupPublicKey } = useEthereum();
   const { getRawVault } = useEthereum();
+
+  const { network } = useSelector((state: RootState) => state.account);
 
   const [ledgerInformation, setLedgerInformation] = useState<LedgerInformation | undefined>(
     undefined
@@ -135,25 +138,31 @@ export function useLedger(): UseLedgerReturnType {
    * @returns The Ledger App.
    */
   async function getLedgerApp(appName: string): Promise<AppClient> {
+    setIsLoading([true, `Opening Ledger ${appName} App`]);
     const transport = await Transport.create();
     const ledgerApp = new AppClient(transport);
     const appAndVersion = await ledgerApp.getAppAndVersion();
 
     if (appAndVersion.name === appName) {
+      setIsLoading([false, '']);
       return new AppClient(transport);
     }
 
     if (appAndVersion.name === LEDGER_APPS_MAP.MAIN_MENU) {
+      setIsLoading([true, `Open ${appName} App on your Ledger Device`]);
       await openApp(transport, appName);
       await delay(1500);
+      setIsLoading([false, '']);
       return new AppClient(await Transport.create());
     }
 
     if (appAndVersion.name !== appName) {
       await quitApp(await Transport.create());
       await delay(1500);
+      setIsLoading([true, `Open ${appName} App on your Ledger Device`]);
       await openApp(await Transport.create(), appName);
       await delay(1500);
+      setIsLoading([false, '']);
       return new AppClient(await Transport.create());
     }
 
@@ -190,7 +199,7 @@ export function useLedger(): UseLedgerReturnType {
     paymentType: 'wpkh' | 'tr'
   ): Promise<[string, number][]> {
     try {
-      setIsLoading([true, 'Loading Native Segwit Adresses']);
+      setIsLoading([true, 'Loading Ledger App and Information']);
       const currentLedgerInformation = await getLedgerAppAndInformation();
       if (!currentLedgerInformation) {
         throw new LedgerError(`Ledger Information is not available`);
@@ -206,6 +215,7 @@ export function useLedger(): UseLedgerReturnType {
       const indices = [0, 1, 2, 3, 4]; // Replace with your actual indices
       const addresses = [];
 
+      setIsLoading([true, 'Loading Native Segwit Adresses']);
       for (const index of indices) {
         const derivationPath = `${paymentType === 'wpkh' ? rootNativeSegwitDerivationPath : rootTaprootDerivationPath}/${index}'`;
         const extendedPublicKey = await ledgerApp.getExtendedPubkey(`m${derivationPath}`);
@@ -337,7 +347,7 @@ export function useLedger(): UseLedgerReturnType {
         bitcoinNetwork
       );
 
-      const attestorExtendedPublicKey = await getExtendedAttestorGroupPublicKey();
+      const attestorExtendedPublicKey = await getAttestorGroupPublicKey(network);
 
       // ==> Create Key Info
       const ledgerKeyInfo = `[${masterFingerprint}/${derivationPath}]${ledgerExtendedPublicKey}`;
@@ -352,6 +362,7 @@ export function useLedger(): UseLedgerReturnType {
       setIsLoading([true, 'Accept Multisig Wallet Policy On Your Device']);
 
       // ==> Register Wallet
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const [_, taprootMultisigPolicyHMac] = await ledgerApp.registerWallet(
         taprootMultisigAccountPolicy
       );

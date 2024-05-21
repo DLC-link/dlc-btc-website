@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { HStack, Menu, MenuButton, MenuItem, MenuList, ScaleFade, Text } from '@chakra-ui/react';
+import { Menu, MenuButton, MenuList, SlideFade, Text } from '@chakra-ui/react';
 
 import { LedgerModalSelectAddressMenuItem } from './components/ledger-modal-select-address-menu-item';
 
@@ -30,7 +30,7 @@ export function LedgerModalSelectAddressMenu({
   }, [nativeSegwitAddresses, isLoading, error, isSuccesful]);
 
   return (
-    <ScaleFade in={showComponent} transition={{ enter: { delay: 0.25 } }} unmountOnExit>
+    <SlideFade in={showComponent} transition={{ enter: { delay: 0.25 } }} unmountOnExit>
       <Menu variant={'ledgerAddress'}>
         <MenuButton>
           <Text>Select Native Segwit Address</Text>
@@ -50,6 +50,6 @@ export function LedgerModalSelectAddressMenu({
           })}
         </MenuList>
       </Menu>
-    </ScaleFade>
+    </SlideFade>
   );
 }

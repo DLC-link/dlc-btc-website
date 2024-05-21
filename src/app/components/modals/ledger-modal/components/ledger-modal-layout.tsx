@@ -33,9 +33,7 @@ export function LedgerModalLayout({
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <VStack spacing={25} h={'150px'}>
-            {children}
-          </VStack>
+          <VStack spacing={25}>{children}</VStack>
         </ModalBody>
       </ModalContent>
     </Modal>

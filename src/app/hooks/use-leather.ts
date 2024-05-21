@@ -1,4 +1,5 @@
 import { useContext, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 import {
   createTaprootMultisigPayment,
@@ -20,14 +21,14 @@ import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
 import {
   BitcoinWalletContext,
   BitcoinWalletContextState,
-} from '@providers/ledger-context-provider';
+} from '@providers/bitcoin-wallet-context-provider';
 import { P2Ret, P2TROut, Transaction, p2wpkh } from '@scure/btc-signer';
+import { RootState } from '@store/index';
 
-import { useAttestors } from './use-attestors';
 import { useEndpoints } from './use-endpoints';
 import { useEthereum } from './use-ethereum';
 
-export interface UseLeatherReturnType {
+interface UseLeatherReturnType {
   getLeatherWalletInformation: (vaultUUID: string) => Promise<void>;
   handleFundingTransaction: (vaultUUID: string) => Promise<Transaction>;
   handleClosingTransaction: (vaultUUID: string, fundingTransactionID: string) => Promise<string>;
@@ -48,8 +49,10 @@ export function useLeather(): UseLeatherReturnType {
     bitcoinBlockchainAPIURL,
     bitcoinBlockchainAPIFeeURL,
   } = useEndpoints();
-  const { getExtendedAttestorGroupPublicKey } = useAttestors();
+  const { getAttestorGroupPublicKey } = useEthereum();
   const { getRawVault } = useEthereum();
+
+  const { network } = useSelector((state: RootState) => state.account);
 
   const [isLoading, setIsLoading] = useState<[boolean, string]>([false, '']);
 
@@ -132,7 +135,7 @@ export function useLeather(): UseLeatherReturnType {
       bitcoinNetwork
     );
 
-    const attestorExtendedPublicKey = await getExtendedAttestorGroupPublicKey();
+    const attestorExtendedPublicKey = await getAttestorGroupPublicKey(network);
 
     const unspendableDerivedPublicKey = getDerivedPublicKey(
       unspendableExtendedPublicKey,

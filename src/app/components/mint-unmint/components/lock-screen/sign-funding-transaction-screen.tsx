@@ -1,30 +1,20 @@
 import { useContext, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
-import {
-  Button,
-  HStack,
-  Image,
-  ScaleFade,
-  Spinner,
-  Text,
-  VStack,
-  useToast,
-} from '@chakra-ui/react';
+import { Button, HStack, Spinner, Text, VStack, useToast } from '@chakra-ui/react';
 import { VaultCard } from '@components/vault/vault-card';
 import { useBitcoinPrice } from '@hooks/use-bitcoin-price';
 import { useLeather } from '@hooks/use-leather';
 import { useVaults } from '@hooks/use-vaults';
 import { BitcoinError } from '@models/error-types';
 import { Vault } from '@models/vault';
-import { BitcoinWalletType, bitcoinWallets } from '@models/wallet';
+import { BitcoinWalletType } from '@models/wallet';
 import {
   BitcoinWalletContext,
   BitcoinWalletContextState,
-} from '@providers/ledger-context-provider';
+} from '@providers/bitcoin-wallet-context-provider';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { modalActions } from '@store/slices/modal/modal.actions';
-import { boxShadowAnimation } from '@styles/css-styles';
 
 import { LockScreenProtocolFee } from './components/protocol-fee';
 
@@ -47,6 +37,7 @@ export function SignFundingTransactionScreen({
   const { bitcoinPrice } = useBitcoinPrice();
   const { readyVaults } = useVaults();
   const { getLeatherWalletInformation } = useLeather();
+  const { resetBitcoinWalletContext } = useContext(BitcoinWalletContext);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -90,18 +81,30 @@ export function SignFundingTransactionScreen({
   }
 
   async function handleClick() {
+    setIsSubmitting(true);
     switch (bitcoinWalletContextState) {
       case BitcoinWalletContextState.SELECT_BITCOIN_WALLET_READY:
         if (bitcoinWalletType === BitcoinWalletType.Ledger) {
           dispatch(modalActions.toggleLedgerModalVisibility());
         } else {
-          await getLeatherWalletInformation(currentStep[1]);
+          try {
+            await getLeatherWalletInformation(currentStep[1]);
+          } catch (error: any) {
+            toast({
+              title: 'Failed to sign transaction',
+              description: error.message,
+              status: 'error',
+              duration: 9000,
+              isClosable: true,
+            });
+          }
         }
         break;
       default:
         dispatch(modalActions.toggleSelectBitcoinWalletModalVisibility());
         break;
     }
+    setIsSubmitting(false);
   }
 
   return (
@@ -141,7 +144,10 @@ export function SignFundingTransactionScreen({
       <Button
         isLoading={isSubmitting}
         variant={'navigate'}
-        onClick={() => dispatch(mintUnmintActions.setMintStep([0, '']))}
+        onClick={() => {
+          resetBitcoinWalletContext();
+          dispatch(mintUnmintActions.setMintStep([0, '']));
+        }}
       >
         Cancel
       </Button>

@@ -29,7 +29,6 @@ export const modalSlice = createSlice({
       state.isSelectBitcoinWalletModalOpen = !state.isSelectBitcoinWalletModalOpen;
     },
     toggleLedgerModalVisibility: state => {
-      console.log('toggleLedgerModalVisibility');
       state.isLedgerModalOpen = !state.isLedgerModalOpen;
     },
   },

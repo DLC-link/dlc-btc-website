@@ -7,7 +7,7 @@ import { BitcoinWalletType, bitcoinWallets } from '@models/wallet';
 import {
   BitcoinWalletContext,
   BitcoinWalletContextState,
-} from '@providers/ledger-context-provider';
+} from '@providers/bitcoin-wallet-context-provider';
 
 import { SelectBitcoinWalletMenu } from './components/select-bitcoin-wallet-modal-menu';
 

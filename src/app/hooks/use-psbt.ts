@@ -5,10 +5,7 @@ import { broadcastTransaction } from '@functions/bitcoin-functions';
 import { BitcoinError } from '@models/error-types';
 import { Vault } from '@models/vault';
 import { BitcoinWalletType } from '@models/wallet';
-import {
-  BitcoinWalletContext,
-  BitcoinWalletContextState,
-} from '@providers/ledger-context-provider';
+import { BitcoinWalletContext } from '@providers/bitcoin-wallet-context-provider';
 import * as btc from '@scure/btc-signer';
 import { RootState } from '@store/index';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
@@ -37,14 +34,8 @@ export function usePSBT(): UsePSBTReturnType {
     handleClosingTransaction: handleClosingTransactionWithLeather,
     isLoading: isLeatherLoading,
   } = useLeather();
-  const {
-    bitcoinWalletType,
-    nativeSegwitAddressInformation,
-    setBitcoinWalletContextState,
-    setNativeSegwitAddressInformation,
-    setBitcoinWalletType,
-    setTaprootMultisigAddressInformation,
-  } = useContext(BitcoinWalletContext);
+  const { bitcoinWalletType, nativeSegwitAddressInformation, resetBitcoinWalletContext } =
+    useContext(BitcoinWalletContext);
   const { bitcoinBlockchainAPIURL } = useEndpoints();
   const { sendClosingTransactionToAttestors } = useAttestors();
 
@@ -111,10 +102,7 @@ export function usePSBT(): UsePSBTReturnType {
       );
 
       dispatch(mintUnmintActions.setMintStep([3, mintStep[1]]));
-      setBitcoinWalletType(undefined);
-      setBitcoinWalletContextState(BitcoinWalletContextState.INITIAL);
-      setNativeSegwitAddressInformation(undefined);
-      setTaprootMultisigAddressInformation(undefined);
+      resetBitcoinWalletContext();
     } catch (error) {
       throw new BitcoinError(`Error signing Closing Transaction: ${error}`);
     }

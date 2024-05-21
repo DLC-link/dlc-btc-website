@@ -10,9 +10,7 @@ import {
 import { BitcoinTransaction, BitcoinTransactionVectorOutput } from '@models/bitcoin-models';
 import { RawVault } from '@models/vault';
 import { hex } from '@scure/base';
-import { p2tr, p2tr_ns, taprootTweakPubkey } from '@scure/btc-signer';
 import { RootState } from '@store/index';
-import { Network } from 'bitcoinjs-lib';
 
 import { useEndpoints } from './use-endpoints';
 import { useEthereum } from './use-ethereum';

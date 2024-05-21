@@ -9,7 +9,6 @@ interface UseAttestorsReturnType {
     uuid: string,
     userNativeSegwitAddress: string
   ) => Promise<void>;
-  getExtendedAttestorGroupPublicKey: () => Promise<string>;
 }
 
 export function useAttestors(): UseAttestorsReturnType {
@@ -47,25 +46,7 @@ export function useAttestors(): UseAttestorsReturnType {
     }
   }
 
-  async function getExtendedAttestorGroupPublicKey(): Promise<string> {
-    try {
-      const attestorExtendedPublicKeyEndpoint = `${attestorAPIURLs[0]}/tss/get-extended-group-publickey`;
-      const response = await fetch(attestorExtendedPublicKeyEndpoint);
-
-      if (!response.ok) {
-        throw new Error(`Failed to get Extended Attestor Group Public Key: ${response.statusText}`);
-      }
-
-      const extendedAttestorGroupPublicKey = await response.text();
-
-      return extendedAttestorGroupPublicKey;
-    } catch (error) {
-      throw new AttestorError(`Error getting Extended Attestor Group Public Key: ${error}`);
-    }
-  }
-
   return {
     sendClosingTransactionToAttestors,
-    getExtendedAttestorGroupPublicKey,
   };
 }

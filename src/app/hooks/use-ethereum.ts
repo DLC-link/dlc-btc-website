@@ -130,8 +130,6 @@ export function useEthereum(): UseEthereumReturnType {
       if (!observerProtocolContract) throw new Error('Protocol contract not initialized');
       await observerProtocolContract.callStatic.getAllVaultsForAddress(address);
       const vaults: RawVault[] = await observerProtocolContract.getAllVaultsForAddress(address);
-      console.log(vaults[0].btcMintFeeBasisPoints.toNumber());
-      console.log(vaults[0].valueLocked.toNumber());
       const formattedVaults: Vault[] = vaults.map(formatVault);
       if (!network) return;
       store.dispatch(

@@ -11,14 +11,14 @@ export interface BitcoinTaprootAddress extends BitcoinNativeSegwitAddress {
   tweakedPublicKey: string;
 }
 
-export interface StacksAddress {
+interface StacksAddress {
   address: string;
   symbol: string;
 }
 
 export type Address = BitcoinNativeSegwitAddress | BitcoinTaprootAddress | StacksAddress;
 
-export interface RpcResult {
+interface RpcResult {
   addresses: Address[];
 }
 

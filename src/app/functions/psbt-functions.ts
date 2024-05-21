@@ -150,6 +150,7 @@ export async function updateNativeSegwitInputs(
   try {
     await addNativeSegwitUTXOLedgerProps(psbt, inputsToUpdate, bitcoinBlockchainAPIURL);
   } catch (e) {
+    // eslint-disable-next-line no-console
     console.error('Error adding UTXO Ledger Props:', e);
   }
 
@@ -172,9 +173,12 @@ export async function updateNativeSegwitInputs(
 export function getNativeSegwitInputsToSign(
   inputByPaymentType: [BitcoinInputSigningConfig, PaymentTypes][]
 ): BitcoinInputSigningConfig[] {
-  return inputByPaymentType
-    .filter(([_, paymentType]) => paymentType === 'p2wpkh')
-    .map(([index]) => index);
+  return (
+    inputByPaymentType
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      .filter(([_, paymentType]) => paymentType === 'p2wpkh')
+      .map(([index]) => index)
+  );
 }
 
 /**
@@ -217,9 +221,12 @@ export async function updateTaprootInputs(
 export function getTaprootInputsToSign(
   inputByPaymentType: [BitcoinInputSigningConfig, PaymentTypes][]
 ): BitcoinInputSigningConfig[] {
-  return inputByPaymentType
-    .filter(([_, paymentType]) => paymentType === 'p2tr')
-    .map(([index]) => index);
+  return (
+    inputByPaymentType
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      .filter(([_, paymentType]) => paymentType === 'p2tr')
+      .map(([index]) => index)
+  );
 }
 
 /**
@@ -228,7 +235,7 @@ export function getTaprootInputsToSign(
  * @param psbt - The PSBT to update.
  * @returns The updated PSBT.
  */
-export async function addNativeSegwitUTXOLedgerProps(
+async function addNativeSegwitUTXOLedgerProps(
   psbt: Psbt,
   inputSigningConfiguration: BitcoinInputSigningConfig[],
   bitcoinBlockchainAPIURL: string
@@ -258,7 +265,7 @@ export async function addNativeSegwitUTXOLedgerProps(
  * @param inputSigningConfiguration - An array of BitcoinInputSigningConfig objects.
  * @returns The updated PSBT.
  */
-export async function addNativeSegwitBip32Derivation(
+async function addNativeSegwitBip32Derivation(
   psbt: Psbt,
   masterFingerPrint: string,
   nativeSegwitPublicKey: Buffer,

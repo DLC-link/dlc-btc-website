@@ -59,9 +59,16 @@ export function createTaprootMultisigPayment(
   userDerivedPublicKey: Buffer,
   bitcoinNetwork: Network
 ): P2TROut {
+  const attestorDerivedPublicKeyFormatted =
+    attestorDerivedPublicKey.length === 32
+      ? attestorDerivedPublicKey
+      : attestorDerivedPublicKey.subarray(1);
+  const userDerivedPublicKeyFormatted =
+    userDerivedPublicKey.length === 32 ? userDerivedPublicKey : userDerivedPublicKey.subarray(1);
+
   const taprootMultiLeafWallet = p2tr_ns(2, [
-    attestorDerivedPublicKey.subarray(1),
-    userDerivedPublicKey.subarray(1),
+    attestorDerivedPublicKeyFormatted,
+    userDerivedPublicKeyFormatted,
   ]);
 
   return p2tr(unspendableDerivedPublicKey.subarray(1), taprootMultiLeafWallet, bitcoinNetwork);
@@ -227,7 +234,7 @@ export function createMultisigTransactionLegacy(
   publicKeyB: string,
   vaultUUID: string,
   bitcoinNetwork: Network
-) {
+): P2TROut {
   const TAPROOT_UNSPENDABLE_KEY_STR =
     '50929b74c1a04954b78b4b6035e97a5e078a5a0f28ec96d547bfee9ace803ac0';
   const TAPROOT_UNSPENDABLE_KEY = hex.decode(TAPROOT_UNSPENDABLE_KEY_STR);
@@ -301,7 +308,7 @@ export function getUnspendableKeyCommittedToUUID(
  * @param input - The Input.
  * @param bitcoinNetwork - The Bitcoin Network to use.
  */
-export function getInputPaymentType(
+function getInputPaymentType(
   index: number,
   input: TransactionInput,
   bitcoinNetwork: Network
@@ -330,7 +337,7 @@ export function getInputPaymentType(
  * @param input - The Input.
  * @param bitcoinNetwork - The Bitcoin Network to use.
  */
-export function getBitcoinInputAddress(
+function getBitcoinInputAddress(
   index: number,
   input: TransactionInput,
   bitcoinNetwork: Network
@@ -347,7 +354,7 @@ export function getBitcoinInputAddress(
  * @param script - The Output Script.
  * @param bitcoinNetwork - The Bitcoin Network to use.
  */
-export function getAddressFromOutScript(script: Uint8Array, bitcoinNetwork: Network): string {
+function getAddressFromOutScript(script: Uint8Array, bitcoinNetwork: Network): string {
   const outputScript = OutScript.decode(script);
 
   switch (outputScript.type) {

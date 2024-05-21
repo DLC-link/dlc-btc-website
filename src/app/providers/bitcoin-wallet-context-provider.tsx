@@ -12,14 +12,14 @@ export enum BitcoinWalletContextState {
   TAPROOT_MULTISIG_ADDRESS_READY = 3,
 }
 
-export interface TaprootMultisigAddressInformation {
+interface TaprootMultisigAddressInformation {
   taprootMultisigPayment: P2TROut;
   userTaprootMultisigDerivedPublicKey: Buffer;
   taprootMultisigAccountPolicy?: WalletPolicy;
   taprootMultisigPolicyHMac?: Buffer;
 }
 
-export interface NativeSegwitAddressInformation {
+interface NativeSegwitAddressInformation {
   nativeSegwitPayment: P2Ret;
   nativeSegwitDerivedPublicKey: Buffer;
   nativeSegwitAccountPolicy?: DefaultWalletPolicy;
@@ -38,6 +38,7 @@ interface BitcoinWalletContextProviderType {
   setNativeSegwitAddressInformation: React.Dispatch<
     React.SetStateAction<NativeSegwitAddressInformation | undefined>
   >;
+  resetBitcoinWalletContext: () => void;
 }
 
 export const BitcoinWalletContext = createContext<BitcoinWalletContextProviderType>({
@@ -49,6 +50,7 @@ export const BitcoinWalletContext = createContext<BitcoinWalletContextProviderTy
   setTaprootMultisigAddressInformation: () => {},
   nativeSegwitAddressInformation: undefined,
   setNativeSegwitAddressInformation: () => {},
+  resetBitcoinWalletContext: () => {},
 });
 
 export function BitcoinWalletContextProvider({ children }: HasChildren): React.JSX.Element {
@@ -64,6 +66,13 @@ export function BitcoinWalletContextProvider({ children }: HasChildren): React.J
     NativeSegwitAddressInformation | undefined
   >(undefined);
 
+  function resetBitcoinWalletContext() {
+    setBitcoinWalletContextState(BitcoinWalletContextState.INITIAL);
+    setBitcoinWalletType(undefined);
+    setTaprootMultisigAddressInformation(undefined);
+    setNativeSegwitAddressInformation(undefined);
+  }
+
   return (
     <BitcoinWalletContext.Provider
       value={{
@@ -75,6 +84,7 @@ export function BitcoinWalletContextProvider({ children }: HasChildren): React.J
         setTaprootMultisigAddressInformation,
         nativeSegwitAddressInformation,
         setNativeSegwitAddressInformation,
+        resetBitcoinWalletContext,
       }}
     >
       {children}

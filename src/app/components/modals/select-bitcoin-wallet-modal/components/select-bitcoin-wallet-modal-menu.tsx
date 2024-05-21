@@ -1,5 +1,5 @@
 import { Button, HStack, Image, Text } from '@chakra-ui/react';
-import { BitcoinWallet, BitcoinWalletType, Wallet, WalletType } from '@models/wallet';
+import { BitcoinWallet, BitcoinWalletType } from '@models/wallet';
 
 interface SelectBitcoinWalletMenuProps {
   wallet: BitcoinWallet;
