@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
-import { BitcoinNetwork, bitcoin, regtest, testnet } from '@models/bitcoin-network';
 import { EthereumNetwork, EthereumNetworkID, ethereumNetworks } from '@models/ethereum-network';
 import { RootState } from '@store/index';
+import { Network } from 'bitcoinjs-lib';
+import { bitcoin, regtest, testnet } from 'bitcoinjs-lib/src/networks';
 
 interface NetworkEndpoints {
   attestorAPIURLs: string[];
@@ -13,7 +14,7 @@ interface NetworkEndpoints {
   bitcoinExplorerAPIURL: string;
   bitcoinBlockchainAPIURL: string;
   bitcoinBlockchainAPIFeeURL: string;
-  bitcoinNetwork: BitcoinNetwork;
+  bitcoinNetwork: Network;
   bitcoinNetworkName: string;
 }
 
@@ -36,7 +37,7 @@ export function useEndpoints(): NetworkEndpoints {
   const [bitcoinBlockchainAPIFeeURL, setbitcoinBlockchainAPIFeeURL] = useState<string>('');
   const [enabledEthereumNetworks, setEnabledEthereumNetworks] = useState<EthereumNetwork[]>([]);
 
-  const [bitcoinNetwork, setBitcoinNetwork] = useState<BitcoinNetwork>(regtest);
+  const [bitcoinNetwork, setBitcoinNetwork] = useState<Network>(regtest);
   const [bitcoinNetworkName, setBitcoinNetworkName] = useState<string>('');
 
   useEffect(() => {
@@ -79,7 +80,7 @@ export function useEndpoints(): NetworkEndpoints {
     const bitcoinBlockchainAPIURL = import.meta.env.VITE_BITCOIN_BLOCKCHAIN_API_URL;
     const bitcoinExplorerAPIURL = import.meta.env.VITE_BITCOIN_EXPLORER_API_URL;
 
-    let bitcoinNetwork: BitcoinNetwork;
+    let bitcoinNetwork: Network;
     let bitcoinBlockchainAPIFeeURL: string;
 
     switch (bitcoinNetworkName) {

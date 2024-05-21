@@ -1,6 +1,7 @@
 import { amber, falconX, galaxy } from '@models/merchant';
 
 // @ts-expect-error: ignoring because of later implementation
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const exampleMerchantTableItems = [
   {
     dlcBTCAmount: 15,

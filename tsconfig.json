@@ -5,6 +5,7 @@
       "@store/*": ["app/store/*"],
       "@components/*": ["app/components/*"],
       "@models/*": ["shared/models/*"],
+      "@functions/*": ["app/functions/*"],
       "@common/*": ["app/common/*"],
       "@pages/*": ["app/pages/*"],
       "@shared/*": ["shared/*"],

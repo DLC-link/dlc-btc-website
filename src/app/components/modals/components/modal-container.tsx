@@ -5,6 +5,8 @@ import { AnyAction } from '@reduxjs/toolkit';
 import { RootState } from '@store/index';
 import { modalActions } from '@store/slices/modal/modal.actions';
 
+import { LedgerModal } from '../ledger-modal/ledger-modal';
+import { SelectBitcoinWalletModal } from '../select-bitcoin-wallet-modal/select-bitcoin-wallet-modal';
 import { SuccessfulFlowModal } from '../successful-flow-modal/successful-flow-modal';
 
 export interface ModalComponentProps {
@@ -14,9 +16,12 @@ export interface ModalComponentProps {
 
 export function ModalContainer(): React.JSX.Element {
   const dispatch = useDispatch();
-  const { isSelectWalletModalOpen, isSuccesfulFlowModalOpen } = useSelector(
-    (state: RootState) => state.modal
-  );
+  const {
+    isSelectWalletModalOpen,
+    isSuccesfulFlowModalOpen,
+    isSelectBitcoinWalletModalOpen,
+    isLedgerModalOpen,
+  } = useSelector((state: RootState) => state.modal);
 
   const handleClosingModal = (actionCreator: () => AnyAction) => {
     dispatch(actionCreator());
@@ -35,6 +40,16 @@ export function ModalContainer(): React.JSX.Element {
         }
         flow={isSuccesfulFlowModalOpen[1]}
         vaultUUID={isSuccesfulFlowModalOpen[2] ? isSuccesfulFlowModalOpen[2] : ''}
+      />
+      <SelectBitcoinWalletModal
+        isOpen={isSelectBitcoinWalletModalOpen}
+        handleClose={() =>
+          handleClosingModal(modalActions.toggleSelectBitcoinWalletModalVisibility)
+        }
+      />
+      <LedgerModal
+        isOpen={isLedgerModalOpen}
+        handleClose={() => handleClosingModal(modalActions.toggleLedgerModalVisibility)}
       />
     </>
   );

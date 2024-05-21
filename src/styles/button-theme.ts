@@ -98,7 +98,19 @@ const wallet = defineStyle({
   },
 });
 
+const ledger = defineStyle({
+  p: '10px',
+  h: '50px',
+  w: '375px',
+  bg: 'transparent',
+  border: '1.5px solid',
+  borderColor: 'white.01',
+  _hover: {
+    bgColor: 'white.03',
+  },
+});
+
 export const buttonTheme = defineStyleConfig({
   baseStyle: basestyle,
-  variants: { tab, company, wallet, account, vault, navigate, merchantHistory },
+  variants: { tab, company, wallet, account, vault, navigate, merchantHistory, ledger },
 });

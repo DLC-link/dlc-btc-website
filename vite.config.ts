@@ -1,10 +1,14 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
+import wasm from 'vite-plugin-wasm';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), wasm()],
+  build: {
+    target: 'esnext',
+  },
   resolve: {
     alias: [{ 
       find: "@store", 
@@ -17,6 +21,10 @@ export default defineConfig({
     { 
       find: "@models", 
       replacement: resolve(__dirname, './src/shared/models') 
+    },
+    {
+      find: "@functions",
+      replacement: resolve(__dirname, './src/app/functions')
     },
     { 
       find: "@common", 
