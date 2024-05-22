@@ -58,18 +58,17 @@ function getXOnlyPublicKey(publicKey: Buffer): Buffer {
  */
 export function createTaprootMultisigPayment(
   unspendableDerivedPublicKey: Buffer,
-  attestorDerivedPublicKey: Buffer,
-  userDerivedPublicKey: Buffer,
+  publicKeyA: Buffer,
+  publicKeyB: Buffer,
   bitcoinNetwork: Network
 ): P2TROut {
-  const attestorDerivedPublicKeyFormatted = getXOnlyPublicKey(attestorDerivedPublicKey);
-  const userDerivedPublicKeyFormatted = getXOnlyPublicKey(userDerivedPublicKey);
   const unspendableDerivedPublicKeyFormatted = getXOnlyPublicKey(unspendableDerivedPublicKey);
+  const publicKeyAFormatted = getXOnlyPublicKey(publicKeyA);
+  const publicKeyBFormatted = getXOnlyPublicKey(publicKeyB);
 
-  const taprootMultiLeafWallet = p2tr_ns(2, [
-    attestorDerivedPublicKeyFormatted,
-    userDerivedPublicKeyFormatted,
-  ]);
+  const sortedPublicKeys = [publicKeyAFormatted, publicKeyBFormatted].sort();
+
+  const taprootMultiLeafWallet = p2tr_ns(2, sortedPublicKeys);
 
   return p2tr(unspendableDerivedPublicKeyFormatted, taprootMultiLeafWallet, bitcoinNetwork);
 }
