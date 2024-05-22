@@ -1,6 +1,5 @@
 /** @format */
 import { createRangeFromLength, isDefined, isUndefined, unshiftValue } from '@common/utilities';
-import { hexToBytes } from '@noble/hashes/utils';
 import { hex } from '@scure/base';
 import {
   Address,
@@ -45,6 +44,10 @@ export function getDerivedPublicKey(extendedPublicKey: string, bitcoinNetwork: N
   return bip32.fromBase58(extendedPublicKey, bitcoinNetwork).derivePath('0/0').publicKey;
 }
 
+function getXOnlyPublicKey(publicKey: Buffer): Buffer {
+  return publicKey.length === 32 ? publicKey : publicKey.subarray(1);
+}
+
 /**
  * Creates a Taproot Multisig Payment.
  * @param unspendableDerivedPublicKey - The Unspendable Derived Public Key.
@@ -59,19 +62,16 @@ export function createTaprootMultisigPayment(
   userDerivedPublicKey: Buffer,
   bitcoinNetwork: Network
 ): P2TROut {
-  const attestorDerivedPublicKeyFormatted =
-    attestorDerivedPublicKey.length === 32
-      ? attestorDerivedPublicKey
-      : attestorDerivedPublicKey.subarray(1);
-  const userDerivedPublicKeyFormatted =
-    userDerivedPublicKey.length === 32 ? userDerivedPublicKey : userDerivedPublicKey.subarray(1);
+  const attestorDerivedPublicKeyFormatted = getXOnlyPublicKey(attestorDerivedPublicKey);
+  const userDerivedPublicKeyFormatted = getXOnlyPublicKey(userDerivedPublicKey);
+  const unspendableDerivedPublicKeyFormatted = getXOnlyPublicKey(unspendableDerivedPublicKey);
 
   const taprootMultiLeafWallet = p2tr_ns(2, [
     attestorDerivedPublicKeyFormatted,
     userDerivedPublicKeyFormatted,
   ]);
 
-  return p2tr(unspendableDerivedPublicKey.subarray(1), taprootMultiLeafWallet, bitcoinNetwork);
+  return p2tr(unspendableDerivedPublicKeyFormatted, taprootMultiLeafWallet, bitcoinNetwork);
 }
 
 /**
@@ -189,44 +189,6 @@ export function getFeeRecipientAddressFromPublicKey(
   const { address } = p2wpkh(feePublicKeyBuffer, bitcoinNetwork);
   if (!address) throw new BitcoinError('Could not create Fee Address from Public Key');
   return address;
-}
-
-/**
- * Creates a Multisig Transaction using the Public Key of the User's Taproot Address and the Attestor Group's Public Key.
- * The Funding Transaction is sent to the Multisig Address.
- *
- * @param userPublicKey - The Public Key of the User's Taproot Address.
- * @param attestorGroupPublicKey - The Attestor Group's Public Key.
- * @param vaultUUID - The UUID of the Vault.
- * @param bitcoinNetwork - The Bitcoin Network to use.
- * @param unspendablePublicKey - (Optional) The Unspendable Public Key.
- * @returns The Multisig Transaction.
- */
-export function createMultisigTransaction(
-  userPublicKey: Uint8Array,
-  attestorGroupPublicKey: Uint8Array,
-  vaultUUID: string,
-  bitcoinNetwork: Network,
-  unspendablePublicKey?: Uint8Array
-): P2TROut {
-  const multisig = p2tr_ns(2, [userPublicKey, attestorGroupPublicKey]);
-
-  if (unspendablePublicKey) {
-    const multisigTransaction = p2tr(unspendablePublicKey, multisig, bitcoinNetwork);
-    multisigTransaction.tapInternalKey = unspendablePublicKey;
-    return multisigTransaction;
-  }
-
-  const unspendablePublicKeyBytes = hexToBytes(TAPROOT_UNSPENDABLE_KEY_HEX);
-
-  const tweakedUnspendableWithUUID = taprootTweakPubkey(
-    unspendablePublicKeyBytes,
-    Buffer.from(vaultUUID)
-  )[0];
-  const multisigTransaction = p2tr(tweakedUnspendableWithUUID, multisig, bitcoinNetwork);
-  multisigTransaction.tapInternalKey = tweakedUnspendableWithUUID;
-
-  return multisigTransaction;
 }
 
 export function createMultisigTransactionLegacy(

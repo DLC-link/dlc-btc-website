@@ -4,14 +4,17 @@ import { useSelector } from 'react-redux';
 
 import { customShiftValue } from '@common/utilities';
 import {
-  createMultisigTransaction,
   createMultisigTransactionLegacy,
+  createTaprootMultisigPayment,
+  getDerivedPublicKey,
+  getUnspendableKeyCommittedToUUID,
 } from '@functions/bitcoin-functions';
 import { BitcoinTransaction, BitcoinTransactionVectorOutput } from '@models/bitcoin-models';
 import { RawVault } from '@models/vault';
 import { hex } from '@scure/base';
 import { RootState } from '@store/index';
 
+import { useAttestors } from './use-attestors';
 import { useEndpoints } from './use-endpoints';
 import { useEthereum } from './use-ethereum';
 
@@ -22,6 +25,7 @@ interface UseProofOfReserveReturnType {
 export function useProofOfReserve(): UseProofOfReserveReturnType {
   const { bitcoinBlockchainAPIURL, bitcoinNetwork, enabledEthereumNetworks } = useEndpoints();
   const { getAllFundedVaults, getAttestorGroupPublicKey } = useEthereum();
+  const { getAttestorGroupPublicKey: getAttestorGroupPublicKeyV1 } = useAttestors();
   const { network } = useSelector((state: RootState) => state.account);
 
   const [shouldFetch, setShouldFetch] = useState(false);
@@ -106,7 +110,11 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
     );
   }
 
-  async function verifyVaultDeposit(vault: RawVault): Promise<boolean> {
+  async function verifyVaultDeposit(
+    vault: RawVault,
+    attestorPublicKeyV1: string,
+    attestorPublicKeyV2: Buffer
+  ): Promise<boolean> {
     if (!vault.fundingTxId || !vault.taprootPubKey || !vault.valueLocked || !vault.uuid) {
       return false;
     }
@@ -131,30 +139,32 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
         vault.valueLocked.toNumber()
       );
 
-      // Get the Attestor Public Key from the Attestor Group
-      const attestorPublicKey = await getAttestorGroupPublicKey(network);
-
       // Create two MultiSig Transactions, because the User and Attestor can sign in any order
       // Create the MultiSig Transaction A
       const multisigTransactionA = createMultisigTransactionLegacy(
         vault.taprootPubKey,
-        attestorPublicKey,
+        attestorPublicKeyV1,
         vault.uuid,
         bitcoinNetwork
       );
 
       // Create the MultiSig Transaction B
       const multisigTransactionB = createMultisigTransactionLegacy(
-        attestorPublicKey,
+        attestorPublicKeyV1,
         vault.taprootPubKey,
         vault.uuid,
         bitcoinNetwork
       );
 
-      const multisigTransactionC = createMultisigTransaction(
-        hex.decode(vault.taprootPubKey),
-        hex.decode(attestorPublicKey),
-        vault.uuid,
+      const unspendableKeyCommittedToUUID = getDerivedPublicKey(
+        getUnspendableKeyCommittedToUUID(vault.uuid, bitcoinNetwork),
+        bitcoinNetwork
+      );
+
+      const multisigTransactionC = createTaprootMultisigPayment(
+        unspendableKeyCommittedToUUID,
+        attestorPublicKeyV2,
+        Buffer.from(vault.taprootPubKey, 'hex'),
         bitcoinNetwork
       );
 
@@ -179,10 +189,17 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
       enabledEthereumNetworks.map(network => getAllFundedVaults(network))
     ).then(vaultsArrays => vaultsArrays.flat());
 
+    // Get the Attestor Public Key from the Attestor Group
+    const attestorPublicKeyV1 = await getAttestorGroupPublicKeyV1();
+    const attestorPublicKeyV2 = getDerivedPublicKey(
+      await getAttestorGroupPublicKey(network),
+      bitcoinNetwork
+    );
+
     const results = await Promise.all(
       allFundedVaults.map(async vault => {
         try {
-          if (await verifyVaultDeposit(vault)) {
+          if (await verifyVaultDeposit(vault, attestorPublicKeyV1, attestorPublicKeyV2)) {
             return vault.valueLocked.toNumber();
           }
         } catch (error) {
