@@ -63,12 +63,11 @@ export function createTaprootMultisigPayment(
   bitcoinNetwork: Network
 ): P2TROut {
   const unspendableDerivedPublicKeyFormatted = getXOnlyPublicKey(unspendableDerivedPublicKey);
-  const publicKeyAFormatted = getXOnlyPublicKey(publicKeyA);
-  const publicKeyBFormatted = getXOnlyPublicKey(publicKeyB);
 
-  const sortedPublicKeys = [publicKeyAFormatted, publicKeyBFormatted].sort();
+  const publicKeys = [getXOnlyPublicKey(publicKeyA), getXOnlyPublicKey(publicKeyB)];
+  const sortedArray = publicKeys.sort((a, b) => (a.toString('hex') > b.toString('hex') ? 1 : -1));
 
-  const taprootMultiLeafWallet = p2tr_ns(2, sortedPublicKeys);
+  const taprootMultiLeafWallet = p2tr_ns(2, sortedArray);
 
   return p2tr(unspendableDerivedPublicKeyFormatted, taprootMultiLeafWallet, bitcoinNetwork);
 }
@@ -354,6 +353,7 @@ function getAddressFromOutScript(script: Uint8Array, bitcoinNetwork: Network): s
  */
 export function createBitcoinInputSigningConfiguration(
   psbt: Uint8Array,
+  derivationPath: string,
   bitcoinNetwork: Network
 ): BitcoinInputSigningConfig[] {
   let nativeSegwitDerivationPath = '';
@@ -361,12 +361,12 @@ export function createBitcoinInputSigningConfiguration(
 
   switch (bitcoinNetwork) {
     case bitcoin:
-      nativeSegwitDerivationPath = "m/84'/0'/0'/0/0";
-      taprootDerivationPath = "m/86'/0'/0'/0/0";
+      nativeSegwitDerivationPath = `m/${derivationPath}/0/0`;
+      taprootDerivationPath = `m/${derivationPath}/0/0`;
       break;
     case testnet:
-      nativeSegwitDerivationPath = "m/84'/1'/0'/0/0";
-      taprootDerivationPath = "m/86'/1'/0'/0/0";
+      nativeSegwitDerivationPath = `m/${derivationPath}/0/0`;
+      taprootDerivationPath = `m/${derivationPath}/0/0`;
       break;
     default:
       throw new BitcoinError('Unsupported Bitcoin Network');
