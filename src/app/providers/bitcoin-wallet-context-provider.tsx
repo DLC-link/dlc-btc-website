@@ -15,6 +15,7 @@ export enum BitcoinWalletContextState {
 interface TaprootMultisigAddressInformation {
   taprootMultisigPayment: P2TROut;
   userTaprootMultisigDerivedPublicKey: Buffer;
+  taprootDerivationPath?: string;
   taprootMultisigAccountPolicy?: WalletPolicy;
   taprootMultisigPolicyHMac?: Buffer;
 }
@@ -22,6 +23,7 @@ interface TaprootMultisigAddressInformation {
 interface NativeSegwitAddressInformation {
   nativeSegwitPayment: P2Ret;
   nativeSegwitDerivedPublicKey: Buffer;
+  nativeSegwitDerivationPath?: string;
   nativeSegwitAccountPolicy?: DefaultWalletPolicy;
 }
 

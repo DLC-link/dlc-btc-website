@@ -309,6 +309,7 @@ export function useLedger(): UseLedgerReturnType {
       setNativeSegwitAddressInformation({
         nativeSegwitAccountPolicy,
         nativeSegwitDerivedPublicKey,
+        nativeSegwitDerivationPath: derivationPath,
         nativeSegwitPayment,
       });
       setBitcoinWalletContextState(BitcoinWalletContextState.NATIVE_SEGWIT_ADDRESS_READY);
@@ -352,11 +353,17 @@ export function useLedger(): UseLedgerReturnType {
       // ==> Create Key Info
       const ledgerKeyInfo = `[${masterFingerprint}/${derivationPath}]${ledgerExtendedPublicKey}`;
 
+      const descriptors =
+        getDerivedPublicKey(ledgerExtendedPublicKey, bitcoinNetwork).toString('hex') <
+        getDerivedPublicKey(attestorExtendedPublicKey, bitcoinNetwork).toString('hex')
+          ? [ledgerKeyInfo, attestorExtendedPublicKey]
+          : [attestorExtendedPublicKey, ledgerKeyInfo];
+
       // ==> Create Multisig Wallet Policy
       const taprootMultisigAccountPolicy = new WalletPolicy(
         `Taproot Multisig Wallet for Vault: ${easyTruncateAddress(vaultUUID)}`,
         `tr(@0/**,and_v(v:pk(@1/**),pk(@2/**)))`,
-        [unspendableExtendedPublicKey, attestorExtendedPublicKey, ledgerKeyInfo]
+        [unspendableExtendedPublicKey, ...descriptors]
       );
 
       setIsLoading([true, 'Accept Multisig Wallet Policy On Your Device']);
@@ -375,6 +382,7 @@ export function useLedger(): UseLedgerReturnType {
         0,
         false
       );
+
       const attestorDerivedPublicKey = getDerivedPublicKey(
         attestorExtendedPublicKey,
         bitcoinNetwork
@@ -403,6 +411,7 @@ export function useLedger(): UseLedgerReturnType {
         taprootMultisigAccountPolicy,
         taprootMultisigPolicyHMac,
         taprootMultisigPayment,
+        taprootDerivationPath: derivationPath,
         userTaprootMultisigDerivedPublicKey: userDerivedPublicKey,
       });
       setBitcoinWalletContextState(BitcoinWalletContextState.TAPROOT_MULTISIG_ADDRESS_READY);
@@ -432,8 +441,12 @@ export function useLedger(): UseLedgerReturnType {
       const vault: RawVault = await getRawVault(vaultUUID);
 
       const { ledgerApp, masterFingerprint } = currentLedgerInformation;
-      const { nativeSegwitPayment, nativeSegwitDerivedPublicKey, nativeSegwitAccountPolicy } =
-        nativeSegwitAddressInformation!;
+      const {
+        nativeSegwitPayment,
+        nativeSegwitDerivedPublicKey,
+        nativeSegwitAccountPolicy,
+        nativeSegwitDerivationPath,
+      } = nativeSegwitAddressInformation!;
       const { taprootMultisigPayment } = taprootMultisigAddressInformation!;
 
       const feeRate = await getFeeRate(bitcoinBlockchainAPIFeeURL);
@@ -450,9 +463,13 @@ export function useLedger(): UseLedgerReturnType {
         bitcoinBlockchainAPIURL
       );
 
+      if (!nativeSegwitDerivationPath)
+        throw new LedgerError(`Native Segwit Derivation Path is not set`);
+
       // ==> Update Funding PSBT with Ledger related information
       const signingConfiguration = createBitcoinInputSigningConfiguration(
         fundingPSBT,
+        nativeSegwitDerivationPath,
         bitcoinNetwork
       );
 
@@ -527,6 +544,7 @@ export function useLedger(): UseLedgerReturnType {
         taprootMultisigAccountPolicy,
         userTaprootMultisigDerivedPublicKey,
         taprootMultisigPolicyHMac,
+        taprootDerivationPath,
       } = taprootMultisigAddressInformation!;
 
       const feeRate = await getFeeRate(bitcoinBlockchainAPIFeeURL);
@@ -542,9 +560,12 @@ export function useLedger(): UseLedgerReturnType {
         vault.btcRedeemFeeBasisPoints.toBigInt()
       );
 
+      if (!taprootDerivationPath) throw new LedgerError(`Taproot Derivation Path is not set`);
+
       // ==> Update Closing PSBT with Ledger related information
       const closingTransactionSigningConfiguration = createBitcoinInputSigningConfiguration(
         closingPSBT,
+        taprootDerivationPath,
         bitcoinNetwork
       );
 
