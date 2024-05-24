@@ -20,7 +20,7 @@ export function ProofOfReserve(): React.JSX.Element {
       <Text w={'100%'} px={'35px'} color={'white'} fontSize={'4xl'} fontWeight={600}>
         Proof of Reserve
       </Text>
-      <TokenStatsBoardLayout>
+      <TokenStatsBoardLayout height="250px">
         <TokenStatsBoardTVL totalSupply={totalSupply} bitcoinPrice={bitcoinPrice} />
         <HStack w={'50%'} pl={'25px'}>
           <TokenStatsBoardToken token={dlcBTC} totalSupply={totalSupply} />

@@ -110,7 +110,21 @@ const ledger = defineStyle({
   },
 });
 
+const points = defineStyle({
+  py: '18px',
+  px: '2px',
+  h: '54px',
+  w: '200px',
+  color: 'accent.lightBlue.01',
+  bg: 'white.01',
+  _hover: {
+    bg: 'none',
+    color: 'white',
+    border: '1px solid',
+  },
+});
+
 export const buttonTheme = defineStyleConfig({
   baseStyle: basestyle,
-  variants: { tab, company, wallet, account, vault, navigate, merchantHistory, ledger },
+  variants: { tab, company, wallet, account, vault, navigate, merchantHistory, ledger, points },
 });
