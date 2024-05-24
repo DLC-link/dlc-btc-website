@@ -77,7 +77,7 @@ export function useEthereumContracts(): UseEthereumContractsReturnType {
       const contract = new ethers.Contract(
         dlcBTCContractData.contract.address,
         dlcBTCContractData.contract.abi,
-        ethereumSigner
+        new ethers.providers.WebSocketProvider(import.meta.env.VITE_ARBITRUM_OBSERVER_NODE)
       );
       dlcBTCContract.current = contract;
     }
