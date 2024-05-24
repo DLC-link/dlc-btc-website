@@ -10,6 +10,8 @@ export function TokenStatsBoardLayout({ children }: HasChildren): React.JSX.Elem
       borderRadius={'md'}
       bg={'background.container.01'}
       alignItems={'flex-start'}
+      border={'1px'}
+      borderColor={'white.03'}
     >
       {children}
     </VStack>
