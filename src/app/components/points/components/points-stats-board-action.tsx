@@ -21,20 +21,24 @@ export function PointsStatsBoardAction({
   }
 
   return (
-    <VStack w={'50%'} h={'100%'} alignItems={'start'}>
-      <Skeleton isLoaded={totalSupply !== undefined} h={'auto'} w={'100%'}>
-        <HStack>
-          <Image src={token.logo} alt={token.logoAlt} boxSize={'25px'} />
-          <Text color={'white'} fontWeight={600} fontSize={'md'}>
-            {`${tokenSuffix} ${token.name} `}
+    <VStack w={'50%'} h={'100%'} pr={'25px'} alignItems={'start'}>
+      <Skeleton isLoaded={totalSupply !== undefined} h={'100%'} w={'100%'}>
+        <VStack w={'100%'} h={'85px'} alignItems={'start'} spacing={'15px'}>
+          <HStack h={'25px'}>
+            <Image src={token.logo} alt={token.logoAlt} boxSize={'25px'} />
+            <Text color={'white'} fontWeight={200} fontSize={'md'}>
+              {`${tokenSuffix} ${token.name} `}
+            </Text>
+          </HStack>
+          <Text color={'white'} fontWeight={200} fontSize={'3xl'}>
+            {totalSupply?.toFixed(2)}
           </Text>
-        </HStack>
-        <Text color={'white'} fontWeight={200} fontSize={'3xl'}>
-          {totalSupply}
-        </Text>
+        </VStack>
       </Skeleton>
       <Button variant={'points'} onClick={() => {}}>
-        {token.name === 'dlcBTC' ? 'Earn More Points' : 'Become a Merchant'}
+        <Text bgGradient={`linear(to-r, #AC50EF, #7059FB, #2ECFF6)`} bgClip="text">
+          {token.name === 'dlcBTC' ? 'Earn More Points' : 'Become a Merchant'}
+        </Text>
       </Button>
     </VStack>
   );

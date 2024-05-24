@@ -1,15 +1,14 @@
-import { useContext } from 'react';
-
 import { Divider, HStack, Text } from '@chakra-ui/react';
 import { TokenStatsBoardLayout } from '@components/proof-of-reserve/components/token-stats-board/token-stats-board.layout';
+import { usePoints } from '@hooks/use-points';
 import { bitcoin, dlcBTC } from '@models/token';
-import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
 
+import { TokenStatsBoardTotalPoints } from './components/point-stats-board-total-points';
 import { PointsLayout } from './components/points-layout';
 import { PointsStatsBoardAction } from './components/points-stats-board-action';
 
 export function Points(): React.JSX.Element {
-  const { proofOfReserve, totalSupply } = useContext(ProofOfReserveContext);
+  const { userPoints } = usePoints();
 
   return (
     <PointsLayout>
@@ -19,23 +18,12 @@ export function Points(): React.JSX.Element {
           Earn Points
         </Text>
       </Text>
-
-      <TokenStatsBoardLayout height={'354px'}>
-        <Text color={'white'} fontSize={'28px'}>
-          You've Earned
-        </Text>
-        <Text
-          fontSize={'48px'}
-          bgGradient={`linear(to-r, #AC50EF, #7059FB, #2ECFF6)`}
-          bgClip="text"
-        >
-          0 Points
-        </Text>
-        <Divider h={'1px'} w={'464px'} orientation={'horizontal'} variant={'thick'} />
+      <TokenStatsBoardLayout>
+        <TokenStatsBoardTotalPoints totalPoints={userPoints} />
         <HStack w={'50%'} pl={'25px'}>
-          <PointsStatsBoardAction token={dlcBTC} totalSupply={totalSupply} />
-          <Divider orientation={'vertical'} px={'15px'} variant={'thick'} />
-          <PointsStatsBoardAction token={bitcoin} totalSupply={proofOfReserve} />
+          <PointsStatsBoardAction token={dlcBTC} totalSupply={0} />
+          <Divider orientation={'vertical'} px={'15px'} height={'150px'} variant={'thick'} />
+          <PointsStatsBoardAction token={bitcoin} totalSupply={userPoints} />
         </HStack>
       </TokenStatsBoardLayout>
       {/* <HStack w={'100%'} spacing={'20px'}>

@@ -115,7 +115,6 @@ const points = defineStyle({
   px: '2px',
   h: '54px',
   w: '200px',
-  color: 'accent.lightBlue.01',
   bg: 'white.01',
   _hover: {
     bg: 'none',

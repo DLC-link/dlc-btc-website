@@ -2,18 +2,15 @@ import { VStack } from '@chakra-ui/react';
 
 interface TokenStatsBoardLayoutProps {
   children: React.ReactNode;
-  height: string;
 }
 
-export function TokenStatsBoardLayout({
-  children,
-  height,
-}: TokenStatsBoardLayoutProps): React.JSX.Element {
+export function TokenStatsBoardLayout({ children }: TokenStatsBoardLayoutProps): React.JSX.Element {
   return (
     <VStack
       w={'1280px'}
-      h={height}
-      p={'25px'}
+      h={'auto'}
+      p={'15px'}
+      justifyContent={'center'}
       borderRadius={'md'}
       bg={'background.container.01'}
       alignItems={'flex-start'}
