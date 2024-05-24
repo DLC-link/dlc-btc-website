@@ -1,5 +1,4 @@
 import { createContext } from 'react';
-import { useEffect } from 'react';
 
 import { usePoints } from '@hooks/use-points';
 import { useProofOfReserve } from '@hooks/use-proof-of-reserve';
@@ -19,13 +18,8 @@ export const ProofOfReserveContext = createContext<ProofOfReserveContextProvider
 export function ProofOfReserveContextProvider({ children }: HasChildren): React.JSX.Element {
   const { proofOfReserve } = useProofOfReserve();
   const { totalSupply } = useTotalSupply();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { userPoints } = usePoints();
-
-  useEffect(() => {
-    if (userPoints) {
-      console.log('user points', userPoints);
-    }
-  }, [userPoints]);
 
   return (
     <ProofOfReserveContext.Provider value={{ proofOfReserve, totalSupply }}>
