@@ -1,22 +1,13 @@
-import { useState } from 'react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
+import { DetailedEvent, Rewards, RollingTVLMap, TimeStampedEvent } from '@models/ethereum-models';
 import { BigNumber, Event } from 'ethers';
 
 import { RootState } from '../store';
 import { useEthereum } from './use-ethereum';
 
 const BURN_ADDRESS = '0x0000000000000000000000000000000000000000';
-// points/TVL(sats)/sec
-const REWARDS_RATE = 0.00001;
-
-interface DetailedEvent {
-  from: string;
-  to: string;
-  value: BigNumber;
-  timestamp: number;
-}
 
 interface UsePointsReturnType {
   userPoints: number | undefined;
@@ -29,64 +20,40 @@ export function usePoints(): UsePointsReturnType {
   const [userPoints, setUserPoints] = useState<number | undefined>(undefined);
 
   useEffect(() => {
-    const fetchUserPoints = async () => {
-      fetchPoints();
+    const fetchUserPoints = async (currentUserAddress: string) => {
+      void fetchPoints(currentUserAddress);
     };
     if (userAddress) {
-      fetchUserPoints();
+      void fetchUserPoints(userAddress);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userAddress]);
 
   function formatTransferEvent(event: any, timestamp: number): DetailedEvent {
     return {
-      from: event.from,
-      to: event.to,
+      from: event.from.toLowerCase(),
+      to: event.to.toLowerCase(),
       value: event.value,
       timestamp,
     };
   }
 
-  // Function to fetch all transfer events from the smart contract
   async function fetchTransferEvents(): Promise<DetailedEvent[]> {
-    const contract = await getDefaultProvider(network, 'DLCBTC');
-    const filter = contract.filters.Transfer();
-    const events = await contract.queryFilter(filter);
+    const dlcBTCContract = await getDefaultProvider(network, 'DLCBTC');
+    const eventFilter = dlcBTCContract.filters.Transfer();
+    const events = await dlcBTCContract.queryFilter(eventFilter);
     const detailedEvents: DetailedEvent[] = [];
 
-    // Fetch detailed information including timestamps
     await Promise.all(
       events.map(async (event: Event) => {
-        const block = await contract.provider.getBlock(event.blockNumber);
+        const block = await dlcBTCContract.provider.getBlock(event.blockNumber);
         detailedEvents.push(formatTransferEvent(event.args, block.timestamp));
       })
     );
 
     detailedEvents.sort((a, b) => a.timestamp - b.timestamp);
 
-    console.log('detailedEvents: ', detailedEvents);
     return detailedEvents;
-  }
-
-  // {
-  //   [ // list of addresses
-  //     {
-  //       '0x123':
-  //       [
-  //         { timestamp: 1650000000, amount: 50, totalValueLocked: 50}, // at time 1650000000 Points are 100 minted - 50 burned
-  //         { tiemstamp: 1700000000, amount: -20, totalValueLocked: 30}, // at time 1700000000 Points are 20 burned
-  //       ],
-  //     }
-  //   ]
-  // }
-
-  interface TimeStampedEvent {
-    timestamp: number;
-    amount: number;
-    totalValueLocked: number;
-  }
-
-  interface RollingTVLMap {
-    [address: string]: TimeStampedEvent[];
   }
 
   function initializeAddressInMap(address: string, map: RollingTVLMap) {
@@ -126,52 +93,56 @@ export function usePoints(): UsePointsReturnType {
       }
     });
 
-    console.log('rollingTVLMap: ', rollingTVLMap);
     return rollingTVLMap;
   }
 
-  interface Rewards {
-    [address: string]: number;
-  }
-
-  function calculateReward(previousEvent: TimeStampedEvent, currentEvent: TimeStampedEvent) {
-    const rewardsPerTime = previousEvent.totalValueLocked * REWARDS_RATE;
+  function calculateReward(
+    previousEvent: TimeStampedEvent,
+    currentEvent: TimeStampedEvent,
+    rewardsRate: number
+  ) {
+    const rewardsPerTime = previousEvent.totalValueLocked * rewardsRate;
     const rewards = rewardsPerTime * (currentEvent.timestamp - previousEvent.timestamp);
     return rewards;
   }
 
-  // Calculate the points rewarded to each address
-  function calculatePoints(rollingTVLMap: RollingTVLMap): void {
+  function calculatePoints(
+    rollingTVLMap: RollingTVLMap,
+    currentUserAddress: string,
+    rewardsRate: number
+  ): void {
     const rewards: Rewards = {};
     const currentTimestamp = Math.floor(Date.now() / 1000);
 
     for (const [address, events] of Object.entries(rollingTVLMap)) {
       let totalRewards = 0;
       for (let i = 1; i < events.length; i++) {
-        totalRewards += calculateReward(events[i - 1], events[i]);
+        totalRewards += calculateReward(events[i - 1], events[i], rewardsRate);
       }
 
       const lastEvent = events[events.length - 1];
       if (lastEvent) {
-        totalRewards += calculateReward(lastEvent, {
-          timestamp: currentTimestamp,
-          totalValueLocked: lastEvent.totalValueLocked,
-          amount: 0,
-        });
+        totalRewards += calculateReward(
+          lastEvent,
+          {
+            timestamp: currentTimestamp,
+            totalValueLocked: lastEvent.totalValueLocked,
+            amount: 0,
+          },
+          rewardsRate
+        );
         rewards[address] = totalRewards;
       }
     }
-    if (!userAddress) {
-      throw new Error('User address is not set');
-    }
 
-    setUserPoints(rewards[userAddress]);
+    setUserPoints(rewards[currentUserAddress]);
   }
 
-  async function fetchPoints() {
+  async function fetchPoints(currentUserAddress: string): Promise<void> {
+    const rewardsRate = import.meta.env.VITE_REWARDS_RATE;
     const events = await fetchTransferEvents();
     const rollingTVL = calculateRollingTVL(events);
-    calculatePoints(rollingTVL);
+    calculatePoints(rollingTVL, currentUserAddress, rewardsRate);
   }
 
   return {
