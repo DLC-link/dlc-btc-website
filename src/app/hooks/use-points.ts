@@ -135,7 +135,7 @@ export function usePoints(): UsePointsReturnType {
       }
     }
 
-    setUserPoints(rewards[currentUserAddress]);
+    setUserPoints(rewards[currentUserAddress] ?? 0);
   }
 
   async function fetchPoints(currentUserAddress: string): Promise<void> {
