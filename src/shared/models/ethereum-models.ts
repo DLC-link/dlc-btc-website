@@ -5,15 +5,6 @@ export interface TimeStampedEvent {
   amount: number;
   totalValueLocked: number;
 }
-
-export interface RollingTVLMap {
-  [address: string]: TimeStampedEvent[];
-}
-
-export interface Rewards {
-  [address: string]: number;
-}
-
 export interface DetailedEvent {
   from: string;
   to: string;
