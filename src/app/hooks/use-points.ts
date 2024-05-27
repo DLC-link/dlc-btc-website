@@ -14,8 +14,7 @@ interface UsePointsReturnType {
 }
 
 export function calculateRollingTVL(events: DetailedEvent[]): TimeStampedEvent[] {
-  const rollingTVL: TimeStampedEvent[] = [];
-  events.map(({ from, to, value, timestamp }) => {
+  return events.reduce<TimeStampedEvent[]>((rollingTVL, { from, to, value, timestamp }) => {
     if (from !== BURN_ADDRESS && to !== BURN_ADDRESS) {
       throw new Error('Invalid event in calculateRollingTVL');
     }
@@ -28,9 +27,9 @@ export function calculateRollingTVL(events: DetailedEvent[]): TimeStampedEvent[]
       amount,
       totalValueLocked: currentTotalValueLocked + amount,
     });
-  });
 
-  return rollingTVL;
+    return rollingTVL;
+  }, []);
 }
 
 export function calculateRewardBetweenEvents(
