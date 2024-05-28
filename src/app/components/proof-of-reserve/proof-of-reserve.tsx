@@ -17,14 +17,14 @@ export function ProofOfReserve(): React.JSX.Element {
 
   return (
     <ProofOfReserveLayout>
-      <Text w={'100%'} px={'35px'} color={'white'} fontSize={'4xl'} fontWeight={600}>
+      <Text w={'100%'} color={'white'} fontSize={'6xl'} fontWeight={500}>
         Proof of Reserve
       </Text>
       <TokenStatsBoardLayout>
         <TokenStatsBoardTVL totalSupply={totalSupply} bitcoinPrice={bitcoinPrice} />
         <HStack w={'50%'} pl={'25px'}>
           <TokenStatsBoardToken token={dlcBTC} totalSupply={totalSupply} />
-          <Divider orientation={'vertical'} px={'15px'} variant={'thick'} />
+          <Divider orientation={'vertical'} px={'15px'} height={'75px'} variant={'thick'} />
           <TokenStatsBoardToken token={bitcoin} totalSupply={proofOfReserve} />
         </HStack>
       </TokenStatsBoardLayout>

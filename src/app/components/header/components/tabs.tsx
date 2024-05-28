@@ -32,6 +32,11 @@ export function NavigationTabs({
         isActive={activeTab === '/proof-of-reserve'}
         handleClick={() => handleTabClick('/proof-of-reserve')}
       />
+      <TabButton
+        title={'Points'}
+        isActive={activeTab === '/points'}
+        handleClick={() => handleTabClick('/points')}
+      />
     </HStack>
   );
 }
