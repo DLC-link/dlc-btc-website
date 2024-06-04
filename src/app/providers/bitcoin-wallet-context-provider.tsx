@@ -2,29 +2,12 @@ import { createContext, useState } from 'react';
 
 import { HasChildren } from '@models/has-children';
 import { BitcoinWalletType } from '@models/wallet';
-import { P2Ret, P2TROut } from '@scure/btc-signer';
-import { DefaultWalletPolicy, WalletPolicy } from 'ledger-bitcoin';
+import { LedgerDLCHandler, SoftwareWalletDLCHandler } from 'dlc-btc-lib';
 
 export enum BitcoinWalletContextState {
   INITIAL = 0,
-  SELECT_BITCOIN_WALLET_READY = 1,
-  NATIVE_SEGWIT_ADDRESS_READY = 2,
-  TAPROOT_MULTISIG_ADDRESS_READY = 3,
-}
-
-interface TaprootMultisigAddressInformation {
-  taprootMultisigPayment: P2TROut;
-  userTaprootMultisigDerivedPublicKey: Buffer;
-  taprootDerivationPath?: string;
-  taprootMultisigAccountPolicy?: WalletPolicy;
-  taprootMultisigPolicyHMac?: Buffer;
-}
-
-interface NativeSegwitAddressInformation {
-  nativeSegwitPayment: P2Ret;
-  nativeSegwitDerivedPublicKey: Buffer;
-  nativeSegwitDerivationPath?: string;
-  nativeSegwitAccountPolicy?: DefaultWalletPolicy;
+  SELECTED = 1,
+  READY = 2,
 }
 
 interface BitcoinWalletContextProviderType {
@@ -32,13 +15,9 @@ interface BitcoinWalletContextProviderType {
   setBitcoinWalletType: React.Dispatch<React.SetStateAction<BitcoinWalletType | undefined>>;
   bitcoinWalletContextState: BitcoinWalletContextState;
   setBitcoinWalletContextState: React.Dispatch<React.SetStateAction<BitcoinWalletContextState>>;
-  taprootMultisigAddressInformation: TaprootMultisigAddressInformation | undefined;
-  setTaprootMultisigAddressInformation: React.Dispatch<
-    React.SetStateAction<TaprootMultisigAddressInformation | undefined>
-  >;
-  nativeSegwitAddressInformation: NativeSegwitAddressInformation | undefined;
-  setNativeSegwitAddressInformation: React.Dispatch<
-    React.SetStateAction<NativeSegwitAddressInformation | undefined>
+  dlcHandler: SoftwareWalletDLCHandler | LedgerDLCHandler | undefined;
+  setDLCHandler: React.Dispatch<
+    React.SetStateAction<SoftwareWalletDLCHandler | LedgerDLCHandler | undefined>
   >;
   resetBitcoinWalletContext: () => void;
 }
@@ -48,10 +27,8 @@ export const BitcoinWalletContext = createContext<BitcoinWalletContextProviderTy
   setBitcoinWalletType: () => {},
   bitcoinWalletContextState: BitcoinWalletContextState.INITIAL,
   setBitcoinWalletContextState: () => {},
-  taprootMultisigAddressInformation: undefined,
-  setTaprootMultisigAddressInformation: () => {},
-  nativeSegwitAddressInformation: undefined,
-  setNativeSegwitAddressInformation: () => {},
+  dlcHandler: undefined,
+  setDLCHandler: () => {},
   resetBitcoinWalletContext: () => {},
 });
 
@@ -61,18 +38,12 @@ export function BitcoinWalletContextProvider({ children }: HasChildren): React.J
   const [bitcoinWalletType, setBitcoinWalletType] = useState<BitcoinWalletType | undefined>(
     BitcoinWalletType.Leather
   );
-  const [taprootMultisigAddressInformation, setTaprootMultisigAddressInformation] = useState<
-    TaprootMultisigAddressInformation | undefined
-  >(undefined);
-  const [nativeSegwitAddressInformation, setNativeSegwitAddressInformation] = useState<
-    NativeSegwitAddressInformation | undefined
-  >(undefined);
+  const [dlcHandler, setDLCHandler] = useState<SoftwareWalletDLCHandler | LedgerDLCHandler>();
 
   function resetBitcoinWalletContext() {
     setBitcoinWalletContextState(BitcoinWalletContextState.INITIAL);
     setBitcoinWalletType(undefined);
-    setTaprootMultisigAddressInformation(undefined);
-    setNativeSegwitAddressInformation(undefined);
+    setDLCHandler(undefined);
   }
 
   return (
@@ -82,10 +53,8 @@ export function BitcoinWalletContextProvider({ children }: HasChildren): React.J
         setBitcoinWalletType,
         bitcoinWalletContextState,
         setBitcoinWalletContextState,
-        taprootMultisigAddressInformation,
-        setTaprootMultisigAddressInformation,
-        nativeSegwitAddressInformation,
-        setNativeSegwitAddressInformation,
+        dlcHandler,
+        setDLCHandler,
         resetBitcoinWalletContext,
       }}
     >

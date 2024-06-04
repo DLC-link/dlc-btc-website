@@ -1,13 +1,11 @@
-import { useContext } from 'react';
+import { useDispatch } from 'react-redux';
 
 import { VStack } from '@chakra-ui/react';
 import { ModalComponentProps } from '@components/modals/components/modal-container';
 import { ModalLayout } from '@components/modals/components/modal.layout';
+import { useLeather } from '@hooks/use-leather';
 import { BitcoinWalletType, bitcoinWallets } from '@models/wallet';
-import {
-  BitcoinWalletContext,
-  BitcoinWalletContextState,
-} from '@providers/bitcoin-wallet-context-provider';
+import { modalActions } from '@store/slices/modal/modal.actions';
 
 import { SelectBitcoinWalletMenu } from './components/select-bitcoin-wallet-modal-menu';
 
@@ -15,11 +13,20 @@ export function SelectBitcoinWalletModal({
   isOpen,
   handleClose,
 }: ModalComponentProps): React.JSX.Element {
-  const { setBitcoinWalletType, setBitcoinWalletContextState } = useContext(BitcoinWalletContext);
+  const dispatch = useDispatch();
+  const { connectLeatherWallet } = useLeather();
 
-  function handleLogin(walletType: BitcoinWalletType) {
-    setBitcoinWalletType(walletType);
-    setBitcoinWalletContextState(BitcoinWalletContextState.SELECT_BITCOIN_WALLET_READY);
+  async function handleLogin(walletType: BitcoinWalletType) {
+    switch (walletType) {
+      case BitcoinWalletType.Leather:
+        await connectLeatherWallet();
+        break;
+      case BitcoinWalletType.Ledger:
+        dispatch(modalActions.toggleLedgerModalVisibility());
+        break;
+      default:
+        break;
+    }
     handleClose();
   }
 

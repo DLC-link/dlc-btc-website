@@ -6,13 +6,14 @@ import { BitcoinError } from '@models/error-types';
 import { Vault } from '@models/vault';
 import { BitcoinWalletType } from '@models/wallet';
 import { BitcoinWalletContext } from '@providers/bitcoin-wallet-context-provider';
-import * as btc from '@scure/btc-signer';
 import { RootState } from '@store/index';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { vaultActions } from '@store/slices/vault/vault.actions';
+import { LedgerDLCHandler, SoftwareWalletDLCHandler } from 'dlc-btc-lib';
+import { Transaction } from 'dlc-btc-lib/models';
 
 import { useAttestors } from './use-attestors';
-import { useEndpoints } from './use-endpoints';
+import { useEthereum } from './use-ethereum';
 import { useLeather } from './use-leather';
 import { useLedger } from './use-ledger';
 
@@ -34,31 +35,47 @@ export function usePSBT(): UsePSBTReturnType {
     handleClosingTransaction: handleClosingTransactionWithLeather,
     isLoading: isLeatherLoading,
   } = useLeather();
-  const { bitcoinWalletType, nativeSegwitAddressInformation, resetBitcoinWalletContext } =
+  const { bitcoinWalletType, dlcHandler, resetBitcoinWalletContext } =
     useContext(BitcoinWalletContext);
-  const { bitcoinBlockchainAPIURL } = useEndpoints();
   const { sendClosingTransactionToAttestors } = useAttestors();
+  const { getAttestorGroupPublicKey, getRawVault } = useEthereum();
 
-  const { network } = useSelector((state: RootState) => state.account);
+  const { bitcoinBlockchainAPIURL, ethereumNetwork } = useSelector(
+    (state: RootState) => state.configuration
+  );
   const { mintStep } = useSelector((state: RootState) => state.mintunmint);
 
-  const [fundingTransaction, setFundingTransaction] = useState<btc.Transaction | undefined>();
+  const [fundingTransaction, setFundingTransaction] = useState<Transaction | undefined>();
 
   async function handleSignFundingTransaction(): Promise<void> {
     try {
-      let handleFundingTransaction;
+      const attestorGroupPublicKey = await getAttestorGroupPublicKey(ethereumNetwork);
+      const vault = await getRawVault(mintStep[1]);
+      let fundingTransaction: Transaction;
+      const feeRateMultiplier = import.meta.env.VITE_FEE_RATE_MULTIPLIER;
+
       switch (bitcoinWalletType) {
         case 'Ledger':
-          handleFundingTransaction = handleFundingTransactionWithLedger;
+          fundingTransaction = await handleFundingTransactionWithLedger(
+            dlcHandler as LedgerDLCHandler,
+            vault,
+            attestorGroupPublicKey,
+            feeRateMultiplier
+          );
           break;
         case 'Leather':
-          handleFundingTransaction = handleFundingTransactionWithLeather;
+          fundingTransaction = await handleFundingTransactionWithLeather(
+            dlcHandler as SoftwareWalletDLCHandler,
+            vault,
+            attestorGroupPublicKey,
+            feeRateMultiplier
+          );
           break;
         default:
           throw new BitcoinError('Invalid Bitcoin Wallet Type');
       }
 
-      setFundingTransaction(await handleFundingTransaction(mintStep[1]));
+      setFundingTransaction(fundingTransaction);
     } catch (error) {
       throw new BitcoinError(`Error signing Funding Transaction: ${error}`);
     }
@@ -67,28 +84,40 @@ export function usePSBT(): UsePSBTReturnType {
   async function handleSignClosingTransaction() {
     try {
       if (!fundingTransaction) throw new BitcoinError('Funding Transaction is not yet signed.');
-      let handleClosingTransaction;
+      let closingTransactionHex: string;
+      const vault = await getRawVault(mintStep[1]);
+      let nativeSegwitAddress;
+      const feeRateMultiplier = import.meta.env.VITE_FEE_RATE_MULTIPLIER;
       switch (bitcoinWalletType) {
         case 'Ledger':
-          handleClosingTransaction = handleClosingTransactionWithLedger;
+          closingTransactionHex = await handleClosingTransactionWithLedger(
+            dlcHandler as LedgerDLCHandler,
+            vault,
+            fundingTransaction.id,
+            feeRateMultiplier
+          );
+          nativeSegwitAddress = dlcHandler?.getVaultRelatedAddress('p2wpkh');
           break;
         case 'Leather':
-          handleClosingTransaction = handleClosingTransactionWithLeather;
+          closingTransactionHex = await handleClosingTransactionWithLeather(
+            dlcHandler as SoftwareWalletDLCHandler,
+            vault,
+            fundingTransaction.id,
+            feeRateMultiplier
+          );
+          nativeSegwitAddress = dlcHandler?.getVaultRelatedAddress('p2wpkh');
           break;
         default:
           throw new BitcoinError('Invalid Bitcoin Wallet Type');
       }
 
-      const closingTransactionHex = await handleClosingTransaction(
-        mintStep[1],
-        fundingTransaction?.id
-      );
+      if (!nativeSegwitAddress) throw new BitcoinError('Native Segwit Address is not defined');
 
       await sendClosingTransactionToAttestors(
         fundingTransaction?.hex,
         closingTransactionHex,
         mintStep[1],
-        nativeSegwitAddressInformation?.nativeSegwitPayment.address!
+        nativeSegwitAddress
       );
 
       await broadcastTransaction(fundingTransaction.hex, bitcoinBlockchainAPIURL);
@@ -97,7 +126,7 @@ export function usePSBT(): UsePSBTReturnType {
         vaultActions.setVaultToFunding({
           vaultUUID: mintStep[1],
           fundingTX: fundingTransaction.id,
-          networkID: network.id,
+          networkID: ethereumNetwork.id,
         })
       );
 
