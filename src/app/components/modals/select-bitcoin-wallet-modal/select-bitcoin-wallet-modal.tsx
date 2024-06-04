@@ -1,6 +1,6 @@
 import { useDispatch } from 'react-redux';
 
-import { VStack } from '@chakra-ui/react';
+import { VStack, useToast } from '@chakra-ui/react';
 import { ModalComponentProps } from '@components/modals/components/modal-container';
 import { ModalLayout } from '@components/modals/components/modal.layout';
 import { useLeather } from '@hooks/use-leather';
@@ -14,12 +14,23 @@ export function SelectBitcoinWalletModal({
   handleClose,
 }: ModalComponentProps): React.JSX.Element {
   const dispatch = useDispatch();
+  const toast = useToast();
   const { connectLeatherWallet } = useLeather();
 
   async function handleLogin(walletType: BitcoinWalletType) {
     switch (walletType) {
       case BitcoinWalletType.Leather:
-        await connectLeatherWallet();
+        try {
+          await connectLeatherWallet();
+        } catch (error: any) {
+          toast({
+            title: 'Failed to sign transaction',
+            description: error.message,
+            status: 'error',
+            duration: 9000,
+            isClosable: true,
+          });
+        }
         break;
       case BitcoinWalletType.Ledger:
         dispatch(modalActions.toggleLedgerModalVisibility());

@@ -7,8 +7,8 @@ import { ModalLayout } from '@components/modals/components/modal.layout';
 import { SelectWalletMenu } from '@components/modals/select-wallet-modal/components/select-wallet-menu';
 import { SelectNetworkButton } from '@components/select-network-button/select-network-button';
 import { useEthereumAccount } from '@hooks/use-ethereum-account';
+import { EthereumNetwork } from '@models/ethereum-network';
 import { WalletType, ethereumWallets } from '@models/wallet';
-import { EthereumNetwork } from 'dlc-btc-lib/models';
 
 export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps): React.JSX.Element {
   const ethereumAccountHandler = useEthereumAccount();
