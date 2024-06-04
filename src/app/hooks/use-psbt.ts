@@ -13,6 +13,7 @@ import { LedgerDLCHandler, SoftwareWalletDLCHandler } from 'dlc-btc-lib';
 import { Transaction } from 'dlc-btc-lib/models';
 
 import { useAttestors } from './use-attestors';
+import { useEndpoints } from './use-endpoints';
 import { useEthereum } from './use-ethereum';
 import { useLeather } from './use-leather';
 import { useLedger } from './use-ledger';
@@ -40,16 +41,16 @@ export function usePSBT(): UsePSBTReturnType {
   const { sendClosingTransactionToAttestors } = useAttestors();
   const { getAttestorGroupPublicKey, getRawVault } = useEthereum();
 
-  const { bitcoinBlockchainAPIURL, ethereumNetwork } = useSelector(
-    (state: RootState) => state.configuration
-  );
+  const { network } = useSelector((state: RootState) => state.account);
+
+  const { bitcoinBlockchainAPIURL } = useEndpoints();
   const { mintStep } = useSelector((state: RootState) => state.mintunmint);
 
   const [fundingTransaction, setFundingTransaction] = useState<Transaction | undefined>();
 
   async function handleSignFundingTransaction(): Promise<void> {
     try {
-      const attestorGroupPublicKey = await getAttestorGroupPublicKey(ethereumNetwork);
+      const attestorGroupPublicKey = await getAttestorGroupPublicKey(network);
       const vault = await getRawVault(mintStep[1]);
       let fundingTransaction: Transaction;
       const feeRateMultiplier = import.meta.env.VITE_FEE_RATE_MULTIPLIER;
@@ -126,7 +127,7 @@ export function usePSBT(): UsePSBTReturnType {
         vaultActions.setVaultToFunding({
           vaultUUID: mintStep[1],
           fundingTX: fundingTransaction.id,
-          networkID: ethereumNetwork.id,
+          networkID: network.id,
         })
       );
 

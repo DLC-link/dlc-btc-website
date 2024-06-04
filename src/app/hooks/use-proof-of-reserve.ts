@@ -9,10 +9,10 @@ import {
   getDerivedPublicKey,
   getUnspendableKeyCommittedToUUID,
 } from '@functions/bitcoin-functions';
-import { BitcoinTransaction, BitcoinTransactionVectorOutput } from '@models/bitcoin-models';
 import { RawVault } from '@models/vault';
 import { hex } from '@scure/base';
 import { RootState } from '@store/index';
+import { BitcoinTransaction, BitcoinTransactionVectorOutput } from 'dlc-btc-lib/models';
 
 import { useAttestors } from './use-attestors';
 import { useEndpoints } from './use-endpoints';

@@ -1,5 +1,4 @@
 import { useContext, useState } from 'react';
-import { useSelector } from 'react-redux';
 
 import { LeatherError } from '@models/error-types';
 import {
@@ -17,10 +16,11 @@ import {
   BitcoinWalletContext,
   BitcoinWalletContextState,
 } from '@providers/bitcoin-wallet-context-provider';
-import { RootState } from '@store/index';
 import { SoftwareWalletDLCHandler } from 'dlc-btc-lib';
 import { bitcoin, regtest, testnet } from 'dlc-btc-lib/constants';
 import { Transaction } from 'dlc-btc-lib/models';
+
+import { useEndpoints } from './use-endpoints';
 
 interface UseLeatherReturnType {
   connectLeatherWallet: () => Promise<void>;
@@ -41,9 +41,7 @@ interface UseLeatherReturnType {
 
 export function useLeather(): UseLeatherReturnType {
   const { setDLCHandler, setBitcoinWalletContextState } = useContext(BitcoinWalletContext);
-  const { bitcoinNetwork, bitcoinBlockchainAPIURL, bitcoinBlockchainAPIFeeURL } = useSelector(
-    (state: RootState) => state.configuration
-  );
+  const { bitcoinNetwork, bitcoinBlockchainAPIURL, bitcoinBlockchainAPIFeeURL } = useEndpoints();
 
   const [isLoading, setIsLoading] = useState<[boolean, string]>([false, '']);
 
@@ -124,8 +122,6 @@ export function useLeather(): UseLeatherReturnType {
     try {
       setIsLoading([true, 'Connecting To Leather Wallet']);
       const { nativeSegwitAccount, taprootAccount } = await getBitcoinAddresses();
-
-      console.log('bitcoinNetwork:', bitcoinNetwork);
 
       const leatherDLCHandler = new SoftwareWalletDLCHandler(
         nativeSegwitAccount.publicKey,

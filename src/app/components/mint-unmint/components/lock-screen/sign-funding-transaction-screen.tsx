@@ -4,7 +4,6 @@ import { useDispatch } from 'react-redux';
 import { Button, HStack, Spinner, Text, VStack, useToast } from '@chakra-ui/react';
 import { VaultCard } from '@components/vault/vault-card';
 import { useBitcoinPrice } from '@hooks/use-bitcoin-price';
-import { useLeather } from '@hooks/use-leather';
 import { useVaults } from '@hooks/use-vaults';
 import { BitcoinError } from '@models/error-types';
 import { Vault } from '@models/vault';
@@ -31,7 +30,7 @@ export function SignFundingTransactionScreen({
   const toast = useToast();
   const dispatch = useDispatch();
 
-  const { bitcoinWalletContextState, bitcoinWalletType } = useContext(BitcoinWalletContext);
+  const { bitcoinWalletContextState } = useContext(BitcoinWalletContext);
 
   const { bitcoinPrice } = useBitcoinPrice();
   const { readyVaults } = useVaults();
@@ -43,18 +42,14 @@ export function SignFundingTransactionScreen({
   const [buttonText, setButtonText] = useState('Select Bitcoin Wallet');
 
   useEffect(() => {
-    console.log('bitcoinWalletContextState:', bitcoinWalletContextState);
-
     switch (bitcoinWalletContextState) {
       case BitcoinWalletContextState.INITIAL:
         setButtonText('Connect Bitcoin Wallet');
         break;
       case BitcoinWalletContextState.READY:
-        console.log('READY');
         setButtonText('Sign Funding Transaction');
         break;
       default:
-        console.log('default');
         setButtonText('Connect Bitcoin Wallet');
         break;
     }

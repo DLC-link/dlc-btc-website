@@ -1,6 +1,5 @@
 /** @format */
 import { useContext, useState } from 'react';
-import { useSelector } from 'react-redux';
 
 import { delay } from '@common/utilities';
 import { getBalance } from '@functions/bitcoin-functions';
@@ -8,16 +7,17 @@ import Transport from '@ledgerhq/hw-transport-webusb';
 import { LedgerError } from '@models/error-types';
 import { LEDGER_APPS_MAP } from '@models/ledger';
 import { RawVault } from '@models/vault';
-import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
+import { bytesToHex } from '@noble/hashes/utils';
 import {
   BitcoinWalletContext,
   BitcoinWalletContextState,
 } from '@providers/bitcoin-wallet-context-provider';
-import { RootState } from '@store/index';
 import { LedgerDLCHandler } from 'dlc-btc-lib';
 import { bitcoin } from 'dlc-btc-lib/constants';
 import { Transaction } from 'dlc-btc-lib/models';
 import { AppClient, DefaultWalletPolicy } from 'ledger-bitcoin';
+
+import { useEndpoints } from './use-endpoints';
 
 type TransportInstance = Awaited<ReturnType<typeof Transport.create>>;
 
@@ -41,9 +41,7 @@ interface UseLedgerReturnType {
 
 export function useLedger(): UseLedgerReturnType {
   const { setBitcoinWalletContextState, setDLCHandler } = useContext(BitcoinWalletContext);
-  const { bitcoinNetwork, bitcoinBlockchainAPIURL, bitcoinBlockchainAPIFeeURL } = useSelector(
-    (state: RootState) => state.configuration
-  );
+  const { bitcoinNetwork, bitcoinBlockchainAPIURL, bitcoinBlockchainAPIFeeURL } = useEndpoints();
 
   const [ledgerApp, setLedgerApp] = useState<AppClient | undefined>(undefined);
   const [isLoading, setIsLoading] = useState<[boolean, string]>([false, '']);
@@ -197,7 +195,7 @@ export function useLedger(): UseLedgerReturnType {
     feeRateMultiplier: number
   ): Promise<Transaction> {
     try {
-      setIsLoading([true, 'Creating Funding Transaction']);
+      setIsLoading([true, 'Accept Multisig Wallet Policy on your Ledger Device']);
 
       // ==> Create Funding Transaction
       const fundingPSBT = await dlcHandler.createFundingPSBT(
