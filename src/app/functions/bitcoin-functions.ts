@@ -1,6 +1,5 @@
 /** @format */
 import { createRangeFromLength, isDefined, isUndefined, unshiftValue } from '@common/utilities';
-import { hex } from '@scure/base';
 import {
   Address,
   OutScript,
@@ -13,7 +12,6 @@ import {
   p2tr,
   p2tr_ns,
   p2wpkh,
-  taprootTweakPubkey,
 } from '@scure/btc-signer';
 import { BIP32Factory } from 'bip32';
 import { Network } from 'bitcoinjs-lib';
@@ -187,29 +185,6 @@ export function getFeeRecipientAddressFromPublicKey(
   const { address } = p2wpkh(feePublicKeyBuffer, bitcoinNetwork);
   if (!address) throw new BitcoinError('Could not create Fee Address from Public Key');
   return address;
-}
-
-export function createMultisigTransactionLegacy(
-  publicKeyA: string,
-  publicKeyB: string,
-  vaultUUID: string,
-  bitcoinNetwork: Network
-): P2TROut {
-  const TAPROOT_UNSPENDABLE_KEY_STR =
-    '50929b74c1a04954b78b4b6035e97a5e078a5a0f28ec96d547bfee9ace803ac0';
-  const TAPROOT_UNSPENDABLE_KEY = hex.decode(TAPROOT_UNSPENDABLE_KEY_STR);
-
-  const tweakedUnspendableTaprootKey = taprootTweakPubkey(
-    TAPROOT_UNSPENDABLE_KEY,
-    Buffer.from(vaultUUID)
-  )[0];
-
-  const multisigPayment = p2tr_ns(2, [hex.decode(publicKeyA), hex.decode(publicKeyB)]);
-
-  const multisigTransaction = p2tr(tweakedUnspendableTaprootKey, multisigPayment, bitcoinNetwork);
-  multisigTransaction.tapInternalKey = tweakedUnspendableTaprootKey;
-
-  return multisigTransaction;
 }
 
 /**
