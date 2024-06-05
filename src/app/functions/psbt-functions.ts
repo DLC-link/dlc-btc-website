@@ -1,8 +1,9 @@
 /** @format */
 import { reverseBytes } from '@common/utilities.ts';
 import { hexToBytes } from '@noble/hashes/utils';
-import { P2Ret, P2TROut, p2wpkh, selectUTXO } from '@scure/btc-signer';
+import { P2Ret, P2TROut, selectUTXO } from '@scure/btc-signer';
 import { Network, Psbt } from 'bitcoinjs-lib';
+import Decimal from 'decimal.js';
 import { PartialSignature } from 'ledger-bitcoin/build/main/lib/appClient.js';
 
 import { BitcoinInputSigningConfig, PaymentTypes } from '@shared/models/bitcoin-models.ts';
@@ -12,6 +13,11 @@ import {
   getFeeRecipientAddressFromPublicKey,
   getUTXOs,
 } from './bitcoin-functions.js';
+
+function getFeeAmount(bitcoinAmount: number, feeBasisPoints: number): number {
+  const feePercentage = new Decimal(feeBasisPoints).dividedBy(100);
+  return new Decimal(bitcoinAmount).times(feePercentage.dividedBy(100)).toNumber();
+}
 
 /**
  * Creates a Funding Transaction to fund the Multisig Transaction.
@@ -36,7 +42,7 @@ export async function createFundingTransaction(
   bitcoinBlockchainAPIURL: string
 ): Promise<Uint8Array> {
   const feeAddress = getFeeRecipientAddressFromPublicKey(feePublicKey, bitcoinNetwork);
-  const feeRecipientOutputValue = bitcoinAmount / feeBasisPoints;
+  const feeAmount = getFeeAmount(Number(bitcoinAmount), Number(feeBasisPoints));
 
   const userUTXOs = await getUTXOs(bitcoinNativeSegwitTransaction, bitcoinBlockchainAPIURL);
 
@@ -44,7 +50,7 @@ export async function createFundingTransaction(
     { address: multisigAddress, amount: bitcoinAmount },
     {
       address: feeAddress,
-      amount: feeRecipientOutputValue,
+      amount: BigInt(feeAmount),
     },
   ];
 
@@ -59,6 +65,10 @@ export async function createFundingTransaction(
   const fundingTX = selected?.tx;
 
   if (!fundingTX) throw new Error('Could not create Funding Transaction');
+
+  fundingTX.updateInput(0, {
+    sequence: 0xfffffff0,
+  });
 
   const fundingPSBT = fundingTX.toPSBT();
 
@@ -90,8 +100,8 @@ export function createClosingTransaction(
   feePublicKey: string,
   feeBasisPoints: bigint
 ): Uint8Array {
-  const feePublicKeyBuffer = Buffer.from(feePublicKey, 'hex');
-  const { address: feeAddress } = p2wpkh(feePublicKeyBuffer, bitcoinNetwork);
+  const feeAddress = getFeeRecipientAddressFromPublicKey(feePublicKey, bitcoinNetwork);
+  const feeAmount = getFeeAmount(Number(bitcoinAmount), Number(feeBasisPoints));
 
   if (!feeAddress) throw new Error('Could not create Fee Address');
 
@@ -110,7 +120,7 @@ export function createClosingTransaction(
   const outputs = [
     {
       address: feeAddress,
-      amount: bitcoinAmount / feeBasisPoints,
+      amount: BigInt(feeAmount),
     },
   ];
 
@@ -122,9 +132,15 @@ export function createClosingTransaction(
     network: bitcoinNetwork,
   });
 
-  if (!selected?.tx) throw new Error('Could not create Closing Transaction');
+  const closingTX = selected?.tx;
 
-  const closingPSBT = selected.tx.toPSBT();
+  if (!closingTX) throw new Error('Could not create Closing Transaction');
+
+  closingTX.updateInput(0, {
+    sequence: 0xfffffff0,
+  });
+
+  const closingPSBT = closingTX.toPSBT();
 
   return closingPSBT;
 }
