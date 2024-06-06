@@ -21,7 +21,7 @@ export function PointsStatsBoardAction({
   }
 
   return (
-    <VStack w={'50%'} h={'100%'} pr={'25px'} alignItems={'start'}>
+    <VStack w={'100%'} h={'100%'} pr={'25px'} py={'15px'} alignItems={'start'}>
       <Skeleton isLoaded={totalSupply !== undefined} h={'100%'} w={'100%'}>
         <VStack w={'100%'} h={'85px'} alignItems={'start'} spacing={'15px'}>
           <HStack h={'25px'}>
@@ -35,7 +35,18 @@ export function PointsStatsBoardAction({
           </Text>
         </VStack>
       </Skeleton>
-      <Button variant={'points'} onClick={() => {}}>
+      <Button
+        w={'100%'}
+        variant={'points'}
+        onClick={() =>
+          window.open(
+            token.name === 'dlcBTC'
+              ? 'https://www.dlc.link/earn-with-dlcbtc'
+              : 'https://www.dlc.link/merchants',
+            '_blank'
+          )
+        }
+      >
         <Text bgGradient={`linear(to-r, #AC50EF, #7059FB, #2ECFF6)`} bgClip="text">
           {token.name === 'dlcBTC' ? 'Earn More Points' : 'Become a Merchant'}
         </Text>
