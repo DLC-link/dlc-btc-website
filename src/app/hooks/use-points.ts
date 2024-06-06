@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { DetailedEvent, TimeStampedEvent } from '@models/ethereum-models';
+import Decimal from 'decimal.js';
 import { Event } from 'ethers';
 
 import { RootState } from '../store';
@@ -37,9 +38,11 @@ export function calculateRewardBetweenEvents(
   currentEvent: TimeStampedEvent,
   rewardsRate: number
 ): number {
-  const rewardsPerTime = previousEvent.totalValueLocked * rewardsRate;
-  const rewards = rewardsPerTime * (currentEvent.timestamp - previousEvent.timestamp);
-  return rewards;
+  const rewardsPerTime = new Decimal(previousEvent.totalValueLocked).times(rewardsRate);
+  const rewards = rewardsPerTime.times(
+    new Decimal(currentEvent.timestamp).minus(previousEvent.timestamp)
+  );
+  return rewards.toNumber();
 }
 
 export function calculatePoints(
@@ -101,8 +104,8 @@ export function usePoints(): UsePointsReturnType {
 
   async function fetchTransferEvents(userAddress: string): Promise<DetailedEvent[]> {
     const dlcBTCContract = await getDefaultProvider(network, 'DLCBTC');
-    const eventFilterTo = dlcBTCContract.filters.Transfer(null, userAddress);
-    const eventFilterFrom = dlcBTCContract.filters.Transfer(userAddress, null);
+    const eventFilterTo = dlcBTCContract.filters.Transfer(BURN_ADDRESS, userAddress);
+    const eventFilterFrom = dlcBTCContract.filters.Transfer(userAddress, BURN_ADDRESS);
     const eventsTo = await dlcBTCContract.queryFilter(eventFilterTo);
     const eventsFrom = await dlcBTCContract.queryFilter(eventFilterFrom);
     const events = [...eventsTo, ...eventsFrom];
@@ -122,6 +125,9 @@ export function usePoints(): UsePointsReturnType {
 
   async function fetchPoints(currentUserAddress: string): Promise<void> {
     const rewardsRate = import.meta.env.VITE_REWARDS_RATE;
+    if (!rewardsRate) {
+      throw new Error('Rewards Rate not set');
+    }
     const events = await fetchTransferEvents(currentUserAddress);
     const rollingTVL = calculateRollingTVL(events);
     setUserPoints(calculatePoints(rollingTVL, rewardsRate));
