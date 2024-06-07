@@ -116,11 +116,6 @@ const points = defineStyle({
   h: '54px',
   w: '200px',
   bg: 'white.01',
-  _hover: {
-    bg: 'none',
-    color: 'white',
-    border: '1px solid',
-  },
 });
 
 export const buttonTheme = defineStyleConfig({

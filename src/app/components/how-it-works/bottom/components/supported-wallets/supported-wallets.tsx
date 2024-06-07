@@ -17,7 +17,7 @@ export function SupportedWallets(): React.JSX.Element {
               coinName={'Ethereum Wallet:'}
               content={
                 <Text color={'white'}>
-                  We currently support MetaMask with support for other popular ethereum wallets
+                  We currently support MetaMask with support for other popular Ethereum wallets
                   coming soon.
                 </Text>
               }
