@@ -20,7 +20,7 @@ export function HowToMint(): React.JSX.Element {
           <Box h={'25px'} />
           <FlowStep
             step={'Step 1'}
-            title={'Deposit Adress'}
+            title={'Deposit Address'}
             content={
               <Text color={'white'}>
                 Select an amount of Bitcoin you would like to lock and confirm it in your{' '}
@@ -51,7 +51,7 @@ export function HowToMint(): React.JSX.Element {
             title={'Mint dlcBTC'}
             content={
               <Text color={'white'}>
-                Wait for Bitcoin to get locked on chain
+                Wait for Bitcoin to get locked on chain{' '}
                 <Text as={'span'} color={'accent.lightBlue.01'}>
                   (~1 hour).{' '}
                 </Text>
@@ -60,7 +60,7 @@ export function HowToMint(): React.JSX.Element {
                   Ethereum Wallet.{' '}
                 </Text>{' '}
                 You can use dlcBTC in big{' '}
-                <Text as={'span'} variant={'navigate'}>
+                <Text as={'span'} variant={'navigate'} fontSize={'md'}>
                   supported DeFi protocols
                 </Text>{' '}
                 for lending, yield farming, staking and more.
