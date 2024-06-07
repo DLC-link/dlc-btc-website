@@ -101,7 +101,7 @@ export function useEndpoints(): NetworkEndpoints {
       case EthereumNetworkID.ArbSepolia:
         return {
           attestorAPIURLs,
-          ethereumExplorerAPIURL: 'https://sepolia.arbiscan.io/tx/',
+          ethereumExplorerAPIURL: 'https://sepolia.arbiscan.io',
           ethereumAttestorChainID: 'evm-arbsepolia',
           enabledEthereumNetworks,
           bitcoinExplorerAPIURL,
@@ -113,7 +113,7 @@ export function useEndpoints(): NetworkEndpoints {
       case EthereumNetworkID.Arbitrum:
         return {
           attestorAPIURLs,
-          ethereumExplorerAPIURL: 'https://arbiscan.io/tx/',
+          ethereumExplorerAPIURL: 'https://arbiscan.io',
           ethereumAttestorChainID: 'evm-arbitrum',
           enabledEthereumNetworks,
           bitcoinExplorerAPIURL,

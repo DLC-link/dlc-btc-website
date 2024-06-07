@@ -1,27 +1,12 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
 
 import { Button, HStack, Image, Skeleton, Text } from '@chakra-ui/react';
-import { ethereumArbSepolia, ethereumArbitrum } from '@models/ethereum-network';
+import { useEndpoints } from '@hooks/use-endpoints';
 import { Merchant } from '@models/merchant';
-import { RootState } from '@store/index';
 
 interface MerchantTableItemProps {
   merchant: Merchant;
   dlcBTCAmount: number | undefined;
-}
-
-function openMerchantLink(ethereumNetworkName: string, merchantAddress: string): void {
-  let link;
-  switch (ethereumNetworkName) {
-    case ethereumArbitrum.name:
-      link = `https://arbiscan.io/address/${merchantAddress}`;
-      break;
-    case ethereumArbSepolia.name:
-      link = `https://sepolia.arbiscan.io/address/${merchantAddress}`;
-      break;
-  }
-  window.open(link, '_blank');
 }
 
 export function MerchantTableItem({
@@ -31,7 +16,7 @@ export function MerchantTableItem({
   //TODO: replace name with logo when the logo is available
   const { name } = merchant;
 
-  const { network } = useSelector((state: RootState) => state.account);
+  const { ethereumExplorerAPIURL } = useEndpoints();
   return (
     <HStack px={'25px'} w={'100%'}>
       <Text
@@ -53,7 +38,9 @@ export function MerchantTableItem({
       </HStack>
       <Button
         variant={'merchantTableItem'}
-        onClick={() => openMerchantLink(network.name, merchant.address)}
+        onClick={() =>
+          window.open(`${ethereumExplorerAPIURL}/address/${merchant.address}`, '_blank')
+        }
       >
         <Text color={'white.01'} fontSize={'sm'}>
           Mint/Redeem History
