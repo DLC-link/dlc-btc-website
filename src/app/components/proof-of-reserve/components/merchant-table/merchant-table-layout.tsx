@@ -1,9 +1,7 @@
 import { VStack } from '@chakra-ui/react';
 import { HasChildren } from '@models/has-children';
 
-// @ts-expect-error: ignoring because of later implementation
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function MerchantTableLayout({ children }: HasChildren): React.JSX.Element {
+export function MerchantTableLayout({ children }: HasChildren): React.JSX.Element {
   return (
     <VStack
       w={'50%'}
@@ -12,6 +10,8 @@ function MerchantTableLayout({ children }: HasChildren): React.JSX.Element {
       alignItems={'flex-start'}
       borderRadius={'md'}
       bg={'background.container.01'}
+      border={'1px'}
+      borderColor={'white.03'}
     >
       {children}
     </VStack>

@@ -8,9 +8,10 @@ interface MerchantTableItemProps {
   dlcBTCAmount: number;
 }
 
-// @ts-expect-error: ignoring because of later implementation
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function MerchantTableItem({ merchant, dlcBTCAmount }: MerchantTableItemProps): React.ReactElement {
+export function MerchantTableItem({
+  merchant,
+  dlcBTCAmount,
+}: MerchantTableItemProps): React.ReactElement {
   //TODO: replace name with logo when the logo is available
   const { name } = merchant;
 
