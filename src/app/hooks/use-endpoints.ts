@@ -3,8 +3,8 @@ import { useSelector } from 'react-redux';
 
 import { EthereumNetwork, EthereumNetworkID, ethereumNetworks } from '@models/ethereum-network';
 import { RootState } from '@store/index';
-import { Network } from 'bitcoinjs-lib';
-import { bitcoin, regtest, testnet } from 'bitcoinjs-lib/src/networks';
+import { bitcoin, regtest, testnet } from 'dlc-btc-lib/constants';
+import { Network } from 'dlc-btc-lib/models';
 
 interface NetworkEndpoints {
   attestorAPIURLs: string[];

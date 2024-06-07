@@ -11,6 +11,7 @@ import {
   SignPsbtRequestParams,
 } from '@models/leather';
 import { RawVault } from '@models/vault';
+import { BitcoinWalletType } from '@models/wallet';
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
 import {
   BitcoinWalletContext,
@@ -40,7 +41,8 @@ interface UseLeatherReturnType {
 }
 
 export function useLeather(): UseLeatherReturnType {
-  const { setDLCHandler, setBitcoinWalletContextState } = useContext(BitcoinWalletContext);
+  const { setDLCHandler, setBitcoinWalletContextState, setBitcoinWalletType } =
+    useContext(BitcoinWalletContext);
   const { bitcoinNetwork, bitcoinBlockchainAPIURL, bitcoinBlockchainAPIFeeURL } = useEndpoints();
 
   const [isLoading, setIsLoading] = useState<[boolean, string]>([false, '']);
@@ -132,6 +134,7 @@ export function useLeather(): UseLeatherReturnType {
       );
 
       setDLCHandler(leatherDLCHandler);
+      setBitcoinWalletType(BitcoinWalletType.Leather);
       setBitcoinWalletContextState(BitcoinWalletContextState.READY);
       setIsLoading([false, '']);
     } catch (error) {

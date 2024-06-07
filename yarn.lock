@@ -3396,10 +3396,10 @@ dir-glob@^3.0.1:
   dependencies:
     path-type "^4.0.0"
 
-dlc-btc-lib@^1.0.8:
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/dlc-btc-lib/-/dlc-btc-lib-1.0.8.tgz#235e3ee2731f2672e5671d491f0b068a8daa1c36"
-  integrity sha512-fTqZNiCi2JonpVSSEI5gnDHv6eQtinyuK00/RsXmEx6Z4Xz2NZxoPdAtvMJlc3FN6rQxMmcBSJomL+KgoUrMBg==
+dlc-btc-lib@^1.0.9:
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/dlc-btc-lib/-/dlc-btc-lib-1.0.9.tgz#97b3db932121efaf82602dd8b413e75a0d232f90"
+  integrity sha512-NCtxhwW2XJ59JCsNYGgxwiAIbA1rgQLz1vrjIKGqZEM8+69dJQqpDSNUWSMK7jmWwc7Apxhkl76LU1Z07j4MLA==
   dependencies:
     "@ledgerhq/hw-app-btc" "^10.2.4"
     "@noble/hashes" "^1.4.0"

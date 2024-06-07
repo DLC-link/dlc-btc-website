@@ -1,9 +1,8 @@
 /** @format */
 import { unshiftValue } from '@common/utilities';
-import { P2TROut, p2tr, p2tr_ns, p2wpkh } from '@scure/btc-signer';
+import { P2TROut, p2tr, p2tr_ns } from '@scure/btc-signer';
 import { BIP32Factory } from 'bip32';
-import { Network } from 'bitcoinjs-lib';
-import { UTXO } from 'dlc-btc-lib/models';
+import { Network, UTXO } from 'dlc-btc-lib/models';
 import * as ellipticCurveCryptography from 'tiny-secp256k1';
 
 import { BitcoinError } from '@shared/models/error-types';
@@ -72,22 +71,6 @@ export async function getBalance(
   const balanceInSats = userUTXOs.reduce((total, utxo) => total + utxo.value, 0);
 
   return unshiftValue(balanceInSats);
-}
-
-/**
- * Gets the Fee Recipient's Address from the Rcipient's Public Key.
- * @param feePublicKey - The Fee Recipient's Public Key.
- * @param bitcoinNetwork - The Bitcoin Network to use.
- * @returns The Fee Recipient's Address.
- */
-export function getFeeRecipientAddressFromPublicKey(
-  feePublicKey: string,
-  bitcoinNetwork: Network
-): string {
-  const feePublicKeyBuffer = Buffer.from(feePublicKey, 'hex');
-  const { address } = p2wpkh(feePublicKeyBuffer, bitcoinNetwork);
-  if (!address) throw new BitcoinError('Could not create Fee Address from Public Key');
-  return address;
 }
 
 /**
