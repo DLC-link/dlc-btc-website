@@ -9,15 +9,26 @@ import {
   getUnspendableKeyCommittedToUUID,
 } from '@functions/bitcoin-functions';
 import { BitcoinTransaction, BitcoinTransactionVectorOutput } from '@models/bitcoin-models';
+import { Merchant, MerchantProofOfReserve } from '@models/merchant';
 import { RawVault } from '@models/vault';
 import { hex } from '@scure/base';
 import { RootState } from '@store/index';
+import { Network } from 'bitcoinjs-lib';
+import { bitcoin, regtest, testnet } from 'bitcoinjs-lib/src/networks';
+
+import {
+  defaultMerchantProofOfReserveArray,
+  devnetMerchants,
+  mainnetMerchants,
+  testnetMerchants,
+} from '@shared/constants/dlc-btc-merchants';
 
 import { useEndpoints } from './use-endpoints';
 import { useEthereum } from './use-ethereum';
 
 interface UseProofOfReserveReturnType {
   proofOfReserve: number | undefined;
+  merchantProofOfReserve: MerchantProofOfReserve[];
 }
 
 export function useProofOfReserve(): UseProofOfReserveReturnType {
@@ -31,6 +42,15 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
     enabled: shouldFetch,
     refetchInterval: 60000,
   });
+
+  const { data: merchantProofOfReserve } = useQuery(
+    ['merchantProofOfReserve'],
+    calculateMerchantProofOfReserves,
+    {
+      enabled: shouldFetch,
+      refetchInterval: 60000,
+    }
+  );
 
   useEffect(() => {
     const delayFetching = setTimeout(() => {
@@ -190,7 +210,65 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
     return customShiftValue(currentProofOfReserve, 8, true);
   }
 
+  async function calculateProofOfReserveOfAddress(ethereumAddress: string): Promise<number> {
+    const allFundedVaults = await Promise.all(
+      enabledEthereumNetworks.map(network => getAllFundedVaults(network))
+    ).then(vaultsArrays => vaultsArrays.flat());
+
+    const filteredVaults = allFundedVaults.filter(vault => vault.creator === ethereumAddress);
+
+    const attestorPublicKey = getDerivedPublicKey(
+      await getAttestorGroupPublicKey(network),
+      bitcoinNetwork
+    );
+
+    const results = await Promise.all(
+      filteredVaults.map(async vault => {
+        try {
+          if (await verifyVaultDeposit(vault, attestorPublicKey)) {
+            return vault.valueLocked.toNumber();
+          }
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.error('Error while verifying Deposit for Vault:', vault.uuid, error);
+        }
+        return 0;
+      })
+    );
+    const currentProofOfReserve = results.reduce((sum, collateral) => sum + collateral, 0);
+
+    return customShiftValue(currentProofOfReserve, 8, true);
+  }
+
+  async function calculateMerchantProofOfReserves(): Promise<MerchantProofOfReserve[]> {
+    const merchants = getMerchantsByBitcoinNetwork(bitcoinNetwork);
+
+    const promises = merchants.map(async merchant => {
+      const proofOfReserve = await calculateProofOfReserveOfAddress(merchant.address);
+      return {
+        merchant,
+        dlcBTCAmount: proofOfReserve,
+      };
+    });
+
+    return Promise.all(promises);
+  }
+
+  function getMerchantsByBitcoinNetwork(bitcoinNetwork: Network): Merchant[] {
+    switch (bitcoinNetwork) {
+      case bitcoin:
+        return mainnetMerchants;
+      case testnet:
+        return testnetMerchants;
+      case regtest:
+        return devnetMerchants;
+      default:
+        throw new Error('Invalid Bitcoin Network');
+    }
+  }
+
   return {
     proofOfReserve,
+    merchantProofOfReserve: merchantProofOfReserve ?? defaultMerchantProofOfReserveArray,
   };
 }

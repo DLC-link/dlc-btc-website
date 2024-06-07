@@ -10,7 +10,7 @@ export function TokenStatsBoardTVL({
   bitcoinPrice,
 }: TokenStatsBoardTVLProps): React.JSX.Element {
   return (
-    <VStack w={'50%'} px={'25px'} py={'15px'} alignItems={'flex-start'}>
+    <VStack w={'100%'} px={'25px'} py={'15px'} alignItems={'flex-start'}>
       <Text color={'white.01'} fontSize={'3xl'} fontWeight={'200'} textAlign={'left'}>
         TVL
       </Text>

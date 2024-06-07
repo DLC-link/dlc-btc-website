@@ -3,16 +3,7 @@ import { HasChildren } from '@models/has-children';
 
 export function MerchantTableLayout({ children }: HasChildren): React.JSX.Element {
   return (
-    <VStack
-      w={'50%'}
-      h={'250px'}
-      px={'15px'}
-      alignItems={'flex-start'}
-      borderRadius={'md'}
-      bg={'background.container.01'}
-      border={'1px'}
-      borderColor={'white.03'}
-    >
+    <VStack w={'50%'} h={'275px'} px={'15px'} alignItems={'flex-start'} borderRadius={'md'}>
       {children}
     </VStack>
   );

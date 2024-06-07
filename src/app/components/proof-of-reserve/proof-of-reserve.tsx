@@ -1,8 +1,7 @@
 import { useContext } from 'react';
 
-import { Divider, HStack, Text } from '@chakra-ui/react';
+import { Divider, HStack, Text, VStack } from '@chakra-ui/react';
 import { useBitcoinPrice } from '@hooks/use-bitcoin-price';
-import { amber } from '@models/merchant';
 import { bitcoin, dlcBTC } from '@models/token';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
 
@@ -17,7 +16,7 @@ import { TokenStatsBoardLayout } from './components/token-stats-board/token-stat
 export function ProofOfReserve(): React.JSX.Element {
   const { bitcoinPrice } = useBitcoinPrice();
 
-  const { proofOfReserve, totalSupply } = useContext(ProofOfReserveContext);
+  const { proofOfReserve, merchantProofOfReserve, totalSupply } = useContext(ProofOfReserveContext);
 
   return (
     <ProofOfReserveLayout>
@@ -25,22 +24,25 @@ export function ProofOfReserve(): React.JSX.Element {
         Proof of Reserve
       </Text>
       <TokenStatsBoardLayout>
-        <TokenStatsBoardTVL totalSupply={totalSupply} bitcoinPrice={bitcoinPrice} />
-        <HStack w={'50%'} pl={'25px'}>
-          <TokenStatsBoardToken token={dlcBTC} totalSupply={totalSupply} />
-          <Divider orientation={'vertical'} px={'15px'} height={'75px'} variant={'thick'} />
-          <TokenStatsBoardToken token={bitcoin} totalSupply={proofOfReserve} />
+        <HStack w={'100%'}>
+          <VStack w={'50%'} alignItems={'flex-start'}>
+            <TokenStatsBoardTVL totalSupply={totalSupply} bitcoinPrice={bitcoinPrice} />
+            <HStack w={'100%'} pl={'25px'}>
+              <TokenStatsBoardToken token={dlcBTC} totalSupply={totalSupply} />
+              <Divider orientation={'vertical'} px={'15px'} height={'75px'} variant={'thick'} />
+              <TokenStatsBoardToken token={bitcoin} totalSupply={proofOfReserve} />
+            </HStack>
+          </VStack>
+          <Divider orientation={'vertical'} px={'15px'} height={'275px'} variant={'thick'} />
+          <MerchantTableLayout>
+            <MerchantTableHeader />
+            {merchantProofOfReserve.map(item => (
+              <MerchantTableItem key={item.merchant.name} {...item} />
+            ))}
+          </MerchantTableLayout>
         </HStack>
-      </TokenStatsBoardLayout>
-      <HStack w={'100%'} spacing={'20px'}>
-        <MerchantTableLayout>
-          <MerchantTableHeader />
-          {[{ merchant: amber, dlcBTCAmount: 0.5 }].map(item => (
-            <MerchantTableItem key={item.merchant.name} {...item} />
-          ))}
-        </MerchantTableLayout>
         {/* <ProtocolHistoryTable /> */}
-      </HStack>
+      </TokenStatsBoardLayout>
     </ProofOfReserveLayout>
   );
 }

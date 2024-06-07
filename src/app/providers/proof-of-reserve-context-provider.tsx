@@ -3,23 +3,28 @@ import { createContext } from 'react';
 import { useProofOfReserve } from '@hooks/use-proof-of-reserve';
 import { useTotalSupply } from '@hooks/use-total-supply';
 import { HasChildren } from '@models/has-children';
+import { MerchantProofOfReserve } from '@models/merchant';
+
+import { defaultMerchantProofOfReserveArray } from '@shared/constants/dlc-btc-merchants';
 
 interface ProofOfReserveContextProviderType {
   proofOfReserve: number | undefined;
+  merchantProofOfReserve: MerchantProofOfReserve[];
   totalSupply: number | undefined;
 }
 
 export const ProofOfReserveContext = createContext<ProofOfReserveContextProviderType>({
   proofOfReserve: undefined,
+  merchantProofOfReserve: defaultMerchantProofOfReserveArray,
   totalSupply: undefined,
 });
 
 export function ProofOfReserveContextProvider({ children }: HasChildren): React.JSX.Element {
-  const { proofOfReserve } = useProofOfReserve();
+  const { proofOfReserve, merchantProofOfReserve } = useProofOfReserve();
   const { totalSupply } = useTotalSupply();
 
   return (
-    <ProofOfReserveContext.Provider value={{ proofOfReserve, totalSupply }}>
+    <ProofOfReserveContext.Provider value={{ proofOfReserve, merchantProofOfReserve, totalSupply }}>
       {children}
     </ProofOfReserveContext.Provider>
   );
