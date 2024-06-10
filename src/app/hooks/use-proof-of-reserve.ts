@@ -9,18 +9,18 @@ import {
   getUnspendableKeyCommittedToUUID,
 } from '@functions/bitcoin-functions';
 import { BitcoinTransaction, BitcoinTransactionVectorOutput } from '@models/bitcoin-models';
-import { MerchantProofOfReserve } from '@models/merchant';
+import { Configuration } from '@models/configuration';
+import { Merchant, MerchantProofOfReserve } from '@models/merchant';
 import { RawVault } from '@models/vault';
 import { hex } from '@scure/base';
 import { RootState } from '@store/index';
 
-import { configuration } from '../app';
 import { useEndpoints } from './use-endpoints';
 import { useEthereum } from './use-ethereum';
 
 interface UseProofOfReserveReturnType {
   proofOfReserve: number | undefined;
-  merchantProofOfReserve: MerchantProofOfReserve[];
+  merchantProofOfReserve: MerchantProofOfReserve[] | undefined;
 }
 
 export function useProofOfReserve(): UseProofOfReserveReturnType {
@@ -235,7 +235,9 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
   }
 
   async function calculateMerchantProofOfReserves(): Promise<MerchantProofOfReserve[]> {
-    const promises = configuration.merchants.map(async merchant => {
+    const configuration: Configuration = JSON.parse(bitcoinNetworkConfiguration);
+
+    const promises = configuration.merchants.map(async (merchant: Merchant) => {
       const proofOfReserve = await calculateProofOfReserveOfAddress(merchant.address);
       return {
         merchant,
@@ -250,9 +252,11 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
     proofOfReserve,
     merchantProofOfReserve:
       merchantProofOfReserve ??
-      configuration.merchants.map(merchant => ({
-        merchant,
-        dlcBTCAmount: undefined,
-      })),
+      JSON.parse(bitcoinNetworkConfiguration).merchants.map((merchant: Merchant) => {
+        return {
+          merchant,
+          dlcBTCAmount: proofOfReserve,
+        };
+      }),
   };
 }

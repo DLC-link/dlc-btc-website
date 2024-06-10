@@ -2,7 +2,6 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { Route } from 'react-router-dom';
 
 import { AppLayout } from '@components/app.layout';
-import { Configuration } from '@models/configuration';
 import { MyVaults } from '@pages/my-vaults/my-vaults';
 import { PointsPage } from '@pages/points/points-page';
 import { ProofOfReservePage } from '@pages/proof-of-reserve/proof-of-reserve-page';
@@ -22,24 +21,6 @@ import { VaultContextProvider } from './providers/vault-context-provider';
 const queryClient = new QueryClient();
 
 initEccLib(ellipticCurveCryptography);
-
-let configuration: Configuration;
-
-switch (import.meta.env.VITE_BITCOIN_NETWORK) {
-  case 'mainnet':
-    configuration = (await import('../../config.mainnet.toml')).default as Configuration;
-    break;
-  case 'testnet':
-    configuration = (await import('../../config.testnet.toml')).default as Configuration;
-    break;
-  case 'regtest':
-    configuration = (await import('../../config.devnet.toml')).default as Configuration;
-    break;
-  default:
-    throw new Error('Invalid Bitcoin Network, could not load Configuration');
-}
-
-export { configuration };
 
 export function App(): React.JSX.Element {
   return (

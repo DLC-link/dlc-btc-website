@@ -16,7 +16,7 @@
     "lint:prettier:fix": "prettier --write \"{src,tests}/**/*.{ts,tsx}\" *.js",
     "lint:unused-exports": "ts-unused-exports tsconfig.json",
     "typecheck": "tsc --noEmit",
-    "test:unit": "vitest --reporter=verbose unit",
+    "test:unit": "VITE_BITCOIN_NETWORK=regtest vitest --reporter=verbose unit",
     "test:integration": "npx playwright test",
     "preview": "vite preview"
   },

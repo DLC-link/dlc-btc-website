@@ -22,7 +22,13 @@ export function ProofOfReserveContextProvider({ children }: HasChildren): React.
   const { totalSupply } = useTotalSupply();
 
   return (
-    <ProofOfReserveContext.Provider value={{ proofOfReserve, merchantProofOfReserve, totalSupply }}>
+    <ProofOfReserveContext.Provider
+      value={{
+        proofOfReserve,
+        merchantProofOfReserve,
+        totalSupply,
+      }}
+    >
       {children}
     </ProofOfReserveContext.Provider>
   );
