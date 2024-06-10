@@ -36,7 +36,7 @@ export function ProofOfReserve(): React.JSX.Element {
           <Divider orientation={'vertical'} px={'15px'} height={'275px'} variant={'thick'} />
           <MerchantTableLayout>
             <MerchantTableHeader />
-            {merchantProofOfReserve.map(item => (
+            {merchantProofOfReserve?.map(item => (
               <MerchantTableItem key={item.merchant.name} {...item} />
             ))}
           </MerchantTableLayout>

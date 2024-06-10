@@ -1,16 +1,19 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
+import { ViteToml } from 'vite-plugin-toml'
+
 import wasm from 'vite-plugin-wasm';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), wasm()],
+  plugins: [react(), wasm(), ViteToml()],
   build: {
     target: 'esnext',
   },
   resolve: {
-    alias: [{ 
+    alias: [
+      { 
       find: "@store", 
       replacement: resolve(__dirname, './src/app/store') 
     },

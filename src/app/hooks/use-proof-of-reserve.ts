@@ -9,20 +9,12 @@ import {
   getUnspendableKeyCommittedToUUID,
 } from '@functions/bitcoin-functions';
 import { BitcoinTransaction, BitcoinTransactionVectorOutput } from '@models/bitcoin-models';
-import { Merchant, MerchantProofOfReserve } from '@models/merchant';
+import { MerchantProofOfReserve } from '@models/merchant';
 import { RawVault } from '@models/vault';
 import { hex } from '@scure/base';
 import { RootState } from '@store/index';
-import { Network } from 'bitcoinjs-lib';
-import { bitcoin, regtest, testnet } from 'bitcoinjs-lib/src/networks';
 
-import {
-  defaultMerchantProofOfReserveArray,
-  devnetMerchants,
-  mainnetMerchants,
-  testnetMerchants,
-} from '@shared/constants/dlc-btc-merchants';
-
+import { configuration } from '../app';
 import { useEndpoints } from './use-endpoints';
 import { useEthereum } from './use-ethereum';
 
@@ -215,7 +207,9 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
       enabledEthereumNetworks.map(network => getAllFundedVaults(network))
     ).then(vaultsArrays => vaultsArrays.flat());
 
-    const filteredVaults = allFundedVaults.filter(vault => vault.creator === ethereumAddress);
+    const filteredVaults = allFundedVaults.filter(
+      vault => vault.creator.toLowerCase() === ethereumAddress
+    );
 
     const attestorPublicKey = getDerivedPublicKey(
       await getAttestorGroupPublicKey(network),
@@ -241,9 +235,7 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
   }
 
   async function calculateMerchantProofOfReserves(): Promise<MerchantProofOfReserve[]> {
-    const merchants = getMerchantsByBitcoinNetwork(bitcoinNetwork);
-
-    const promises = merchants.map(async merchant => {
+    const promises = configuration.merchants.map(async merchant => {
       const proofOfReserve = await calculateProofOfReserveOfAddress(merchant.address);
       return {
         merchant,
@@ -254,21 +246,13 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
     return Promise.all(promises);
   }
 
-  function getMerchantsByBitcoinNetwork(bitcoinNetwork: Network): Merchant[] {
-    switch (bitcoinNetwork) {
-      case bitcoin:
-        return mainnetMerchants;
-      case testnet:
-        return testnetMerchants;
-      case regtest:
-        return devnetMerchants;
-      default:
-        throw new Error('Invalid Bitcoin Network');
-    }
-  }
-
   return {
     proofOfReserve,
-    merchantProofOfReserve: merchantProofOfReserve ?? defaultMerchantProofOfReserveArray,
+    merchantProofOfReserve:
+      merchantProofOfReserve ??
+      configuration.merchants.map(merchant => ({
+        merchant,
+        dlcBTCAmount: undefined,
+      })),
   };
 }

@@ -5,17 +5,15 @@ import { useTotalSupply } from '@hooks/use-total-supply';
 import { HasChildren } from '@models/has-children';
 import { MerchantProofOfReserve } from '@models/merchant';
 
-import { defaultMerchantProofOfReserveArray } from '@shared/constants/dlc-btc-merchants';
-
 interface ProofOfReserveContextProviderType {
   proofOfReserve: number | undefined;
-  merchantProofOfReserve: MerchantProofOfReserve[];
+  merchantProofOfReserve: MerchantProofOfReserve[] | undefined;
   totalSupply: number | undefined;
 }
 
 export const ProofOfReserveContext = createContext<ProofOfReserveContextProviderType>({
   proofOfReserve: undefined,
-  merchantProofOfReserve: defaultMerchantProofOfReserveArray,
+  merchantProofOfReserve: undefined,
   totalSupply: undefined,
 });
 
