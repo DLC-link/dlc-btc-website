@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) =>  {
 
   const env = loadEnv(mode, process.cwd(), '')
 
-  const bitcoinNetworkConfiguration = readFileSync(resolve(__dirname, `./config.${env.VITE_BITCOIN_NETWORK}.json`), 'utf-8');
+  const bitcoinNetworkConfiguration = JSON.parse(readFileSync(resolve(__dirname, `./config.${env.VITE_BITCOIN_NETWORK}.json`), 'utf-8'));
 
   return {
   plugins: [react(), wasm(), ViteToml()],
@@ -19,7 +19,7 @@ export default defineConfig(({ mode }) =>  {
     target: 'esnext',
   },
   define: {
-    bitcoinNetworkConfiguration: JSON.stringify(bitcoinNetworkConfiguration)
+    bitcoinNetworkConfiguration,
   },
   resolve: {
     alias: [

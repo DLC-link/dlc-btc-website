@@ -9,7 +9,6 @@ import {
   getUnspendableKeyCommittedToUUID,
 } from '@functions/bitcoin-functions';
 import { BitcoinTransaction, BitcoinTransactionVectorOutput } from '@models/bitcoin-models';
-import { Configuration } from '@models/configuration';
 import { Merchant, MerchantProofOfReserve } from '@models/merchant';
 import { RawVault } from '@models/vault';
 import { hex } from '@scure/base';
@@ -235,9 +234,7 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
   }
 
   async function calculateMerchantProofOfReserves(): Promise<MerchantProofOfReserve[]> {
-    const configuration: Configuration = JSON.parse(bitcoinNetworkConfiguration);
-
-    const promises = configuration.merchants.map(async (merchant: Merchant) => {
+    const promises = bitcoinNetworkConfiguration.merchants.map(async (merchant: Merchant) => {
       const proofOfReserve = await calculateProofOfReserveOfAddress(merchant.address);
       return {
         merchant,
@@ -252,7 +249,7 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
     proofOfReserve,
     merchantProofOfReserve:
       merchantProofOfReserve ??
-      JSON.parse(bitcoinNetworkConfiguration).merchants.map((merchant: Merchant) => {
+      bitcoinNetworkConfiguration.merchants.map((merchant: Merchant) => {
         return {
           merchant,
           dlcBTCAmount: proofOfReserve,
