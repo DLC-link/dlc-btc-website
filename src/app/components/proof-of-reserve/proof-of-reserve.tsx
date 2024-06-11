@@ -1,8 +1,7 @@
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 
 import { Divider, HStack, Text, VStack } from '@chakra-ui/react';
 import { useBitcoinPrice } from '@hooks/use-bitcoin-price';
-import { useRisk } from '@hooks/use-risk';
 import { bitcoin, dlcBTC } from '@models/token';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
 
@@ -18,11 +17,6 @@ export function ProofOfReserve(): React.JSX.Element {
   const { bitcoinPrice } = useBitcoinPrice();
 
   const { proofOfReserve, merchantProofOfReserve, totalSupply } = useContext(ProofOfReserveContext);
-  const risk = useRisk();
-
-  useEffect(() => {
-    console.log('risk', risk);
-  }, [risk]);
 
   return (
     <ProofOfReserveLayout>

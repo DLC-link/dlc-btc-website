@@ -47,78 +47,59 @@ interface UserAddressRiskResponse {
   status: string;
 }
 
-export function useRisk(): UserAddressRiskResponse | undefined {
+interface UseRiskReturnType {
+  risk: string | undefined;
+  fetchUserAddressRisk: () => Promise<string>;
+  isLoading: boolean;
+}
+
+export function useRisk(): UseRiskReturnType {
   const { address } = useSelector((state: RootState) => state.account);
 
-  const { data: risk } = useQuery(['userAddressRisk'], registerAndFetchUserAddressRisk);
+  const { data: risk, isLoading } = useQuery(['userAddressRisk'], registerAndFetchUserAddressRisk);
 
-  async function registerAndFetchUserAddressRisk(): Promise<UserAddressRiskResponse> {
-    const chainalysisToken = import.meta.env.VITE_CHAINALYSIS_TOKEN;
-
+  async function registerAndFetchUserAddressRisk(): Promise<string> {
     if (!address) {
       throw new Error('Address is required');
     }
 
-    const fetchUserAddressRiskResponse = await fetchUserAddressRisk(chainalysisToken, address);
+    await registerUserAddress(address);
 
-    if (typeof fetchUserAddressRiskResponse === 'string') {
-      await registerUserAddress(chainalysisToken, address);
-      const fetchUserAddressRiskResponse = await fetchUserAddressRisk(chainalysisToken, address);
-      if (typeof fetchUserAddressRiskResponse === 'string') {
-        throw new Error(fetchUserAddressRiskResponse);
-      }
-      return fetchUserAddressRiskResponse;
-    }
+    const fetchUserAddressRiskResponse = await fetchUserAddressRisk(address);
 
-    return fetchUserAddressRiskResponse;
+    return fetchUserAddressRiskResponse.risk;
   }
 
-  async function fetchUserAddressRisk(
-    chainalysisToken: string,
-    userAddress: string
-  ): Promise<UserAddressRiskResponse | string> {
-    const riskEndpoint = `https://api.chainalysis.com/api/risk/v2/entities/${userAddress}`;
-    const options = {
-      method: 'GET',
-      headers: {
-        Token: chainalysisToken,
-        'Content-Type': 'application/json',
-      },
-    };
+  async function fetchUserAddressRisk(userAddress: string): Promise<UserAddressRiskResponse> {
+    const netlifyFunctionEndpoint = `/.netlify/functions/fetch-user-address-risk?address=${userAddress}`;
+    const response = await fetch(netlifyFunctionEndpoint);
 
-    const response = await fetch(riskEndpoint, options);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const data = await response.json();
-    return data;
+    return data.message;
   }
 
   async function registerUserAddress(
-    chainalysisToken: string,
     userAddress: string
   ): Promise<UserAddressRegistrationResponse> {
-    const registerEndpoint = 'https://api.chainalysis.com/api/risk/v2/entities';
-    const options = {
-      method: 'POST',
-      headers: {
-        Token: chainalysisToken,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        address: userAddress,
-      }),
-    };
+    const netlifyFunctionEndpoint = `/.netlify/functions/register-user-address?address=${userAddress}`;
 
-    const response = await fetch(registerEndpoint, options);
+    const response = await fetch(netlifyFunctionEndpoint);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    return await response.json();
+    const data = await response.json();
+    return data.message;
   }
 
-  return risk;
+  return {
+    risk,
+    fetchUserAddressRisk: registerAndFetchUserAddressRisk,
+    isLoading,
+  };
 }
