@@ -1,20 +1,19 @@
 export async function handler(event) {
-  const address = event.queryStringParameters.address;
-  const token = process.env.VITE_CHAINALYSIS_TOKEN;
+  const chainalysisURL = process.env.VITE_CHAINALYSIS_API_URL;
+  const chainalysisToken = process.env.VITE_CHAINALYSIS_TOKEN;
 
-  const registerEndpoint = 'https://api.chainalysis.com/api/risk/v2/entities';
   const options = {
     method: 'POST',
     headers: {
-      Token: token,
+      Token: chainalysisToken,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      address: address,
+      address: event.queryStringParameters.address,
     }),
   };
 
-  const response = await fetch(registerEndpoint, options);
+  const response = await fetch(chainalysisURL, options);
 
   if (!response.ok) {
     return {
