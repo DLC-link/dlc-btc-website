@@ -18,7 +18,6 @@ import {
   BitcoinWalletContextState,
 } from '@providers/bitcoin-wallet-context-provider';
 import { SoftwareWalletDLCHandler } from 'dlc-btc-lib';
-import { bitcoin, regtest, testnet } from 'dlc-btc-lib/constants';
 import { Transaction } from 'dlc-btc-lib/models';
 
 import { BITCOIN_NETWORK_MAP } from '@shared/constants/bitcoin.constants';
@@ -71,24 +70,8 @@ export function useLeather(): UseLeatherReturnType {
    * @throws BitcoinError - If the user's wallet is not on the same network as the app.
    */
   function checkUserWalletNetwork(userNativeSegwitAddress: Account): void {
-    if (
-      BITCOIN_NETWORK_MAP[appConfiguration.bitcoinNetwork] === bitcoin &&
-      !userNativeSegwitAddress.address.startsWith('bc1')
-    ) {
-      throw new LeatherError('User wallet is not on Bitcoin Mainnet');
-    } else if (
-      BITCOIN_NETWORK_MAP[appConfiguration.bitcoinNetwork] === testnet &&
-      !userNativeSegwitAddress.address.startsWith('tb1')
-    ) {
-      throw new LeatherError('User wallet is not on Bitcoin Testnet');
-    } else if (
-      BITCOIN_NETWORK_MAP[appConfiguration.bitcoinNetwork] === regtest &&
-      !userNativeSegwitAddress.address.startsWith('bcrt1')
-    ) {
+    if (!userNativeSegwitAddress.address.startsWith(appConfiguration.bitcoinNetworkPreFix))
       throw new LeatherError('User wallet is not on Bitcoin Regtest');
-    } else {
-      return;
-    }
   }
 
   /**

@@ -5,10 +5,13 @@ enum BitcoinNetworkName {
   TESTNET = 'testnet',
   REGTEST = 'regtest',
 }
+
+type BitcoinNetworkPrefix = 'bc1' | 'tb1' | 'bcrt1';
 export interface Configuration {
   attestorURLs: string[];
   enabledEthereumNetworkIDs: string[];
   bitcoinNetwork: BitcoinNetworkName;
+  bitcoinNetworkPreFix: BitcoinNetworkPrefix;
   bitcoinBlockchainURL: string;
   bitcoinBlockchainExplorerURL: string;
   bitcoinBlockchainFeeEstimateURL: string;
