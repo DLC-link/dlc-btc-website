@@ -16,7 +16,7 @@
     "lint:prettier:fix": "prettier --write \"{src,tests}/**/*.{ts,tsx}\" *.js",
     "lint:unused-exports": "ts-unused-exports tsconfig.json",
     "typecheck": "tsc --noEmit",
-    "test:unit": "vitest --reporter=verbose unit",
+    "test:unit": "VITE_BITCOIN_NETWORK=regtest vitest --reporter=verbose unit",
     "test:integration": "npx playwright test",
     "preview": "vite preview"
   },
@@ -66,6 +66,7 @@
     "redux-persist-expire": "^1.1.1",
     "tiny-secp256k1": "^2.2.3",
     "ts-unused-exports": "^10.0.1",
+    "vite-plugin-toml": "^0.7.0",
     "vitest": "^0.34.6"
   },
   "devDependencies": {

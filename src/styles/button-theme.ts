@@ -118,7 +118,27 @@ const points = defineStyle({
   bg: 'white.01',
 });
 
+const merchantTableItem = defineStyle({
+  bgGradient: `linear(to-r, #AC50EF, #7059FB, #2ECFF6)`,
+  backgroundSize: '150% 100%',
+  transition: 'background-position 500ms ease',
+  _hover: {
+    backgroundPosition: 'right',
+  },
+});
+
 export const buttonTheme = defineStyleConfig({
   baseStyle: basestyle,
-  variants: { tab, company, wallet, account, vault, navigate, merchantHistory, ledger, points },
+  variants: {
+    tab,
+    company,
+    wallet,
+    account,
+    vault,
+    navigate,
+    merchantHistory,
+    ledger,
+    points,
+    merchantTableItem,
+  },
 });

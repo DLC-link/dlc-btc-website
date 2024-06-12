@@ -18,6 +18,7 @@ import { useEthereum } from './use-ethereum';
 
 interface UseProofOfReserveReturnType {
   proofOfReserve: number | undefined;
+  merchantProofOfReserve: MerchantProofOfReserve[] | undefined;
 }
 
 export function useProofOfReserve(): UseProofOfReserveReturnType {
@@ -31,6 +32,15 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
     enabled: shouldFetch,
     refetchInterval: 60000,
   });
+
+  const { data: merchantProofOfReserve } = useQuery(
+    ['merchantProofOfReserve'],
+    calculateMerchantProofOfReserves,
+    {
+      enabled: shouldFetch,
+      refetchInterval: 60000,
+    }
+  );
 
   useEffect(() => {
     const delayFetching = setTimeout(() => {
@@ -190,7 +200,59 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
     return customShiftValue(currentProofOfReserve, 8, true);
   }
 
+  async function calculateProofOfReserveOfAddress(ethereumAddress: string): Promise<number> {
+    const allFundedVaults = await Promise.all(
+      enabledEthereumNetworks.map(network => getAllFundedVaults(network))
+    ).then(vaultsArrays => vaultsArrays.flat());
+
+    const filteredVaults = allFundedVaults.filter(
+      vault => vault.creator.toLowerCase() === ethereumAddress
+    );
+
+    const attestorPublicKey = getDerivedPublicKey(
+      await getAttestorGroupPublicKey(network),
+      bitcoinNetwork
+    );
+
+    const results = await Promise.all(
+      filteredVaults.map(async vault => {
+        try {
+          if (await verifyVaultDeposit(vault, attestorPublicKey)) {
+            return vault.valueLocked.toNumber();
+          }
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.error('Error while verifying Deposit for Vault:', vault.uuid, error);
+        }
+        return 0;
+      })
+    );
+    const currentProofOfReserve = results.reduce((sum, collateral) => sum + collateral, 0);
+
+    return customShiftValue(currentProofOfReserve, 8, true);
+  }
+
+  async function calculateMerchantProofOfReserves(): Promise<MerchantProofOfReserve[]> {
+    const promises = bitcoinNetworkConfiguration.merchants.map(async (merchant: Merchant) => {
+      const proofOfReserve = await calculateProofOfReserveOfAddress(merchant.address);
+      return {
+        merchant,
+        dlcBTCAmount: proofOfReserve,
+      };
+    });
+
+    return Promise.all(promises);
+  }
+
   return {
     proofOfReserve,
+    merchantProofOfReserve:
+      merchantProofOfReserve ??
+      bitcoinNetworkConfiguration.merchants.map((merchant: Merchant) => {
+        return {
+          merchant,
+          dlcBTCAmount: proofOfReserve,
+        };
+      }),
   };
 }

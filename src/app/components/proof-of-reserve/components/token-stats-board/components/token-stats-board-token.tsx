@@ -21,7 +21,7 @@ export function TokenStatsBoardToken({
   }
 
   return (
-    <VStack w={'50%'} h={'100%'} alignItems={'start'}>
+    <VStack w={'100%'} h={'100%'} alignItems={'start'}>
       <Text color={'accent.lightBlue.01'} fontWeight={600} fontSize={'md'}>
         {`${token.name} ${tokenSuffix}`}
       </Text>
