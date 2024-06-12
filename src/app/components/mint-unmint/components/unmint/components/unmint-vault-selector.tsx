@@ -11,7 +11,18 @@ import { Vault } from '@models/vault';
 import { RootState } from '@store/index';
 import { scrollBarCSS } from '@styles/css-styles';
 
-export function UnmintVaultSelector(): React.JSX.Element {
+import { RiskBox } from '../../risk-box/risk-box';
+
+interface UnmintVaultSelectorProps {
+  risk: string;
+  fetchRisk: () => Promise<string>;
+  isRiskLoading: boolean;
+}
+export function UnmintVaultSelector({
+  risk,
+  fetchRisk,
+  isRiskLoading,
+}: UnmintVaultSelectorProps): React.JSX.Element {
   const { fundedVaults } = useVaults();
   const { closeVault } = useEthereum();
 
@@ -33,6 +44,8 @@ export function UnmintVaultSelector(): React.JSX.Element {
     if (selectedVault) {
       try {
         setIsSubmitting(true);
+        const currentRisk = await fetchRisk();
+        if (currentRisk === 'High') throw new Error('Risk Level is too high');
         await closeVault(selectedVault.uuid);
       } catch (error) {
         setIsSubmitting(false);
@@ -66,7 +79,7 @@ export function UnmintVaultSelector(): React.JSX.Element {
       ) : fundedVaults.length == 0 ? (
         <Text color={'white'}>You don't have any active vaults.</Text>
       ) : (
-        <VaultsList height="305px" isScrollable={!selectedVault}>
+        <VaultsList height="268.5px" isScrollable={!selectedVault}>
           <VaultsListGroupContainer
             vaults={fundedVaults}
             isSelectable
@@ -74,6 +87,7 @@ export function UnmintVaultSelector(): React.JSX.Element {
           />
         </VaultsList>
       )}
+      <RiskBox risk={risk} isRiskLoading={isRiskLoading} />
       <Button
         isLoading={isSubmitting}
         variant={'account'}
@@ -84,6 +98,7 @@ export function UnmintVaultSelector(): React.JSX.Element {
       </Button>
       {selectedVault && (
         <Button
+          isDisabled={risk === 'High'}
           isLoading={isSubmitting}
           variant={'navigate'}
           onClick={() => setSelectedVault(undefined)}
