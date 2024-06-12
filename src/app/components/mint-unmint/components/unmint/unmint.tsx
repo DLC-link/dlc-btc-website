@@ -1,6 +1,7 @@
 import { useSelector } from 'react-redux';
 
 import { HStack } from '@chakra-ui/react';
+import { useRisk } from '@hooks/use-risk';
 import { RootState } from '@store/index';
 
 import { ProgressTimeline } from '../progress-timeline/progress-timeline';
@@ -11,13 +12,20 @@ import { UnmintLayout } from './components/unmint.layout';
 
 export function Unmint(): React.JSX.Element {
   const { unmintStep } = useSelector((state: RootState) => state.mintunmint);
+  const { risk, fetchUserAddressRisk, isLoading } = useRisk();
 
   return (
     <UnmintLayout>
       <ProgressTimeline variant={'unmint'} currentStep={unmintStep[0]} />
       <HStack w={'100%'} alignItems={'start'} justifyContent={'space-between'}>
         <Walkthrough flow={'unmint'} currentStep={unmintStep[0]} />
-        {[0].includes(unmintStep[0]) && <UnmintVaultSelector />}
+        {[0].includes(unmintStep[0]) && (
+          <UnmintVaultSelector
+            risk={risk!}
+            fetchRisk={fetchUserAddressRisk}
+            isRiskLoading={isLoading}
+          />
+        )}
         {[1, 2].includes(unmintStep[0]) && (
           <TransactionSummary
             currentStep={unmintStep}
