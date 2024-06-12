@@ -13,7 +13,6 @@ import { LedgerDLCHandler, SoftwareWalletDLCHandler } from 'dlc-btc-lib';
 import { Transaction } from 'dlc-btc-lib/models';
 
 import { useAttestors } from './use-attestors';
-import { useEndpoints } from './use-endpoints';
 import { useEthereum } from './use-ethereum';
 import { useLeather } from './use-leather';
 import { useLedger } from './use-ledger';
@@ -43,7 +42,6 @@ export function usePSBT(): UsePSBTReturnType {
 
   const { network } = useSelector((state: RootState) => state.account);
 
-  const { bitcoinBlockchainAPIURL } = useEndpoints();
   const { mintStep } = useSelector((state: RootState) => state.mintunmint);
 
   const [fundingTransaction, setFundingTransaction] = useState<Transaction | undefined>();
@@ -121,7 +119,7 @@ export function usePSBT(): UsePSBTReturnType {
         nativeSegwitAddress
       );
 
-      await broadcastTransaction(fundingTransaction.hex, bitcoinBlockchainAPIURL);
+      await broadcastTransaction(fundingTransaction.hex, appConfiguration.bitcoinBlockchainURL);
 
       dispatch(
         vaultActions.setVaultToFunding({

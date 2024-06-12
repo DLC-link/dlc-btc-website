@@ -17,7 +17,7 @@ import { bitcoin } from 'dlc-btc-lib/constants';
 import { Transaction } from 'dlc-btc-lib/models';
 import { AppClient, DefaultWalletPolicy } from 'ledger-bitcoin';
 
-import { useEndpoints } from './use-endpoints';
+import { BITCOIN_NETWORK_MAP } from '@shared/constants/bitcoin.constants';
 
 type TransportInstance = Awaited<ReturnType<typeof Transport.create>>;
 
@@ -41,7 +41,6 @@ interface UseLedgerReturnType {
 
 export function useLedger(): UseLedgerReturnType {
   const { setBitcoinWalletContextState, setDLCHandler } = useContext(BitcoinWalletContext);
-  const { bitcoinNetwork, bitcoinBlockchainAPIURL, bitcoinBlockchainAPIFeeURL } = useEndpoints();
 
   const [ledgerApp, setLedgerApp] = useState<AppClient | undefined>(undefined);
   const [isLoading, setIsLoading] = useState<[boolean, string]>([false, '']);
@@ -115,14 +114,14 @@ export function useLedger(): UseLedgerReturnType {
     try {
       setIsLoading([true, 'Loading Ledger App and Information']);
       const ledgerApp = await getLedgerApp(
-        bitcoinNetwork === bitcoin
+        BITCOIN_NETWORK_MAP[appConfiguration.bitcoinNetwork] === bitcoin
           ? LEDGER_APPS_MAP.BITCOIN_MAINNET
           : LEDGER_APPS_MAP.BITCOIN_TESTNET
       );
       setLedgerApp(ledgerApp);
 
       const masterFingerprint = await ledgerApp.getMasterFingerprint();
-      const derivationPathRoot = `${paymentType === 'wpkh' ? '84' : '86'}'/${bitcoinNetwork === bitcoin ? 0 : 1}'`;
+      const derivationPathRoot = `${paymentType === 'wpkh' ? '84' : '86'}'/${BITCOIN_NETWORK_MAP[appConfiguration.bitcoinNetwork] === bitcoin ? 0 : 1}'`;
 
       const indices = [0, 1, 2, 3, 4]; // Replace with your actual indices
       const addresses = [];
@@ -144,7 +143,7 @@ export function useLedger(): UseLedgerReturnType {
 
       const addressesWithBalances = await Promise.all(
         addresses.map(async address => {
-          const balance = await getBalance(address, bitcoinBlockchainAPIURL); // Replace with your actual function to get balance
+          const balance = await getBalance(address, appConfiguration.bitcoinBlockchainURL); // Replace with your actual function to get balance
           return [address, balance] as [string, number];
         })
       );
@@ -169,9 +168,9 @@ export function useLedger(): UseLedgerReturnType {
         ledgerApp,
         masterFingerprint,
         walletAccountIndex,
-        bitcoinNetwork,
-        bitcoinBlockchainAPIURL,
-        bitcoinBlockchainAPIFeeURL
+        BITCOIN_NETWORK_MAP[appConfiguration.bitcoinNetwork],
+        appConfiguration.bitcoinBlockchainURL,
+        appConfiguration.bitcoinBlockchainFeeEstimateURL
       );
 
       setDLCHandler(ledgerDLCHandler);

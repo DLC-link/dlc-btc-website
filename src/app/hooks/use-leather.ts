@@ -21,7 +21,7 @@ import { SoftwareWalletDLCHandler } from 'dlc-btc-lib';
 import { bitcoin, regtest, testnet } from 'dlc-btc-lib/constants';
 import { Transaction } from 'dlc-btc-lib/models';
 
-import { useEndpoints } from './use-endpoints';
+import { BITCOIN_NETWORK_MAP } from '@shared/constants/bitcoin.constants';
 
 interface UseLeatherReturnType {
   connectLeatherWallet: () => Promise<void>;
@@ -43,7 +43,6 @@ interface UseLeatherReturnType {
 export function useLeather(): UseLeatherReturnType {
   const { setDLCHandler, setBitcoinWalletContextState, setBitcoinWalletType } =
     useContext(BitcoinWalletContext);
-  const { bitcoinNetwork, bitcoinBlockchainAPIURL, bitcoinBlockchainAPIFeeURL } = useEndpoints();
 
   const [isLoading, setIsLoading] = useState<[boolean, string]>([false, '']);
 
@@ -72,11 +71,20 @@ export function useLeather(): UseLeatherReturnType {
    * @throws BitcoinError - If the user's wallet is not on the same network as the app.
    */
   function checkUserWalletNetwork(userNativeSegwitAddress: Account): void {
-    if (bitcoinNetwork === bitcoin && !userNativeSegwitAddress.address.startsWith('bc1')) {
+    if (
+      BITCOIN_NETWORK_MAP[appConfiguration.bitcoinNetwork] === bitcoin &&
+      !userNativeSegwitAddress.address.startsWith('bc1')
+    ) {
       throw new LeatherError('User wallet is not on Bitcoin Mainnet');
-    } else if (bitcoinNetwork === testnet && !userNativeSegwitAddress.address.startsWith('tb1')) {
+    } else if (
+      BITCOIN_NETWORK_MAP[appConfiguration.bitcoinNetwork] === testnet &&
+      !userNativeSegwitAddress.address.startsWith('tb1')
+    ) {
       throw new LeatherError('User wallet is not on Bitcoin Testnet');
-    } else if (bitcoinNetwork === regtest && !userNativeSegwitAddress.address.startsWith('bcrt1')) {
+    } else if (
+      BITCOIN_NETWORK_MAP[appConfiguration.bitcoinNetwork] === regtest &&
+      !userNativeSegwitAddress.address.startsWith('bcrt1')
+    ) {
       throw new LeatherError('User wallet is not on Bitcoin Regtest');
     } else {
       return;
@@ -128,9 +136,9 @@ export function useLeather(): UseLeatherReturnType {
       const leatherDLCHandler = new SoftwareWalletDLCHandler(
         nativeSegwitAccount.publicKey,
         taprootAccount.publicKey,
-        bitcoinNetwork,
-        bitcoinBlockchainAPIURL,
-        bitcoinBlockchainAPIFeeURL
+        BITCOIN_NETWORK_MAP[appConfiguration.bitcoinNetwork],
+        appConfiguration.bitcoinBlockchainURL,
+        appConfiguration.bitcoinBlockchainFeeEstimateURL
       );
 
       setDLCHandler(leatherDLCHandler);
