@@ -181,6 +181,8 @@ export function getFeeRecipientAddressFromPublicKey(
   feePublicKey: string,
   bitcoinNetwork: Network
 ): string {
+  if (!feePublicKey) throw new BitcoinError('Fee Recipient Public Key is undefined');
+  // if (feePublicKey.length !== 66) throw new BitcoinError('Invalid Fee Recipient Public Key Length');
   const feePublicKeyBuffer = Buffer.from(feePublicKey, 'hex');
   const { address } = p2wpkh(feePublicKeyBuffer, bitcoinNetwork);
   if (!address) throw new BitcoinError('Could not create Fee Address from Public Key');

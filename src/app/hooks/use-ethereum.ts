@@ -70,12 +70,12 @@ export function useEthereum(): UseEthereumReturnType {
     contractName: string
   ): Promise<ethers.Contract> {
     try {
-      const ethereumNetworkName = ethereumNetwork.name.toLowerCase();
+      // const ethereumNetworkName = ethereumNetwork.name.toLowerCase();
       const provider = ethers.providers.getDefaultProvider(ethereumNetwork.defaultNodeURL);
 
-      const deploymentBranchName = import.meta.env.VITE_ETHEREUM_DEPLOYMENT_BRANCH;
+      // const deploymentBranchName = import.meta.env.VITE_ETHEREUM_DEPLOYMENT_BRANCH;
 
-      const deploymentPlanURL = `${SOLIDITY_CONTRACT_URL}/${deploymentBranchName}/deploymentFiles/${ethereumNetworkName}/${contractName}.json`;
+      const deploymentPlanURL = `${import.meta.env.VITE_ETHEREUM_DEPLOYMENT_FILES_URL}/${contractName}.json`;
 
       const response = await fetch(deploymentPlanURL);
       const contractData = await response.json();

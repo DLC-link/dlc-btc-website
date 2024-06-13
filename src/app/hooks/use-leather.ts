@@ -165,6 +165,7 @@ export function useLeather(): UseLeatherReturnType {
     try {
       setIsLoading([true, 'Connecting To Leather Wallet']);
       const userAddresses = await getBitcoinAddresses();
+      console.log('userAddresses', userAddresses);
       const bitcoinAddresses = userAddresses.filter(
         address => address.symbol === 'BTC'
       ) as BitcoinNativeSegwitAddress[];
@@ -178,10 +179,13 @@ export function useLeather(): UseLeatherReturnType {
       ) as BitcoinTaprootAddress;
 
       const nativeSegwitPayment = getNativeSegwitPayment(userNativeSegwitAddress);
+
+      console.log('nativeSegwitPayment', nativeSegwitPayment);
       const taprootMultisigPayment = await getTaprootMultisigPayment(
         vaultUUID,
         userTaprootAddress.publicKey
       );
+      console.log('taprootMultisigPayment', taprootMultisigPayment);
 
       setNativeSegwitAddressInformation({
         nativeSegwitPayment,
@@ -219,7 +223,7 @@ export function useLeather(): UseLeatherReturnType {
 
       // ==> Create Funding Transaction
       const fundingPSBT = await createFundingTransaction(
-        vault.valueLocked.toBigInt(),
+        10000000n, // vault.valueLocked.toBigInt(),
         bitcoinNetwork,
         taprootMultisigPayment.address!,
         nativeSegwitPayment,
@@ -266,7 +270,7 @@ export function useLeather(): UseLeatherReturnType {
       const feeRate = await getFeeRate(bitcoinBlockchainAPIFeeURL);
       // ==> Create Closing PSBT
       const closingTransaction = createClosingTransaction(
-        vault.valueLocked.toBigInt(),
+        10000000n, // vault.valueLocked.toBigInt(),
         bitcoinNetwork,
         fundingTransactionID,
         taprootMultisigPayment,
