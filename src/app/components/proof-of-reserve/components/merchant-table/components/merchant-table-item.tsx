@@ -18,31 +18,33 @@ export function MerchantTableItem({
 
   const { ethereumExplorerAPIURL } = useEthereumConfiguration();
   return (
-    <HStack px={'25px'} w={'100%'}>
-      <Text
-        w={'33.3%'}
-        fontSize={'2xl'}
-        fontWeight={600}
-        bgGradient={`linear(to-r, #AC50EF, #7059FB, #2ECFF6)`}
-        bgClip="text"
-      >
-        {name}
-      </Text>
-      <HStack w={'33.3%'} h={'35px'}>
+    <HStack px={'25px'} w={'100%'} justifyContent={'space-between'}>
+      <HStack w={'150px'}>
+        <Text
+          fontSize={'2xl'}
+          fontWeight={600}
+          bgGradient={`linear(to-r, #AC50EF, #7059FB, #2ECFF6)`}
+          bgClip="text"
+        >
+          {name}
+        </Text>
+      </HStack>
+      <HStack w={'150px'} h={'35px'}>
         <Image src={'/images/logos/dlc-btc-logo.svg'} alt={'dlcBTC Logo'} boxSize={'25px'} />
-        <Skeleton isLoaded={dlcBTCAmount !== undefined} h={'auto'} w={'33.3%'}>
+        <Skeleton isLoaded={dlcBTCAmount !== undefined} h={'auto'} w={'150px'}>
           <Text color={'white'} fontSize={'2xl'} fontWeight={800} h={'35px'}>
             {dlcBTCAmount}
           </Text>
         </Skeleton>
       </HStack>
       <Button
+        w={'150px'}
         variant={'merchantTableItem'}
         onClick={() =>
           window.open(`${ethereumExplorerAPIURL}/address/${merchant.address}`, '_blank')
         }
       >
-        <Text color={'white.01'} fontSize={'sm'}>
+        <Text color={'white.01'} fontSize={'xs'}>
           Mint/Redeem History
         </Text>
       </Button>

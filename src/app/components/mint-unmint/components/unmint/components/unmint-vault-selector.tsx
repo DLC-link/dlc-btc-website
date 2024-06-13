@@ -60,15 +60,7 @@ export function UnmintVaultSelector({
         Select vault to redeem dlcBTC:
       </Text>
       {selectedVault ? (
-        <VStack
-          overflowY={'scroll'}
-          overflowX={'hidden'}
-          alignItems={'start'}
-          py={'15px'}
-          pr={'15px'}
-          w={'100%'}
-          css={scrollBarCSS}
-        >
+        <VStack alignItems={'start'} py={'15px'} w={'100%'} css={scrollBarCSS}>
           <VaultCard
             vault={selectedVault}
             isSelectable
@@ -79,7 +71,7 @@ export function UnmintVaultSelector({
       ) : fundedVaults.length == 0 ? (
         <Text color={'white'}>You don't have any active vaults.</Text>
       ) : (
-        <VaultsList height="268.5px" isScrollable={!selectedVault}>
+        <VaultsList height="223.5px" isScrollable={!selectedVault}>
           <VaultsListGroupContainer
             vaults={fundedVaults}
             isSelectable
@@ -87,18 +79,18 @@ export function UnmintVaultSelector({
           />
         </VaultsList>
       )}
-      <RiskBox risk={risk} isRiskLoading={isRiskLoading} />
+      {risk === 'High' && <RiskBox risk={risk} isRiskLoading={isRiskLoading} />}
       <Button
         isLoading={isSubmitting}
         variant={'account'}
-        isDisabled={!selectedVault}
+        isDisabled={!selectedVault || risk === 'High'}
         onClick={() => handleUnmint()}
       >
         Redeem dlcBTC
       </Button>
       {selectedVault && (
         <Button
-          isDisabled={risk === 'High'}
+          isDisabled={true}
           isLoading={isSubmitting}
           variant={'navigate'}
           onClick={() => setSelectedVault(undefined)}
