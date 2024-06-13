@@ -54,7 +54,7 @@ export function useEthereumContracts(): UseEthereumContractsReturnType {
       const contract = new ethers.Contract(
         observerProtocolContractData.contract.address,
         observerProtocolContractData.contract.abi,
-        new ethers.providers.WebSocketProvider(import.meta.env.VITE_ARBITRUM_OBSERVER_NODE)
+        new ethers.providers.WebSocketProvider('http://localhost:8545')
       );
       observerProtocolContract.current = contract;
     }
@@ -90,7 +90,7 @@ export function useEthereumContracts(): UseEthereumContractsReturnType {
     ethereumNetwork: EthereumNetwork
   ) {
     const branchName = import.meta.env.VITE_ETHEREUM_DEPLOYMENT_BRANCH;
-    const deploymentPlanURL = `${SOLIDITY_CONTRACT_URL}/${branchName}/deploymentFiles/${ethereumNetwork.name.toLowerCase()}/${contractName}.json`;
+    const deploymentPlanURL = `${import.meta.env.VITE_ETHEREUM_DEPLOYMENT_FILES_URL}/${contractName}.json`;
 
     // eslint-disable-next-line no-console
     console.log(

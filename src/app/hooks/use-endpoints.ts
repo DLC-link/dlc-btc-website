@@ -122,6 +122,18 @@ export function useEndpoints(): NetworkEndpoints {
           bitcoinNetwork,
           bitcoinNetworkName,
         };
+      case EthereumNetworkID.Hardhat:
+        return {
+          attestorAPIURLs,
+          ethereumExplorerAPIURL: 'https://arbiscan.io',
+          ethereumAttestorChainID: 'evm-localhost',
+          enabledEthereumNetworks,
+          bitcoinExplorerAPIURL,
+          bitcoinBlockchainAPIURL,
+          bitcoinBlockchainAPIFeeURL,
+          bitcoinNetwork,
+          bitcoinNetworkName,
+        };
       default:
         throw new Error(`Unsupported network: ${network?.name}`);
     }
