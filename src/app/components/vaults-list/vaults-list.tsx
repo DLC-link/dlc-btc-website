@@ -17,7 +17,7 @@ export function VaultsList({
   children,
 }: VaultsListProps): React.JSX.Element {
   return (
-    <FadeLayer h={height} fh={'35px'}>
+    <FadeLayer h={height} fh={'15px'}>
       {title && (
         <Text pt={'15px'} color={'white.01'} fontWeight={600}>
           {title}

@@ -11,7 +11,18 @@ import { Vault } from '@models/vault';
 import { RootState } from '@store/index';
 import { scrollBarCSS } from '@styles/css-styles';
 
-export function UnmintVaultSelector(): React.JSX.Element {
+import { RiskBox } from '../../risk-box/risk-box';
+
+interface UnmintVaultSelectorProps {
+  risk: string;
+  fetchRisk: () => Promise<string>;
+  isRiskLoading: boolean;
+}
+export function UnmintVaultSelector({
+  risk,
+  fetchRisk,
+  isRiskLoading,
+}: UnmintVaultSelectorProps): React.JSX.Element {
   const { fundedVaults } = useVaults();
   const { closeVault } = useEthereum();
 
@@ -33,6 +44,8 @@ export function UnmintVaultSelector(): React.JSX.Element {
     if (selectedVault) {
       try {
         setIsSubmitting(true);
+        const currentRisk = await fetchRisk();
+        if (currentRisk === 'High') throw new Error('Risk Level is too high');
         await closeVault(selectedVault.uuid);
       } catch (error) {
         setIsSubmitting(false);
@@ -47,15 +60,7 @@ export function UnmintVaultSelector(): React.JSX.Element {
         Select vault to redeem dlcBTC:
       </Text>
       {selectedVault ? (
-        <VStack
-          overflowY={'scroll'}
-          overflowX={'hidden'}
-          alignItems={'start'}
-          py={'15px'}
-          pr={'15px'}
-          w={'100%'}
-          css={scrollBarCSS}
-        >
+        <VStack alignItems={'start'} py={'15px'} w={'100%'} css={scrollBarCSS}>
           <VaultCard
             vault={selectedVault}
             isSelectable
@@ -66,7 +71,7 @@ export function UnmintVaultSelector(): React.JSX.Element {
       ) : fundedVaults.length == 0 ? (
         <Text color={'white'}>You don't have any active vaults.</Text>
       ) : (
-        <VaultsList height="305px" isScrollable={!selectedVault}>
+        <VaultsList height="223.5px" isScrollable={!selectedVault}>
           <VaultsListGroupContainer
             vaults={fundedVaults}
             isSelectable
@@ -74,16 +79,18 @@ export function UnmintVaultSelector(): React.JSX.Element {
           />
         </VaultsList>
       )}
+      {risk === 'High' && <RiskBox risk={risk} isRiskLoading={isRiskLoading} />}
       <Button
         isLoading={isSubmitting}
         variant={'account'}
-        isDisabled={!selectedVault}
+        isDisabled={!selectedVault || risk === 'High'}
         onClick={() => handleUnmint()}
       >
         Redeem dlcBTC
       </Button>
       {selectedVault && (
         <Button
+          isDisabled={true}
           isLoading={isSubmitting}
           variant={'navigate'}
           onClick={() => setSelectedVault(undefined)}

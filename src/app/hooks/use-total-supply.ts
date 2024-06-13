@@ -5,15 +5,15 @@ import { customShiftValue } from '@common/utilities';
 import { EthereumError } from '@models/error-types';
 import { EthereumNetwork } from '@models/ethereum-network';
 
-import { useEndpoints } from './use-endpoints';
 import { useEthereum } from './use-ethereum';
+import { useEthereumConfiguration } from './use-ethereum-configuration';
 
 interface UseTotalSupplyReturnType {
   totalSupply: number | undefined;
 }
 
 export function useTotalSupply(): UseTotalSupplyReturnType {
-  const { enabledEthereumNetworks } = useEndpoints();
+  const { enabledEthereumNetworks } = useEthereumConfiguration();
   const { getDefaultProvider } = useEthereum();
 
   const [shouldFetch, setShouldFetch] = useState(false);

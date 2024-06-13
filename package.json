@@ -30,7 +30,6 @@
     "@fontsource/onest": "^5.0.3",
     "@fontsource/poppins": "^5.0.8",
     "@ledgerhq/hw-transport-webusb": "^6.28.6",
-    "@ls-lint/ls-lint": "^2.2.2",
     "@reduxjs/toolkit": "^1.9.7",
     "@scure/base": "^1.1.5",
     "@scure/bip32": "^1.4.0",
@@ -42,12 +41,8 @@
     "buffer": "^6.0.3",
     "concurrently": "^8.2.2",
     "decimal.js": "^10.4.3",
+    "dlc-btc-lib": "^1.0.9",
     "dotenv": "^16.3.1",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-deprecation": "^2.0.0",
-    "eslint-plugin-import": "^2.29.0",
-    "eslint-plugin-jsx-a11y": "^6.8.0",
-    "eslint-plugin-react": "^7.33.2",
     "ethers": "5.7.2",
     "formik": "^2.4.5",
     "framer-motion": "^11.0.23",
@@ -64,9 +59,7 @@
     "redux-persist": "^6.0.0",
     "redux-persist-expire": "^1.1.1",
     "tiny-secp256k1": "^2.2.3",
-    "ts-unused-exports": "^10.0.1",
-    "vite-plugin-toml": "^0.7.0",
-    "vitest": "^0.34.6"
+    "vite-plugin-toml": "^0.7.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.39.0",
@@ -82,6 +75,14 @@
     "react-router-dom": "^6.18.0",
     "typescript": "^5.2.2",
     "vite": "^4.4.5",
-    "vite-plugin-wasm": "^3.3.0"
+    "vite-plugin-wasm": "^3.3.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-deprecation": "^2.0.0",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-jsx-a11y": "^6.8.0",
+    "eslint-plugin-react": "^7.33.2",
+    "@ls-lint/ls-lint": "^2.2.2",
+    "ts-unused-exports": "^10.0.1",
+    "vitest": "^0.34.6"
   }
 }

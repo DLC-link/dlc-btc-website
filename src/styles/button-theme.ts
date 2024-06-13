@@ -59,8 +59,9 @@ const account = defineStyle({
   fontWeight: 600,
   bgSize: '400%',
   bgPosition: 'left',
-  bg: 'accent.lightBlue.01',
-  transition: 'background-position 500ms ease, color 500ms ease',
+  bgGradient: `linear(to-r, #AC50EF, #7059FB, #2ECFF6)`,
+  backgroundSize: '125% 100%',
+  transition: 'background-position 500ms ease',
   _hover: {
     bgPosition: 'right',
   },

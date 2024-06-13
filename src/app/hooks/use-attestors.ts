@@ -1,6 +1,6 @@
 import { AttestorError } from '@models/error-types';
 
-import { useEndpoints } from './use-endpoints';
+import { useEthereumConfiguration } from './use-ethereum-configuration';
 
 interface UseAttestorsReturnType {
   sendClosingTransactionToAttestors: (
@@ -12,7 +12,7 @@ interface UseAttestorsReturnType {
 }
 
 export function useAttestors(): UseAttestorsReturnType {
-  const { attestorAPIURLs, ethereumAttestorChainID } = useEndpoints();
+  const { ethereumAttestorChainID } = useEthereumConfiguration();
 
   async function sendClosingTransactionToAttestors(
     fundingTransaction: string,
@@ -20,7 +20,7 @@ export function useAttestors(): UseAttestorsReturnType {
     uuid: string,
     userNativeSegwitAddress: string
   ): Promise<void> {
-    const createPSBTURLs = attestorAPIURLs.map(url => `${url}/app/create-psbt-event`);
+    const createPSBTURLs = appConfiguration.attestorURLs.map(url => `${url}/app/create-psbt-event`);
 
     const requests = createPSBTURLs.map(async url =>
       fetch(url, {

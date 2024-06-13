@@ -1,5 +1,4 @@
 import { HStack, Text } from '@chakra-ui/react';
-import { useEndpoints } from '@hooks/use-endpoints';
 
 interface VaultExpandedInformationTransactionRowProps {
   label: string;
@@ -10,8 +9,6 @@ export function VaultExpandedInformationTransactionRow({
   label,
   value,
 }: VaultExpandedInformationTransactionRowProps): React.JSX.Element {
-  const { bitcoinExplorerAPIURL } = useEndpoints();
-
   return (
     <HStack pl={'35px'} w={'100%'} alignItems={'start'}>
       <Text w={'50%'} color={'white'} fontSize={'xs'}>
@@ -23,7 +20,9 @@ export function VaultExpandedInformationTransactionRow({
         color={'accent.lightBlue.01'}
         fontSize={'xs'}
         textDecoration={'underline'}
-        onClick={() => window.open(`${bitcoinExplorerAPIURL}/tx/${value}`, '_blank')}
+        onClick={() =>
+          window.open(`${appConfiguration.bitcoinBlockchainExplorerURL}/tx/${value}`, '_blank')
+        }
         _hover={{ cursor: 'pointer' }}
       >
         View in TX explorer
