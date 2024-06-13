@@ -1,4 +1,15 @@
 {
+  "attestorURLs": [
+    "https://mainnet.dlc.link/attestor-1",
+    "https://mainnet.dlc.link/attestor-2",
+    "https://mainnet.dlc.link/attestor-3"
+  ],
+  "enabledEthereumNetworkIDs": ["42161"],
+  "bitcoinNetwork": "mainnet",
+  "bitcoinNetworkPreFix": "bc1",
+  "bitcoinBlockchainURL": "https://mainnet.dlc.link/electrs",
+  "bitcoinBlockchainExplorerURL": "https://mempool.space",
+  "bitcoinBlockchainFeeEstimateURL": "https://mempool.space/api/v1/fees/recommended",
   "merchants": [
     {
       "name": "AMBER",

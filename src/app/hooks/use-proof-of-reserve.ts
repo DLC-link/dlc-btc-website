@@ -8,14 +8,16 @@ import {
   getDerivedPublicKey,
   getUnspendableKeyCommittedToUUID,
 } from '@functions/bitcoin-functions';
-import { BitcoinTransaction, BitcoinTransactionVectorOutput } from '@models/bitcoin-models';
 import { Merchant, MerchantProofOfReserve } from '@models/merchant';
 import { RawVault } from '@models/vault';
 import { hex } from '@scure/base';
 import { RootState } from '@store/index';
+import { BitcoinTransaction, BitcoinTransactionVectorOutput } from 'dlc-btc-lib/models';
 
-import { useEndpoints } from './use-endpoints';
+import { BITCOIN_NETWORK_MAP } from '@shared/constants/bitcoin.constants';
+
 import { useEthereum } from './use-ethereum';
+import { useEthereumConfiguration } from './use-ethereum-configuration';
 
 interface UseProofOfReserveReturnType {
   proofOfReserve: number | undefined;
@@ -23,7 +25,7 @@ interface UseProofOfReserveReturnType {
 }
 
 export function useProofOfReserve(): UseProofOfReserveReturnType {
-  const { bitcoinBlockchainAPIURL, bitcoinNetwork, enabledEthereumNetworks } = useEndpoints();
+  const { enabledEthereumNetworks } = useEthereumConfiguration();
   const { getAllFundedVaults, getAttestorGroupPublicKey } = useEthereum();
   const { network } = useSelector((state: RootState) => state.account);
 
@@ -52,7 +54,7 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
 
   async function fetchFundingTransaction(txID: string): Promise<BitcoinTransaction> {
     try {
-      const bitcoinExplorerTXURL = `${bitcoinBlockchainAPIURL}/tx/${txID}`;
+      const bitcoinExplorerTXURL = `${appConfiguration.bitcoinBlockchainURL}/tx/${txID}`;
 
       const response = await fetch(bitcoinExplorerTXURL);
       if (!response.ok) throw new Error('Network response was not ok');
@@ -66,7 +68,7 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
 
   async function fetchBitcoinBlockHeight(): Promise<number> {
     try {
-      const bitcoinExplorerBlockHeightURL = `${bitcoinBlockchainAPIURL}/blocks/tip/height`;
+      const bitcoinExplorerBlockHeightURL = `${appConfiguration.bitcoinBlockchainURL}/blocks/tip/height`;
 
       const response = await fetch(bitcoinExplorerBlockHeightURL);
       if (!response.ok) throw new Error('Bitcoin Block Height Network Response was not OK');
@@ -144,15 +146,18 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
       );
 
       const unspendableKeyCommittedToUUID = getDerivedPublicKey(
-        getUnspendableKeyCommittedToUUID(vault.uuid, bitcoinNetwork),
-        bitcoinNetwork
+        getUnspendableKeyCommittedToUUID(
+          vault.uuid,
+          BITCOIN_NETWORK_MAP[appConfiguration.bitcoinNetwork]
+        ),
+        BITCOIN_NETWORK_MAP[appConfiguration.bitcoinNetwork]
       );
 
       const multisigTransaction = createTaprootMultisigPayment(
         unspendableKeyCommittedToUUID,
         attestorPublicKey,
         Buffer.from(vault.taprootPubKey, 'hex'),
-        bitcoinNetwork
+        BITCOIN_NETWORK_MAP[appConfiguration.bitcoinNetwork]
       );
 
       // Verify that the Funding Transaction's Output Script matches the expected MultiSig Script
@@ -179,7 +184,7 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
     // Get the Attestor Public Key from the Attestor Group
     const attestorPublicKey = getDerivedPublicKey(
       await getAttestorGroupPublicKey(network),
-      bitcoinNetwork
+      BITCOIN_NETWORK_MAP[appConfiguration.bitcoinNetwork]
     );
 
     const results = await Promise.all(
@@ -212,7 +217,7 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
 
     const attestorPublicKey = getDerivedPublicKey(
       await getAttestorGroupPublicKey(network),
-      bitcoinNetwork
+      BITCOIN_NETWORK_MAP[appConfiguration.bitcoinNetwork]
     );
 
     const results = await Promise.all(
@@ -234,7 +239,7 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
   }
 
   async function calculateMerchantProofOfReserves(): Promise<MerchantProofOfReserve[]> {
-    const promises = bitcoinNetworkConfiguration.merchants.map(async (merchant: Merchant) => {
+    const promises = appConfiguration.merchants.map(async (merchant: Merchant) => {
       const proofOfReserve = await calculateProofOfReserveOfAddress(merchant.address);
       return {
         merchant,
@@ -249,7 +254,7 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
     proofOfReserve,
     merchantProofOfReserve:
       merchantProofOfReserve ??
-      bitcoinNetworkConfiguration.merchants.map((merchant: Merchant) => {
+      appConfiguration.merchants.map((merchant: Merchant) => {
         return {
           merchant,
           dlcBTCAmount: proofOfReserve,

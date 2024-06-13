@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Button, HStack, Image, Skeleton, Text } from '@chakra-ui/react';
-import { useEndpoints } from '@hooks/use-endpoints';
+import { useEthereumConfiguration } from '@hooks/use-ethereum-configuration';
 import { Merchant } from '@models/merchant';
 
 interface MerchantTableItemProps {
@@ -16,7 +16,7 @@ export function MerchantTableItem({
   //TODO: replace name with logo when the logo is available
   const { name } = merchant;
 
-  const { ethereumExplorerAPIURL } = useEndpoints();
+  const { ethereumExplorerAPIURL } = useEthereumConfiguration();
   return (
     <HStack px={'25px'} w={'100%'} justifyContent={'space-between'}>
       <HStack w={'150px'}>
