@@ -23,7 +23,7 @@ export function TokenStatsBoardTVL({
         >
           $
           {totalSupply && bitcoinPrice
-            ? `${(totalSupply * bitcoinPrice).toLocaleString('en-US')} USD`
+            ? `${Math.floor(totalSupply * bitcoinPrice).toLocaleString('en-US')} USD`
             : 0}
         </Text>
       </Skeleton>

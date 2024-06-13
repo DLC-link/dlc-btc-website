@@ -139,7 +139,7 @@ export function Points(): React.JSX.Element {
                   </HStack>
                   <HStack>
                     <Text color={'white.02'}>
-                      Become a merchany by providing BTC. Support the network and earn points for
+                      Become a merchant by providing BTC. Support the network and earn points for
                       your contributions.
                     </Text>
                   </HStack>
