@@ -1,6 +1,7 @@
 import { useSelector } from 'react-redux';
 
 import { HStack } from '@chakra-ui/react';
+import { usePSBT } from '@hooks/use-psbt';
 import { useRisk } from '@hooks/use-risk';
 import { RootState } from '@store/index';
 
@@ -11,6 +12,8 @@ import { UnmintVaultSelector } from './components/unmint-vault-selector';
 import { UnmintLayout } from './components/unmint.layout';
 
 export function Unmint(): React.JSX.Element {
+  const { handleSignWithdrawTransaction, isLoading: isWithdrawLoading } = usePSBT();
+
   const { unmintStep } = useSelector((state: RootState) => state.mintunmint);
   const { risk, fetchUserAddressRisk, isLoading } = useRisk();
 
@@ -24,6 +27,7 @@ export function Unmint(): React.JSX.Element {
             risk={risk!}
             fetchRisk={fetchUserAddressRisk}
             isRiskLoading={isLoading}
+            handleSignWithdrawTransaction={handleSignWithdrawTransaction}
           />
         )}
         {[1, 2].includes(unmintStep[0]) && (

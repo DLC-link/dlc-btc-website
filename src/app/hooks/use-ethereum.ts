@@ -14,7 +14,7 @@ import { Logger } from 'ethers/lib/utils';
 
 import { useEthereumContext } from './use-ethereum-context';
 
-const SOLIDITY_CONTRACT_URL = 'https://raw.githubusercontent.com/DLC-link/dlc-solidity';
+// const SOLIDITY_CONTRACT_URL = 'https://raw.githubusercontent.com/DLC-link/dlc-solidity';
 
 interface UseEthereumReturnType {
   getDefaultProvider: (

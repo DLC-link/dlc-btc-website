@@ -25,7 +25,7 @@ export const ethereumArbitrum: EthereumNetwork = {
   defaultNodeURL: 'https://arb1.arbitrum.io/rpc',
 };
 
-export const ethereumHardhat: EthereumNetwork = {
+const ethereumHardhat: EthereumNetwork = {
   name: 'Hardhat',
   displayName: 'Hardhat',
   id: EthereumNetworkID.Hardhat,

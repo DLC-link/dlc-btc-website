@@ -1,5 +1,6 @@
 import { useContext, useState } from 'react';
 
+import { customShiftValue, unshiftValue } from '@common/utilities';
 import { LeatherError } from '@models/error-types';
 import {
   Account,
@@ -34,6 +35,13 @@ interface UseLeatherReturnType {
     dlcHandler: SoftwareWalletDLCHandler,
     vault: RawVault,
     fundingTransactionID: string,
+    feeRateMultiplier: number
+  ) => Promise<string>;
+  handleWithdrawalTransaction: (
+    dlcHandler: SoftwareWalletDLCHandler,
+    withdrawAmount: number,
+    attestorGroupPublicKey: string,
+    vault: RawVault,
     feeRateMultiplier: number
   ) => Promise<string>;
   isLoading: [boolean, string];
@@ -204,10 +212,44 @@ export function useLeather(): UseLeatherReturnType {
     }
   }
 
+  async function handleWithdrawalTransaction(
+    dlcHandler: SoftwareWalletDLCHandler,
+    withdrawAmount: number,
+    attestorGroupPublicKey: string,
+    vault: RawVault,
+    feeRateMultiplier: number
+  ): Promise<string> {
+    try {
+      setIsLoading([true, 'Creating Withdrawal Transaction']);
+
+      console.log(unshiftValue(withdrawAmount));
+
+      const withdrawalTransaction = await dlcHandler.createWithdrawalPSBT(
+        vault,
+        BigInt(customShiftValue(withdrawAmount, 8, false)),
+        attestorGroupPublicKey,
+        vault.fundingTxId,
+        feeRateMultiplier
+      );
+
+      setIsLoading([true, 'Sign Withdrawal Transaction in your Leather Wallet']);
+      // ==> Sign Withdrawal PSBT with Ledger
+      const withdrawalTransactionHex = await signPSBT(withdrawalTransaction.toPSBT());
+
+      setIsLoading([false, '']);
+      console.log('withdrawalTransactionHex', withdrawalTransactionHex);
+      return withdrawalTransactionHex;
+    } catch (error) {
+      setIsLoading([false, '']);
+      throw new LeatherError(`Error handling Withdrawal Transaction: ${error}`);
+    }
+  }
+
   return {
     connectLeatherWallet,
     handleFundingTransaction,
     handleClosingTransaction,
+    handleWithdrawalTransaction,
     isLoading,
   };
 }

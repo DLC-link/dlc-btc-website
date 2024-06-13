@@ -36,6 +36,13 @@ interface UseLedgerReturnType {
     fundingTransactionID: string,
     feeRateMultiplier: number
   ) => Promise<string>;
+  handleWithdrawalTransaction: (
+    dlcHandler: LedgerDLCHandler,
+    withdrawAmount: number,
+    attestorGroupPublicKey: string,
+    vault: RawVault,
+    feeRateMultiplier: number
+  ) => Promise<string>;
   isLoading: [boolean, string];
 }
 
@@ -250,11 +257,43 @@ export function useLedger(): UseLedgerReturnType {
     }
   }
 
+  async function handleWithdrawalTransaction(
+    dlcHandler: LedgerDLCHandler,
+    withdrawAmount: number,
+    attestorGroupPublicKey: string,
+    vault: RawVault,
+    feeRateMultiplier: number
+  ): Promise<string> {
+    try {
+      setIsLoading([true, 'Creating Withdrawal Transaction']);
+
+      const withdrawalPSBT = await dlcHandler.createWithdrawalPSBT(
+        vault,
+        BigInt(withdrawAmount),
+        attestorGroupPublicKey,
+        vault.fundingTxId,
+        feeRateMultiplier
+      );
+
+      setIsLoading([true, 'Sign Withdrawal Transaction in your Leather Wallet']);
+      // ==> Sign Withdrawal PSBT with Ledger
+      const withdrawalTransaction = await dlcHandler.signPSBT(withdrawalPSBT, 'closing');
+
+      setIsLoading([false, '']);
+      console.log('withdrawalTransactionHex', withdrawalTransaction.hex);
+      return bytesToHex(withdrawalTransaction.toPSBT());
+    } catch (error) {
+      setIsLoading([false, '']);
+      throw new LedgerError(`Error handling Withdrawal Transaction: ${error}`);
+    }
+  }
+
   return {
     getLedgerAddressesWithBalances,
     connectLedgerWallet,
     handleFundingTransaction,
     handleClosingTransaction,
+    handleWithdrawalTransaction,
     isLoading,
   };
 }

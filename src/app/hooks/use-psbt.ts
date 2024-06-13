@@ -20,6 +20,7 @@ import { useLedger } from './use-ledger';
 interface UsePSBTReturnType {
   handleSignFundingTransaction: (vault: Vault) => Promise<void>;
   handleSignClosingTransaction: () => Promise<void>;
+  handleSignWithdrawTransaction: (vaultUUID: string, withdrawAmount: number) => Promise<void>;
   isLoading: [boolean, string];
 }
 
@@ -28,16 +29,19 @@ export function usePSBT(): UsePSBTReturnType {
   const {
     handleFundingTransaction: handleFundingTransactionWithLedger,
     handleClosingTransaction: handleClosingTransactionWithLedger,
+    handleWithdrawalTransaction: handleWithdrawalTransactionWithLedger,
     isLoading: isLedgerLoading,
   } = useLedger();
   const {
     handleFundingTransaction: handleFundingTransactionWithLeather,
     handleClosingTransaction: handleClosingTransactionWithLeather,
+    handleWithdrawalTransaction: handleWithdrawalTransactionWithLeather,
     isLoading: isLeatherLoading,
   } = useLeather();
   const { bitcoinWalletType, dlcHandler, resetBitcoinWalletContext } =
     useContext(BitcoinWalletContext);
-  const { sendClosingTransactionToAttestors } = useAttestors();
+  const { sendClosingTransactionToAttestors, sendWithdrawalTransactionToAttestors } =
+    useAttestors();
   const { getAttestorGroupPublicKey, getRawVault } = useEthereum();
 
   const { network } = useSelector((state: RootState) => state.account);
@@ -136,9 +140,57 @@ export function usePSBT(): UsePSBTReturnType {
     }
   }
 
+  async function handleSignWithdrawTransaction(
+    vaultUUID: string,
+    withdrawAmount: number
+  ): Promise<void> {
+    try {
+      let withdrawalTransactionHex: string;
+      const attestorGroupPublicKey = await getAttestorGroupPublicKey(network);
+      const vault = await getRawVault(vaultUUID);
+      let nativeSegwitAddress;
+      const feeRateMultiplier = import.meta.env.VITE_FEE_RATE_MULTIPLIER;
+      switch (bitcoinWalletType) {
+        case 'Ledger':
+          withdrawalTransactionHex = await handleWithdrawalTransactionWithLedger(
+            dlcHandler as LedgerDLCHandler,
+            withdrawAmount,
+            attestorGroupPublicKey,
+            vault,
+            feeRateMultiplier
+          );
+          nativeSegwitAddress = dlcHandler?.getVaultRelatedAddress('p2wpkh');
+          break;
+        case 'Leather':
+          withdrawalTransactionHex = await handleWithdrawalTransactionWithLeather(
+            dlcHandler as SoftwareWalletDLCHandler,
+            withdrawAmount,
+            attestorGroupPublicKey,
+            vault,
+            feeRateMultiplier
+          );
+          nativeSegwitAddress = dlcHandler?.getVaultRelatedAddress('p2wpkh');
+          break;
+        default:
+          throw new BitcoinError('Invalid Bitcoin Wallet Type');
+      }
+
+      if (!nativeSegwitAddress) throw new BitcoinError('Native Segwit Address is not defined');
+
+      await sendWithdrawalTransactionToAttestors(vaultUUID, withdrawalTransactionHex);
+
+      await broadcastTransaction(withdrawalTransactionHex, appConfiguration.bitcoinBlockchainURL);
+
+      resetBitcoinWalletContext();
+    } catch (error) {
+      throw new BitcoinError(`Error signing Closing Transaction: ${error}`);
+    }
+  }
+
   return {
     handleSignFundingTransaction,
     handleSignClosingTransaction,
+    handleSignWithdrawTransaction,
     isLoading: bitcoinWalletType === BitcoinWalletType.Leather ? isLeatherLoading : isLedgerLoading,
   };
 }

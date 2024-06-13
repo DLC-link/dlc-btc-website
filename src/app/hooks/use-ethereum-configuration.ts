@@ -56,6 +56,12 @@ export function useEthereumConfiguration(): NetworkEndpoints {
           ethereumAttestorChainID: 'evm-arbitrum',
           enabledEthereumNetworks,
         };
+      case EthereumNetworkID.Hardhat:
+        return {
+          ethereumExplorerAPIURL: 'https://arbiscan.io',
+          ethereumAttestorChainID: 'evm-localhost',
+          enabledEthereumNetworks,
+        };
       default:
         throw new Error(`Unsupported network: ${network?.name}`);
     }
