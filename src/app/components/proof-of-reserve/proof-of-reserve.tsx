@@ -1,7 +1,6 @@
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 
 import { Divider, HStack, Text, VStack } from '@chakra-ui/react';
-import { useBitcoinPrice } from '@hooks/use-bitcoin-price';
 import { Merchant } from '@models/merchant';
 import { bitcoin, dlcBTC } from '@models/token';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
@@ -15,9 +14,7 @@ import { TokenStatsBoardTVL } from './components/token-stats-board/components/to
 import { TokenStatsBoardLayout } from './components/token-stats-board/token-stats-board.layout';
 
 export function ProofOfReserve(): React.JSX.Element {
-  const { bitcoinPrice } = useBitcoinPrice();
-
-  const { proofOfReserve, totalSupply } = useContext(ProofOfReserveContext);
+  const { proofOfReserve, totalSupply, bitcoinPrice } = useContext(ProofOfReserveContext);
 
   const [proofOfReserveSum, merchantProofOfReserves] = proofOfReserve || [
     undefined,
