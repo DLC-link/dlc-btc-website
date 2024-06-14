@@ -1,8 +1,7 @@
 import { useQuery } from 'react-query';
 
 export function useBlockchainHeightQuery(): number | undefined {
-  const bitcoinBlockchainAPIURL = import.meta.env.VITE_BITCOIN_BLOCKCHAIN_API_URL;
-  const bitcoinExplorerHeightURL = `${bitcoinBlockchainAPIURL}/blocks/tip/height`;
+  const bitcoinExplorerHeightURL = `${appConfiguration.bitcoinBlockchainURL}/blocks/tip/height`;
 
   async function getBlockchainHeight() {
     const response = await fetch(bitcoinExplorerHeightURL);
