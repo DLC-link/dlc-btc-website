@@ -1,7 +1,8 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 
 import { Divider, HStack, Text, VStack } from '@chakra-ui/react';
 import { useBitcoinPrice } from '@hooks/use-bitcoin-price';
+import { Merchant } from '@models/merchant';
 import { bitcoin, dlcBTC } from '@models/token';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
 
@@ -16,7 +17,17 @@ import { TokenStatsBoardLayout } from './components/token-stats-board/token-stat
 export function ProofOfReserve(): React.JSX.Element {
   const { bitcoinPrice } = useBitcoinPrice();
 
-  const { proofOfReserve, merchantProofOfReserve, totalSupply } = useContext(ProofOfReserveContext);
+  const { proofOfReserve, totalSupply } = useContext(ProofOfReserveContext);
+
+  const [proofOfReserveSum, merchantProofOfReserves] = proofOfReserve || [
+    undefined,
+    appConfiguration.merchants.map((merchant: Merchant) => {
+      return {
+        merchant,
+        dlcBTCAmount: undefined,
+      };
+    }),
+  ];
 
   return (
     <ProofOfReserveLayout>
@@ -30,13 +41,13 @@ export function ProofOfReserve(): React.JSX.Element {
             <HStack w={'100%'} pl={'25px'}>
               <TokenStatsBoardToken token={dlcBTC} totalSupply={totalSupply} />
               <Divider orientation={'vertical'} px={'15px'} height={'75px'} variant={'thick'} />
-              <TokenStatsBoardToken token={bitcoin} totalSupply={proofOfReserve} />
+              <TokenStatsBoardToken token={bitcoin} totalSupply={proofOfReserveSum} />
             </HStack>
           </VStack>
           <Divider orientation={'vertical'} px={'15px'} height={'275px'} variant={'thick'} />
           <MerchantTableLayout>
             <MerchantTableHeader />
-            {merchantProofOfReserve?.map(item => (
+            {merchantProofOfReserves.map(item => (
               <MerchantTableItem key={item.merchant.name} {...item} />
             ))}
           </MerchantTableLayout>

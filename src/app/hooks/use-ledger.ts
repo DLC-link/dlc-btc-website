@@ -2,7 +2,6 @@
 import { useContext, useState } from 'react';
 
 import { delay } from '@common/utilities';
-import { getBalance } from '@functions/bitcoin-functions';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { LedgerError } from '@models/error-types';
 import { LEDGER_APPS_MAP } from '@models/ledger';
@@ -13,8 +12,10 @@ import {
   BitcoinWalletContextState,
 } from '@providers/bitcoin-wallet-context-provider';
 import { LedgerDLCHandler } from 'dlc-btc-lib';
+import { getBalance } from 'dlc-btc-lib/bitcoin-functions';
 import { bitcoin } from 'dlc-btc-lib/constants';
 import { Transaction } from 'dlc-btc-lib/models';
+import { unshiftValue } from 'dlc-btc-lib/utilities';
 import { AppClient, DefaultWalletPolicy } from 'ledger-bitcoin';
 
 import { BITCOIN_NETWORK_MAP } from '@shared/constants/bitcoin.constants';
@@ -143,7 +144,9 @@ export function useLedger(): UseLedgerReturnType {
 
       const addressesWithBalances = await Promise.all(
         addresses.map(async address => {
-          const balance = await getBalance(address, appConfiguration.bitcoinBlockchainURL); // Replace with your actual function to get balance
+          const balance = unshiftValue(
+            await getBalance(address, appConfiguration.bitcoinBlockchainURL)
+          );
           return [address, balance] as [string, number];
         })
       );
