@@ -1,7 +1,6 @@
 /** @format */
 import { useContext, useState } from 'react';
 
-import { delay } from '@common/utilities';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { LedgerError } from '@models/error-types';
 import { LEDGER_APPS_MAP } from '@models/ledger';
@@ -15,6 +14,7 @@ import { LedgerDLCHandler } from 'dlc-btc-lib';
 import { getBalance } from 'dlc-btc-lib/bitcoin-functions';
 import { bitcoin } from 'dlc-btc-lib/constants';
 import { Transaction } from 'dlc-btc-lib/models';
+import { delay } from 'dlc-btc-lib/utilities';
 import { unshiftValue } from 'dlc-btc-lib/utilities';
 import { AppClient, DefaultWalletPolicy } from 'ledger-bitcoin';
 

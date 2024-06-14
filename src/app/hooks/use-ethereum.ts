@@ -2,13 +2,13 @@
 import { useContext } from 'react';
 import { useSelector } from 'react-redux';
 
-import { customShiftValue } from '@common/utilities';
 import { EthereumError } from '@models/error-types';
 import { EthereumNetwork } from '@models/ethereum-network';
 import { RawVault, Vault, VaultState } from '@models/vault';
 import { VaultContext } from '@providers/vault-context-provider';
 import { RootState, store } from '@store/index';
 import { vaultActions } from '@store/slices/vault/vault.actions';
+import { customShiftValue, unshiftValue } from 'dlc-btc-lib/utilities';
 import { ethers } from 'ethers';
 import { Logger } from 'ethers/lib/utils';
 
@@ -53,7 +53,7 @@ export function useEthereum(): UseEthereumReturnType {
     return {
       uuid: vault.uuid,
       timestamp: vault.timestamp.toNumber(),
-      collateral: customShiftValue(vault.valueLocked.toNumber(), 8, true),
+      collateral: unshiftValue(vault.valueLocked.toNumber()),
       state: vault.status,
       userPublicKey: vault.taprootPubKey,
       fundingTX: vault.fundingTxId,

@@ -1,10 +1,10 @@
 import { useContext, useState } from 'react';
 
 import { Button, FormControl, FormErrorMessage, Text, VStack, useToast } from '@chakra-ui/react';
-import { customShiftValue } from '@common/utilities';
 import { useEthereum } from '@hooks/use-ethereum';
 import { EthereumError } from '@models/error-types';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
+import { shiftValue } from 'dlc-btc-lib/utilities';
 import { Form, Formik } from 'formik';
 
 import { TransactionFormInput } from './components/transaction-form-input';
@@ -27,7 +27,7 @@ export function TransactionForm(): React.JSX.Element {
   async function handleSetup(btcDepositAmount: number) {
     try {
       setIsSubmitting(true);
-      const shiftedBTCDepositAmount = customShiftValue(btcDepositAmount, 8, false);
+      const shiftedBTCDepositAmount = shiftValue(btcDepositAmount);
       await setupVault(shiftedBTCDepositAmount);
     } catch (error) {
       setIsSubmitting(false);

@@ -1,7 +1,7 @@
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import { HStack, Image, Menu, MenuButton, MenuItem, MenuList, Text } from '@chakra-ui/react';
-import { easyTruncateAddress } from '@common/utilities';
 import { Wallet } from '@models/wallet';
+import { truncateAddress } from 'dlc-btc-lib/utilities';
 
 interface AccountMenuProps {
   address: string;
@@ -15,7 +15,7 @@ export function AccountMenu({ address, wallet, handleClick }: AccountMenuProps):
       <MenuButton>
         <HStack justifyContent={'space-evenly'}>
           <Image p={'2.5px'} src={wallet?.logo} alt={wallet?.name} boxSize={'35px'} />
-          <Text>{easyTruncateAddress(address)}</Text>
+          <Text>{truncateAddress(address)}</Text>
           <ChevronDownIcon boxSize={'35px'} color={'white'} />
         </HStack>
       </MenuButton>

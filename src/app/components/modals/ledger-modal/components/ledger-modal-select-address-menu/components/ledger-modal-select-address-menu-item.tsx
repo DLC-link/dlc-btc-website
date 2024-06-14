@@ -1,5 +1,5 @@
 import { HStack, MenuItem, Text } from '@chakra-ui/react';
-import { easyTruncateAddress } from '@common/utilities';
+import { truncateAddress } from 'dlc-btc-lib/utilities';
 
 interface LedgerModalSelectAddressMenuItemProps {
   index: number;
@@ -18,7 +18,7 @@ export function LedgerModalSelectAddressMenuItem({
       onClick={() => setNativeSegwitAddressAndTaprootMultisigAddress(index)}
     >
       <HStack w={'275px'} justifyContent={'space-between'}>
-        <Text>{easyTruncateAddress(address[0])}</Text>
+        <Text>{truncateAddress(address[0])}</Text>
         <Text>{address[1]} BTC</Text>
       </HStack>
     </MenuItem>

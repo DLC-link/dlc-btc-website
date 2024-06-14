@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useQuery } from 'react-query';
 
 import { BitcoinError } from '@models/error-types';

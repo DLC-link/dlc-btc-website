@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
 
-import { customShiftValue } from '@common/utilities';
 import { Merchant, MerchantProofOfReserve } from '@models/merchant';
 import { RootState } from '@store/index';
 import { ProofOfReserveHandler } from 'dlc-btc-lib';
 import { RawVault } from 'dlc-btc-lib/models';
+import { unshiftValue } from 'dlc-btc-lib/utilities';
 
 import { BITCOIN_NETWORK_MAP } from '@shared/constants/bitcoin.constants';
 
@@ -83,7 +83,7 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
 
     const merchantProofOfReserves = await Promise.all(promises);
 
-    return [customShiftValue(proofOfReserve, 8, true), merchantProofOfReserves];
+    return [unshiftValue(proofOfReserve), merchantProofOfReserves];
   }
 
   async function calculateProofOfReserveOfAddress(
@@ -98,7 +98,7 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
 
     const proofOfReserve = await proofOfReserveHandler.calculateProofOfReserve(filteredVaults);
 
-    return customShiftValue(proofOfReserve, 8, true);
+    return unshiftValue(proofOfReserve);
   }
 
   return {
