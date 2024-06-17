@@ -7,7 +7,7 @@ import { AttestorDetailsValidatorsCard } from './components/attestor-details-car
 import { AttestorDetailsLayout } from './components/attestor-details-layout';
 import { AttestorDetailsTable } from './components/attestor-details-table/attestor-details-table';
 
-export const donutData = [
+const donutData = [
   { name: 'Mark', value: 90 },
   { name: 'Robert', value: 12 },
   { name: 'Emily', value: 34 },
