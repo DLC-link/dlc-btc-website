@@ -1,12 +1,12 @@
 import { useContext, useEffect, useState } from 'react';
 
-import { delay } from '@common/utilities';
 import { useLedger } from '@hooks/use-ledger';
 import { BitcoinWalletType } from '@models/wallet';
 import {
   BitcoinWalletContext,
   BitcoinWalletContextState,
 } from '@providers/bitcoin-wallet-context-provider';
+import { delay } from 'dlc-btc-lib/utilities';
 
 import { ModalComponentProps } from '../components/modal-container';
 import { LedgerModalConnectButton } from './components/ledger-modal-connect-button';

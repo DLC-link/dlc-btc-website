@@ -1,7 +1,7 @@
 /* eslint-disable */
 import { HStack, Image, Text } from '@chakra-ui/react';
-import { easyTruncateAddress } from '@common/utilities';
 import { CustomSkeleton } from '@components/custom-skeleton/custom-skeleton';
+import { truncateAddress } from 'dlc-btc-lib/utilities';
 
 interface ProtocolHistoryItem {
   id: number;
@@ -37,7 +37,7 @@ export function ProtocolHistoryItem(protocolHistoryItem: ProtocolHistoryItem): R
         {merchant}
       </Text>
       <Text w={'25%'} color={'white'} fontSize={'sm'}>
-        {easyTruncateAddress(btcReserve)}
+        {truncateAddress(btcReserve)}
       </Text>
       <Text w={'25%'} color={'white'} fontSize={'sm'}>
         {date}

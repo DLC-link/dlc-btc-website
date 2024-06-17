@@ -1,12 +1,12 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { Button, HStack, Spinner, Text, VStack, useToast } from '@chakra-ui/react';
 import { VaultCard } from '@components/vault/vault-card';
-import { useBitcoinPrice } from '@hooks/use-bitcoin-price';
 import { useVaults } from '@hooks/use-vaults';
 import { BitcoinError } from '@models/error-types';
 import { Vault } from '@models/vault';
+import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 
 import { LockScreenProtocolFee } from './components/protocol-fee';
@@ -27,7 +27,7 @@ export function SignClosingTransactionScreen({
 
   const { readyVaults } = useVaults();
 
-  const { bitcoinPrice } = useBitcoinPrice();
+  const { bitcoinPrice } = useContext(ProofOfReserveContext);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 

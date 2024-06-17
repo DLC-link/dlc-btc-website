@@ -24,8 +24,7 @@ export function useConfirmationChecker(vault?: Vault): number {
   );
   const [transactionProgress, setTransactionProgress] = useState<number>(0);
 
-  const bitcoinBlockchainAPIURL = import.meta.env.VITE_BITCOIN_BLOCKCHAIN_API_URL;
-  const bitcoinExplorerTXURL = `${bitcoinBlockchainAPIURL}/tx/${txID}`;
+  const bitcoinExplorerTXURL = `${appConfiguration.bitcoinBlockchainURL}/tx/${txID}`;
 
   async function fetchTransactionDetails() {
     const response = await fetch(bitcoinExplorerTXURL);
