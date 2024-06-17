@@ -1,2 +1,0 @@
-export const TAPROOT_DERIVATION_PATH = "86'";
-export const NATIVE_SEGWIT_DERIVATION_PATH = "84'";

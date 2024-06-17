@@ -1,4 +1,4 @@
-export interface BitcoinNativeSegwitAddress {
+export interface BitcoinNativeSegwitAccount {
   address: string;
   derivationPath: string;
   publicKey: string;
@@ -6,9 +6,16 @@ export interface BitcoinNativeSegwitAddress {
   type: string;
 }
 
-export interface BitcoinTaprootAddress extends BitcoinNativeSegwitAddress {
+export interface BitcoinTaprootAccount extends BitcoinNativeSegwitAccount {
   type: 'p2tr';
   tweakedPublicKey: string;
+}
+
+export type BitcoinAccount = BitcoinNativeSegwitAccount | BitcoinTaprootAccount;
+
+export interface BitcoinAccounts {
+  nativeSegwitAccount: BitcoinNativeSegwitAccount;
+  taprootAccount: BitcoinTaprootAccount;
 }
 
 interface StacksAddress {
@@ -16,10 +23,10 @@ interface StacksAddress {
   symbol: string;
 }
 
-export type Address = BitcoinNativeSegwitAddress | BitcoinTaprootAddress | StacksAddress;
+export type Account = BitcoinNativeSegwitAccount | BitcoinTaprootAccount | StacksAddress;
 
 interface RpcResult {
-  addresses: Address[];
+  addresses: Account[];
 }
 
 export interface RpcResponse {

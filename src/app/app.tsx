@@ -11,8 +11,6 @@ import { BlockchainHeightContextProvider } from '@providers/bitcoin-query-provid
 import { BitcoinWalletContextProvider } from '@providers/bitcoin-wallet-context-provider';
 import { EthereumObserverProvider } from '@providers/ethereum-observer-provider';
 import { ProofOfReserveContextProvider } from '@providers/proof-of-reserve-context-provider';
-import { initEccLib } from 'bitcoinjs-lib';
-import * as ellipticCurveCryptography from 'tiny-secp256k1';
 
 import { About } from './pages/about/about';
 import { Dashboard } from './pages/dashboard/dashboard';
@@ -20,8 +18,6 @@ import { EthereumContextProvider } from './providers/ethereum-context-provider';
 import { VaultContextProvider } from './providers/vault-context-provider';
 
 const queryClient = new QueryClient();
-
-initEccLib(ellipticCurveCryptography);
 
 export function App(): React.JSX.Element {
   return (

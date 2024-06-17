@@ -1,9 +1,12 @@
-import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useContext, useEffect, useState } from 'react';
 
-import { delay } from '@common/utilities';
 import { useLedger } from '@hooks/use-ledger';
-import { RootState } from '@store/index';
+import { BitcoinWalletType } from '@models/wallet';
+import {
+  BitcoinWalletContext,
+  BitcoinWalletContextState,
+} from '@providers/bitcoin-wallet-context-provider';
+import { delay } from 'dlc-btc-lib/utilities';
 
 import { ModalComponentProps } from '../components/modal-container';
 import { LedgerModalConnectButton } from './components/ledger-modal-connect-button';
@@ -14,14 +17,9 @@ import { LedgerModalSelectAddressMenu } from './components/ledger-modal-select-a
 import { LedgerModalSuccessIcon } from './components/ledger-modal-success-icon';
 
 export function LedgerModal({ isOpen, handleClose }: ModalComponentProps): React.JSX.Element {
-  const {
-    getLedgerAddressesWithBalances,
-    getNativeSegwitAccount,
-    getTaprootMultisigAccount,
-    isLoading,
-  } = useLedger();
+  const { getLedgerAddressesWithBalances, connectLedgerWallet, isLoading } = useLedger();
 
-  const { mintStep } = useSelector((state: RootState) => state.mintunmint);
+  const { setBitcoinWalletType, setBitcoinWalletContextState } = useContext(BitcoinWalletContext);
 
   const [isSuccesful, setIsSuccesful] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
@@ -50,10 +48,12 @@ export function LedgerModal({ isOpen, handleClose }: ModalComponentProps): React
   async function setNativeSegwitAddressAndTaprootMultisigAddress(index: number) {
     try {
       setError(undefined);
-      await getNativeSegwitAccount(index);
-      await getTaprootMultisigAccount(mintStep[1]);
+      await connectLedgerWallet(index);
       setIsSuccesful(true);
       await delay(2500);
+      setIsSuccesful(false);
+      setBitcoinWalletType(BitcoinWalletType.Ledger);
+      setBitcoinWalletContextState(BitcoinWalletContextState.READY);
       handleClose();
     } catch (error: any) {
       setError(error.message);

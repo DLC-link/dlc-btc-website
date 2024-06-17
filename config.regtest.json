@@ -1,4 +1,15 @@
 {
+  "attestorURLs": [
+    "https://devnet.dlc.link/attestor-1",
+    "https://devnet.dlc.link/attestor-2",
+    "https://devnet.dlc.link/attestor-3"
+  ],
+  "enabledEthereumNetworkIDs": ["421614"],
+  "bitcoinNetwork": "regtest",
+  "bitcoinNetworkPreFix": "bcrt1",
+  "bitcoinBlockchainURL": "https://devnet.dlc.link/electrs",
+  "bitcoinBlockchainExplorerURL": "https://devnet.dlc.link/electrs",
+  "bitcoinBlockchainFeeEstimateURL": "https://devnet.dlc.link/electrs/fee-estimates",
   "merchants": [
     {
       "name": "AMBER",

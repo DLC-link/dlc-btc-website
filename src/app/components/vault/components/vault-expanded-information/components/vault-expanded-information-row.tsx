@@ -1,7 +1,7 @@
 import { CheckCircleIcon, CopyIcon } from '@chakra-ui/icons';
 import { Button, HStack, Text, Tooltip } from '@chakra-ui/react';
-import { easyTruncateAddress } from '@common/utilities';
 import { useCopyToClipboard } from '@hooks/use-copy-to-clipboard';
+import { truncateAddress } from 'dlc-btc-lib/utilities';
 
 interface VaultExpandedInformationUUIDRowProps {
   uuid: string;
@@ -41,7 +41,7 @@ export function VaultExpandedInformationUUIDRow({
         </Tooltip>
       </HStack>
       <Text textAlign={'right'} w={'50%'} color={'white'} fontSize={'xs'}>
-        {easyTruncateAddress(uuid)}
+        {truncateAddress(uuid)}
       </Text>
     </HStack>
   );

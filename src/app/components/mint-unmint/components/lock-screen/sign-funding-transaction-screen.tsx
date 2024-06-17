@@ -3,16 +3,14 @@ import { useDispatch } from 'react-redux';
 
 import { Button, HStack, Spinner, Text, VStack, useToast } from '@chakra-ui/react';
 import { VaultCard } from '@components/vault/vault-card';
-import { useBitcoinPrice } from '@hooks/use-bitcoin-price';
-import { useLeather } from '@hooks/use-leather';
 import { useVaults } from '@hooks/use-vaults';
 import { BitcoinError } from '@models/error-types';
 import { Vault } from '@models/vault';
-import { BitcoinWalletType } from '@models/wallet';
 import {
   BitcoinWalletContext,
   BitcoinWalletContextState,
 } from '@providers/bitcoin-wallet-context-provider';
+import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { modalActions } from '@store/slices/modal/modal.actions';
 
@@ -32,11 +30,10 @@ export function SignFundingTransactionScreen({
   const toast = useToast();
   const dispatch = useDispatch();
 
-  const { bitcoinWalletContextState, bitcoinWalletType } = useContext(BitcoinWalletContext);
+  const { bitcoinWalletContextState } = useContext(BitcoinWalletContext);
 
-  const { bitcoinPrice } = useBitcoinPrice();
+  const { bitcoinPrice } = useContext(ProofOfReserveContext);
   const { readyVaults } = useVaults();
-  const { getLeatherWalletInformation } = useLeather();
   const { resetBitcoinWalletContext } = useContext(BitcoinWalletContext);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -46,14 +43,14 @@ export function SignFundingTransactionScreen({
 
   useEffect(() => {
     switch (bitcoinWalletContextState) {
-      case BitcoinWalletContextState.SELECT_BITCOIN_WALLET_READY:
+      case BitcoinWalletContextState.INITIAL:
         setButtonText('Connect Bitcoin Wallet');
         break;
-      case BitcoinWalletContextState.TAPROOT_MULTISIG_ADDRESS_READY:
+      case BitcoinWalletContextState.READY:
         setButtonText('Sign Funding Transaction');
         break;
       default:
-        setButtonText('Select Bitcoin Wallet');
+        setButtonText('Connect Bitcoin Wallet');
         break;
     }
   }, [bitcoinWalletContextState]);
@@ -80,31 +77,8 @@ export function SignFundingTransactionScreen({
     }
   }
 
-  async function handleClick() {
-    setIsSubmitting(true);
-    switch (bitcoinWalletContextState) {
-      case BitcoinWalletContextState.SELECT_BITCOIN_WALLET_READY:
-        if (bitcoinWalletType === BitcoinWalletType.Ledger) {
-          dispatch(modalActions.toggleLedgerModalVisibility());
-        } else {
-          try {
-            await getLeatherWalletInformation(currentStep[1]);
-          } catch (error: any) {
-            toast({
-              title: 'Failed to sign transaction',
-              description: error.message,
-              status: 'error',
-              duration: 9000,
-              isClosable: true,
-            });
-          }
-        }
-        break;
-      default:
-        dispatch(modalActions.toggleSelectBitcoinWalletModalVisibility());
-        break;
-    }
-    setIsSubmitting(false);
+  async function handleConnect() {
+    dispatch(modalActions.toggleSelectBitcoinWalletModalVisibility());
   }
 
   return (
@@ -133,10 +107,10 @@ export function SignFundingTransactionScreen({
       <Button
         isLoading={isSubmitting}
         variant={'account'}
-        onClick={() =>
-          bitcoinWalletContextState === BitcoinWalletContextState.TAPROOT_MULTISIG_ADDRESS_READY
-            ? handleSign(currentVault)
-            : handleClick()
+        onClick={async () =>
+          bitcoinWalletContextState === BitcoinWalletContextState.READY
+            ? await handleSign(currentVault)
+            : await handleConnect()
         }
       >
         {buttonText}

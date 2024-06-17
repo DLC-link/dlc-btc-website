@@ -3,7 +3,6 @@ import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
 import { ViteToml } from 'vite-plugin-toml'
 import { readFileSync } from 'fs';
-
 import wasm from 'vite-plugin-wasm';
 
 // https://vitejs.dev/config/
@@ -11,7 +10,11 @@ export default defineConfig(({ mode }) =>  {
 
   const env = loadEnv(mode, process.cwd(), '')
 
-  const bitcoinNetworkConfiguration = JSON.parse(readFileSync(resolve(__dirname, `./config.${env.VITE_BITCOIN_NETWORK}.json`), 'utf-8'));
+  const bitcoinNetworkName = env.VITE_BITCOIN_NETWORK;
+
+  const appConfigurationJSON = readFileSync(resolve(__dirname, `./config.${bitcoinNetworkName}.json`), 'utf-8');
+  const appConfiguration = JSON.parse(appConfigurationJSON);
+  
 
   return {
   plugins: [react(), wasm(), ViteToml()],
@@ -19,7 +22,7 @@ export default defineConfig(({ mode }) =>  {
     target: 'esnext',
   },
   define: {
-    bitcoinNetworkConfiguration,
+    appConfiguration,
   },
   resolve: {
     alias: [

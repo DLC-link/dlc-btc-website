@@ -22,7 +22,9 @@ export function TokenStatsBoardTVL({
           bgClip="text"
         >
           $
-          {totalSupply && bitcoinPrice ? `${(totalSupply * bitcoinPrice).toLocaleString()} USD` : 0}
+          {totalSupply && bitcoinPrice
+            ? `${Math.floor(totalSupply * bitcoinPrice).toLocaleString('en-US')} USD`
+            : 0}
         </Text>
       </Skeleton>
       <Divider h={'25px'} orientation={'horizontal'} variant={'thick'} />

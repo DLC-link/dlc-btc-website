@@ -1,19 +1,19 @@
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 
-import { customShiftValue } from '@common/utilities';
 import { EthereumError } from '@models/error-types';
 import { EthereumNetwork } from '@models/ethereum-network';
+import { unshiftValue } from 'dlc-btc-lib/utilities';
 
-import { useEndpoints } from './use-endpoints';
 import { useEthereum } from './use-ethereum';
+import { useEthereumConfiguration } from './use-ethereum-configuration';
 
 interface UseTotalSupplyReturnType {
   totalSupply: number | undefined;
 }
 
 export function useTotalSupply(): UseTotalSupplyReturnType {
-  const { enabledEthereumNetworks } = useEndpoints();
+  const { enabledEthereumNetworks } = useEthereumConfiguration();
   const { getDefaultProvider } = useEthereum();
 
   const [shouldFetch, setShouldFetch] = useState(false);
@@ -25,7 +25,7 @@ export function useTotalSupply(): UseTotalSupplyReturnType {
 
     const totalSupply = supplies.reduce((a, b) => a + b, 0);
 
-    return customShiftValue(totalSupply, 8, true);
+    return unshiftValue(totalSupply);
   };
 
   const { data: totalSupply } = useQuery(['totalSupply'], fetchTotalSupply, {
