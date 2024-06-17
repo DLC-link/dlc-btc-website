@@ -71,7 +71,7 @@ export const exampleAttestorDetailsTableItems = [
     },
     {
         node: 'NodeID-3Afn7T0Za6AX7YTjebN0Rl0pF3aLcMRY',
-        observedResponse: 'AVERAGE',
+        observedResponse: 'BAD',
         totalStake: 6545.79,
         del: 7,
         fee: '4.07%',
@@ -111,7 +111,7 @@ export const exampleAttestorDetailsTableItems = [
     },
     {
         node: 'NodeID-rMkQezvXvXrIgNWmbFT05cEU1dPy2fiE',
-        observedResponse: 'AVERAGE',
+        observedResponse: 'GOOD',
         totalStake: 11412.51,
         del: 14,
         fee: '1.47%',

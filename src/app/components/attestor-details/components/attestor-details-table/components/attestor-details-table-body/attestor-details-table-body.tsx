@@ -11,7 +11,6 @@ export function AttestorDetailsTableBody(): React.JSX.Element {
       w={'100%'}
       pb={'15px'}
       pr={'15px'}
-      alignItems={'start'}
       overflowY={'scroll'}
       overflowX={'hidden'}
       css={scrollBarCSS}

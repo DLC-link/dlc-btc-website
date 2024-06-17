@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 
+import { VStack } from '@chakra-ui/react';
 import * as d3 from 'd3';
 
 interface DataItem {
@@ -14,7 +15,7 @@ interface AttestorDetailsDonutChartProps {
 
 const MARGIN = 30;
 
-const colors = ['#e0ac2b', '#e85252', '#6689c6', '#9a6fb0', '#a53253', '#69b3a2'];
+const colors = ['#6818AD', '#CC7FCF', '#B595D6', '#D9C7EB', '#EBE1F4', '#F3F0FA'];
 
 export const AttestorDetailsDonutChart = ({
   width,
@@ -32,7 +33,7 @@ export const AttestorDetailsDonutChart = ({
     const arcPathGenerator = d3.arc();
     return pie.map(p =>
       arcPathGenerator({
-        innerRadius: 70,
+        innerRadius: 50,
         outerRadius: radius,
         startAngle: p.startAngle,
         endAngle: p.endAngle,
@@ -41,12 +42,14 @@ export const AttestorDetailsDonutChart = ({
   }, [radius, pie]);
 
   return (
-    <svg width={width} height={height} style={{ display: 'inline-block' }}>
-      <g transform={`translate(${width / 2}, ${height / 2})`}>
-        {arcs.map((arc, i) => {
-          return <path key={i} d={arc || undefined} fill={colors[i % colors.length]} />;
-        })}
-      </g>
-    </svg>
+    <VStack>
+      <svg width={width} height={height} style={{ display: 'inline-block' }}>
+        <g transform={`translate(${width / 2}, ${height / 2})`}>
+          {arcs.map((arc, i) => {
+            return <path key={i} d={arc || undefined} fill={colors[i % colors.length]} />;
+          })}
+        </g>
+      </svg>
+    </VStack>
   );
 };

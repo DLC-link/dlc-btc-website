@@ -2,8 +2,8 @@ import { HStack, Text } from '@chakra-ui/react';
 
 import { AttestorDetailsCardLayout } from './components/attestor-details-card/attestor-details-card-layout';
 import { AttestorDetailsDonutChart } from './components/attestor-details-card/attestor-details-donut-chart';
-import { AttestorDetailsRateCardContent } from './components/attestor-details-card/attestor-details-rate-card-content';
-import { AttestorDetailsValidatorsCardContent } from './components/attestor-details-card/attestor-details-validators-card-content';
+import { AttestorDetailsRateCard } from './components/attestor-details-card/attestor-details-rate-card';
+import { AttestorDetailsValidatorsCard } from './components/attestor-details-card/attestor-details-validators-card';
 import { AttestorDetailsLayout } from './components/attestor-details-layout';
 import { AttestorDetailsTable } from './components/attestor-details-table/attestor-details-table';
 
@@ -23,13 +23,13 @@ export function AttestorDetails(): React.JSX.Element {
       </Text>
       <HStack spacing={'20px'}>
         <AttestorDetailsCardLayout width={'310px'}>
-          {<AttestorDetailsValidatorsCardContent />}
+          <AttestorDetailsValidatorsCard />
         </AttestorDetailsCardLayout>
         <AttestorDetailsCardLayout width={'620px'}>
-          {<AttestorDetailsRateCardContent width={'280px'} />}
+          <AttestorDetailsRateCard width={'280px'} />
         </AttestorDetailsCardLayout>
         <AttestorDetailsCardLayout width={'310px'}>
-          <AttestorDetailsDonutChart width={300} height={300} data={donutData} />
+          <AttestorDetailsDonutChart width={250} height={250} data={donutData} />
         </AttestorDetailsCardLayout>
       </HStack>
       <AttestorDetailsTable />

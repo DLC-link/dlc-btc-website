@@ -4,15 +4,19 @@ import { AttestorDetailsTableHeaderText } from './attestor-details-table-header-
 
 export function AttestorDetailsTableHeader(): React.JSX.Element {
   return (
-    <HStack w={'95%'} pl={'10px'}>
-      <AttestorDetailsTableHeaderText>Node</AttestorDetailsTableHeaderText>
-      <AttestorDetailsTableHeaderText>Observed Response</AttestorDetailsTableHeaderText>
-      <AttestorDetailsTableHeaderText>Total Stake</AttestorDetailsTableHeaderText>
-      <AttestorDetailsTableHeaderText>Del.</AttestorDetailsTableHeaderText>
-      <AttestorDetailsTableHeaderText>Fee</AttestorDetailsTableHeaderText>
-      <AttestorDetailsTableHeaderText>Comulative Stake</AttestorDetailsTableHeaderText>
-      <AttestorDetailsTableHeaderText>Max Yield</AttestorDetailsTableHeaderText>
-      <AttestorDetailsTableHeaderText>Start Date</AttestorDetailsTableHeaderText>
+    <HStack w={'98%'} px={'10px'} justifyContent={'space-between'}>
+      <AttestorDetailsTableHeaderText width={'20%'}>Node</AttestorDetailsTableHeaderText>
+      <AttestorDetailsTableHeaderText width={'15%'}>
+        Observed Response
+      </AttestorDetailsTableHeaderText>
+      <AttestorDetailsTableHeaderText width={'10%'}>Total Stake</AttestorDetailsTableHeaderText>
+      <AttestorDetailsTableHeaderText width={'5%'}>Del.</AttestorDetailsTableHeaderText>
+      <AttestorDetailsTableHeaderText width={'5%'}>Fee</AttestorDetailsTableHeaderText>
+      <AttestorDetailsTableHeaderText width={'10%'}>
+        Comulative Stake
+      </AttestorDetailsTableHeaderText>
+      <AttestorDetailsTableHeaderText width={'10%'}>Max Yield</AttestorDetailsTableHeaderText>
+      <AttestorDetailsTableHeaderText width={'15%'}>Start Date</AttestorDetailsTableHeaderText>
     </HStack>
   );
 }
