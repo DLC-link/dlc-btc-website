@@ -47,3 +47,9 @@ export function reverseBytes(bytes: Buffer | Uint8Array): Buffer | Uint8Array {
   if (Buffer.isBuffer(bytes)) return Buffer.from(bytes).reverse();
   return new Uint8Array(bytes.slice().reverse());
 }
+
+export function truncateNodeID(nodeID: string): string {
+  const start = nodeID.slice(0, 14);
+  const end = nodeID.slice(-7);
+  return `${start}...${end}`;
+} 
