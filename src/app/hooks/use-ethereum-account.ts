@@ -36,7 +36,7 @@ function alertNonMetaMaskProvider(): void {
 
 function alertNetworkNotSupported(ethereumNetworkID: string): void {
   alert(
-    'Your current Ethereum network is not supported. Please switch to the correct Ethereum network, then reload the page.'
+    'Your current Ethereum network is not supported. Please switch to the Arbitrum network, then reload the page.'
   );
   throw new Error(`Unsupported Ethereum network, ID: ${ethereumNetworkID}`);
 }
