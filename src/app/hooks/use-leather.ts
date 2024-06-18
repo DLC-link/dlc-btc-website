@@ -20,6 +20,7 @@ import {
 } from '@providers/bitcoin-wallet-context-provider';
 import { SoftwareWalletDLCHandler } from 'dlc-btc-lib';
 import { Transaction } from 'dlc-btc-lib/models';
+import { BigNumber } from 'ethers';
 
 import { BITCOIN_NETWORK_MAP } from '@shared/constants/bitcoin.constants';
 
@@ -156,9 +157,15 @@ export function useLeather(): UseLeatherReturnType {
     try {
       setIsLoading([true, 'Creating Funding Transaction']);
 
+      // fortesting
+      const vault2: RawVault = {
+        ...vault,
+        valueLocked: BigNumber.from(10000000n),
+      };
+
       // ==> Create Funding Transaction
       const fundingPSBT = await dlcHandler?.createFundingPSBT(
-        vault,
+        vault2,
         attestorGroupPublicKey,
         feeRateMultiplier
       );
@@ -194,8 +201,14 @@ export function useLeather(): UseLeatherReturnType {
     try {
       setIsLoading([true, 'Creating Closing Transaction']);
 
+      // fortesting
+      const vault2: RawVault = {
+        ...vault,
+        valueLocked: BigNumber.from(10000000n),
+      };
+
       const closingTransaction = await dlcHandler.createClosingPSBT(
-        vault,
+        vault2,
         fundingTransactionID,
         feeRateMultiplier
       );

@@ -59,7 +59,7 @@ export function useAttestors(): UseAttestorsReturnType {
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
         body: JSON.stringify({
           uuid,
-          withdrawal_transaction: withdrawalPSBT,
+          withdraw_psbt: withdrawalPSBT,
           chain: ethereumAttestorChainID,
         }),
       })

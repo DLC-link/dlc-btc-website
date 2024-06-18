@@ -177,9 +177,10 @@ export function usePSBT(): UsePSBTReturnType {
 
       if (!nativeSegwitAddress) throw new BitcoinError('Native Segwit Address is not defined');
 
-      await sendWithdrawalTransactionToAttestors(vaultUUID, withdrawalTransactionHex);
+      await sendWithdrawalTransactionToAttestors(withdrawalTransactionHex, vaultUUID);
 
-      await broadcastTransaction(withdrawalTransactionHex, appConfiguration.bitcoinBlockchainURL);
+      // I don't think we want to do this because the attestors haven't signed it.
+      // await broadcastTransaction(withdrawalTransactionHex, appConfiguration.bitcoinBlockchainURL);
 
       resetBitcoinWalletContext();
     } catch (error) {
