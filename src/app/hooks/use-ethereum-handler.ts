@@ -51,13 +51,12 @@ export function useEthereumHandler(): UseEthereumHandlerReturnType {
   useEffect(() => {
     const fetchEthereumHandler = async () => {
       if (ethereumUserAddress) {
-        console.log('Fetching Ethereum Handler');
-
         await getEthereumHandler(ethereumWalletType, ethereumNetworkName);
       }
     };
 
-    fetchEthereumHandler();
+    void fetchEthereumHandler();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ethereumUserAddress, ethereumNetwork]);
 
   useEffect(() => {
@@ -67,7 +66,8 @@ export function useEthereumHandler(): UseEthereumHandlerReturnType {
       await getReadOnlyEthereumHandler(ethereumNetworkName, infuraWebsocketURL);
     };
 
-    fetchReadOnlyEthereumHandler();
+    void fetchReadOnlyEthereumHandler();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ethereumNetwork]);
 
   async function getEthereumHandler(
@@ -82,7 +82,7 @@ export function useEthereumHandler(): UseEthereumHandlerReturnType {
     const ethereumDeploymentPlans =
       await fetchEthereumDeploymentPlansByNetwork(ethereumNetworkName);
 
-    const provider = ethers.providers.getDefaultProvider(ethereumNetwork.defaultNodeURL);
+    const provider = ethers.providers.getDefaultProvider('http://54.243.139.139:8547/ ');
 
     const dlcBTCContractDeploymentPlan = ethereumDeploymentPlans.find(
       plan => plan.contract.name === 'DLCBTC'
@@ -97,8 +97,6 @@ export function useEthereumHandler(): UseEthereumHandlerReturnType {
       dlcBTCContractDeploymentPlan.contract.abi,
       provider
     );
-
-    console.log('currentUserPointsContractReader', currentUserPointsContractReader);
 
     const ethereumHandler = EthereumHandler.fromSigner(ethereumDeploymentPlans, ethereumSigner);
 

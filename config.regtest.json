@@ -5,6 +5,7 @@
     "https://devnet.dlc.link/attestor-3"
   ],
   "enabledEthereumNetworkIDs": ["421614"],
+  "arbitrumNetworkName": "arbitrum-sepolia-devnet",
   "infuraWebsocketURL": "wss://arbitrum-sepolia.infura.io/ws/v3/1f37bd1ce1a24f97bc0a3d1670b4a077",
   "bitcoinNetwork": "regtest",
   "bitcoinNetworkPreFix": "bcrt1",

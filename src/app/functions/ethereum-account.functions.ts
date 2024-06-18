@@ -1,7 +1,17 @@
 import { WalletType } from '@models/wallet';
 import { addNetworkParams, hexChainIDs } from 'dlc-btc-lib/constants';
-import { EthereumNetwork, EthereumNetworkID } from 'dlc-btc-lib/models';
+import { EthereumNetwork, EthereumNetworkID, SupportedNetwork } from 'dlc-btc-lib/models';
 import { ethers } from 'ethers';
+
+export function getNetworkName(ethereumNetworkID: EthereumNetworkID): SupportedNetwork {
+  switch (ethereumNetworkID) {
+    case EthereumNetworkID.Arbitrum:
+    case EthereumNetworkID.ArbitrumSepolia:
+      return appConfiguration.arbitrumNetworkName;
+    default:
+      throw new Error('Unknown Network ID');
+  }
+}
 
 function alertMissingWallet(walletType: WalletType): void {
   alert(`Install ${walletType}!`);

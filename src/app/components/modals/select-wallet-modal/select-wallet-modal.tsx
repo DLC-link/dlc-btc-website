@@ -6,6 +6,7 @@ import { ModalComponentProps } from '@components/modals/components/modal-contain
 import { ModalLayout } from '@components/modals/components/modal.layout';
 import { SelectWalletMenu } from '@components/modals/select-wallet-modal/components/select-wallet-menu';
 import { SelectNetworkButton } from '@components/select-network-button/select-network-button';
+import { getNetworkName } from '@functions/ethereum-account.functions';
 import { WalletType, ethereumWallets } from '@models/wallet';
 import { EthereumHandlerContext } from '@providers/ethereum-handler-context-provider';
 import { EthereumNetwork } from 'dlc-btc-lib/models';
@@ -17,7 +18,8 @@ export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps):
 
   async function handleLogin(walletType: WalletType) {
     if (!currentNetwork) throw new Error('No network selected');
-    await getEthereumHandler(walletType, 'arbitrum-sepolia-devnet');
+    const networkName = getNetworkName(currentNetwork.id);
+    await getEthereumHandler(walletType, networkName);
     setCurrentNetwork(undefined);
     handleClose();
   }

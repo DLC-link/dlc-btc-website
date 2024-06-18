@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import { useSelector } from 'react-redux';
 
 import { HStack } from '@chakra-ui/react';

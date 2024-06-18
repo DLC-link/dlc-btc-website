@@ -1,12 +1,11 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
 import { useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
 
 import { DetailedEvent, TimeStampedEvent } from '@models/ethereum-models';
 import { EthereumHandlerContext } from '@providers/ethereum-handler-context-provider';
 import Decimal from 'decimal.js';
-import { Event } from 'ethers';
-import { ethers } from 'ethers';
+import { Event, ethers } from 'ethers';
 
 import { RootState } from '../store';
 
@@ -83,31 +82,13 @@ export function usePoints(): UsePointsReturnType {
   const { address: userAddress } = useSelector((state: RootState) => state.account);
   const { userPointsContractReader } = useContext(EthereumHandlerContext);
 
-  useEffect(() => {
-    console.log('userPointsContractReader', userPointsContractReader);
-  }, [userPointsContractReader]);
-
-  const {
-    data: userPoints,
-    isLoading,
-    error,
-  } = useQuery(
+  const { data: userPoints } = useQuery(
     ['userPoints', userAddress], // Unique key for the query, including the userAddress to refetch when it changes
     () => fetchPoints(userPointsContractReader!, userAddress!), // Fetch function, using non-null assertion because we check for existence in `enabled`
     {
       enabled: !!userAddress && !!userPointsContractReader, // Only run the query if userAddress is not undefined or empty
     }
   );
-
-  // useEffect(() => {
-  //   const fetchUserPoints = async (currentUserAddress: string) => {
-  //     void fetchPoints(currentUserAddress);
-  //   };
-  //   if (userAddress) {
-  //     void fetchUserPoints(userAddress);
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [userAddress]);
 
   function formatTransferEvent(event: any, timestamp: number): DetailedEvent {
     return {
@@ -125,19 +106,12 @@ export function usePoints(): UsePointsReturnType {
     if (!userPointsContractReader) {
       throw new Error('Points Contract Reader is not set');
     }
-    console.log('Okay it is set');
     const eventFilterTo = userPointsContractReader.filters.Transfer(BURN_ADDRESS, userAddress);
-    console.log('eventFilterTo', eventFilterTo);
     const eventFilterFrom = userPointsContractReader.filters.Transfer(userAddress, BURN_ADDRESS);
-    console.log('eventFilterFrom', eventFilterFrom);
     const eventsTo = await userPointsContractReader.queryFilter(eventFilterTo);
-    console.log('eventsTo', eventsTo);
     const eventsFrom = await userPointsContractReader.queryFilter(eventFilterFrom);
-    console.log('eventsFrom', eventsFrom);
     const events = [...eventsTo, ...eventsFrom];
     const detailedEvents: DetailedEvent[] = [];
-
-    console.log('events', events);
 
     await Promise.all(
       events.map(async (event: Event) => {
@@ -155,7 +129,6 @@ export function usePoints(): UsePointsReturnType {
     userPointsContractReader: ethers.Contract,
     currentUserAddress: string
   ): Promise<number> {
-    console.log('fetchPoints');
     const rewardsRate = import.meta.env.VITE_REWARDS_RATE;
     if (!rewardsRate) {
       throw new Error('Rewards Rate not set');

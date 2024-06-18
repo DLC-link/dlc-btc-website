@@ -30,7 +30,7 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
     void fetchProofOfReserveHandler();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [network]);
+  }, [network, readOnlyEthereumHandler]);
 
   async function getProofOfReserveHandler(): Promise<void> {
     if (!readOnlyEthereumHandler) return;

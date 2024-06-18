@@ -1,3 +1,5 @@
+import { SupportedNetwork } from 'dlc-btc-lib/models';
+
 import { Merchant } from './merchant';
 
 enum BitcoinNetworkName {
@@ -10,6 +12,7 @@ type BitcoinNetworkPrefix = 'bc1' | 'tb1' | 'bcrt1';
 export interface Configuration {
   attestorURLs: string[];
   enabledEthereumNetworkIDs: string[];
+  arbitrumNetworkName: SupportedNetwork;
   infuraWebsocketURL: string;
   bitcoinNetwork: BitcoinNetworkName;
   bitcoinNetworkPreFix: BitcoinNetworkPrefix;

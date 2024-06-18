@@ -1,4 +1,4 @@
-import React, { createContext, useEffect } from 'react';
+import React, { createContext } from 'react';
 
 import { useEthereumHandler } from '@hooks/use-ethereum-handler';
 import { HasChildren } from '@models/has-children';
@@ -44,10 +44,6 @@ export function EthereumHandlerContextProvider({ children }: HasChildren): React
     getEthereumHandler,
     recommendTokenToMetamask,
   } = useEthereumHandler();
-
-  useEffect(() => {
-    console.log('userPointsContractReader', userPointsContractReader);
-  }, [userPointsContractReader]);
 
   return (
     <EthereumHandlerContext.Provider

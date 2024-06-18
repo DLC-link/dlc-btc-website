@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
+import { getNetworkName } from '@functions/ethereum-account.functions';
 import { RootState } from '@store/index';
 import { supportedEthereumNetworks } from 'dlc-btc-lib/constants';
 import { EthereumNetwork, EthereumNetworkID, SupportedNetwork } from 'dlc-btc-lib/models';
@@ -54,22 +55,21 @@ export function useEthereumConfiguration(): NetworkEndpoints {
         getEthereumNetworkByID(id as EthereumNetworkID)
       );
 
+    const networkName = getNetworkName(network?.id as EthereumNetworkID);
+
     switch (network?.id) {
       case EthereumNetworkID.ArbitrumSepolia:
         return {
           ethereumExplorerAPIURL: 'https://sepolia.arbiscan.io',
           ethereumAttestorChainID: 'evm-arbsepolia',
-          ethereumNetworkName:
-            appConfiguration.bitcoinNetwork === 'testnet'
-              ? 'arbitrum-sepolia-testnet'
-              : 'arbitrum-sepolia-devnet',
+          ethereumNetworkName: networkName,
           enabledEthereumNetworks,
         };
       case EthereumNetworkID.Arbitrum:
         return {
           ethereumExplorerAPIURL: 'https://arbiscan.io',
           ethereumAttestorChainID: 'evm-arbitrum',
-          ethereumNetworkName: 'arbitrum',
+          ethereumNetworkName: networkName,
           enabledEthereumNetworks,
         };
       default:
