@@ -168,28 +168,3 @@ export async function connectEthereumAccount(
     throw Error(`Could not connect to Ethereum: ${error}`);
   }
 }
-
-// async function recommendTokenToMetamask(): Promise<boolean> {
-//   try {
-//     if (!walletType) throw new Error('Wallet not initialized');
-//     const walletProvider = getWalletProvider(walletType);
-
-//     const response = await walletProvider.request({
-//       method: 'wallet_watchAsset',
-//       params: {
-//         type: 'ERC20',
-//         options: {
-//           address: dlcBTCContract?.address,
-//           symbol: 'dlcBTC',
-//           decimals: 8,
-//           image: 'https://dlc-public-assets.s3.amazonaws.com/dlcBTC_Token.png',
-//         },
-//       },
-//     });
-//     await response.wait();
-//     return response;
-//   } catch (error) {
-//     throwEthereumError(`Could not recommend dlcBTC token to MetaMask: `, error);
-//     return false;
-//   }
-// }
