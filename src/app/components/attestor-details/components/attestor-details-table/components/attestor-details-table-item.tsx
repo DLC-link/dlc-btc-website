@@ -1,6 +1,5 @@
 /* eslint-disable */
 import { HStack, Image, Text } from '@chakra-ui/react';
-import { truncateNodeID } from '@common/utilities';
 import { CustomSkeleton } from '@components/custom-skeleton/custom-skeleton';
 
 interface AttestorDetailsTableItem {
@@ -37,7 +36,7 @@ export function AttestorDetailsTableItem(
       <HStack w={'20%'}>
         <Image src={'/images/logos/dlc-btc-logo.svg'} alt={'dlcBTC Logo'} boxSize={'30px'} />
         <Text color={'white'} fontSize={'sm'} fontWeight={500}>
-          {truncateNodeID(node)}
+          {node}
         </Text>
       </HStack>
       <Text

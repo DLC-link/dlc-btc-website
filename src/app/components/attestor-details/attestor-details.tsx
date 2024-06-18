@@ -1,5 +1,6 @@
 import { HStack, Text } from '@chakra-ui/react';
 
+import { AttestorDetailsCard } from './components/attestor-details-card/attestor-details-card';
 import { AttestorDetailsCardLayout } from './components/attestor-details-card/attestor-details-card-layout';
 import { AttestorDetailsDonutChart } from './components/attestor-details-card/attestor-details-donut-chart';
 import { AttestorDetailsRateCard } from './components/attestor-details-card/attestor-details-rate-card';
@@ -21,7 +22,7 @@ export function AttestorDetails(): React.JSX.Element {
       <Text w={'100%'} color={'white'} fontSize={'6xl'} fontWeight={500}>
         dlcBTC Attestor Details
       </Text>
-      <HStack spacing={'20px'}>
+      <AttestorDetailsCard>
         <AttestorDetailsCardLayout width={'310px'}>
           <AttestorDetailsValidatorsCard />
         </AttestorDetailsCardLayout>
@@ -31,7 +32,7 @@ export function AttestorDetails(): React.JSX.Element {
         <AttestorDetailsCardLayout width={'310px'}>
           <AttestorDetailsDonutChart width={250} height={250} data={donutData} />
         </AttestorDetailsCardLayout>
-      </HStack>
+      </AttestorDetailsCard>
       <AttestorDetailsTable />
     </AttestorDetailsLayout>
   );
