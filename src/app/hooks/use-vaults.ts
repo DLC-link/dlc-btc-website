@@ -1,10 +1,12 @@
 import { useContext, useMemo } from 'react';
 import { useQuery } from 'react-query';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
+import { formatVault } from '@functions/vault.functions';
 import { Vault, VaultState } from '@models/vault';
 import { EthereumHandlerContext } from '@providers/ethereum-handler-context-provider';
 import { RootState } from '@store/index';
+import { vaultActions } from '@store/slices/vault/vault.actions';
 
 export interface UseVaultsReturnType {
   allVaults: Vault[];
@@ -17,12 +19,13 @@ export interface UseVaultsReturnType {
 }
 
 export function useVaults(): UseVaultsReturnType {
+  const dispatch = useDispatch();
   const { ethereumHandler } = useContext(EthereumHandlerContext);
 
   const { vaults } = useSelector((state: RootState) => state.vault);
   const { network } = useSelector((state: RootState) => state.account);
 
-  const { isLoading } = useQuery(['vaults'], ethereumHandler?.getAllVaults!, {
+  const { isLoading } = useQuery(['vaults'], getAllVaults, {
     enabled: !!ethereumHandler,
     refetchInterval: 60000,
   });
@@ -31,6 +34,24 @@ export function useVaults(): UseVaultsReturnType {
     () => [...vaults[network ? network.id : '42161']].sort((a, b) => b.timestamp - a.timestamp),
     [vaults, network]
   );
+
+  async function getAllVaults(): Promise<void> {
+    try {
+      if (!ethereumHandler) return;
+
+      const rawVaults = await ethereumHandler.getAllVaults();
+      const formattedVaults: Vault[] = rawVaults.map(formatVault);
+      if (!network) return;
+      dispatch(
+        vaultActions.setVaults({
+          newVaults: formattedVaults,
+          networkID: network?.id,
+        })
+      );
+    } catch (error) {
+      throw new Error(`Could not fetch Vaults: ${error}`);
+    }
+  }
 
   const readyVaults = useMemo(
     () =>

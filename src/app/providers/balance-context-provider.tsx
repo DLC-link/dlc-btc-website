@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { getLockedBTCBalance } from '@functions/vault.functions';
 import { useVaults } from '@hooks/use-vaults';
 import { HasChildren } from '@models/has-children';
+import { unshiftValue } from 'dlc-btc-lib/utilities';
 
 import { EthereumHandlerContext } from './ethereum-handler-context-provider';
 
@@ -27,7 +28,11 @@ export function BalanceContextProvider({ children }: HasChildren): React.JSX.Ele
     if (ethereumHandler) {
       const currentTokenBalance = await ethereumHandler.getDLCBTCBalance();
       if (currentTokenBalance !== dlcBTCBalance) {
-        setDLCBTCBalance(currentTokenBalance);
+        if (currentTokenBalance) {
+          setDLCBTCBalance(unshiftValue(currentTokenBalance));
+        } else {
+          setDLCBTCBalance(currentTokenBalance);
+        }
       }
       const currentLockedBTCBalance = await getLockedBTCBalance(fundedVaults);
       if (currentLockedBTCBalance !== lockedBTCBalance) {

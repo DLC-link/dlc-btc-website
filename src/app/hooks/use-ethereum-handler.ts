@@ -6,14 +6,17 @@ import { WalletType } from '@models/wallet';
 import { RootState } from '@store/index';
 import { accountActions } from '@store/slices/account/account.actions';
 import { EthereumHandler, ReadOnlyEthereumHandler } from 'dlc-btc-lib';
+import { ethereumArbitrumSepolia } from 'dlc-btc-lib/constants';
 import { fetchEthereumDeploymentPlansByNetwork } from 'dlc-btc-lib/ethereum-functions';
 import { SupportedNetwork } from 'dlc-btc-lib/models';
+import { Contract, ethers } from 'ethers';
 
 import { useEthereumConfiguration } from './use-ethereum-configuration';
 
 interface UseEthereumHandlerReturnType {
   ethereumHandler: EthereumHandler | undefined;
   readOnlyEthereumHandler: ReadOnlyEthereumHandler | undefined;
+  userPointsContractReader: Contract | undefined;
   isEthereumHandlerSet: boolean;
   isReadOnlyEthereumHandlerSet: boolean;
   getEthereumHandler: (
@@ -30,6 +33,9 @@ export function useEthereumHandler(): UseEthereumHandlerReturnType {
   const [readOnlyEthereumHandler, setReadOnlyEthereumHandler] = useState<
     ReadOnlyEthereumHandler | undefined
   >(undefined);
+  const [userPointsContractReader, setUserPointsContractReader] = useState<Contract | undefined>(
+    undefined
+  );
 
   const [isEthereumHandlerSet, setIsEthereumHandlerSet] = useState<boolean>(false);
   const [isReadOnlyEthereumHandlerSet, setIsReadOnlyEthereumHandlerSet] = useState<boolean>(false);
@@ -43,8 +49,6 @@ export function useEthereumHandler(): UseEthereumHandlerReturnType {
   } = useSelector((state: RootState) => state.account);
 
   useEffect(() => {
-    if (isEthereumHandlerSet) return;
-
     const fetchEthereumHandler = async () => {
       if (ethereumUserAddress) {
         console.log('Fetching Ethereum Handler');
@@ -57,13 +61,10 @@ export function useEthereumHandler(): UseEthereumHandlerReturnType {
   }, [ethereumUserAddress, ethereumNetwork]);
 
   useEffect(() => {
-    console.log('Fetching Read Only Ethereum Handler');
-    console.log('appConfiguration', appConfiguration);
     const { infuraWebsocketURL } = appConfiguration;
 
-    console.log('infuraWebsocketURL', infuraWebsocketURL);
     const fetchReadOnlyEthereumHandler = async () => {
-      await getReadOnlyEthereumHandler(ethereumNetworkName, appConfiguration.infuraWebsocketURL);
+      await getReadOnlyEthereumHandler(ethereumNetworkName, infuraWebsocketURL);
     };
 
     fetchReadOnlyEthereumHandler();
@@ -78,20 +79,39 @@ export function useEthereumHandler(): UseEthereumHandlerReturnType {
       ethereumNetwork
     );
 
-    console.log('ethereumSigner', ethereumSigner);
-
     const ethereumDeploymentPlans =
       await fetchEthereumDeploymentPlansByNetwork(ethereumNetworkName);
 
+    const provider = ethers.providers.getDefaultProvider(ethereumNetwork.defaultNodeURL);
+
+    const dlcBTCContractDeploymentPlan = ethereumDeploymentPlans.find(
+      plan => plan.contract.name === 'DLCBTC'
+    );
+
+    if (!dlcBTCContractDeploymentPlan) {
+      throw new Error(`DLCBTC Contract not found in Deployment Plans`);
+    }
+
+    const currentUserPointsContractReader = new Contract(
+      dlcBTCContractDeploymentPlan.contract.address,
+      dlcBTCContractDeploymentPlan.contract.abi,
+      provider
+    );
+
+    console.log('currentUserPointsContractReader', currentUserPointsContractReader);
+
     const ethereumHandler = EthereumHandler.fromSigner(ethereumDeploymentPlans, ethereumSigner);
 
-    console.log('ethereumHandler', ethereumHandler);
-
+    setUserPointsContractReader(currentUserPointsContractReader);
     setEthereumHandler(ethereumHandler);
     setIsEthereumHandlerSet(true);
 
     dispatch(
-      accountActions.login({ address: ethereumUserAddress, walletType: ethereumWalletType })
+      accountActions.login({
+        address: ethereumUserAddress,
+        walletType: ethereumWalletType,
+        network: ethereumArbitrumSepolia,
+      })
     );
   }
 
@@ -142,6 +162,7 @@ export function useEthereumHandler(): UseEthereumHandlerReturnType {
   return {
     ethereumHandler,
     readOnlyEthereumHandler,
+    userPointsContractReader,
     isEthereumHandlerSet,
     isReadOnlyEthereumHandlerSet,
     getEthereumHandler,

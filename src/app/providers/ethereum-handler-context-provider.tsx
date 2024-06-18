@@ -1,14 +1,16 @@
-import React, { createContext } from 'react';
+import React, { createContext, useEffect } from 'react';
 
 import { useEthereumHandler } from '@hooks/use-ethereum-handler';
 import { HasChildren } from '@models/has-children';
 import { WalletType } from '@models/wallet';
 import { EthereumHandler, ReadOnlyEthereumHandler } from 'dlc-btc-lib';
 import { SupportedNetwork } from 'dlc-btc-lib/models';
+import { Contract } from 'ethers';
 
 interface EthereumHandlerContextProviderType {
   ethereumHandler: EthereumHandler | undefined;
   readOnlyEthereumHandler: ReadOnlyEthereumHandler | undefined;
+  userPointsContractReader: Contract | undefined;
   isEthereumHandlerSet: boolean;
   isReadOnlyEthereumHandlerSet: boolean;
   getEthereumHandler: (
@@ -21,6 +23,7 @@ interface EthereumHandlerContextProviderType {
 export const EthereumHandlerContext = createContext<EthereumHandlerContextProviderType>({
   ethereumHandler: undefined,
   readOnlyEthereumHandler: undefined,
+  userPointsContractReader: undefined,
   isEthereumHandlerSet: false,
   isReadOnlyEthereumHandlerSet: false,
   getEthereumHandler: async () => {
@@ -35,17 +38,23 @@ export function EthereumHandlerContextProvider({ children }: HasChildren): React
   const {
     ethereumHandler,
     readOnlyEthereumHandler,
+    userPointsContractReader,
     isEthereumHandlerSet,
     isReadOnlyEthereumHandlerSet,
     getEthereumHandler,
     recommendTokenToMetamask,
   } = useEthereumHandler();
 
+  useEffect(() => {
+    console.log('userPointsContractReader', userPointsContractReader);
+  }, [userPointsContractReader]);
+
   return (
     <EthereumHandlerContext.Provider
       value={{
         ethereumHandler,
         readOnlyEthereumHandler,
+        userPointsContractReader,
         isEthereumHandlerSet,
         isReadOnlyEthereumHandlerSet,
         getEthereumHandler,
