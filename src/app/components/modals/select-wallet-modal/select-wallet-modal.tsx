@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 
 import { CheckIcon } from '@chakra-ui/icons';
 import { HStack, ScaleFade, Text, VStack } from '@chakra-ui/react';
@@ -6,18 +6,18 @@ import { ModalComponentProps } from '@components/modals/components/modal-contain
 import { ModalLayout } from '@components/modals/components/modal.layout';
 import { SelectWalletMenu } from '@components/modals/select-wallet-modal/components/select-wallet-menu';
 import { SelectNetworkButton } from '@components/select-network-button/select-network-button';
-import { useEthereumAccount } from '@hooks/use-ethereum-account';
-import { EthereumNetwork } from '@models/ethereum-network';
 import { WalletType, ethereumWallets } from '@models/wallet';
+import { EthereumHandlerContext } from '@providers/ethereum-handler-context-provider';
+import { EthereumNetwork } from 'dlc-btc-lib/models';
 
 export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps): React.JSX.Element {
-  const ethereumAccountHandler = useEthereumAccount();
+  const { getEthereumHandler } = useContext(EthereumHandlerContext);
 
   const [currentNetwork, setCurrentNetwork] = useState<EthereumNetwork | undefined>(undefined);
 
   async function handleLogin(walletType: WalletType) {
     if (!currentNetwork) throw new Error('No network selected');
-    await ethereumAccountHandler?.connectEthereumAccount(walletType, currentNetwork);
+    await getEthereumHandler(walletType, 'arbitrum-sepolia-devnet');
     setCurrentNetwork(undefined);
     handleClose();
   }

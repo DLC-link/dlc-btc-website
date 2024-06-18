@@ -1,96 +1,144 @@
-/* eslint-disable no-console */
-import { useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { VaultState } from '@models/vault';
+import { formatVault } from '@functions/vault.functions';
+import { Vault } from '@models/vault';
+import { EthereumHandlerContext } from '@providers/ethereum-handler-context-provider';
 import { RootState } from '@store/index';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { modalActions } from '@store/slices/modal/modal.actions';
+import { vaultActions } from '@store/slices/vault/vault.actions';
+import { RawVault } from 'dlc-btc-lib/models';
 
-import { useEthereum } from './use-ethereum';
-import { useEthereumContext } from './use-ethereum-context';
+function getAndFormatVault(vaultUUID: string, ethereumHandler: any): Promise<Vault> {
+  return ethereumHandler.getRawVault(vaultUUID).then((vault: RawVault) => formatVault(vault));
+}
 
 export function useEthereumObserver(): void {
   const dispatch = useDispatch();
 
-  const { observerProtocolContract } = useEthereumContext();
-  const { getVault } = useEthereum();
+  const { readOnlyEthereumHandler, isReadOnlyEthereumHandlerSet } =
+    useContext(EthereumHandlerContext);
 
-  const { address, network } = useSelector((state: RootState) => state.account);
+  const { address: ethereumUserAddress, network: ethereumNetwork } = useSelector(
+    (state: RootState) => state.account
+  );
 
   useEffect(() => {
-    if (!observerProtocolContract) return;
+    if (!isReadOnlyEthereumHandlerSet) return;
 
-    console.log(`Listening to [${network?.name}]`);
-    console.log(`Listening to [${observerProtocolContract.address}]`);
+    const ethereumContracts = readOnlyEthereumHandler?.getContracts();
 
-    observerProtocolContract.on('SetupVault', async (...args: any[]) => {
+    console.log(`Listening to [${ethereumNetwork?.name}]`);
+    console.log(`Listening to [${ethereumContracts?.protocolContract.address}]`);
+
+    ethereumContracts?.protocolContract.on('SetupVault', async (...args: any[]) => {
       const vaultOwner: string = args[2];
 
-      if (vaultOwner.toLowerCase() !== address) return;
+      if (vaultOwner.toLowerCase() !== ethereumUserAddress) return;
 
       const vaultUUID = args[0];
 
       console.log(`Vault ${vaultUUID} is ready`);
 
-      await getVault(vaultUUID, VaultState.READY).then(() => {
-        dispatch(mintUnmintActions.setMintStep([1, vaultUUID]));
-      });
+      await getAndFormatVault(vaultUUID, readOnlyEthereumHandler)
+        .then((vault: Vault) => {
+          dispatch(
+            vaultActions.swapVault({
+              vaultUUID,
+              updatedVault: vault,
+              networkID: ethereumNetwork.id,
+            })
+          );
+        })
+        .then(() => {
+          dispatch(mintUnmintActions.setMintStep([1, vaultUUID]));
+        });
     });
 
-    observerProtocolContract.on('CloseVault', async (...args: any[]) => {
+    ethereumContracts?.protocolContract.on('CloseVault', async (...args: any[]) => {
       const vaultOwner: string = args[1];
 
-      if (vaultOwner.toLowerCase() !== address) return;
+      if (vaultOwner.toLowerCase() !== ethereumUserAddress) return;
 
       const vaultUUID = args[0];
 
       console.log(`Vault ${vaultUUID} is closing`);
 
-      await getVault(vaultUUID, VaultState.CLOSING).then(() => {
-        dispatch(mintUnmintActions.setUnmintStep([1, vaultUUID]));
-      });
+      await getAndFormatVault(vaultUUID, readOnlyEthereumHandler)
+        .then((vault: Vault) => {
+          dispatch(
+            vaultActions.swapVault({
+              vaultUUID,
+              updatedVault: vault,
+              networkID: ethereumNetwork.id,
+            })
+          );
+        })
+        .then(() => {
+          dispatch(mintUnmintActions.setUnmintStep([1, vaultUUID]));
+        });
     });
 
-    observerProtocolContract.on('SetStatusFunded', async (...args: any[]) => {
+    ethereumContracts?.protocolContract.on('SetStatusFunded', async (...args: any[]) => {
       const vaultOwner = args[2];
 
-      if (vaultOwner.toLowerCase() !== address) return;
+      if (vaultOwner.toLowerCase() !== ethereumUserAddress) return;
 
       const vaultUUID = args[0];
 
       console.log(`Vault ${vaultUUID} is minted`);
 
-      await getVault(vaultUUID, VaultState.FUNDED).then(() => {
-        dispatch(mintUnmintActions.setMintStep([0, vaultUUID]));
-        dispatch(
-          modalActions.toggleSuccessfulFlowModalVisibility({
-            flow: 'mint',
-            vaultUUID,
-          })
-        );
-      });
+      await getAndFormatVault(vaultUUID, readOnlyEthereumHandler)
+        .then((vault: Vault) => {
+          dispatch(
+            vaultActions.swapVault({
+              vaultUUID,
+              updatedVault: vault,
+              networkID: ethereumNetwork.id,
+            })
+          );
+        })
+        .then(() => {
+          dispatch(mintUnmintActions.setMintStep([0, vaultUUID]));
+          dispatch(
+            modalActions.toggleSuccessfulFlowModalVisibility({
+              flow: 'mint',
+              vaultUUID,
+            })
+          );
+        });
     });
 
-    observerProtocolContract.on('PostCloseDLCHandler', async (...args: any[]) => {
+    ethereumContracts?.protocolContract.on('PostCloseDLCHandler', async (...args: any[]) => {
       const vaultOwner = args[2];
 
-      if (vaultOwner.toLowerCase() !== address) return;
+      if (vaultOwner.toLowerCase() !== ethereumUserAddress) return;
 
       const vaultUUID = args[0];
 
       console.log(`Vault ${vaultUUID} is closed`);
 
-      await getVault(vaultUUID, VaultState.CLOSED).then(() => {
-        dispatch(mintUnmintActions.setUnmintStep([0, vaultUUID]));
-        dispatch(
-          modalActions.toggleSuccessfulFlowModalVisibility({
-            flow: 'unmint',
-            vaultUUID,
-          })
-        );
-      });
+      await getAndFormatVault(vaultUUID, readOnlyEthereumHandler)
+        .then((vault: Vault) => {
+          dispatch(
+            vaultActions.swapVault({
+              vaultUUID,
+              updatedVault: vault,
+              networkID: ethereumNetwork.id,
+            })
+          );
+        })
+        .then(() => {
+          dispatch(mintUnmintActions.setUnmintStep([0, vaultUUID]));
+          dispatch(
+            modalActions.toggleSuccessfulFlowModalVisibility({
+              flow: 'unmint',
+              vaultUUID,
+            })
+          );
+        });
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [observerProtocolContract, network]);
+  }, [readOnlyEthereumHandler, ethereumNetwork]);
 }

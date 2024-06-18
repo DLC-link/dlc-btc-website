@@ -5,6 +5,7 @@ import { BitcoinError } from '@models/error-types';
 import { Vault } from '@models/vault';
 import { BitcoinWalletType } from '@models/wallet';
 import { BitcoinWalletContext } from '@providers/bitcoin-wallet-context-provider';
+import { EthereumHandlerContext } from '@providers/ethereum-handler-context-provider';
 import { RootState } from '@store/index';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { vaultActions } from '@store/slices/vault/vault.actions';
@@ -13,7 +14,6 @@ import { broadcastTransaction } from 'dlc-btc-lib/bitcoin-functions';
 import { Transaction } from 'dlc-btc-lib/models';
 
 import { useAttestors } from './use-attestors';
-import { useEthereum } from './use-ethereum';
 import { useLeather } from './use-leather';
 import { useLedger } from './use-ledger';
 
@@ -38,7 +38,7 @@ export function usePSBT(): UsePSBTReturnType {
   const { bitcoinWalletType, dlcHandler, resetBitcoinWalletContext } =
     useContext(BitcoinWalletContext);
   const { sendClosingTransactionToAttestors } = useAttestors();
-  const { getAttestorGroupPublicKey, getRawVault } = useEthereum();
+  const { readOnlyEthereumHandler } = useContext(EthereumHandlerContext);
 
   const { network } = useSelector((state: RootState) => state.account);
 
@@ -48,8 +48,10 @@ export function usePSBT(): UsePSBTReturnType {
 
   async function handleSignFundingTransaction(): Promise<void> {
     try {
-      const attestorGroupPublicKey = await getAttestorGroupPublicKey(network);
-      const vault = await getRawVault(mintStep[1]);
+      if (!readOnlyEthereumHandler) throw new BitcoinError('Ethereum Handler is not yet set.');
+
+      const attestorGroupPublicKey = await readOnlyEthereumHandler.getAttestorGroupPublicKey();
+      const vault = await readOnlyEthereumHandler.getRawVault(mintStep[1]);
       let fundingTransaction: Transaction;
       const feeRateMultiplier = import.meta.env.VITE_FEE_RATE_MULTIPLIER;
 
@@ -84,7 +86,8 @@ export function usePSBT(): UsePSBTReturnType {
     try {
       if (!fundingTransaction) throw new BitcoinError('Funding Transaction is not yet signed.');
       let closingTransactionHex: string;
-      const vault = await getRawVault(mintStep[1]);
+      const vault = await readOnlyEthereumHandler?.getRawVault(mintStep[1]);
+      if (!vault) throw new BitcoinError('Vault is not yet set.');
       let nativeSegwitAddress;
       const feeRateMultiplier = import.meta.env.VITE_FEE_RATE_MULTIPLIER;
       switch (bitcoinWalletType) {

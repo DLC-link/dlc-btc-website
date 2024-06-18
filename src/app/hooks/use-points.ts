@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { DetailedEvent, TimeStampedEvent } from '@models/ethereum-models';
+import { EthereumHandlerContext } from '@providers/ethereum-handler-context-provider';
 import Decimal from 'decimal.js';
 import { Event } from 'ethers';
 
 import { RootState } from '../store';
-import { useEthereum } from './use-ethereum';
 
 const BURN_ADDRESS = '0x0000000000000000000000000000000000000000';
 
@@ -78,8 +78,8 @@ export function calculatePoints(
 }
 
 export function usePoints(): UsePointsReturnType {
-  const { address: userAddress, network } = useSelector((state: RootState) => state.account);
-  const { getDefaultProvider } = useEthereum();
+  const { address: userAddress } = useSelector((state: RootState) => state.account);
+  const { ethereumHandler } = useContext(EthereumHandlerContext);
 
   const [userPoints, setUserPoints] = useState<number | undefined>(undefined);
 
@@ -103,7 +103,10 @@ export function usePoints(): UsePointsReturnType {
   }
 
   async function fetchTransferEvents(userAddress: string): Promise<DetailedEvent[]> {
-    const dlcBTCContract = await getDefaultProvider(network, 'DLCBTC');
+    if (!ethereumHandler) {
+      throw new Error('Ethereum Handler not set');
+    }
+    const { dlcBTCContract } = ethereumHandler.getContracts();
     const eventFilterTo = dlcBTCContract.filters.Transfer(BURN_ADDRESS, userAddress);
     const eventFilterFrom = dlcBTCContract.filters.Transfer(userAddress, BURN_ADDRESS);
     const eventsTo = await dlcBTCContract.queryFilter(eventFilterTo);

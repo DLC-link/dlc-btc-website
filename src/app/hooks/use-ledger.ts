@@ -18,7 +18,7 @@ import { delay } from 'dlc-btc-lib/utilities';
 import { unshiftValue } from 'dlc-btc-lib/utilities';
 import { AppClient, DefaultWalletPolicy } from 'ledger-bitcoin';
 
-import { BITCOIN_NETWORK_MAP } from '@shared/constants/bitcoin.constants';
+import { BITCOIN_NETWORK_MAP } from '@shared/constants/map.constants';
 
 type TransportInstance = Awaited<ReturnType<typeof Transport.create>>;
 

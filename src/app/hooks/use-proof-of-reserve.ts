@@ -1,25 +1,22 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
 
 import { Merchant, MerchantProofOfReserve } from '@models/merchant';
+import { EthereumHandlerContext } from '@providers/ethereum-handler-context-provider';
 import { RootState } from '@store/index';
 import { ProofOfReserveHandler } from 'dlc-btc-lib';
 import { RawVault } from 'dlc-btc-lib/models';
 import { unshiftValue } from 'dlc-btc-lib/utilities';
 
-import { BITCOIN_NETWORK_MAP } from '@shared/constants/bitcoin.constants';
-
-import { useEthereum } from './use-ethereum';
-import { useEthereumConfiguration } from './use-ethereum-configuration';
+import { BITCOIN_NETWORK_MAP } from '@shared/constants/map.constants';
 
 interface UseProofOfReserveReturnType {
   proofOfReserve: [number | undefined, MerchantProofOfReserve[]] | undefined;
 }
 
 export function useProofOfReserve(): UseProofOfReserveReturnType {
-  const { enabledEthereumNetworks } = useEthereumConfiguration();
-  const { getAllFundedVaults, getAttestorGroupPublicKey } = useEthereum();
+  const { readOnlyEthereumHandler } = useContext(EthereumHandlerContext);
   const { network } = useSelector((state: RootState) => state.account);
 
   const [proofOfReserveHandler, setProofOfReserveHandler] = useState<
@@ -36,7 +33,9 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
   }, [network]);
 
   async function getProofOfReserveHandler(): Promise<void> {
-    const attestorPublicKey = await getAttestorGroupPublicKey(network);
+    if (!readOnlyEthereumHandler) return;
+
+    const attestorPublicKey = await readOnlyEthereumHandler.getAttestorGroupPublicKey();
 
     const proofOfReserveHandler = new ProofOfReserveHandler(
       appConfiguration.bitcoinBlockchainURL,
@@ -55,9 +54,9 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
   async function calculateProofOfReserve(): Promise<
     [number | undefined, MerchantProofOfReserve[]]
   > {
-    const fundedVaults = await Promise.all(
-      enabledEthereumNetworks.map(network => getAllFundedVaults(network))
-    ).then(vaultsArrays => vaultsArrays.flat());
+    if (!readOnlyEthereumHandler) return [undefined, []];
+
+    const fundedVaults = await readOnlyEthereumHandler?.getContractFundedVaults();
 
     if (!proofOfReserveHandler) {
       return [

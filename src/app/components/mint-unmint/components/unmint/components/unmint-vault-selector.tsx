@@ -1,13 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { Button, Text, VStack } from '@chakra-ui/react';
 import { VaultCard } from '@components/vault/vault-card';
 import { VaultsListGroupContainer } from '@components/vaults-list/components/vaults-list-group-container';
 import { VaultsList } from '@components/vaults-list/vaults-list';
-import { useEthereum } from '@hooks/use-ethereum';
 import { useVaults } from '@hooks/use-vaults';
 import { Vault } from '@models/vault';
+import { EthereumHandlerContext } from '@providers/ethereum-handler-context-provider';
 import { RootState } from '@store/index';
 import { scrollBarCSS } from '@styles/css-styles';
 
@@ -24,7 +24,7 @@ export function UnmintVaultSelector({
   isRiskLoading,
 }: UnmintVaultSelectorProps): React.JSX.Element {
   const { fundedVaults } = useVaults();
-  const { closeVault } = useEthereum();
+  const { ethereumHandler } = useContext(EthereumHandlerContext);
 
   const { unmintStep } = useSelector((state: RootState) => state.mintunmint);
 
@@ -46,7 +46,7 @@ export function UnmintVaultSelector({
         setIsSubmitting(true);
         const currentRisk = await fetchRisk();
         if (currentRisk === 'High') throw new Error('Risk Level is too high');
-        await closeVault(selectedVault.uuid);
+        await ethereumHandler?.closeVault(selectedVault.uuid);
       } catch (error) {
         setIsSubmitting(false);
         throw new Error('Error closing vault');

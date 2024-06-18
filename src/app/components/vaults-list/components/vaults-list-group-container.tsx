@@ -1,6 +1,5 @@
 import { Button, HStack, Image, Spinner, Text, VStack } from '@chakra-ui/react';
 import { VaultCard } from '@components/vault/vault-card';
-import { useEthereumAccount } from '@hooks/use-ethereum-account';
 import { Vault } from '@models/vault';
 
 interface VaultsListGroupContainerProps {
@@ -18,7 +17,7 @@ export function VaultsListGroupContainer({
   isSelectable = false,
   handleSelect,
 }: VaultsListGroupContainerProps): React.JSX.Element | boolean {
-  const { recommendTokenToMetamask } = useEthereumAccount();
+  // const { recommendTokenToMetamask } = useEthereumAccount();
 
   if (vaults.length === 0) return false;
 
@@ -37,7 +36,7 @@ export function VaultsListGroupContainer({
               variant={'ghost'}
               size={'xs'}
               _hover={{ backgroundColor: 'accent.lightBlue.01' }}
-              onClick={async () => await recommendTokenToMetamask()}
+              onClick={async () => {}}
             >
               <HStack>
                 <Image src={'/images/logos/dlc-btc-logo.svg'} alt={'dlcBTC'} boxSize={'15px'} />

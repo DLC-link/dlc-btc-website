@@ -1,11 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useContext, useMemo } from 'react';
+import { useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
 
 import { Vault, VaultState } from '@models/vault';
+import { EthereumHandlerContext } from '@providers/ethereum-handler-context-provider';
 import { RootState } from '@store/index';
-
-import { useEthereum } from './use-ethereum';
-import { useEthereumContext } from './use-ethereum-context';
 
 export interface UseVaultsReturnType {
   allVaults: Vault[];
@@ -18,27 +17,15 @@ export interface UseVaultsReturnType {
 }
 
 export function useVaults(): UseVaultsReturnType {
-  const { contractsLoaded } = useEthereumContext();
-  const { getAllVaults } = useEthereum();
+  const { ethereumHandler } = useContext(EthereumHandlerContext);
 
   const { vaults } = useSelector((state: RootState) => state.vault);
   const { network } = useSelector((state: RootState) => state.account);
 
-  const [isLoading, setIsLoading] = useState(true);
-
-  const fetchVaultsIfReady = async () => {
-    if (contractsLoaded) {
-      setIsLoading(true);
-      await getAllVaults();
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    fetchVaultsIfReady();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contractsLoaded]);
+  const { isLoading } = useQuery(['vaults'], ethereumHandler?.getAllVaults!, {
+    enabled: !!ethereumHandler,
+    refetchInterval: 60000,
+  });
 
   const allVaults = useMemo(
     () => [...vaults[network ? network.id : '42161']].sort((a, b) => b.timestamp - a.timestamp),
