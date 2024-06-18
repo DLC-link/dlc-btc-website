@@ -1,4 +1,4 @@
-import { HStack, Text } from '@chakra-ui/react';
+import { Text } from '@chakra-ui/react';
 
 import { AttestorDetailsCard } from './components/attestor-details-card/attestor-details-card';
 import { AttestorDetailsCardLayout } from './components/attestor-details-card/attestor-details-card-layout';
