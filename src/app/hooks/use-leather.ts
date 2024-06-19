@@ -1,6 +1,5 @@
 import { useContext, useState } from 'react';
 
-import { customShiftValue, unshiftValue } from '@common/utilities';
 import { LeatherError } from '@models/error-types';
 import {
   Account,
@@ -20,6 +19,7 @@ import {
 } from '@providers/bitcoin-wallet-context-provider';
 import { SoftwareWalletDLCHandler } from 'dlc-btc-lib';
 import { Transaction } from 'dlc-btc-lib/models';
+import { customShiftValue, shiftValue, unshiftValue } from 'dlc-btc-lib/utilities';
 import { BigNumber } from 'ethers';
 
 import { BITCOIN_NETWORK_MAP } from '@shared/constants/bitcoin.constants';
@@ -29,15 +29,10 @@ interface UseLeatherReturnType {
   handleFundingTransaction: (
     dlcHandler: SoftwareWalletDLCHandler,
     vault: RawVault,
+    bitcoinAmount: number,
     attestorGroupPublicKey: string,
     feeRateMultiplier: number
   ) => Promise<Transaction>;
-  handleClosingTransaction: (
-    dlcHandler: SoftwareWalletDLCHandler,
-    vault: RawVault,
-    fundingTransactionID: string,
-    feeRateMultiplier: number
-  ) => Promise<string>;
   handleWithdrawalTransaction: (
     dlcHandler: SoftwareWalletDLCHandler,
     withdrawAmount: number,
@@ -151,21 +146,17 @@ export function useLeather(): UseLeatherReturnType {
   async function handleFundingTransaction(
     dlcHandler: SoftwareWalletDLCHandler,
     vault: RawVault,
+    bitcoinAmount: number,
     attestorGroupPublicKey: string,
     feeRateMultiplier: number
   ): Promise<Transaction> {
     try {
       setIsLoading([true, 'Creating Funding Transaction']);
 
-      // fortesting
-      const vault2: RawVault = {
-        ...vault,
-        valueLocked: BigNumber.from(10000000n),
-      };
-
       // ==> Create Funding Transaction
       const fundingPSBT = await dlcHandler?.createFundingPSBT(
-        vault2,
+        vault,
+        BigInt(shiftValue(bitcoinAmount)),
         attestorGroupPublicKey,
         feeRateMultiplier
       );
@@ -186,45 +177,6 @@ export function useLeather(): UseLeatherReturnType {
     }
   }
 
-  /**
-   * Creates the Closing Transaction and signs it with Leather Wallet.
-   * @param vaultUUID The Vault UUID.
-   * @param fundingTransactionID The Funding Transaction ID.
-   * @returns The Partially Signed Closing Transaction HEX.
-   */
-  async function handleClosingTransaction(
-    dlcHandler: SoftwareWalletDLCHandler,
-    vault: RawVault,
-    fundingTransactionID: string,
-    feeRateMultiplier: number
-  ): Promise<string> {
-    try {
-      setIsLoading([true, 'Creating Closing Transaction']);
-
-      // fortesting
-      const vault2: RawVault = {
-        ...vault,
-        valueLocked: BigNumber.from(10000000n),
-      };
-
-      const closingTransaction = await dlcHandler.createClosingPSBT(
-        vault2,
-        fundingTransactionID,
-        feeRateMultiplier
-      );
-
-      setIsLoading([true, 'Sign Closing Transaction in your Leather Wallet']);
-      // ==> Sign Closing PSBT with Ledger
-      const closingTransactionHex = await signPSBT(closingTransaction.toPSBT());
-
-      setIsLoading([false, '']);
-      return closingTransactionHex;
-    } catch (error) {
-      setIsLoading([false, '']);
-      throw new LeatherError(`Error handling Closing Transaction: ${error}`);
-    }
-  }
-
   async function handleWithdrawalTransaction(
     dlcHandler: SoftwareWalletDLCHandler,
     withdrawAmount: number,
@@ -235,11 +187,9 @@ export function useLeather(): UseLeatherReturnType {
     try {
       setIsLoading([true, 'Creating Withdrawal Transaction']);
 
-      console.log(unshiftValue(withdrawAmount));
-
       const withdrawalTransaction = await dlcHandler.createWithdrawalPSBT(
         vault,
-        BigInt(customShiftValue(withdrawAmount, 8, false)),
+        BigInt(shiftValue(withdrawAmount)),
         attestorGroupPublicKey,
         vault.fundingTxId,
         feeRateMultiplier
@@ -250,7 +200,6 @@ export function useLeather(): UseLeatherReturnType {
       const withdrawalTransactionHex = await signPSBT(withdrawalTransaction.toPSBT());
 
       setIsLoading([false, '']);
-      console.log('withdrawalTransactionHex', withdrawalTransactionHex);
       return withdrawalTransactionHex;
     } catch (error) {
       setIsLoading([false, '']);
@@ -261,7 +210,6 @@ export function useLeather(): UseLeatherReturnType {
   return {
     connectLeatherWallet,
     handleFundingTransaction,
-    handleClosingTransaction,
     handleWithdrawalTransaction,
     isLoading,
   };

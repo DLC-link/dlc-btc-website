@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { BitcoinError } from '@models/error-types';
@@ -18,8 +18,7 @@ import { useLeather } from './use-leather';
 import { useLedger } from './use-ledger';
 
 interface UsePSBTReturnType {
-  handleSignFundingTransaction: (vault: Vault) => Promise<void>;
-  handleSignClosingTransaction: () => Promise<void>;
+  handleSignFundingTransaction: (bitcoinAmount: number) => Promise<void>;
   handleSignWithdrawTransaction: (vaultUUID: string, withdrawAmount: number) => Promise<void>;
   isLoading: [boolean, string];
 }
@@ -28,13 +27,11 @@ export function usePSBT(): UsePSBTReturnType {
   const dispatch = useDispatch();
   const {
     handleFundingTransaction: handleFundingTransactionWithLedger,
-    handleClosingTransaction: handleClosingTransactionWithLedger,
     handleWithdrawalTransaction: handleWithdrawalTransactionWithLedger,
     isLoading: isLedgerLoading,
   } = useLedger();
   const {
     handleFundingTransaction: handleFundingTransactionWithLeather,
-    handleClosingTransaction: handleClosingTransactionWithLeather,
     handleWithdrawalTransaction: handleWithdrawalTransactionWithLeather,
     isLoading: isLeatherLoading,
   } = useLeather();
@@ -48,9 +45,7 @@ export function usePSBT(): UsePSBTReturnType {
 
   const { mintStep } = useSelector((state: RootState) => state.mintunmint);
 
-  const [fundingTransaction, setFundingTransaction] = useState<Transaction | undefined>();
-
-  async function handleSignFundingTransaction(): Promise<void> {
+  async function handleSignFundingTransaction(bitcoinAmount: number): Promise<void> {
     try {
       const attestorGroupPublicKey = await getAttestorGroupPublicKey(network);
       const vault = await getRawVault(mintStep[1]);
@@ -62,6 +57,7 @@ export function usePSBT(): UsePSBTReturnType {
           fundingTransaction = await handleFundingTransactionWithLedger(
             dlcHandler as LedgerDLCHandler,
             vault,
+            bitcoinAmount,
             attestorGroupPublicKey,
             feeRateMultiplier
           );
@@ -70,6 +66,7 @@ export function usePSBT(): UsePSBTReturnType {
           fundingTransaction = await handleFundingTransactionWithLeather(
             dlcHandler as SoftwareWalletDLCHandler,
             vault,
+            bitcoinAmount,
             attestorGroupPublicKey,
             feeRateMultiplier
           );
@@ -77,44 +74,6 @@ export function usePSBT(): UsePSBTReturnType {
         default:
           throw new BitcoinError('Invalid Bitcoin Wallet Type');
       }
-
-      setFundingTransaction(fundingTransaction);
-    } catch (error) {
-      throw new BitcoinError(`Error signing Funding Transaction: ${error}`);
-    }
-  }
-
-  async function handleSignClosingTransaction() {
-    try {
-      if (!fundingTransaction) throw new BitcoinError('Funding Transaction is not yet signed.');
-      let closingTransactionHex: string;
-      const vault = await getRawVault(mintStep[1]);
-      let nativeSegwitAddress;
-      const feeRateMultiplier = import.meta.env.VITE_FEE_RATE_MULTIPLIER;
-      switch (bitcoinWalletType) {
-        case 'Ledger':
-          closingTransactionHex = await handleClosingTransactionWithLedger(
-            dlcHandler as LedgerDLCHandler,
-            vault,
-            fundingTransaction.id,
-            feeRateMultiplier
-          );
-          nativeSegwitAddress = dlcHandler?.getVaultRelatedAddress('p2wpkh');
-          break;
-        case 'Leather':
-          closingTransactionHex = await handleClosingTransactionWithLeather(
-            dlcHandler as SoftwareWalletDLCHandler,
-            vault,
-            fundingTransaction.id,
-            feeRateMultiplier
-          );
-          nativeSegwitAddress = dlcHandler?.getVaultRelatedAddress('p2wpkh');
-          break;
-        default:
-          throw new BitcoinError('Invalid Bitcoin Wallet Type');
-      }
-
-      if (!nativeSegwitAddress) throw new BitcoinError('Native Segwit Address is not defined');
 
       await sendClosingTransactionToAttestors(
         fundingTransaction?.hex,
@@ -133,10 +92,9 @@ export function usePSBT(): UsePSBTReturnType {
         })
       );
 
-      dispatch(mintUnmintActions.setMintStep([3, mintStep[1]]));
-      resetBitcoinWalletContext();
+      dispatch(mintUnmintActions.setMintStep([2, mintStep[1]]));
     } catch (error) {
-      throw new BitcoinError(`Error signing Closing Transaction: ${error}`);
+      throw new BitcoinError(`Error signing Funding Transaction: ${error}`);
     }
   }
 
@@ -144,6 +102,7 @@ export function usePSBT(): UsePSBTReturnType {
     vaultUUID: string,
     withdrawAmount: number
   ): Promise<void> {
+    console.log('withdrawAmount', withdrawAmount);
     try {
       let withdrawalTransactionHex: string;
       const attestorGroupPublicKey = await getAttestorGroupPublicKey(network);
@@ -179,9 +138,6 @@ export function usePSBT(): UsePSBTReturnType {
 
       await sendWithdrawalTransactionToAttestors(withdrawalTransactionHex, vaultUUID);
 
-      // I don't think we want to do this because the attestors haven't signed it.
-      // await broadcastTransaction(withdrawalTransactionHex, appConfiguration.bitcoinBlockchainURL);
-
       resetBitcoinWalletContext();
     } catch (error) {
       throw new BitcoinError(`Error signing Closing Transaction: ${error}`);
@@ -190,7 +146,6 @@ export function usePSBT(): UsePSBTReturnType {
 
   return {
     handleSignFundingTransaction,
-    handleSignClosingTransaction,
     handleSignWithdrawTransaction,
     isLoading: bitcoinWalletType === BitcoinWalletType.Leather ? isLeatherLoading : isLedgerLoading,
   };

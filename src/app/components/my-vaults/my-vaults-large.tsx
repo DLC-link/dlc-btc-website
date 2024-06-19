@@ -36,7 +36,7 @@ export function MyVaultsLarge(): React.JSX.Element {
               !!address && [...readyVaults, ...fundingVaults, ...closingVaults].length > 0
             }
           >
-            <VaultsListGroupContainer label="Lock BTC" vaults={readyVaults} />
+            <VaultsListGroupContainer label="Empty Vaults" vaults={readyVaults} />
             <VaultsListGroupContainer label="Locking BTC in Progress" vaults={fundingVaults} />
             <VaultsListGroupContainer label="Unlocking BTC in Progress" vaults={closingVaults} />
           </VaultsList>

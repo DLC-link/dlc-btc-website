@@ -2,17 +2,11 @@ import { ReactNode } from 'react';
 
 import { VStack } from '@chakra-ui/react';
 
-interface VaultCardLayoutProps {
+interface VaultMiniCardLayoutProps {
   children: ReactNode;
-  isSelectable?: boolean;
-  handleClick: () => void;
 }
 
-export function VaultCardLayout({
-  children,
-  isSelectable = false,
-  handleClick,
-}: VaultCardLayoutProps): React.JSX.Element {
+export function VaultMiniCardLayout({ children }: VaultMiniCardLayoutProps): React.JSX.Element {
   return (
     <VStack
       alignContent={'start'}
@@ -24,8 +18,6 @@ export function VaultCardLayout({
       border={'1px solid'}
       borderColor={'border.white.01'}
       borderRadius={'md'}
-      _hover={isSelectable ? { cursor: 'pointer' } : {}}
-      onClick={isSelectable ? handleClick : () => {}}
     >
       {children}
     </VStack>

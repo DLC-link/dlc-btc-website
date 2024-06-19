@@ -14,7 +14,7 @@ import { LedgerDLCHandler } from 'dlc-btc-lib';
 import { getBalance } from 'dlc-btc-lib/bitcoin-functions';
 import { bitcoin } from 'dlc-btc-lib/constants';
 import { Transaction } from 'dlc-btc-lib/models';
-import { delay } from 'dlc-btc-lib/utilities';
+import { delay, shiftValue } from 'dlc-btc-lib/utilities';
 import { unshiftValue } from 'dlc-btc-lib/utilities';
 import { AppClient, DefaultWalletPolicy } from 'ledger-bitcoin';
 
@@ -28,15 +28,10 @@ interface UseLedgerReturnType {
   handleFundingTransaction: (
     dlcHandler: LedgerDLCHandler,
     vault: RawVault,
+    bitcoinAmount: number,
     attestorGroupPublicKey: string,
     feeRateMultiplier: number
   ) => Promise<Transaction>;
-  handleClosingTransaction: (
-    dlcHandler: LedgerDLCHandler,
-    vault: RawVault,
-    fundingTransactionID: string,
-    feeRateMultiplier: number
-  ) => Promise<string>;
   handleWithdrawalTransaction: (
     dlcHandler: LedgerDLCHandler,
     withdrawAmount: number,
@@ -200,6 +195,7 @@ export function useLedger(): UseLedgerReturnType {
   async function handleFundingTransaction(
     dlcHandler: LedgerDLCHandler,
     vault: RawVault,
+    bitcoinAmount: number,
     attestorGroupPublicKey: string,
     feeRateMultiplier: number
   ): Promise<Transaction> {
@@ -209,6 +205,7 @@ export function useLedger(): UseLedgerReturnType {
       // ==> Create Funding Transaction
       const fundingPSBT = await dlcHandler.createFundingPSBT(
         vault,
+        BigInt(shiftValue(bitcoinAmount)),
         attestorGroupPublicKey,
         feeRateMultiplier
       );
@@ -226,40 +223,6 @@ export function useLedger(): UseLedgerReturnType {
     }
   }
 
-  /**
-   * Creates the Closing Transaction and signs it with the Ledger Device.
-   * @param vaultUUID The Vault UUID.
-   * @param fundingTransactionID The Funding Transaction ID.
-   * @returns The Partially Signed Closing Transaction HEX.
-   */
-  async function handleClosingTransaction(
-    dlcHandler: LedgerDLCHandler,
-    vault: RawVault,
-    fundingTransactionID: string,
-    feeRateMultiplier: number
-  ): Promise<string> {
-    try {
-      setIsLoading([true, 'Creating Closing Transaction']);
-
-      // ==> Create Closing PSBT
-      const closingPSBT = await dlcHandler.createClosingPSBT(
-        vault,
-        fundingTransactionID,
-        feeRateMultiplier
-      );
-
-      setIsLoading([true, 'Sign Closing Transaction on your Ledger Device']);
-      // ==> Sign Closing PSBT with Ledger
-      const closingTransaction = await dlcHandler.signPSBT(closingPSBT, 'closing');
-
-      setIsLoading([false, '']);
-      return bytesToHex(closingTransaction.toPSBT());
-    } catch (error) {
-      setIsLoading([false, '']);
-      throw new LedgerError(`Error handling Closing Transaction: ${error}`);
-    }
-  }
-
   async function handleWithdrawalTransaction(
     dlcHandler: LedgerDLCHandler,
     withdrawAmount: number,
@@ -272,7 +235,7 @@ export function useLedger(): UseLedgerReturnType {
 
       const withdrawalPSBT = await dlcHandler.createWithdrawalPSBT(
         vault,
-        BigInt(withdrawAmount),
+        BigInt(shiftValue(withdrawAmount)),
         attestorGroupPublicKey,
         vault.fundingTxId,
         feeRateMultiplier
@@ -283,7 +246,6 @@ export function useLedger(): UseLedgerReturnType {
       const withdrawalTransaction = await dlcHandler.signPSBT(withdrawalPSBT, 'closing');
 
       setIsLoading([false, '']);
-      console.log('withdrawalTransactionHex', withdrawalTransaction.hex);
       return bytesToHex(withdrawalTransaction.toPSBT());
     } catch (error) {
       setIsLoading([false, '']);
@@ -295,7 +257,6 @@ export function useLedger(): UseLedgerReturnType {
     getLedgerAddressesWithBalances,
     connectLedgerWallet,
     handleFundingTransaction,
-    handleClosingTransaction,
     handleWithdrawalTransaction,
     isLoading,
   };

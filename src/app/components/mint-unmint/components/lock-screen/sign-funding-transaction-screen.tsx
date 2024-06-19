@@ -1,11 +1,19 @@
 import { useContext, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { Button, HStack, Spinner, Text, VStack, useToast } from '@chakra-ui/react';
-import { VaultCard } from '@components/vault/vault-card';
+import {
+  Button,
+  FormControl,
+  FormErrorMessage,
+  HStack,
+  Spinner,
+  Text,
+  VStack,
+  useToast,
+} from '@chakra-ui/react';
+import { VaultMiniCard } from '@components/vault-mini/vault-mini-card';
 import { useVaults } from '@hooks/use-vaults';
 import { BitcoinError } from '@models/error-types';
-import { Vault } from '@models/vault';
 import {
   BitcoinWalletContext,
   BitcoinWalletContextState,
@@ -13,14 +21,23 @@ import {
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { modalActions } from '@store/slices/modal/modal.actions';
+import { Form, Formik } from 'formik';
 
+import { TransactionFormInput } from '../transaction-form/components/transaction-form-input';
+import { TransactionFormWarning } from '../transaction-form/components/transaction-form-warning';
 import { LockScreenProtocolFee } from './components/protocol-fee';
 
 interface SignFundingTransactionScreenProps {
   currentStep: [number, string];
-  handleSignFundingTransaction: (vault: Vault) => Promise<void>;
+  handleSignFundingTransaction: (bitcoinAmount: number) => Promise<void>;
   isLoading: [boolean, string];
 }
+
+export interface TransactionFormValues {
+  amount: number;
+}
+
+const initialValues: TransactionFormValues = { amount: 0.01 };
 
 export function SignFundingTransactionScreen({
   currentStep,
@@ -30,11 +47,10 @@ export function SignFundingTransactionScreen({
   const toast = useToast();
   const dispatch = useDispatch();
 
-  const { bitcoinWalletContextState } = useContext(BitcoinWalletContext);
+  const { bitcoinWalletContextState, resetBitcoinWalletContext } = useContext(BitcoinWalletContext);
 
   const { bitcoinPrice } = useContext(ProofOfReserveContext);
   const { readyVaults } = useVaults();
-  const { resetBitcoinWalletContext } = useContext(BitcoinWalletContext);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -55,16 +71,12 @@ export function SignFundingTransactionScreen({
     }
   }, [bitcoinWalletContextState]);
 
-  async function handleSign(currentVault?: Vault) {
+  async function handleSign(bitcoinAmount: number) {
     if (!currentVault) return;
 
     try {
       setIsSubmitting(true);
-      await handleSignFundingTransaction(currentVault);
-      setTimeout(() => {
-        dispatch(mintUnmintActions.setMintStep([2, currentVault.uuid]));
-        setIsSubmitting(false);
-      }, 3000);
+      await handleSignFundingTransaction(bitcoinAmount);
     } catch (error) {
       setIsSubmitting(false);
       toast({
@@ -82,49 +94,71 @@ export function SignFundingTransactionScreen({
   }
 
   return (
-    <VStack w={'45%'} spacing={'15px'}>
-      <VaultCard vault={currentVault} isSelected />
-      <LockScreenProtocolFee
-        assetAmount={currentVault?.collateral}
-        bitcoinPrice={bitcoinPrice}
-        protocolFeePercentage={currentVault?.btcMintFeeBasisPoints}
-      />
-      {isLoading[0] && (
-        <HStack
-          p={'5%'}
-          w={'100%'}
-          spacing={4}
-          bgColor={'background.content.01'}
-          justifyContent={'space-between'}
-        >
-          <Text fontSize={'sm'} color={'white.01'}>
-            {isLoading[1]}
-          </Text>
-          <Spinner size="xs" color="accent.lightBlue.01" />
-        </HStack>
-      )}
-
-      <Button
-        isLoading={isSubmitting}
-        variant={'account'}
-        onClick={async () =>
-          bitcoinWalletContextState === BitcoinWalletContextState.READY
-            ? await handleSign(currentVault)
-            : await handleConnect()
-        }
-      >
-        {buttonText}
-      </Button>
-      <Button
-        isLoading={isSubmitting}
-        variant={'navigate'}
-        onClick={() => {
-          resetBitcoinWalletContext();
-          dispatch(mintUnmintActions.setMintStep([0, '']));
+    <VStack w={'45%'}>
+      <Formik
+        initialValues={initialValues}
+        onSubmit={async values => {
+          if (bitcoinWalletContextState === BitcoinWalletContextState.READY) {
+            await handleSign(values.amount);
+          } else {
+            await handleConnect();
+          }
         }}
       >
-        Cancel
-      </Button>
+        {({ handleSubmit, errors, touched, values }) => (
+          <Form onSubmit={handleSubmit}>
+            <FormControl isInvalid={!!errors.amount && touched.amount}>
+              <VStack w={'385px'} spacing={'16.5px'} h={'456.5px'}>
+                {currentVault && <VaultMiniCard vault={currentVault} />}
+                <TransactionFormInput values={values} bitcoinPrice={bitcoinPrice} />
+                <FormErrorMessage m={'0px'} fontSize={'xs'}>
+                  {errors.amount}
+                </FormErrorMessage>
+                <LockScreenProtocolFee
+                  assetAmount={values.amount}
+                  bitcoinPrice={bitcoinPrice}
+                  protocolFeePercentage={currentVault?.btcMintFeeBasisPoints}
+                />
+                {!errors.amount && !isLoading[0] && (
+                  <TransactionFormWarning assetAmount={values.amount} />
+                )}
+                {isLoading[0] && (
+                  <HStack
+                    p={'5%'}
+                    w={'100%'}
+                    spacing={4}
+                    bgColor={'background.content.01'}
+                    justifyContent={'space-between'}
+                  >
+                    <Text fontSize={'sm'} color={'white.01'}>
+                      {isLoading[1]}
+                    </Text>
+                    <Spinner size="xs" color="accent.lightBlue.01" />
+                  </HStack>
+                )}
+                <Button
+                  isLoading={isSubmitting}
+                  variant={'account'}
+                  type={'submit'}
+                  isDisabled={Boolean(errors.amount)}
+                >
+                  {buttonText}
+                </Button>
+                <Button
+                  isLoading={isSubmitting}
+                  variant={'navigate'}
+                  onClick={() => {
+                    resetBitcoinWalletContext();
+                    dispatch(mintUnmintActions.setMintStep([0, '']));
+                  }}
+                >
+                  Cancel
+                </Button>
+              </VStack>
+            </FormControl>
+          </Form>
+        )}
+      </Formik>
     </VStack>
   );
 }

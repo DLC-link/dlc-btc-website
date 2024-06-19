@@ -14,7 +14,7 @@ import { Logger } from 'ethers/lib/utils';
 
 import { useEthereumContext } from './use-ethereum-context';
 
-// const SOLIDITY_CONTRACT_URL = 'https://raw.githubusercontent.com/DLC-link/dlc-solidity';
+const SOLIDITY_CONTRACT_URL = 'https://raw.githubusercontent.com/DLC-link/dlc-solidity';
 
 interface UseEthereumReturnType {
   getDefaultProvider: (
@@ -28,7 +28,7 @@ interface UseEthereumReturnType {
   getVault: (vaultUUID: string, vaultState: VaultState) => Promise<void>;
   getRawVault: (vaultUUID: string) => Promise<RawVault>;
   getAllFundedVaults: (thereumNetwork: EthereumNetwork) => Promise<RawVault[]>;
-  setupVault: (btcDepositAmount: number) => Promise<void>;
+  setupVault: () => Promise<void>;
   closeVault: (vaultUUID: string) => Promise<void>;
 }
 
@@ -59,8 +59,8 @@ export function useEthereum(): UseEthereumReturnType {
       fundingTX: vault.fundingTxId,
       closingTX: vault.closingTxId,
       btcFeeRecipient: vault.btcFeeRecipient,
-      btcMintFeeBasisPoints: customShiftValue(vault.btcMintFeeBasisPoints.toNumber(), 4, true),
-      btcRedeemFeeBasisPoints: customShiftValue(vault.btcRedeemFeeBasisPoints.toNumber(), 4, true),
+      btcMintFeeBasisPoints: vault.btcMintFeeBasisPoints.toNumber(),
+      btcRedeemFeeBasisPoints: vault.btcRedeemFeeBasisPoints.toNumber(),
       taprootPubKey: vault.taprootPubKey,
     };
   }
@@ -70,12 +70,12 @@ export function useEthereum(): UseEthereumReturnType {
     contractName: string
   ): Promise<ethers.Contract> {
     try {
-      // const ethereumNetworkName = ethereumNetwork.name.toLowerCase();
+      const ethereumNetworkName = ethereumNetwork.name.toLowerCase();
       const provider = ethers.providers.getDefaultProvider(ethereumNetwork.defaultNodeURL);
 
-      // const deploymentBranchName = import.meta.env.VITE_ETHEREUM_DEPLOYMENT_BRANCH;
+      const deploymentBranchName = import.meta.env.VITE_ETHEREUM_DEPLOYMENT_BRANCH;
 
-      const deploymentPlanURL = `${import.meta.env.VITE_ETHEREUM_DEPLOYMENT_FILES_URL}/${contractName}.json`;
+      const deploymentPlanURL = `${SOLIDITY_CONTRACT_URL}/${deploymentBranchName}/deploymentFiles/${ethereumNetworkName}/${contractName}.json`;
 
       const response = await fetch(deploymentPlanURL);
       const contractData = await response.json();
@@ -204,11 +204,11 @@ export function useEthereum(): UseEthereumReturnType {
     }
   }
 
-  async function setupVault(btcDepositAmount: number): Promise<void> {
+  async function setupVault(): Promise<void> {
     try {
       if (!protocolContract) throw new Error('Protocol contract not initialized');
-      await protocolContract.callStatic.setupVault(btcDepositAmount);
-      await protocolContract.setupVault(btcDepositAmount);
+      await protocolContract.callStatic.setupVault();
+      await protocolContract.setupVault();
     } catch (error: any) {
       throwEthereumError(`Could not setup Vault: `, error);
     }

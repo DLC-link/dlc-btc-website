@@ -28,6 +28,7 @@ export function Unmint(): React.JSX.Element {
             fetchRisk={fetchUserAddressRisk}
             isRiskLoading={isLoading}
             handleSignWithdrawTransaction={handleSignWithdrawTransaction}
+            isBitcoinWalletLoading={isWithdrawLoading}
           />
         )}
         {[1, 2].includes(unmintStep[0]) && (

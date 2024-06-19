@@ -54,7 +54,7 @@ export function VaultExpandedInformation({
                 }}
                 variant={'account'}
               >
-                Lock BTC
+                Deposit
               </Button>
             )}
             {state === VaultState.FUNDED && !isSelected && (
