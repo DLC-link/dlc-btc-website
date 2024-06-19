@@ -28,8 +28,9 @@ export function useEthereumConfiguration(): NetworkEndpoints {
 
   const [ethereumExplorerAPIURL, setEthereumExplorerAPIURL] = useState<string>('');
   const [ethereumAttestorChainID, setEthereumAttestorChainID] = useState<string>('');
-  const [ethereumNetworkName, setEthereumNetworkName] =
-    useState<SupportedNetwork>('arbitrum-sepolia-devnet');
+  const [ethereumNetworkName, setEthereumNetworkName] = useState<SupportedNetwork>(
+    appConfiguration.arbitrumNetworkName
+  );
   const [enabledEthereumNetworks, setEnabledEthereumNetworks] = useState<EthereumNetwork[]>([]);
 
   useEffect(() => {

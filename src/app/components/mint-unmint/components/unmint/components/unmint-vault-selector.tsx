@@ -90,7 +90,7 @@ export function UnmintVaultSelector({
       </Button>
       {selectedVault && (
         <Button
-          isDisabled={true}
+          isDisabled={isSubmitting}
           isLoading={isSubmitting}
           variant={'navigate'}
           onClick={() => setSelectedVault(undefined)}

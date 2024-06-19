@@ -6,9 +6,8 @@ import { WalletType } from '@models/wallet';
 import { RootState } from '@store/index';
 import { accountActions } from '@store/slices/account/account.actions';
 import { EthereumHandler, ReadOnlyEthereumHandler } from 'dlc-btc-lib';
-import { ethereumArbitrumSepolia } from 'dlc-btc-lib/constants';
 import { fetchEthereumDeploymentPlansByNetwork } from 'dlc-btc-lib/ethereum-functions';
-import { SupportedNetwork } from 'dlc-btc-lib/models';
+import { EthereumNetwork, SupportedNetwork } from 'dlc-btc-lib/models';
 import { Contract, ethers } from 'ethers';
 
 import { useEthereumConfiguration } from './use-ethereum-configuration';
@@ -21,7 +20,8 @@ interface UseEthereumHandlerReturnType {
   isReadOnlyEthereumHandlerSet: boolean;
   getEthereumHandler: (
     ethereumWalletType: WalletType,
-    ethereumNetwork: SupportedNetwork
+    ethereumNetworkName: SupportedNetwork,
+    ethereumNetwork: EthereumNetwork
   ) => Promise<void>;
   recommendTokenToMetamask: () => Promise<void>;
 }
@@ -45,19 +45,19 @@ export function useEthereumHandler(): UseEthereumHandlerReturnType {
   const {
     address: ethereumUserAddress,
     walletType: ethereumWalletType,
-    network: ethereumNetwork,
+    network,
   } = useSelector((state: RootState) => state.account);
 
   useEffect(() => {
     const fetchEthereumHandler = async () => {
       if (ethereumUserAddress) {
-        await getEthereumHandler(ethereumWalletType, ethereumNetworkName);
+        await getEthereumHandler(ethereumWalletType, ethereumNetworkName, network);
       }
     };
 
     void fetchEthereumHandler();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ethereumUserAddress, ethereumNetwork]);
+  }, [ethereumUserAddress, network]);
 
   useEffect(() => {
     const { infuraWebsocketURL } = appConfiguration;
@@ -68,11 +68,12 @@ export function useEthereumHandler(): UseEthereumHandlerReturnType {
 
     void fetchReadOnlyEthereumHandler();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ethereumNetwork]);
+  }, [network]);
 
   async function getEthereumHandler(
     ethereumWalletType: WalletType,
-    ethereumNetworkName: SupportedNetwork
+    ethereumNetworkName: SupportedNetwork,
+    ethereumNetwork: EthereumNetwork
   ): Promise<void> {
     const { ethereumUserAddress, ethereumSigner } = await connectEthereumAccount(
       ethereumWalletType,
@@ -82,7 +83,7 @@ export function useEthereumHandler(): UseEthereumHandlerReturnType {
     const ethereumDeploymentPlans =
       await fetchEthereumDeploymentPlansByNetwork(ethereumNetworkName);
 
-    const provider = ethers.providers.getDefaultProvider('http://54.243.139.139:8547/ ');
+    const provider = ethers.providers.getDefaultProvider(ethereumNetwork.defaultNodeURL);
 
     const dlcBTCContractDeploymentPlan = ethereumDeploymentPlans.find(
       plan => plan.contract.name === 'DLCBTC'
@@ -108,7 +109,7 @@ export function useEthereumHandler(): UseEthereumHandlerReturnType {
       accountActions.login({
         address: ethereumUserAddress,
         walletType: ethereumWalletType,
-        network: ethereumArbitrumSepolia,
+        network: ethereumNetwork,
       })
     );
   }

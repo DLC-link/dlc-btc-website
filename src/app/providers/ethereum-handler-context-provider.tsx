@@ -4,7 +4,7 @@ import { useEthereumHandler } from '@hooks/use-ethereum-handler';
 import { HasChildren } from '@models/has-children';
 import { WalletType } from '@models/wallet';
 import { EthereumHandler, ReadOnlyEthereumHandler } from 'dlc-btc-lib';
-import { SupportedNetwork } from 'dlc-btc-lib/models';
+import { EthereumNetwork, SupportedNetwork } from 'dlc-btc-lib/models';
 import { Contract } from 'ethers';
 
 interface EthereumHandlerContextProviderType {
@@ -15,7 +15,8 @@ interface EthereumHandlerContextProviderType {
   isReadOnlyEthereumHandlerSet: boolean;
   getEthereumHandler: (
     ethereumWalletType: WalletType,
-    ethereumNetwork: SupportedNetwork
+    ethereumNetworkName: SupportedNetwork,
+    ethereumNetwork: EthereumNetwork
   ) => Promise<void>;
   recommendTokenToMetamask: () => Promise<void>;
 }

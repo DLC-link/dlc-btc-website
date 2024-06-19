@@ -19,7 +19,7 @@ export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps):
   async function handleLogin(walletType: WalletType) {
     if (!currentNetwork) throw new Error('No network selected');
     const networkName = getNetworkName(currentNetwork.id);
-    await getEthereumHandler(walletType, networkName);
+    await getEthereumHandler(walletType, networkName, currentNetwork);
     setCurrentNetwork(undefined);
     handleClose();
   }

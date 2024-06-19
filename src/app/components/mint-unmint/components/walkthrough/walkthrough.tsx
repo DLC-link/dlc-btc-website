@@ -114,7 +114,7 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
                 simply <span style={{ fontWeight: 800 }}>add them </span>
                 to your Ethereum Wallet.
               </Text>
-              <Button variant={'vault'} onClick={async () => recommendTokenToMetamask()}>
+              <Button variant={'vault'} onClick={async () => await recommendTokenToMetamask()}>
                 <HStack>
                   <Image src={'/images/logos/dlc-btc-logo.svg'} alt={'dlcBTC'} boxSize={'25px'} />
                   <Text> Add Token to Wallet</Text>

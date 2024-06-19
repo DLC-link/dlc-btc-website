@@ -39,7 +39,7 @@ export function VaultsListGroupContainer({
               variant={'ghost'}
               size={'xs'}
               _hover={{ backgroundColor: 'accent.lightBlue.01' }}
-              onClick={async () => recommendTokenToMetamask()}
+              onClick={async () => await recommendTokenToMetamask()}
             >
               <HStack>
                 <Image src={'/images/logos/dlc-btc-logo.svg'} alt={'dlcBTC'} boxSize={'15px'} />
