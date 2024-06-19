@@ -80,7 +80,7 @@ export function useLeather(): UseLeatherReturnType {
    */
   function checkUserWalletNetwork(userNativeSegwitAddress: Account): void {
     if (!userNativeSegwitAddress.address.startsWith(appConfiguration.bitcoinNetworkPreFix))
-      throw new LeatherError('User wallet is not on Bitcoin Regtest');
+      throw new LeatherError(`User wallet is not on [${appConfiguration.bitcoinNetwork}] Network`);
   }
 
   /**

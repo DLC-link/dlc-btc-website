@@ -1,7 +1,6 @@
 import { useContext, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { broadcastTransaction } from '@functions/bitcoin-functions';
 import { BitcoinError } from '@models/error-types';
 import { Vault } from '@models/vault';
 import { BitcoinWalletType } from '@models/wallet';
@@ -10,6 +9,7 @@ import { RootState } from '@store/index';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { vaultActions } from '@store/slices/vault/vault.actions';
 import { LedgerDLCHandler, SoftwareWalletDLCHandler } from 'dlc-btc-lib';
+import { broadcastTransaction } from 'dlc-btc-lib/bitcoin-functions';
 import { Transaction } from 'dlc-btc-lib/models';
 
 import { useAttestors } from './use-attestors';

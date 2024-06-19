@@ -2,7 +2,6 @@ import React, { useContext } from 'react';
 
 import { Divider, HStack } from '@chakra-ui/react';
 import { TokenStatsBoardTVL } from '@components/proof-of-reserve/components/token-stats-board/components/token-stats-board-tvl';
-import { useBitcoinPrice } from '@hooks/use-bitcoin-price';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
 
 import { LandingPageLayout } from './components/landing-page.layout';
@@ -10,8 +9,7 @@ import { SetupInformation } from './components/setup-information/setup-informati
 import { WelcomeStack } from './components/welcome-stack';
 
 export function LandingPage(): React.JSX.Element {
-  const { bitcoinPrice } = useBitcoinPrice();
-  const { totalSupply } = useContext(ProofOfReserveContext);
+  const { totalSupply, bitcoinPrice } = useContext(ProofOfReserveContext);
   return (
     <LandingPageLayout>
       <WelcomeStack />

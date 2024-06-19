@@ -11,7 +11,7 @@ export function SelectNetworkButton({
   handleClick,
   currentNetwork,
 }: SelectNetworkButtonProps): React.JSX.Element {
-  const enabledEthereumNetworkIDs = import.meta.env.VITE_ENABLED_ETHEREUM_NETWORKS.split(',');
+  const enabledEthereumNetworkIDs = appConfiguration.enabledEthereumNetworkIDs;
   const enabledEthereumNetworks = ethereumNetworks.filter(network =>
     enabledEthereumNetworkIDs.includes(network.id)
   );
