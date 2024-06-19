@@ -2,7 +2,7 @@
 import { HStack, Image, Text } from '@chakra-ui/react';
 import { CustomSkeleton } from '@components/custom-skeleton/custom-skeleton';
 
-interface AttestorDetailsTableItem {
+interface AttestorDetailsTableItemProps {
   node: string;
   observedResponse: string;
   totalStake: number;
@@ -14,7 +14,7 @@ interface AttestorDetailsTableItem {
 }
 
 export function AttestorDetailsTableItem(
-  attestorDetailsTableItem: AttestorDetailsTableItem
+  attestorDetailsTableItem: AttestorDetailsTableItemProps
 ): React.JSX.Element {
   if (!attestorDetailsTableItem) return <CustomSkeleton height={'35px'} />;
 
