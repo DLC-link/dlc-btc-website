@@ -1,25 +1,31 @@
 import { AttestorError } from '@models/error-types';
 
-import { useEthereumConfiguration } from './use-ethereum-configuration';
-
 interface UseAttestorsReturnType {
-  sendClosingTransactionToAttestors: (
-    fundingTransaction: string,
-    closingPSBT: string,
-    uuid: string,
-    userNativeSegwitAddress: string
+  sendFundingTransactionToAttestors: (
+    fundingTXAttestorInfo: FundingTXAttestorInfo
   ) => Promise<void>;
-  sendWithdrawalTransactionToAttestors: (withdrawalPSBT: string, uuid: string) => Promise<void>;
+  sendWithdrawalTransactionToAttestors: (
+    withdrawalTXAttestorInfo: WithdrawalTXAttestorInfo
+  ) => Promise<void>;
+}
+
+export interface FundingTXAttestorInfo {
+  vaultUUID: string;
+  fundingPSBT: string;
+  userEthereumAddress: string;
+  userBitcoinPublicKey: string;
+  chain: string;
+}
+
+export interface WithdrawalTXAttestorInfo {
+  vaultUUID: string;
+  withdrawalPSBT: string;
+  chain: string;
 }
 
 export function useAttestors(): UseAttestorsReturnType {
-  const { ethereumAttestorChainID } = useEthereumConfiguration();
-
-  async function sendClosingTransactionToAttestors(
-    fundingTransaction: string,
-    closingPSBT: string,
-    uuid: string,
-    userNativeSegwitAddress: string
+  async function sendFundingTransactionToAttestors(
+    fundingTXAttestorInfo: FundingTXAttestorInfo
   ): Promise<void> {
     const createPSBTURLs = appConfiguration.attestorURLs.map(url => `${url}/app/create-psbt-event`);
 
@@ -28,11 +34,11 @@ export function useAttestors(): UseAttestorsReturnType {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
         body: JSON.stringify({
-          uuid,
-          funding_transaction: fundingTransaction,
-          closing_psbt: closingPSBT,
-          mint_address: userNativeSegwitAddress,
-          chain: ethereumAttestorChainID,
+          uuid: fundingTXAttestorInfo.vaultUUID,
+          funding_transaction_psbt: fundingTXAttestorInfo.fundingPSBT,
+          mint_address: fundingTXAttestorInfo.userEthereumAddress,
+          chain: fundingTXAttestorInfo.chain,
+          alice_pubkey: fundingTXAttestorInfo.userBitcoinPublicKey,
         }),
       })
         .then(response => response.ok)
@@ -43,13 +49,12 @@ export function useAttestors(): UseAttestorsReturnType {
 
     const responses = await Promise.all(requests);
     if (!responses.includes(true)) {
-      throw new AttestorError('Error sending Closing Transaction to Attestors!');
+      throw new AttestorError('Error sending Funding Transaction to Attestors!');
     }
   }
 
   async function sendWithdrawalTransactionToAttestors(
-    withdrawalPSBT: string,
-    uuid: string
+    withdrawalTXAttestorInfo: WithdrawalTXAttestorInfo
   ): Promise<void> {
     const createPSBTURLs = appConfiguration.attestorURLs.map(url => `${url}/app/withdraw`);
 
@@ -58,9 +63,9 @@ export function useAttestors(): UseAttestorsReturnType {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
         body: JSON.stringify({
-          uuid,
-          withdraw_psbt: withdrawalPSBT,
-          chain: ethereumAttestorChainID,
+          uuid: withdrawalTXAttestorInfo.vaultUUID,
+          withdraw_psbt: withdrawalTXAttestorInfo.withdrawalPSBT,
+          chain: withdrawalTXAttestorInfo.chain,
         }),
       })
         .then(response => response.ok)
@@ -76,7 +81,7 @@ export function useAttestors(): UseAttestorsReturnType {
   }
 
   return {
-    sendClosingTransactionToAttestors,
+    sendFundingTransactionToAttestors,
     sendWithdrawalTransactionToAttestors,
   };
 }

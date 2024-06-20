@@ -2,19 +2,21 @@ import { useSelector } from 'react-redux';
 
 import { HStack } from '@chakra-ui/react';
 import { usePSBT } from '@hooks/use-psbt';
+import { useRisk } from '@hooks/use-risk';
 import { RootState } from '@store/index';
 
-import { SignFundingTransactionScreen } from '../lock-screen/sign-funding-transaction-screen';
 import { ProgressTimeline } from '../progress-timeline/progress-timeline';
-import { SetupVaultScreen } from '../transaction-form/transaction-form';
+import { SetupVaultScreen } from '../setup-vault-screen/setup-vault-screen';
+import { SignFundingTransactionScreen } from '../sign-transaction-screen/sign-funding-transaction-screen';
 import { TransactionSummary } from '../transaction-summary/transaction-summary';
 import { Walkthrough } from '../walkthrough/walkthrough';
 import { MintLayout } from './components/mint.layout';
 
 export function Mint(): React.JSX.Element {
-  const { handleSignFundingTransaction, isLoading } = usePSBT();
+  const { handleSignFundingTransaction, isLoading: isBitcoinWalletLoading } = usePSBT();
 
   const { mintStep } = useSelector((state: RootState) => state.mintunmint);
+  const { risk, fetchUserAddressRisk, isLoading } = useRisk();
 
   return (
     <MintLayout>
@@ -24,9 +26,11 @@ export function Mint(): React.JSX.Element {
         {[0].includes(mintStep[0]) && <SetupVaultScreen />}
         {[1].includes(mintStep[0]) && (
           <SignFundingTransactionScreen
-            currentStep={mintStep}
             handleSignFundingTransaction={handleSignFundingTransaction}
-            isLoading={isLoading}
+            risk={risk!}
+            fetchRisk={fetchUserAddressRisk}
+            isRiskLoading={isLoading}
+            isBitcoinWalletLoading={isBitcoinWalletLoading}
           />
         )}
         {[2, 3].includes(mintStep[0]) && (

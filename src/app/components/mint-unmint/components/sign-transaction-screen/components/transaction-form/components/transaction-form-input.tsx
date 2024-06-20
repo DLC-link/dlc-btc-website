@@ -1,8 +1,6 @@
 import { HStack, Image, Input, Text, VStack } from '@chakra-ui/react';
 import { Field } from 'formik';
 
-import { TransactionFormValues } from '../../lock-screen/sign-funding-transaction-screen';
-
 function validateTokenAmount(value: number): string | undefined {
   let error;
   if (!value) {
@@ -14,11 +12,13 @@ function validateTokenAmount(value: number): string | undefined {
 }
 
 interface TransactionFormInputProps {
-  values: TransactionFormValues;
+  header: string;
+  values: { amount: number };
   bitcoinPrice?: number;
 }
 
 export function TransactionFormInput({
+  header,
   values,
   bitcoinPrice,
 }: TransactionFormInputProps): React.JSX.Element {
@@ -35,7 +35,7 @@ export function TransactionFormInput({
       borderRadius={'md'}
     >
       <Text w={'100%'} pl={'9.5%'} color={'accent.lightBlue.01'}>
-        Amount of dlcBTC to mint:
+        {header}
       </Text>
       <HStack w={'100%'} justifyContent={'space-between'}>
         <HStack>

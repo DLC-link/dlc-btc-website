@@ -66,7 +66,7 @@ export function VaultExpandedInformation({
                 }}
                 variant={'account'}
               >
-                Redeem dlcBTC
+                Withdraw
               </Button>
             )}
           </VStack>

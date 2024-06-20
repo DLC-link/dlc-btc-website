@@ -1,15 +1,11 @@
 import { HStack, Text, VStack } from '@chakra-ui/react';
 import Decimal from 'decimal.js';
+import { getFeeAmount } from 'dlc-btc-lib/bitcoin-functions';
 
-interface LockScreenProtocolFeeProps {
+interface ProtocolFeeBoxProps {
   assetAmount?: number;
   bitcoinPrice?: number;
-  protocolFeePercentage?: number;
-}
-
-function calculateProtocolFee(amount: number, feeBasisPoints: number): string {
-  const feePercentage = new Decimal(feeBasisPoints).dividedBy(100);
-  return new Decimal(amount).times(feePercentage.dividedBy(100)).toString();
+  protocolFeeBasisPoints?: number;
 }
 
 function calculateProtocolFeeInUSD(
@@ -17,18 +13,17 @@ function calculateProtocolFeeInUSD(
   usdPrice: number,
   feeBasisPoints: number
 ): string {
-  const result = new Decimal(assetAmount)
-    .mul(new Decimal(feeBasisPoints).div(100))
-    .mul(new Decimal(usdPrice));
+  const feeAmount = new Decimal(getFeeAmount(assetAmount, feeBasisPoints));
+  const result = feeAmount.mul(new Decimal(usdPrice));
 
   return result.toNumber().toLocaleString('en-US');
 }
 
-export function LockScreenProtocolFee({
+export function ProtocolFeeBox({
   assetAmount,
   bitcoinPrice,
-  protocolFeePercentage,
-}: LockScreenProtocolFeeProps): React.JSX.Element {
+  protocolFeeBasisPoints,
+}: ProtocolFeeBoxProps): React.JSX.Element {
   return (
     <VStack
       alignItems={'end'}
@@ -45,8 +40,8 @@ export function LockScreenProtocolFee({
         <Text color={'white.01'} fontSize={'xs'} fontWeight={800}>
           {`${
             assetAmount &&
-            protocolFeePercentage &&
-            calculateProtocolFee(assetAmount, protocolFeePercentage)
+            protocolFeeBasisPoints &&
+            getFeeAmount(assetAmount, protocolFeeBasisPoints)
           }
           BTC`}
         </Text>{' '}
@@ -56,8 +51,8 @@ export function LockScreenProtocolFee({
         ${
           assetAmount &&
           bitcoinPrice &&
-          protocolFeePercentage &&
-          calculateProtocolFeeInUSD(assetAmount, bitcoinPrice, protocolFeePercentage)
+          protocolFeeBasisPoints &&
+          calculateProtocolFeeInUSD(assetAmount, bitcoinPrice, protocolFeeBasisPoints)
         }
         $`}
       </Text>

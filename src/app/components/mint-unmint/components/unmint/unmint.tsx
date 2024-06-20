@@ -12,7 +12,7 @@ import { UnmintVaultSelector } from './components/unmint-vault-selector';
 import { UnmintLayout } from './components/unmint.layout';
 
 export function Unmint(): React.JSX.Element {
-  const { handleSignWithdrawTransaction, isLoading: isWithdrawLoading } = usePSBT();
+  const { handleSignWithdrawTransaction, isLoading: isBitcoinWalletLoading } = usePSBT();
 
   const { unmintStep } = useSelector((state: RootState) => state.mintunmint);
   const { risk, fetchUserAddressRisk, isLoading } = useRisk();
@@ -24,11 +24,11 @@ export function Unmint(): React.JSX.Element {
         <Walkthrough flow={'unmint'} currentStep={unmintStep[0]} />
         {[0].includes(unmintStep[0]) && (
           <UnmintVaultSelector
+            handleSignWithdrawTransaction={handleSignWithdrawTransaction}
             risk={risk!}
             fetchRisk={fetchUserAddressRisk}
             isRiskLoading={isLoading}
-            handleSignWithdrawTransaction={handleSignWithdrawTransaction}
-            isBitcoinWalletLoading={isWithdrawLoading}
+            isBitcoinWalletLoading={isBitcoinWalletLoading}
           />
         )}
         {[1, 2].includes(unmintStep[0]) && (

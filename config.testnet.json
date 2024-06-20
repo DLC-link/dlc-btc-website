@@ -1,4 +1,5 @@
 {
+  "appEnvironment": "testnet",
   "attestorURLs": [
     "https://testnet.dlc.link/attestor-1",
     "https://testnet.dlc.link/attestor-2",

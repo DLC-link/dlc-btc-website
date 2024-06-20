@@ -19,8 +19,7 @@ import {
 } from '@providers/bitcoin-wallet-context-provider';
 import { SoftwareWalletDLCHandler } from 'dlc-btc-lib';
 import { Transaction } from 'dlc-btc-lib/models';
-import { customShiftValue, shiftValue, unshiftValue } from 'dlc-btc-lib/utilities';
-import { BigNumber } from 'ethers';
+import { shiftValue } from 'dlc-btc-lib/utilities';
 
 import { BITCOIN_NETWORK_MAP } from '@shared/constants/bitcoin.constants';
 

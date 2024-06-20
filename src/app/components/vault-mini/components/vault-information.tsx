@@ -1,5 +1,5 @@
 import { CheckCircleIcon, CopyIcon } from '@chakra-ui/icons';
-import { Button, Divider, HStack, Image, Text, Tooltip, VStack } from '@chakra-ui/react';
+import { Button, Divider, HStack, Image, Text, Tooltip } from '@chakra-ui/react';
 import { useCopyToClipboard } from '@hooks/use-copy-to-clipboard';
 import { VaultState } from '@models/vault';
 import { truncateAddress } from 'dlc-btc-lib/utilities';
