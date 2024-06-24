@@ -4,6 +4,7 @@ import { useContext, useState } from 'react';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { LedgerError } from '@models/error-types';
 import { LEDGER_APPS_MAP } from '@models/ledger';
+import { SupportedPaymentType } from '@models/supported-payment-types';
 import { RawVault } from '@models/vault';
 import { bytesToHex } from '@noble/hashes/utils';
 import {
@@ -23,8 +24,13 @@ import { BITCOIN_NETWORK_MAP } from '@shared/constants/bitcoin.constants';
 type TransportInstance = Awaited<ReturnType<typeof Transport.create>>;
 
 interface UseLedgerReturnType {
-  getLedgerAddressesWithBalances: (paymentType: 'wpkh' | 'tr') => Promise<[string, number][]>;
-  connectLedgerWallet: (walletAccountIndex: number, paymentType: 'wpkh' | 'tr') => Promise<void>;
+  getLedgerAddressesWithBalances: (
+    paymentType: SupportedPaymentType
+  ) => Promise<[string, number][]>;
+  connectLedgerWallet: (
+    walletAccountIndex: number,
+    paymentType: SupportedPaymentType
+  ) => Promise<void>;
   handleFundingTransaction: (
     dlcHandler: LedgerDLCHandler,
     vault: RawVault,
@@ -110,7 +116,7 @@ export function useLedger(): UseLedgerReturnType {
    * @returns The Ledger Addresses with Balances.
    */
   async function getLedgerAddressesWithBalances(
-    paymentType: 'wpkh' | 'tr'
+    paymentType: SupportedPaymentType
   ): Promise<[string, number][]> {
     try {
       setIsLoading([true, 'Loading Ledger App and Information']);
@@ -164,7 +170,7 @@ export function useLedger(): UseLedgerReturnType {
 
   async function connectLedgerWallet(
     walletAccountIndex: number,
-    paymentType: 'wpkh' | 'tr'
+    paymentType: SupportedPaymentType
   ): Promise<void> {
     try {
       setIsLoading([true, 'Connecting To Ledger Wallet']);

@@ -11,6 +11,7 @@ import {
   Text,
   VStack,
 } from '@chakra-ui/react';
+import { SupportedPaymentType } from '@models/supported-payment-types';
 
 import { LedgerModalSelectAddressMenuItem } from './components/ledger-modal-select-address-menu-item';
 
@@ -20,7 +21,7 @@ interface LedgerModalSelectAddressMenuProps {
   isLoading: [boolean, string];
   isSuccesful: boolean;
   error: string | undefined;
-  setFundingAndTaprootAddress: (index: number, paymentType: 'wpkh' | 'tr') => void;
+  setFundingAndTaprootAddress: (index: number, paymentType: SupportedPaymentType) => void;
 }
 
 export function LedgerModalSelectAddressMenu({
@@ -66,7 +67,7 @@ export function LedgerModalSelectAddressMenu({
                 <LedgerModalSelectAddressMenuItem
                   key={index}
                   address={address}
-                  paymentType="wpkh"
+                  paymentType={SupportedPaymentType.NATIVE_SEGWIT}
                   index={index}
                   setFundingAndTaprootAddress={setFundingAndTaprootAddress}
                 />
@@ -75,7 +76,7 @@ export function LedgerModalSelectAddressMenu({
                 <LedgerModalSelectAddressMenuItem
                   key={index}
                   address={address}
-                  paymentType="tr"
+                  paymentType={SupportedPaymentType.TAPROOT}
                   index={index}
                   setFundingAndTaprootAddress={setFundingAndTaprootAddress}
                 />

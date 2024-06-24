@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 
 import { useLedger } from '@hooks/use-ledger';
+import { SupportedPaymentType } from '@models/supported-payment-types';
 import { BitcoinWalletType } from '@models/wallet';
 import {
   BitcoinWalletContext,
@@ -41,8 +42,8 @@ export function LedgerModal({ isOpen, handleClose }: ModalComponentProps): React
   async function getLedgerAddresses() {
     try {
       setError(undefined);
-      const nativeSegwitAddresses = await getLedgerAddressesWithBalances('wpkh');
-      const taprootAddresses = await getLedgerAddressesWithBalances('tr');
+      const nativeSegwitAddresses = await getLedgerAddressesWithBalances(SupportedPaymentType.NATIVE_SEGWIT);
+      const taprootAddresses = await getLedgerAddressesWithBalances(SupportedPaymentType.TAPROOT);
       setNativeSegwitAddresses(nativeSegwitAddresses);
       setTaprootAddresses(taprootAddresses);
     } catch (error: any) {
@@ -50,7 +51,7 @@ export function LedgerModal({ isOpen, handleClose }: ModalComponentProps): React
     }
   }
 
-  async function setFundingAndTaprootAddress(index: number, paymentType: 'wpkh' | 'tr') {
+  async function setFundingAndTaprootAddress(index: number, paymentType: SupportedPaymentType) {
     try {
       setError(undefined);
       await connectLedgerWallet(index, paymentType);
