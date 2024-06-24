@@ -4,18 +4,20 @@ import { truncateAddress } from 'dlc-btc-lib/utilities';
 interface LedgerModalSelectAddressMenuItemProps {
   index: number;
   address: [string, number];
-  setNativeSegwitAddressAndTaprootMultisigAddress: (index: number) => void;
+  paymentType: 'wpkh' | 'tr';
+  setFundingAndTaprootAddress: (index: number, paymentType: 'wpkh' | 'tr') => void;
 }
 export function LedgerModalSelectAddressMenuItem({
   index,
   address,
-  setNativeSegwitAddressAndTaprootMultisigAddress,
+  paymentType,
+  setFundingAndTaprootAddress,
 }: LedgerModalSelectAddressMenuItemProps): React.JSX.Element {
   return (
     <MenuItem
       key={index}
       value={index}
-      onClick={() => setNativeSegwitAddressAndTaprootMultisigAddress(index)}
+      onClick={() => setFundingAndTaprootAddress(index, paymentType)}
     >
       <HStack w={'275px'} justifyContent={'space-between'}>
         <Text>{truncateAddress(address[0])}</Text>

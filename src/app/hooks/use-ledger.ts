@@ -24,7 +24,7 @@ type TransportInstance = Awaited<ReturnType<typeof Transport.create>>;
 
 interface UseLedgerReturnType {
   getLedgerAddressesWithBalances: (paymentType: 'wpkh' | 'tr') => Promise<[string, number][]>;
-  connectLedgerWallet: (walletAccountIndex: number) => Promise<void>;
+  connectLedgerWallet: (walletAccountIndex: number, paymentType: 'wpkh' | 'tr') => Promise<void>;
   handleFundingTransaction: (
     dlcHandler: LedgerDLCHandler,
     vault: RawVault,
@@ -127,7 +127,10 @@ export function useLedger(): UseLedgerReturnType {
       const indices = [0, 1, 2, 3, 4]; // Replace with your actual indices
       const addresses = [];
 
-      setIsLoading([true, 'Loading Native Segwit Adresses']);
+      setIsLoading([
+        true,
+        `Loading ${paymentType === 'wpkh' ? 'Native Segwit' : 'Taproot'} Adresses`,
+      ]);
       for (const index of indices) {
         const derivationPath = `${derivationPathRoot}/${index}'`;
         const extendedPublicKey = await ledgerApp.getExtendedPubkey(`m/${derivationPath}`);
@@ -159,7 +162,10 @@ export function useLedger(): UseLedgerReturnType {
     }
   }
 
-  async function connectLedgerWallet(walletAccountIndex: number): Promise<void> {
+  async function connectLedgerWallet(
+    walletAccountIndex: number,
+    paymentType: 'wpkh' | 'tr'
+  ): Promise<void> {
     try {
       setIsLoading([true, 'Connecting To Ledger Wallet']);
       if (!ledgerApp) {
@@ -171,6 +177,7 @@ export function useLedger(): UseLedgerReturnType {
         ledgerApp,
         masterFingerprint,
         walletAccountIndex,
+        paymentType,
         BITCOIN_NETWORK_MAP[appConfiguration.bitcoinNetwork],
         appConfiguration.bitcoinBlockchainURL,
         appConfiguration.bitcoinBlockchainFeeEstimateURL
