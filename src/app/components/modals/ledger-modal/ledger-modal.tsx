@@ -42,7 +42,9 @@ export function LedgerModal({ isOpen, handleClose }: ModalComponentProps): React
   async function getLedgerAddresses() {
     try {
       setError(undefined);
-      const nativeSegwitAddresses = await getLedgerAddressesWithBalances(SupportedPaymentType.NATIVE_SEGWIT);
+      const nativeSegwitAddresses = await getLedgerAddressesWithBalances(
+        SupportedPaymentType.NATIVE_SEGWIT
+      );
       const taprootAddresses = await getLedgerAddressesWithBalances(SupportedPaymentType.TAPROOT);
       setNativeSegwitAddresses(nativeSegwitAddresses);
       setTaprootAddresses(taprootAddresses);
