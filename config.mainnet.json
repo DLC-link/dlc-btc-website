@@ -5,6 +5,7 @@
     "https://mainnet.dlc.link/attestor-3"
   ],
   "enabledEthereumNetworkIDs": ["42161"],
+  "arbitrumNetworkName": "arbitrum",
   "bitcoinNetwork": "mainnet",
   "bitcoinNetworkPreFix": "bc1",
   "bitcoinBlockchainURL": "https://mainnet.dlc.link/electrs",

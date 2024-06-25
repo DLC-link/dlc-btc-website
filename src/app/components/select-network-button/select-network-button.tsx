@@ -1,6 +1,7 @@
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import { HStack, Menu, MenuButton, MenuItem, MenuList, Text } from '@chakra-ui/react';
-import { EthereumNetwork, ethereumNetworks } from '@models/ethereum-network';
+import { supportedEthereumNetworks } from 'dlc-btc-lib/constants';
+import { EthereumNetwork } from 'dlc-btc-lib/models';
 
 interface SelectNetworkButtonProps {
   handleClick: (network: EthereumNetwork) => void;
@@ -12,7 +13,7 @@ export function SelectNetworkButton({
   currentNetwork,
 }: SelectNetworkButtonProps): React.JSX.Element {
   const enabledEthereumNetworkIDs = appConfiguration.enabledEthereumNetworkIDs;
-  const enabledEthereumNetworks = ethereumNetworks.filter(network =>
+  const enabledEthereumNetworks = supportedEthereumNetworks.filter(network =>
     enabledEthereumNetworkIDs.includes(network.id)
   );
 

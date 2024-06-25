@@ -1,7 +1,9 @@
+import { useContext } from 'react';
+
 import { Button, HStack, Image, Spinner, Text, VStack } from '@chakra-ui/react';
 import { VaultCard } from '@components/vault/vault-card';
-import { useEthereumAccount } from '@hooks/use-ethereum-account';
 import { Vault } from '@models/vault';
+import { EthereumHandlerContext } from '@providers/ethereum-handler-context-provider';
 
 interface VaultsListGroupContainerProps {
   label?: string;
@@ -18,7 +20,7 @@ export function VaultsListGroupContainer({
   isSelectable = false,
   handleSelect,
 }: VaultsListGroupContainerProps): React.JSX.Element | boolean {
-  const { recommendTokenToMetamask } = useEthereumAccount();
+  const { recommendTokenToMetamask } = useContext(EthereumHandlerContext);
 
   if (vaults.length === 0) return false;
 

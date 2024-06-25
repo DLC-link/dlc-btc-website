@@ -1,12 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useContext } from 'react';
+import { useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
 
 import { DetailedEvent, TimeStampedEvent } from '@models/ethereum-models';
+import { EthereumHandlerContext } from '@providers/ethereum-handler-context-provider';
 import Decimal from 'decimal.js';
-import { Event } from 'ethers';
+import { Event, ethers } from 'ethers';
 
 import { RootState } from '../store';
-import { useEthereum } from './use-ethereum';
 
 const BURN_ADDRESS = '0x0000000000000000000000000000000000000000';
 
@@ -78,20 +79,16 @@ export function calculatePoints(
 }
 
 export function usePoints(): UsePointsReturnType {
-  const { address: userAddress, network } = useSelector((state: RootState) => state.account);
-  const { getDefaultProvider } = useEthereum();
+  const { address: userAddress } = useSelector((state: RootState) => state.account);
+  const { userPointsContractReader } = useContext(EthereumHandlerContext);
 
-  const [userPoints, setUserPoints] = useState<number | undefined>(undefined);
-
-  useEffect(() => {
-    const fetchUserPoints = async (currentUserAddress: string) => {
-      void fetchPoints(currentUserAddress);
-    };
-    if (userAddress) {
-      void fetchUserPoints(userAddress);
+  const { data: userPoints } = useQuery(
+    ['userPoints', userAddress], // Unique key for the query, including the userAddress to refetch when it changes
+    () => fetchPoints(userPointsContractReader!, userAddress!), // Fetch function, using non-null assertion because we check for existence in `enabled`
+    {
+      enabled: !!userAddress && !!userPointsContractReader, // Only run the query if userAddress is not undefined or empty
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userAddress]);
+  );
 
   function formatTransferEvent(event: any, timestamp: number): DetailedEvent {
     return {
@@ -102,18 +99,23 @@ export function usePoints(): UsePointsReturnType {
     };
   }
 
-  async function fetchTransferEvents(userAddress: string): Promise<DetailedEvent[]> {
-    const dlcBTCContract = await getDefaultProvider(network, 'DLCBTC');
-    const eventFilterTo = dlcBTCContract.filters.Transfer(BURN_ADDRESS, userAddress);
-    const eventFilterFrom = dlcBTCContract.filters.Transfer(userAddress, BURN_ADDRESS);
-    const eventsTo = await dlcBTCContract.queryFilter(eventFilterTo);
-    const eventsFrom = await dlcBTCContract.queryFilter(eventFilterFrom);
+  async function fetchTransferEvents(
+    userPointsContractReader: ethers.Contract,
+    userAddress: string
+  ): Promise<DetailedEvent[]> {
+    if (!userPointsContractReader) {
+      throw new Error('Points Contract Reader is not set');
+    }
+    const eventFilterTo = userPointsContractReader.filters.Transfer(BURN_ADDRESS, userAddress);
+    const eventFilterFrom = userPointsContractReader.filters.Transfer(userAddress, BURN_ADDRESS);
+    const eventsTo = await userPointsContractReader.queryFilter(eventFilterTo);
+    const eventsFrom = await userPointsContractReader.queryFilter(eventFilterFrom);
     const events = [...eventsTo, ...eventsFrom];
     const detailedEvents: DetailedEvent[] = [];
 
     await Promise.all(
       events.map(async (event: Event) => {
-        const block = await dlcBTCContract.provider.getBlock(event.blockNumber);
+        const block = await userPointsContractReader.provider.getBlock(event.blockNumber);
         detailedEvents.push(formatTransferEvent(event.args, block.timestamp));
       })
     );
@@ -123,14 +125,17 @@ export function usePoints(): UsePointsReturnType {
     return detailedEvents;
   }
 
-  async function fetchPoints(currentUserAddress: string): Promise<void> {
+  async function fetchPoints(
+    userPointsContractReader: ethers.Contract,
+    currentUserAddress: string
+  ): Promise<number> {
     const rewardsRate = import.meta.env.VITE_REWARDS_RATE;
     if (!rewardsRate) {
       throw new Error('Rewards Rate not set');
     }
-    const events = await fetchTransferEvents(currentUserAddress);
+    const events = await fetchTransferEvents(userPointsContractReader, currentUserAddress);
     const rollingTVL = calculateRollingTVL(events);
-    setUserPoints(calculatePoints(rollingTVL, rewardsRate));
+    return calculatePoints(rollingTVL, rewardsRate);
   }
 
   return {

@@ -1,8 +1,8 @@
 import { useContext, useState } from 'react';
 
 import { Button, FormControl, FormErrorMessage, Text, VStack, useToast } from '@chakra-ui/react';
-import { useEthereum } from '@hooks/use-ethereum';
 import { EthereumError } from '@models/error-types';
+import { EthereumHandlerContext } from '@providers/ethereum-handler-context-provider';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
 import { shiftValue } from 'dlc-btc-lib/utilities';
 import { Form, Formik } from 'formik';
@@ -19,7 +19,7 @@ const initialValues: TransactionFormValues = { amount: 0.01 };
 export function TransactionForm(): React.JSX.Element {
   const toast = useToast();
 
-  const { setupVault } = useEthereum();
+  const { ethereumHandler } = useContext(EthereumHandlerContext);
   const { bitcoinPrice } = useContext(ProofOfReserveContext);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -28,7 +28,7 @@ export function TransactionForm(): React.JSX.Element {
     try {
       setIsSubmitting(true);
       const shiftedBTCDepositAmount = shiftValue(btcDepositAmount);
-      await setupVault(shiftedBTCDepositAmount);
+      await ethereumHandler?.setupVault(shiftedBTCDepositAmount);
     } catch (error) {
       setIsSubmitting(false);
       toast({

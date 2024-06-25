@@ -20,7 +20,7 @@ import {
 import { SoftwareWalletDLCHandler } from 'dlc-btc-lib';
 import { Transaction } from 'dlc-btc-lib/models';
 
-import { BITCOIN_NETWORK_MAP } from '@shared/constants/bitcoin.constants';
+import { BITCOIN_NETWORK_MAP } from '@shared/constants/map.constants';
 
 interface UseLeatherReturnType {
   connectLeatherWallet: () => Promise<void>;

@@ -1,33 +1,22 @@
-import { EthereumNetwork, ethereumArbSepolia, ethereumArbitrum } from '@models/ethereum-network';
 import { WalletType } from '@models/wallet';
 import { createSlice } from '@reduxjs/toolkit';
+import { EthereumNetwork, EthereumNetworkID } from 'dlc-btc-lib/models';
+
+import { ETHEREUM_NETWORK_MAP } from '@shared/constants/map.constants';
 
 interface AccountState {
   address: string | undefined;
-  walletType: WalletType | undefined;
+  walletType: WalletType;
   network: EthereumNetwork;
   dlcBTCBalance: number | undefined;
   lockedBTCBalance: number | undefined;
   loadedAt: string | undefined;
 }
 
-const bitcoinNetworkName = import.meta.env.VITE_BITCOIN_NETWORK;
-let ethereumNetwork: EthereumNetwork;
-switch (bitcoinNetworkName) {
-  case 'mainnet':
-    ethereumNetwork = ethereumArbitrum;
-    break;
-  case 'regtest':
-    ethereumNetwork = ethereumArbSepolia;
-    break;
-  default:
-    ethereumNetwork = ethereumArbSepolia;
-}
-
 export const initialAccountState: AccountState = {
   address: undefined,
   walletType: WalletType.Metamask,
-  network: ethereumNetwork,
+  network: ETHEREUM_NETWORK_MAP[appConfiguration.enabledEthereumNetworkIDs[0] as EthereumNetworkID],
   dlcBTCBalance: 0,
   lockedBTCBalance: 0,
   loadedAt: undefined,
@@ -45,10 +34,11 @@ export const accountSlice = createSlice({
     },
     logout: state => {
       state.address = undefined;
-      state.walletType = undefined;
+      state.walletType = WalletType.Metamask;
       state.dlcBTCBalance = 0;
       state.lockedBTCBalance = 0;
-      state.network = ethereumNetwork;
+      state.network =
+        ETHEREUM_NETWORK_MAP[appConfiguration.enabledEthereumNetworkIDs[0] as EthereumNetworkID];
     },
   },
 });

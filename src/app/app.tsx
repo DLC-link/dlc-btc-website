@@ -14,7 +14,7 @@ import { ProofOfReserveContextProvider } from '@providers/proof-of-reserve-conte
 
 import { About } from './pages/about/about';
 import { Dashboard } from './pages/dashboard/dashboard';
-import { EthereumContextProvider } from './providers/ethereum-context-provider';
+import { EthereumHandlerContextProvider } from './providers/ethereum-handler-context-provider';
 import { VaultContextProvider } from './providers/vault-context-provider';
 
 const queryClient = new QueryClient();
@@ -22,7 +22,7 @@ const queryClient = new QueryClient();
 export function App(): React.JSX.Element {
   return (
     <QueryClientProvider client={queryClient}>
-      <EthereumContextProvider>
+      <EthereumHandlerContextProvider>
         <EthereumObserverProvider>
           <BitcoinWalletContextProvider>
             <VaultContextProvider>
@@ -43,7 +43,7 @@ export function App(): React.JSX.Element {
             </VaultContextProvider>
           </BitcoinWalletContextProvider>
         </EthereumObserverProvider>
-      </EthereumContextProvider>
+      </EthereumHandlerContextProvider>
     </QueryClientProvider>
   );
 }

@@ -1,11 +1,12 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useContext, useMemo } from 'react';
+import { useQuery } from 'react-query';
+import { useDispatch, useSelector } from 'react-redux';
 
+import { formatVault } from '@functions/vault.functions';
 import { Vault, VaultState } from '@models/vault';
+import { EthereumHandlerContext } from '@providers/ethereum-handler-context-provider';
 import { RootState } from '@store/index';
-
-import { useEthereum } from './use-ethereum';
-import { useEthereumContext } from './use-ethereum-context';
+import { vaultActions } from '@store/slices/vault/vault.actions';
 
 export interface UseVaultsReturnType {
   allVaults: Vault[];
@@ -18,32 +19,39 @@ export interface UseVaultsReturnType {
 }
 
 export function useVaults(): UseVaultsReturnType {
-  const { contractsLoaded } = useEthereumContext();
-  const { getAllVaults } = useEthereum();
+  const dispatch = useDispatch();
+  const { ethereumHandler } = useContext(EthereumHandlerContext);
 
   const { vaults } = useSelector((state: RootState) => state.vault);
   const { network } = useSelector((state: RootState) => state.account);
 
-  const [isLoading, setIsLoading] = useState(true);
-
-  const fetchVaultsIfReady = async () => {
-    if (contractsLoaded) {
-      setIsLoading(true);
-      await getAllVaults();
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    fetchVaultsIfReady();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contractsLoaded]);
+  const { isLoading } = useQuery(['vaults'], getAllVaults, {
+    enabled: !!ethereumHandler,
+    refetchInterval: 60000,
+  });
 
   const allVaults = useMemo(
     () => [...vaults[network ? network.id : '42161']].sort((a, b) => b.timestamp - a.timestamp),
     [vaults, network]
   );
+
+  async function getAllVaults(): Promise<void> {
+    try {
+      if (!ethereumHandler) return;
+
+      const rawVaults = await ethereumHandler.getAllVaults();
+      const formattedVaults: Vault[] = rawVaults.map(formatVault);
+      if (!network) return;
+      dispatch(
+        vaultActions.setVaults({
+          newVaults: formattedVaults,
+          networkID: network?.id,
+        })
+      );
+    } catch (error) {
+      throw new Error(`Could not fetch Vaults: ${error}`);
+    }
+  }
 
   const readyVaults = useMemo(
     () =>
