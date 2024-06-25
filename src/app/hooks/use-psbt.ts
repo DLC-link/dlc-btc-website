@@ -170,7 +170,9 @@ export function usePSBT(): UsePSBTReturnType {
         chain: ethereumAttestorChainID,
       };
 
-      await sendWithdrawalTransactionToAttestors(withdrawalTXAttestorInfo);
+      // await sendWithdrawalTransactionToAttestors(withdrawalTXAttestorInfo);
+
+      dispatch(mintUnmintActions.setUnmintStep([1, vaultUUID]));
 
       resetBitcoinWalletContext();
     } catch (error) {

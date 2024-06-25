@@ -28,6 +28,7 @@ interface UnmintVaultSelectorProps {
   risk: string;
   fetchRisk: () => Promise<string>;
   isRiskLoading: boolean;
+  setWithdrawAmount: (amount: number) => void;
 }
 
 export function UnmintVaultSelector({
@@ -36,6 +37,7 @@ export function UnmintVaultSelector({
   risk,
   fetchRisk,
   isRiskLoading,
+  setWithdrawAmount,
 }: UnmintVaultSelectorProps): React.JSX.Element {
   const toast = useToast();
   const dispatch = useDispatch();
@@ -67,6 +69,7 @@ export function UnmintVaultSelector({
         // const currentRisk = await fetchRisk();
         // if (currentRisk === 'High') throw new Error('Risk Level is too high');
         await handleSignWithdrawTransaction(selectedVault.uuid, withdrawAmount);
+        setWithdrawAmount(withdrawAmount);
       } catch (error) {
         setIsSubmitting(false);
         toast({
