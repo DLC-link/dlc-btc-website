@@ -88,7 +88,6 @@ export function usePSBT(): UsePSBTReturnType {
       let closingTransactionHex: string;
       const vault = await readOnlyEthereumHandler?.getRawVault(mintStep[1]);
       if (!vault) throw new BitcoinError('Vault is not yet set.');
-      let nativeSegwitAddress;
       const feeRateMultiplier = import.meta.env.VITE_FEE_RATE_MULTIPLIER;
       switch (bitcoinWalletType) {
         case 'Ledger':
@@ -98,7 +97,6 @@ export function usePSBT(): UsePSBTReturnType {
             fundingTransaction.id,
             feeRateMultiplier
           );
-          nativeSegwitAddress = dlcHandler?.getVaultRelatedAddress('p2wpkh');
           break;
         case 'Leather':
           closingTransactionHex = await handleClosingTransactionWithLeather(
@@ -107,19 +105,20 @@ export function usePSBT(): UsePSBTReturnType {
             fundingTransaction.id,
             feeRateMultiplier
           );
-          nativeSegwitAddress = dlcHandler?.getVaultRelatedAddress('p2wpkh');
           break;
         default:
           throw new BitcoinError('Invalid Bitcoin Wallet Type');
       }
 
-      if (!nativeSegwitAddress) throw new BitcoinError('Native Segwit Address is not defined');
+      const fundingAddress = dlcHandler?.getVaultRelatedAddress('funding');
+
+      if (!fundingAddress) throw new BitcoinError('Funding Address is not defined');
 
       await sendClosingTransactionToAttestors(
         fundingTransaction?.hex,
         closingTransactionHex,
         mintStep[1],
-        nativeSegwitAddress
+        fundingAddress
       );
 
       await broadcastTransaction(fundingTransaction.hex, appConfiguration.bitcoinBlockchainURL);

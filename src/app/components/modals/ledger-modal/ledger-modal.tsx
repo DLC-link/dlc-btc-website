@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 
 import { useLedger } from '@hooks/use-ledger';
+import { SupportedPaymentType } from '@models/supported-payment-types';
 import { BitcoinWalletType } from '@models/wallet';
 import {
   BitcoinWalletContext,
@@ -26,29 +27,36 @@ export function LedgerModal({ isOpen, handleClose }: ModalComponentProps): React
   const [nativeSegwitAddresses, setNativeSegwitAddresses] = useState<
     [string, number][] | undefined
   >(undefined);
+  const [taprootAddresses, setTaprootAddresses] = useState<[string, number][] | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     if (isOpen) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      getLedgerNativeSegwitAddresses();
+      getLedgerAddresses();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
-  async function getLedgerNativeSegwitAddresses() {
+  async function getLedgerAddresses() {
     try {
       setError(undefined);
-      const nativeSegwitAddresses = await getLedgerAddressesWithBalances('wpkh');
+      const nativeSegwitAddresses = await getLedgerAddressesWithBalances(
+        SupportedPaymentType.NATIVE_SEGWIT
+      );
+      const taprootAddresses = await getLedgerAddressesWithBalances(SupportedPaymentType.TAPROOT);
       setNativeSegwitAddresses(nativeSegwitAddresses);
+      setTaprootAddresses(taprootAddresses);
     } catch (error: any) {
       setError(error.message);
     }
   }
 
-  async function setNativeSegwitAddressAndTaprootMultisigAddress(index: number) {
+  async function setFundingAndTaprootAddress(index: number, paymentType: SupportedPaymentType) {
     try {
       setError(undefined);
-      await connectLedgerWallet(index);
+      await connectLedgerWallet(index, paymentType);
       setIsSuccesful(true);
       await delay(2500);
       setIsSuccesful(false);
@@ -63,19 +71,15 @@ export function LedgerModal({ isOpen, handleClose }: ModalComponentProps): React
   return (
     <LedgerModalLayout logo={'/images/logos/ledger-logo.svg'} isOpen={isOpen} onClose={handleClose}>
       <LedgerModalSuccessIcon isSuccesful={isSuccesful} />
-      <LedgerModalConnectButton
-        error={error}
-        getLedgerNativeSegwitAddresses={getLedgerNativeSegwitAddresses}
-      />
+      <LedgerModalConnectButton error={error} getLedgerAddresses={getLedgerAddresses} />
       <LedgerModalLoadingStack isLoading={isLoading} />
       <LedgerModalSelectAddressMenu
         nativeSegwitAddresses={nativeSegwitAddresses}
+        taprootAddresses={taprootAddresses}
         isLoading={isLoading}
         isSuccesful={isSuccesful}
         error={error}
-        setNativeSegwitAddressAndTaprootMultisigAddress={
-          setNativeSegwitAddressAndTaprootMultisigAddress
-        }
+        setFundingAndTaprootAddress={setFundingAndTaprootAddress}
       />
       <LedgerModalErrorBox error={error} />
     </LedgerModalLayout>
