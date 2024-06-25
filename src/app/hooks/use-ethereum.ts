@@ -45,7 +45,7 @@ export function throwEthereumError(message: string, error: any): void {
 
 export function useEthereum(): UseEthereumReturnType {
   const { vaults } = useContext(VaultContext);
-  const { protocolContract, dlcBTCContract, observerProtocolContract } = useEthereumContext();
+  const { dlcManagerContract, dlcBTCContract, observerDLCManagerContract } = useEthereumContext();
 
   const { address, network } = useSelector((state: RootState) => state.account);
 
@@ -127,9 +127,9 @@ export function useEthereum(): UseEthereumReturnType {
 
   async function getAllVaults(): Promise<void> {
     try {
-      if (!observerProtocolContract) throw new Error('Protocol contract not initialized');
-      await observerProtocolContract.callStatic.getAllVaultsForAddress(address);
-      const vaults: RawVault[] = await observerProtocolContract.getAllVaultsForAddress(address);
+      if (!observerDLCManagerContract) throw new Error('Protocol contract not initialized');
+      await observerDLCManagerContract.callStatic.getAllVaultsForAddress(address);
+      const vaults: RawVault[] = await observerDLCManagerContract.getAllVaultsForAddress(address);
       const formattedVaults: Vault[] = vaults.map(formatVault);
       if (!network) return;
       store.dispatch(
@@ -144,8 +144,8 @@ export function useEthereum(): UseEthereumReturnType {
   }
 
   async function getRawVault(vaultUUID: string): Promise<RawVault> {
-    if (!observerProtocolContract) throw new Error('Protocol contract not initialized');
-    const vault: RawVault = await observerProtocolContract.getVault(vaultUUID);
+    if (!observerDLCManagerContract) throw new Error('Protocol contract not initialized');
+    const vault: RawVault = await observerDLCManagerContract.getVault(vaultUUID);
     if (!vault) throw new Error('Vault is undefined');
     return vault;
   }
@@ -158,8 +158,8 @@ export function useEthereum(): UseEthereumReturnType {
   ): Promise<void> {
     for (let i = 0; i < maxRetries; i++) {
       try {
-        if (!observerProtocolContract) throw new Error('Protocol contract not initialized');
-        const vault: RawVault = await observerProtocolContract.getVault(vaultUUID);
+        if (!observerDLCManagerContract) throw new Error('Protocol contract not initialized');
+        const vault: RawVault = await observerDLCManagerContract.getVault(vaultUUID);
         if (!vault) throw new Error('Vault is undefined');
         if (vault.status !== vaultState) throw new Error('Vault is not in the correct state');
         const formattedVault: Vault = formatVault(vault);
@@ -206,9 +206,9 @@ export function useEthereum(): UseEthereumReturnType {
 
   async function setupVault(btcDepositAmount: number): Promise<void> {
     try {
-      if (!protocolContract) throw new Error('Protocol contract not initialized');
-      await protocolContract.callStatic.setupVault(btcDepositAmount);
-      await protocolContract.setupVault(btcDepositAmount);
+      if (!dlcManagerContract) throw new Error('Protocol contract not initialized');
+      await dlcManagerContract.callStatic.setupVault(btcDepositAmount);
+      await dlcManagerContract.setupVault(btcDepositAmount);
     } catch (error: any) {
       throwEthereumError(`Could not setup Vault: `, error);
     }
@@ -216,9 +216,9 @@ export function useEthereum(): UseEthereumReturnType {
 
   async function closeVault(vaultUUID: string) {
     try {
-      if (!protocolContract) throw new Error('Protocol contract not initialized');
-      await protocolContract.callStatic.closeVault(vaultUUID);
-      await protocolContract.closeVault(vaultUUID);
+      if (!dlcManagerContract) throw new Error('Protocol contract not initialized');
+      await dlcManagerContract.callStatic.closeVault(vaultUUID);
+      await dlcManagerContract.closeVault(vaultUUID);
     } catch (error) {
       throwEthereumError(`Could not close Vault: `, error);
     }
