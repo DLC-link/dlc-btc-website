@@ -1,4 +1,7 @@
-import { Text } from '@chakra-ui/react';
+import { MdArrowBack } from 'react-icons/md';
+import { useNavigate } from 'react-router-dom';
+
+import { HStack, Icon, Text } from '@chakra-ui/react';
 
 import { ActivityCardRow } from './components/attestor-details-card/activity-card-row';
 import { AttestorDetailsActivityCard } from './components/attestor-details-card/attestor-details-activity-card';
@@ -10,11 +13,19 @@ import { AttestorDetailsLayout } from './components/attestor-details-layout';
 import { AttestorSelectTable } from './components/attestor-details-table/attestor-select-table';
 
 export function AttestorDetailsSelect(): React.JSX.Element {
+  const navigate = useNavigate();
   return (
     <AttestorDetailsLayout>
       <Text w={'100%'} color={'white'} fontSize={'6xl'} fontWeight={500}>
         DLC-Link Attestor 1
       </Text>
+      <Text variant={'navigate'} fontSize={'xl'} onClick={() => navigate('/attestor-details')}>
+        <HStack spacing={2} alignItems="center">
+          <Icon as={MdArrowBack} />
+          <Text>Back to the List</Text>
+        </HStack>
+      </Text>
+
       <AttestorDetailsCard>
         <AttestorDetailsCardLayout
           width={'245px'}
