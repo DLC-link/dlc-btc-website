@@ -90,8 +90,19 @@ export function useEthereumContracts(): UseEthereumContractsReturnType {
     ethereumNetwork: EthereumNetwork
   ) {
     const branchName = import.meta.env.VITE_ETHEREUM_DEPLOYMENT_BRANCH;
-    const deploymentPlanURL = `${SOLIDITY_CONTRACT_URL}/${branchName}/deploymentFiles/${ethereumNetwork.name.toLowerCase()}/${contractName}.json`;
-
+    let deploymentPlanURL: string;
+    switch (appConfiguration.appEnvironment) {
+      case 'mainnet':
+      case 'testnet':
+      case 'devnet':
+        deploymentPlanURL = `${SOLIDITY_CONTRACT_URL}/${branchName}/deploymentFiles/${ethereumNetwork.name.toLowerCase()}/${contractName}.json`;
+        break;
+      case 'localhost':
+        deploymentPlanURL = `${import.meta.env.VITE_ETHEREUM_DEPLOYMENT_FILES_URL}/${contractName}.json`;
+        break;
+      default:
+        throw new EthereumError('Invalid Ethereum Network');
+    }
     // eslint-disable-next-line no-console
     console.log(
       `Fetching deployment info for ${contractName} on ${ethereumNetwork.name} from dlc-solidity/${branchName}`

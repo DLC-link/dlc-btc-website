@@ -10,11 +10,11 @@ export default defineConfig(({ mode }) =>  {
 
   const env = loadEnv(mode, process.cwd(), '')
 
-  const bitcoinNetworkName = env.VITE_BITCOIN_NETWORK;
+  const environmentName = env.VITE_APP_ENVIRONMENT;
 
-  const appConfigurationJSON = readFileSync(resolve(__dirname, `./config.${bitcoinNetworkName}.json`), 'utf-8');
+  const appConfigurationJSON = readFileSync(resolve(__dirname, `./config.${environmentName}.json`), 'utf-8');
   const appConfiguration = JSON.parse(appConfigurationJSON);
-  
+
 
   return {
   plugins: [react(), wasm(), ViteToml()],
@@ -26,45 +26,45 @@ export default defineConfig(({ mode }) =>  {
   },
   resolve: {
     alias: [
-      { 
-      find: "@store", 
-      replacement: resolve(__dirname, './src/app/store') 
+      {
+      find: "@store",
+      replacement: resolve(__dirname, './src/app/store')
     },
-    { 
-      find: "@components", 
-      replacement: resolve(__dirname, './src/app/components') 
+    {
+      find: "@components",
+      replacement: resolve(__dirname, './src/app/components')
     },
-    { 
-      find: "@models", 
-      replacement: resolve(__dirname, './src/shared/models') 
+    {
+      find: "@models",
+      replacement: resolve(__dirname, './src/shared/models')
     },
     {
       find: "@functions",
       replacement: resolve(__dirname, './src/app/functions')
     },
-    { 
-      find: "@common", 
-      replacement: resolve(__dirname, './src/app/common') 
+    {
+      find: "@common",
+      replacement: resolve(__dirname, './src/app/common')
     },
-    { 
-      find: "@pages", 
-      replacement: resolve(__dirname, './src/app/pages') 
+    {
+      find: "@pages",
+      replacement: resolve(__dirname, './src/app/pages')
     },
-    { 
-      find: "@shared", 
-      replacement: resolve(__dirname, './src/shared') 
+    {
+      find: "@shared",
+      replacement: resolve(__dirname, './src/shared')
     },
-    { 
-      find: "@hooks", 
-      replacement: resolve(__dirname, './src/app/hooks') 
+    {
+      find: "@hooks",
+      replacement: resolve(__dirname, './src/app/hooks')
     },
-    { 
-      find: "@providers", 
-      replacement: resolve(__dirname, './src/app/providers') 
+    {
+      find: "@providers",
+      replacement: resolve(__dirname, './src/app/providers')
     },
-    { 
-      find: "@styles", 
-      replacement: resolve(__dirname, './src/styles') 
+    {
+      find: "@styles",
+      replacement: resolve(__dirname, './src/styles')
     }]
   }
 }

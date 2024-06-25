@@ -75,8 +75,21 @@ export function useEthereum(): UseEthereumReturnType {
 
       const deploymentBranchName = import.meta.env.VITE_ETHEREUM_DEPLOYMENT_BRANCH;
 
-      const deploymentPlanURL = `${SOLIDITY_CONTRACT_URL}/${deploymentBranchName}/deploymentFiles/${ethereumNetworkName}/${contractName}.json`;
+      let deploymentPlanURL: string;
+      switch (appConfiguration.appEnvironment) {
+        case 'mainnet':
+        case 'testnet':
+        case 'devnet':
+          deploymentPlanURL = `${SOLIDITY_CONTRACT_URL}/${deploymentBranchName}/deploymentFiles/${ethereumNetworkName}/${contractName}.json`;
+          break;
+        case 'localhost':
+          deploymentPlanURL = `${import.meta.env.VITE_ETHEREUM_DEPLOYMENT_FILES_URL}/${contractName}.json`;
+          break;
+        default:
+          throw new EthereumError('Invalid Ethereum Network');
+      }
 
+      // const deploymentPlanURL = `${SOLIDITY_CONTRACT_URL}/${deploymentBranchName}/deploymentFiles/${ethereumNetworkName}/${contractName}.json`;
       const response = await fetch(deploymentPlanURL);
       const contractData = await response.json();
 
