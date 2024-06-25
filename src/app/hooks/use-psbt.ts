@@ -95,8 +95,7 @@ export function usePSBT(): UsePSBTReturnType {
           throw new BitcoinError('Invalid Bitcoin Wallet Type');
       }
 
-      const userTaprootPublicKey =
-        dlcHandler?.payment?.taprootMultisigPayment.tweakedPubkey.toString();
+      const userTaprootPublicKey = dlcHandler?.getTaprootDerivedPublicKey();
 
       if (!address || !userTaprootPublicKey)
         throw new Error('Required Information is not available');
