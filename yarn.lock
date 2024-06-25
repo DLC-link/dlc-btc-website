@@ -3845,7 +3845,7 @@ dir-glob@^3.0.1:
   dependencies:
     path-type "^4.0.0"
 
-"dlc-btc-lib@file:../dlc-btc-app":
+"dlc-btc-lib@file:../dlc-btc-lib":
   version "1.0.11"
   dependencies:
     "@ledgerhq/hw-app-btc" "^10.2.4"

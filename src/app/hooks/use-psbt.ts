@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { BitcoinError } from '@models/error-types';
 import { BitcoinWalletType } from '@models/wallet';
+import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
 import { BitcoinWalletContext } from '@providers/bitcoin-wallet-context-provider';
 import { RootState } from '@store/index';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
@@ -95,8 +96,12 @@ export function usePSBT(): UsePSBTReturnType {
           throw new BitcoinError('Invalid Bitcoin Wallet Type');
       }
 
-      const userTaprootPublicKey =
-        dlcHandler?.payment?.taprootMultisigPayment.tweakedPubkey.toString();
+      const dlcHandler2 = dlcHandler as SoftwareWalletDLCHandler;
+
+      const userTaprootPublicKey = dlcHandler2.getTaprootDerivedPublicKey();
+      // const userTaprootPublicKey = bytesToHex(
+      //   dlcHandler?.payment?.taprootMultisigPayment.tweakedPubkey as Uint8Array
+      // );
 
       if (!address || !userTaprootPublicKey)
         throw new Error('Required Information is not available');

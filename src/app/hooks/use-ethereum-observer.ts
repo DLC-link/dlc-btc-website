@@ -25,7 +25,7 @@ export function useEthereumObserver(): void {
     console.log(`Listening to [${observerProtocolContract.address}]`);
 
     observerProtocolContract.on('SetupVault', async (...args: any[]) => {
-      const vaultOwner: string = args[2];
+      const vaultOwner: string = args[1];
 
       if (vaultOwner.toLowerCase() !== address) return;
 
