@@ -17,7 +17,7 @@ export function SuccessfulFlowModal({
   return (
     <ModalLayout title={'Success!'} isOpen={isOpen} onClose={() => handleClose()}>
       <TransactionSummary
-        currentStep={[flow === 'mint' ? 2 : 2, vaultUUID]}
+        currentStep={[flow === 'mint' ? 3 : 2, vaultUUID]}
         flow={flow}
         blockchain={'ethereum'}
         width="100%"

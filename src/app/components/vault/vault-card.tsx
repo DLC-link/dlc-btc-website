@@ -32,7 +32,9 @@ export function VaultCard({
   return (
     <VaultCardLayout isSelectable={isSelectable} handleClick={() => handleSelect && handleSelect()}>
       <VaultInformation
-        collateral={vault.valueLocked}
+        collateral={
+          [VaultState.PENDING].includes(vault.state) ? vault.valueMinted : vault.valueLocked
+        }
         state={vault.state}
         timestamp={vault.timestamp}
         isExpanded={isExpanded}

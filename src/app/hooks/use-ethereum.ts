@@ -46,7 +46,7 @@ export function throwEthereumError(message: string, error: any): void {
 }
 
 export function useEthereum(): UseEthereumReturnType {
-  const { vaults } = useContext(VaultContext);
+  const { fundedVaults } = useContext(VaultContext);
   const { dlcManagerContract, dlcBTCContract, observerDLCManagerContract } = useEthereumContext();
 
   const { address, network } = useSelector((state: RootState) => state.account);
@@ -87,7 +87,7 @@ export function useEthereum(): UseEthereumReturnType {
           deploymentPlanURL = `${SOLIDITY_CONTRACT_URL}/${deploymentBranchName}/deploymentFiles/${ethereumNetworkName}/${contractName}.json`;
           break;
         case 'localhost':
-          deploymentPlanURL = `${import.meta.env.VITE_ETHEREUM_DEPLOYMENT_FILES_URL}/contracts/localhost/${contractName}.json`;
+          deploymentPlanURL = `${import.meta.env.VITE_ETHEREUM_DEPLOYMENT_FILES_URL}/${contractName}.json`;
           break;
         default:
           throw new EthereumError('Invalid Ethereum Network');
@@ -110,7 +110,7 @@ export function useEthereum(): UseEthereumReturnType {
 
   async function getLockedBTCBalance(): Promise<number | undefined> {
     try {
-      const totalCollateral = vaults.fundedVaults.reduce(
+      const totalCollateral = fundedVaults.reduce(
         (sum: number, vault: Vault) => sum + vault.valueLocked,
         0
       );
@@ -133,8 +133,8 @@ export function useEthereum(): UseEthereumReturnType {
 
   async function getAttestorGroupPublicKey(ethereumNetwork: EthereumNetwork): Promise<string> {
     try {
-      const dlcManagerContract = await getDefaultProvider(ethereumNetwork, 'DLCManager');
-      const attestorGroupPubKey = await dlcManagerContract.attestorGroupPubKey();
+      // const dlcManagerContract = await getDefaultProvider(ethereumNetwork, 'DLCManager');
+      const attestorGroupPubKey = await observerDLCManagerContract.attestorGroupPubKey();
       return attestorGroupPubKey;
     } catch (error) {
       throw new EthereumError(`Could not fetch Attestor Public Key: ${error}`);
@@ -222,11 +222,11 @@ export function useEthereum(): UseEthereumReturnType {
     }
   }
 
-  async function setupVault(btcDepositAmount: number): Promise<void> {
+  async function setupVault(): Promise<void> {
     try {
       if (!dlcManagerContract) throw new Error('Protocol contract not initialized');
-      await dlcManagerContract.callStatic.setupVault(btcDepositAmount);
-      await dlcManagerContract.setupVault(btcDepositAmount);
+      await dlcManagerContract.callStatic.setupVault();
+      await dlcManagerContract.setupVault();
     } catch (error: any) {
       throwEthereumError(`Could not setup Vault: `, error);
     }

@@ -49,11 +49,14 @@ export function useAttestors(): UseAttestorsReturnType {
           return false;
         })
     );
+    console.log('createPSBTURLs', createPSBTURLs);
 
     const responses = await Promise.all(requests);
+    console.log('responses', responses);
     if (!responses.includes(true)) {
       throw new AttestorError('Error sending Funding Transaction to Attestors!');
     }
+    console.log('done');
   }
 
   async function sendDepositTransactionToAttestors(
@@ -76,11 +79,15 @@ export function useAttestors(): UseAttestorsReturnType {
           return false;
         })
     );
+    console.log('createPSBTURLs', createPSBTURLs);
 
     const responses = await Promise.all(requests);
+
+    console.log('responses', responses);
     if (!responses.includes(true)) {
       throw new AttestorError('Error sending Funding Transaction to Attestors!');
     }
+    console.log('done');
   }
 
   async function sendWithdrawalTransactionToAttestors(
@@ -103,11 +110,13 @@ export function useAttestors(): UseAttestorsReturnType {
           return false;
         })
     );
-
+    console.log('createPSBTURLs', createPSBTURLs);
     const responses = await Promise.all(requests);
+    console.log('responses', responses);
     if (!responses.includes(true)) {
       throw new AttestorError('Error sending Closing Transaction to Attestors!');
     }
+    console.log('done');
   }
 
   return {

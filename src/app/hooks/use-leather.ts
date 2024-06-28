@@ -265,11 +265,15 @@ export function useLeather(): UseLeatherReturnType {
     feeRateMultiplier: number
   ): Promise<string> {
     try {
+      console.log('bitcoinAmount', shiftValue(withdrawAmount));
+
       setIsLoading([true, 'Creating Withdrawal Transaction']);
+
+      console.log('vault', vault);
 
       const withdrawalTransaction = await dlcHandler.createWithdrawalPSBT(
         vault,
-        BigInt(withdrawAmount),
+        BigInt(shiftValue(withdrawAmount)),
         attestorGroupPublicKey,
         vault.fundingTxId,
         feeRateMultiplier

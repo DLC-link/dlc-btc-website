@@ -2,12 +2,12 @@ import { useContext, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { useToast } from '@chakra-ui/react';
-import { useVaults } from '@hooks/use-vaults';
 import {
   BitcoinWalletContext,
   BitcoinWalletContextState,
 } from '@providers/bitcoin-wallet-context-provider';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
+import { VaultContext } from '@providers/vault-context-provider';
 import { RootState } from '@store/index';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { modalActions } from '@store/slices/modal/modal.actions';
@@ -41,7 +41,7 @@ export function SignFundingTransactionScreen({
   const { bitcoinWalletContextState, resetBitcoinWalletContext } = useContext(BitcoinWalletContext);
 
   const { bitcoinPrice } = useContext(ProofOfReserveContext);
-  const { allVaults } = useVaults();
+  const { allVaults } = useContext(VaultContext);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 

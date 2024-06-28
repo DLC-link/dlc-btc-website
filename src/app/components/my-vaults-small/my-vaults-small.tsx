@@ -26,7 +26,7 @@ export function MyVaultsSmall({ address }: MyVaultsSmallProps): React.JSX.Elemen
     closedVaults,
     isLoading,
     allVaults,
-  } = vaultContext.vaults;
+  } = vaultContext;
 
   return (
     <MyVaultsSmallLayout>

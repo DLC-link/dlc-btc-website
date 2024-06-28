@@ -1,11 +1,12 @@
 /* eslint-disable no-console */
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { RootState } from '@store/index';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { modalActions } from '@store/slices/modal/modal.actions';
 import { VaultState } from 'dlc-btc-lib/models';
+import { delay } from 'dlc-btc-lib/utilities';
 
 import { useEthereum } from './use-ethereum';
 import { useEthereumContext } from './use-ethereum-context';
@@ -25,7 +26,7 @@ export function useEthereumObserver(): void {
     console.log(`Listening to [${observerDLCManagerContract.address}]`);
 
     observerDLCManagerContract.on('CreateDLC', async (...args: any[]) => {
-      const vaultOwner: string = args[2];
+      const vaultOwner: string = args[1];
 
       if (vaultOwner.toLowerCase() !== address) return;
 
@@ -56,29 +57,36 @@ export function useEthereumObserver(): void {
       console.log('SetStatusFunded');
       const vaultOwner = args[2];
 
-      if (vaultOwner.toLowerCase() !== address) return;
+      console.log('vaultOwner', vaultOwner.toLowerCase());
+
+      // if (vaultOwner.toLowerCase() !== address) return;
 
       const vaultUUID = args[0];
 
+      console.log('vaultUUID', vaultUUID);
+
       console.log(`Vault ${vaultUUID} is minted`);
 
-      await getVault(vaultUUID, VaultState.FUNDED).then(() => {
+      await getVault(vaultUUID, VaultState.FUNDED).then(vault => {
+        console.log('vaultFetched', vault);
         dispatch(
           modalActions.toggleSuccessfulFlowModalVisibility({
             flow: 'mint',
             vaultUUID,
           })
         );
-        dispatch(mintUnmintActions.setMintStep([0, vaultUUID]));
-        dispatch(mintUnmintActions.setUnmintStep([0, vaultUUID]));
+        void delay(2000).then(() => {
+          dispatch(mintUnmintActions.setMintStep([0, '']));
+          dispatch(mintUnmintActions.setUnmintStep([0, '']));
+        });
       });
     });
 
     observerDLCManagerContract.on('SetStatusPending', async (...args: any[]) => {
-      console.log('SetStatusPending');
+      console.log('SETSTATUSPENDING');
       const vaultOwner = args[2];
 
-      if (vaultOwner.toLowerCase() !== address) return;
+      // if (vaultOwner.toLowerCase() !== address) return;
 
       const vaultUUID = args[0];
 
@@ -86,6 +94,7 @@ export function useEthereumObserver(): void {
 
       await getVault(vaultUUID, VaultState.PENDING).then(vault => {
         if (vault.valueLocked !== vault.valueMinted) {
+          console.log('vaultFetched', vault);
           dispatch(mintUnmintActions.setUnmintStep([2, vaultUUID]));
         } else {
           dispatch(mintUnmintActions.setMintStep([2, vaultUUID]));

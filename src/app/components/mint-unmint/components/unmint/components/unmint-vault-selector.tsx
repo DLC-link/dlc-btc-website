@@ -5,11 +5,12 @@ import { Text, VStack, useToast } from '@chakra-ui/react';
 import { VaultsListGroupContainer } from '@components/vaults-list/components/vaults-list-group-container';
 import { VaultsList } from '@components/vaults-list/vaults-list';
 import { useEthereum } from '@hooks/use-ethereum';
-import { useVaults } from '@hooks/use-vaults';
 import { Vault } from '@models/vault';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
+import { VaultContext } from '@providers/vault-context-provider';
 import { RootState } from '@store/index';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
+import { VaultState } from 'dlc-btc-lib/models';
 import { shiftValue } from 'dlc-btc-lib/utilities';
 
 import { BurnTokenTransactionForm } from '../../sign-transaction-screen/components/ethereum-transaction-form';
@@ -25,10 +26,10 @@ export function UnmintVaultSelector({
 }: UnmintVaultSelectorProps): React.JSX.Element {
   const toast = useToast();
   const dispatch = useDispatch();
-  const { withdrawVault } = useEthereum();
+  const { withdrawVault, getVault } = useEthereum();
 
   const { bitcoinPrice } = useContext(ProofOfReserveContext);
-  const { fundedVaults } = useVaults();
+  const { fundedVaults } = useContext(VaultContext);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -53,7 +54,9 @@ export function UnmintVaultSelector({
         // if (currentRisk === 'High') throw new Error('Risk Level is too high');
         const formattedWithdrawAmount = BigInt(shiftValue(withdrawAmount));
         await withdrawVault(selectedVault.uuid, formattedWithdrawAmount);
-        dispatch(mintUnmintActions.setUnmintStep([1, selectedVault.uuid]));
+        await getVault(selectedVault.uuid, VaultState.FUNDED).then(() => {
+          dispatch(mintUnmintActions.setUnmintStep([1, selectedVault.uuid]));
+        });
       } catch (error) {
         setIsSubmitting(false);
         toast({

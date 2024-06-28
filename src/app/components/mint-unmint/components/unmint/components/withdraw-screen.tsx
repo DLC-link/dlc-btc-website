@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { Button, HStack, Spinner, Text, VStack, useToast } from '@chakra-ui/react';
@@ -9,6 +9,7 @@ import {
 } from '@providers/bitcoin-wallet-context-provider';
 import { VaultContext } from '@providers/vault-context-provider';
 import { modalActions } from '@store/slices/modal/modal.actions';
+import Decimal from 'decimal.js';
 
 interface WithdrawScreenProps {
   currentStep: [number, string];
@@ -27,16 +28,24 @@ export function WithdrawScreen({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { bitcoinWalletContextState } = useContext(BitcoinWalletContext);
 
-  const { vaults } = useContext(VaultContext);
-  const currentVault = vaults.allVaults.find(vault => vault.uuid === currentStep[1]);
+  useEffect(() => {
+    console.log('bitcoinWalletContextState', bitcoinWalletContextState);
+    console.log('isBwC', BitcoinWalletContextState.INITIAL || BitcoinWalletContextState.SELECTED);
+  }, [bitcoinWalletContextState]);
+
+  const { allVaults } = useContext(VaultContext);
+  const currentVault = allVaults.find(vault => vault.uuid === currentStep[1]);
 
   async function handleWithdraw(): Promise<void> {
     if (currentVault) {
       try {
-        const withdrawAmount = currentVault.valueLocked - currentVault.valueMinted;
+        console.log('vault', currentVault);
+        const withdrawAmount = new Decimal(currentVault.valueLocked).minus(
+          currentVault.valueMinted
+        );
         console.log('withdrawAmount', withdrawAmount);
         setIsSubmitting(true);
-        await handleSignWithdrawTransaction(currentVault.uuid, withdrawAmount);
+        await handleSignWithdrawTransaction(currentVault.uuid, withdrawAmount.toNumber());
       } catch (error) {
         setIsSubmitting(false);
         toast({
@@ -81,9 +90,13 @@ export function WithdrawScreen({
             : handleConnect()
         }
       >
-        {BitcoinWalletContextState.INITIAL || BitcoinWalletContextState.SELECTED
+        {[BitcoinWalletContextState.INITIAL, BitcoinWalletContextState.SELECTED].includes(
+          bitcoinWalletContextState
+        )
           ? 'Connect Bitcoin Wallet'
-          : `Withdraw ${currentVault?.valueLocked! - currentVault?.valueMinted!} BTC`}
+          : `Withdraw ${new Decimal(currentVault?.valueLocked!).minus(
+              currentVault?.valueMinted!
+            )} BTC`}
       </Button>
     </VStack>
   );

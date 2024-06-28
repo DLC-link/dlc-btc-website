@@ -25,7 +25,7 @@ export function MyVaultsLarge(): React.JSX.Element {
     closingVaults,
     closedVaults,
     pendingVaults,
-  } = vaultContext.vaults;
+  } = vaultContext;
 
   return (
     <MyVaultsLargeLayout>

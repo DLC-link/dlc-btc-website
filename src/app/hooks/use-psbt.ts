@@ -9,7 +9,7 @@ import { RootState } from '@store/index';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { vaultActions } from '@store/slices/vault/vault.actions';
 import { LedgerDLCHandler, SoftwareWalletDLCHandler } from 'dlc-btc-lib';
-import { Transaction } from 'dlc-btc-lib/models';
+import { Transaction, VaultState } from 'dlc-btc-lib/models';
 
 import { FundingTXAttestorInfo, WithdrawalTXAttestorInfo, useAttestors } from './use-attestors';
 import { useEthereum } from './use-ethereum';
@@ -27,7 +27,7 @@ export function usePSBT(): UsePSBTReturnType {
   const dispatch = useDispatch();
 
   const { network, address } = useSelector((state: RootState) => state.account);
-  const { mintStep } = useSelector((state: RootState) => state.mintunmint);
+  const { mintStep, unmintStep } = useSelector((state: RootState) => state.mintunmint);
 
   const { bitcoinWalletType, dlcHandler, resetBitcoinWalletContext } =
     useContext(BitcoinWalletContext);
@@ -70,7 +70,9 @@ export function usePSBT(): UsePSBTReturnType {
     try {
       const feeRateMultiplier = import.meta.env.VITE_FEE_RATE_MULTIPLIER;
 
+      console.log('handleSignFundingTransaction');
       const attestorGroupPublicKey = await getAttestorGroupPublicKey(network);
+      console.log('attestorGroupPublicKey', attestorGroupPublicKey);
       const vault = await getRawVault(vaultUUID);
 
       if (!bitcoinWalletType) throw new Error('Bitcoin Wallet is not setup');
@@ -99,7 +101,9 @@ export function usePSBT(): UsePSBTReturnType {
           }
           break;
         case 'Leather':
-          if (vault.valueLocked.toNumber() === 0) {
+          if (vault.status === VaultState.READY) {
+            console.log('Leather Funding Transaction');
+            console.log('vault', vault);
             fundingTransaction = await handleFundingTransactionWithLeather(
               dlcHandler as SoftwareWalletDLCHandler,
               vault,
@@ -107,14 +111,26 @@ export function usePSBT(): UsePSBTReturnType {
               attestorGroupPublicKey,
               feeRateMultiplier
             );
+            console.log('Leather Funding Transaction', fundingTransaction.hex);
           } else {
-            fundingTransaction = await handleDepositTransactionWithLeather(
-              dlcHandler as SoftwareWalletDLCHandler,
-              vault,
-              depositAmount,
-              attestorGroupPublicKey,
-              feeRateMultiplier
-            );
+            if (vault.valueLocked.toNumber() === 0) {
+              console.log('in leather deposit');
+              fundingTransaction = await handleFundingTransactionWithLeather(
+                dlcHandler as SoftwareWalletDLCHandler,
+                vault,
+                depositAmount,
+                attestorGroupPublicKey,
+                feeRateMultiplier
+              );
+            } else {
+              fundingTransaction = await handleDepositTransactionWithLeather(
+                dlcHandler as SoftwareWalletDLCHandler,
+                vault,
+                depositAmount,
+                attestorGroupPublicKey,
+                feeRateMultiplier
+              );
+            }
           }
           break;
         default:
@@ -126,7 +142,7 @@ export function usePSBT(): UsePSBTReturnType {
       if (!address || !userTaprootPublicKey)
         throw new Error('Required Information is not available');
 
-      if (vault.valueLocked.toNumber() === 0) {
+      if (vault.status === VaultState.READY) {
         const fundingTXAttestorInfo: FundingTXAttestorInfo = {
           vaultUUID,
           fundingPSBT: fundingTransaction.hex,
@@ -135,7 +151,9 @@ export function usePSBT(): UsePSBTReturnType {
           chain: ethereumAttestorChainID,
         };
 
+        console.log('sendFundingTransactionToAttestors');
         await sendFundingTransactionToAttestors(fundingTXAttestorInfo);
+        console.log('sendFundingTransactionToAttestors done');
 
         dispatch(
           vaultActions.setVaultToFunding({
@@ -187,6 +205,7 @@ export function usePSBT(): UsePSBTReturnType {
           );
           break;
         case 'Leather':
+          console.log('withdraw Amount', withdrawAmount);
           withdrawalTransactionHex = await handleWithdrawalTransactionWithLeather(
             dlcHandler as SoftwareWalletDLCHandler,
             withdrawAmount,
