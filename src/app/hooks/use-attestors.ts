@@ -7,9 +7,12 @@ interface UseAttestorsReturnType {
   sendWithdrawalTransactionToAttestors: (
     withdrawalTXAttestorInfo: WithdrawalTXAttestorInfo
   ) => Promise<void>;
+  sendDepositTransactionToAttestors: (
+    withdrawalTXAttestorInfo: WithdrawalTXAttestorInfo
+  ) => Promise<void>;
 }
 
-export interface FundingTXAttestorInfo {
+interface FundingTXAttestorInfo {
   vaultUUID: string;
   fundingPSBT: string;
   userEthereumAddress: string;
@@ -17,7 +20,7 @@ export interface FundingTXAttestorInfo {
   chain: string;
 }
 
-export interface WithdrawalTXAttestorInfo {
+interface WithdrawalTXAttestorInfo {
   vaultUUID: string;
   withdrawalPSBT: string;
   chain: string;
@@ -53,6 +56,34 @@ export function useAttestors(): UseAttestorsReturnType {
     }
   }
 
+  async function sendDepositTransactionToAttestors(
+    withdrawalTXAttestorInfo: WithdrawalTXAttestorInfo
+  ): Promise<void> {
+    const createPSBTURLs = appConfiguration.attestorURLs.map(url => `${url}/app/deposit`);
+
+    const requests = createPSBTURLs.map(async url =>
+      fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+        body: JSON.stringify({
+          uuid: withdrawalTXAttestorInfo.vaultUUID,
+          withdraw_psbt: withdrawalTXAttestorInfo.withdrawalPSBT,
+          chain: withdrawalTXAttestorInfo.chain,
+        }),
+      })
+        .then(response => response.ok)
+        .catch(() => {
+          return false;
+        })
+    );
+
+    const responses = await Promise.all(requests);
+
+    if (!responses.includes(true)) {
+      throw new AttestorError('Error sending Funding Transaction to Attestors!');
+    }
+  }
+
   async function sendWithdrawalTransactionToAttestors(
     withdrawalTXAttestorInfo: WithdrawalTXAttestorInfo
   ): Promise<void> {
@@ -73,8 +104,8 @@ export function useAttestors(): UseAttestorsReturnType {
           return false;
         })
     );
-
     const responses = await Promise.all(requests);
+
     if (!responses.includes(true)) {
       throw new AttestorError('Error sending Closing Transaction to Attestors!');
     }
@@ -82,6 +113,7 @@ export function useAttestors(): UseAttestorsReturnType {
 
   return {
     sendFundingTransactionToAttestors,
+    sendDepositTransactionToAttestors,
     sendWithdrawalTransactionToAttestors,
   };
 }

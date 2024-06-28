@@ -1,8 +1,9 @@
 import { useContext, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 
-import { Vault, VaultState } from '@models/vault';
+import { Vault } from '@models/vault';
 import { BlockchainHeightContext } from '@providers/bitcoin-query-provider';
+import { VaultState } from 'dlc-btc-lib/models';
 
 export function useConfirmationChecker(vault?: Vault): number {
   const { blockHeight } = useContext(BlockchainHeightContext);
@@ -12,8 +13,8 @@ export function useConfirmationChecker(vault?: Vault): number {
     case VaultState.FUNDING:
       txID = vault?.fundingTX;
       break;
-    case VaultState.CLOSED:
-      txID = vault?.closingTX;
+    case VaultState.PENDING:
+      txID = vault?.withdrawTX;
       break;
     default:
       txID = undefined;
@@ -39,7 +40,7 @@ export function useConfirmationChecker(vault?: Vault): number {
     {
       enabled:
         !!txID &&
-        (vault?.state === VaultState.FUNDING || vault?.state === VaultState.CLOSED) &&
+        (vault?.state === VaultState.FUNDING || vault?.state === VaultState.PENDING) &&
         !blockHeightAtBroadcast,
       refetchInterval: 10000,
     }
@@ -53,7 +54,7 @@ export function useConfirmationChecker(vault?: Vault): number {
 
   useEffect(() => {
     if (
-      (vault?.state != VaultState.FUNDING && vault?.state != VaultState.CLOSED) ||
+      (vault?.state != VaultState.FUNDING && vault?.state != VaultState.PENDING) ||
       transactionProgress > 6
     )
       return;

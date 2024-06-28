@@ -6,9 +6,8 @@ import { HasChildren } from '@models/has-children';
 import { ethers } from 'ethers';
 
 export interface EthereumContextProviderType {
-  protocolContract: any;
-  observerProtocolContract: any;
   dlcManagerContract: any;
+  observerDLCManagerContract: any;
   dlcBTCContract: any;
   getEthereumContracts: (
     ethereumSigner: ethers.providers.JsonRpcSigner,
@@ -18,9 +17,8 @@ export interface EthereumContextProviderType {
 }
 
 export const EthereumContext = createContext<any>({
-  protocolContract: undefined,
-  observerProtocolContract: undefined,
   dlcManagerContract: undefined,
+  observerDLCManagerContract: undefined,
   dlcBTCContract: undefined,
   getEthereumContracts: async (
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -33,8 +31,7 @@ export const EthereumContext = createContext<any>({
 
 export function EthereumContextProvider({ children }: HasChildren): React.JSX.Element {
   const {
-    protocolContract,
-    observerProtocolContract,
+    observerDLCManagerContract,
     dlcManagerContract,
     dlcBTCContract,
     getEthereumContracts,
@@ -44,8 +41,7 @@ export function EthereumContextProvider({ children }: HasChildren): React.JSX.El
   return (
     <EthereumContext.Provider
       value={{
-        protocolContract,
-        observerProtocolContract,
+        observerDLCManagerContract,
         dlcManagerContract,
         dlcBTCContract,
         getEthereumContracts,

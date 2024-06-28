@@ -17,11 +17,13 @@ export function ProgressTimeline({
         <VStack w={'100%'}>
           <HStack w={'100%'}>
             <StepGraphics currentStep={currentStep} stepIndex={0} />
-            <StepGraphics currentStep={currentStep} stepIndex={1} isLastStep />
+            <StepGraphics currentStep={currentStep} stepIndex={1} />
+            <StepGraphics currentStep={currentStep} stepIndex={2} isLastStep />
           </HStack>
           <HStack w={'100%'} justifyContent={'space-between'}>
-            <StepText currentStep={currentStep} stepIndex={0} title="Unmint dlcBTC" />
-            <StepText currentStep={currentStep} stepIndex={1} title="Receive BTC" />
+            <StepText currentStep={currentStep} stepIndex={0} title="Burn dlcBTC" />
+            <StepText currentStep={currentStep} stepIndex={1} title="Sign Withdraw Transaction" />
+            <StepText currentStep={currentStep} stepIndex={2} title="Receive BTC" />
           </HStack>
         </VStack>
       );

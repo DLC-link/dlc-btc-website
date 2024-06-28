@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 
-import { Vault, VaultState } from '@models/vault';
+import { Vault } from '@models/vault';
 import { RootState } from '@store/index';
+import { VaultState } from 'dlc-btc-lib/models';
 
 import { useEthereum } from './use-ethereum';
 import { useEthereumContext } from './use-ethereum-context';
@@ -11,6 +12,7 @@ export interface UseVaultsReturnType {
   allVaults: Vault[];
   readyVaults: Vault[];
   fundingVaults: Vault[];
+  pendingVaults: Vault[];
   fundedVaults: Vault[];
   closingVaults: Vault[];
   closedVaults: Vault[];
@@ -66,6 +68,13 @@ export function useVaults(): UseVaultsReturnType {
         .sort((a, b) => b.timestamp - a.timestamp),
     [vaults, network]
   );
+  const pendingVaults = useMemo(
+    () =>
+      vaults[network.id]
+        .filter(vault => vault.state === VaultState.PENDING)
+        .sort((a, b) => b.timestamp - a.timestamp),
+    [vaults, network]
+  );
   const closingVaults = useMemo(
     () =>
       vaults[network.id]
@@ -85,6 +94,7 @@ export function useVaults(): UseVaultsReturnType {
     allVaults,
     readyVaults,
     fundingVaults,
+    pendingVaults,
     closingVaults,
     fundedVaults,
     closedVaults,

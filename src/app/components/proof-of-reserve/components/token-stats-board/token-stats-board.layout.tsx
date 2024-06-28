@@ -7,7 +7,7 @@ interface TokenStatsBoardLayoutProps {
 export function TokenStatsBoardLayout({ children }: TokenStatsBoardLayoutProps): React.JSX.Element {
   return (
     <VStack
-      w={'1280px'}
+      w={'100%'}
       h={'auto'}
       p={'15px'}
       justifyContent={'center'}

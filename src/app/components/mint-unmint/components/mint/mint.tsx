@@ -13,7 +13,11 @@ import { Walkthrough } from '../walkthrough/walkthrough';
 import { MintLayout } from './components/mint.layout';
 
 export function Mint(): React.JSX.Element {
-  const { handleSignFundingTransaction, isLoading: isBitcoinWalletLoading } = usePSBT();
+  const {
+    handleSignFundingTransaction,
+    isLoading: isBitcoinWalletLoading,
+    bitcoinDepositAmount,
+  } = usePSBT();
 
   const { mintStep } = useSelector((state: RootState) => state.mintunmint);
   const { risk, fetchUserAddressRisk, isLoading } = useRisk();
@@ -27,14 +31,15 @@ export function Mint(): React.JSX.Element {
         {[1].includes(mintStep[0]) && (
           <SignFundingTransactionScreen
             handleSignFundingTransaction={handleSignFundingTransaction}
-            risk={risk!}
-            fetchRisk={fetchUserAddressRisk}
-            isRiskLoading={isLoading}
             isBitcoinWalletLoading={isBitcoinWalletLoading}
+            userEthereumAddressRiskLevel={risk!}
+            fetchUserEthereumAddressRiskLevel={fetchUserAddressRisk}
+            isUserEthereumAddressRiskLevelLoading={isLoading}
           />
         )}
-        {[2, 3].includes(mintStep[0]) && (
+        {[2].includes(mintStep[0]) && (
           <TransactionSummary
+            depositAmount={bitcoinDepositAmount}
             currentStep={mintStep}
             flow={'mint'}
             blockchain={'ethereum'}

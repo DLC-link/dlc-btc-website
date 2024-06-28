@@ -4,46 +4,32 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Text, VStack, useToast } from '@chakra-ui/react';
 import { VaultsListGroupContainer } from '@components/vaults-list/components/vaults-list-group-container';
 import { VaultsList } from '@components/vaults-list/vaults-list';
-import { useVaults } from '@hooks/use-vaults';
+import { useEthereum } from '@hooks/use-ethereum';
 import { Vault } from '@models/vault';
-import {
-  BitcoinWalletContext,
-  BitcoinWalletContextState,
-} from '@providers/bitcoin-wallet-context-provider';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
+import { VaultContext } from '@providers/vault-context-provider';
 import { RootState } from '@store/index';
-import { modalActions } from '@store/slices/modal/modal.actions';
+import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
+import { VaultState } from 'dlc-btc-lib/models';
+import { shiftValue } from 'dlc-btc-lib/utilities';
 
-import { TransactionForm } from '../../sign-transaction-screen/components/transaction-form';
-
-const ActionButtonTextMap = {
-  [BitcoinWalletContextState.INITIAL]: 'Connect Bitcoin Wallet',
-  [BitcoinWalletContextState.SELECTED]: 'Connect Bitcoin Wallet',
-  [BitcoinWalletContextState.READY]: 'Sign Withdrawal Transaction',
-};
+import { BurnTokenTransactionForm } from '../../sign-transaction-screen/components/ethereum-transaction-form';
 
 interface UnmintVaultSelectorProps {
-  handleSignWithdrawTransaction: (vaultUUID: string, withdrawAmount: number) => Promise<void>;
-  isBitcoinWalletLoading: [boolean, string];
   risk: string;
-  fetchRisk: () => Promise<string>;
   isRiskLoading: boolean;
 }
 
 export function UnmintVaultSelector({
-  handleSignWithdrawTransaction,
-  isBitcoinWalletLoading,
   risk,
-  fetchRisk,
   isRiskLoading,
 }: UnmintVaultSelectorProps): React.JSX.Element {
   const toast = useToast();
   const dispatch = useDispatch();
-
-  const { bitcoinWalletContextState } = useContext(BitcoinWalletContext);
+  const { withdrawVault, getVault } = useEthereum();
 
   const { bitcoinPrice } = useContext(ProofOfReserveContext);
-  const { fundedVaults } = useVaults();
+  const { fundedVaults } = useContext(VaultContext);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -60,17 +46,21 @@ export function UnmintVaultSelector({
     setSelectedVault(fundedVaults.find(vault => vault.uuid === unmintStep[1]));
   }, [fundedVaults, unmintStep]);
 
-  async function handleWithdraw(withdrawAmount: number): Promise<void> {
+  async function handleBurn(withdrawAmount: number): Promise<void> {
     if (selectedVault) {
       try {
         setIsSubmitting(true);
         // const currentRisk = await fetchRisk();
         // if (currentRisk === 'High') throw new Error('Risk Level is too high');
-        await handleSignWithdrawTransaction(selectedVault.uuid, withdrawAmount);
+        const formattedWithdrawAmount = BigInt(shiftValue(withdrawAmount));
+        await withdrawVault(selectedVault.uuid, formattedWithdrawAmount);
+        await getVault(selectedVault.uuid, VaultState.FUNDED).then(() => {
+          dispatch(mintUnmintActions.setUnmintStep([1, selectedVault.uuid]));
+        });
       } catch (error) {
         setIsSubmitting(false);
         toast({
-          title: 'Failed to sign transaction',
+          title: 'Failed to sign Transaction',
           description: error instanceof Error ? error.message : '',
           status: 'error',
           duration: 9000,
@@ -80,10 +70,6 @@ export function UnmintVaultSelector({
     }
   }
 
-  function handleConnect() {
-    dispatch(modalActions.toggleSelectBitcoinWalletModalVisibility());
-  }
-
   function handleCancel() {
     setSelectedVault(undefined);
   }
@@ -91,18 +77,13 @@ export function UnmintVaultSelector({
   return (
     <>
       {selectedVault ? (
-        <TransactionForm
-          type={'withdraw'}
-          bitcoinWalletContextState={bitcoinWalletContextState}
+        <BurnTokenTransactionForm
           vault={selectedVault}
           bitcoinPrice={bitcoinPrice}
-          isBitcoinWalletLoading={isBitcoinWalletLoading}
           isSubmitting={isSubmitting}
           risk={risk}
           isRiskLoading={isRiskLoading}
-          actionButtonText={ActionButtonTextMap[bitcoinWalletContextState]}
-          handleConnect={handleConnect}
-          handleSign={handleWithdraw}
+          handleBurn={handleBurn}
           handleCancel={handleCancel}
         />
       ) : fundedVaults.length == 0 ? (
@@ -112,7 +93,7 @@ export function UnmintVaultSelector({
       ) : (
         <VStack w={'45%'}>
           <Text color={'accent.lightBlue.01'} fontSize={'md'} fontWeight={600}>
-            Select vault to redeem dlcBTC:
+            Select vault to withdraw dlcBTC:
           </Text>
           <VaultsList height={'425.5px'} isScrollable={!selectedVault}>
             <VaultsListGroupContainer
