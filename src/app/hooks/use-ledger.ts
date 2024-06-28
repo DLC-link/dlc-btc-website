@@ -178,8 +178,8 @@ export function useLedger(): UseLedgerReturnType {
   }
 
   async function connectLedgerWallet(
-    walletAccountIndex: number,
-    paymentType: SupportedPaymentType
+    walletAccountIndex: number
+    // paymentType: SupportedPaymentType
   ): Promise<void> {
     try {
       setIsLoading([true, 'Connecting To Ledger Wallet']);

@@ -35,6 +35,7 @@ const flowPropertyMap: FlowPropertyMap = {
 
 interface TransactionSummaryProps {
   currentStep: [number, string];
+  depositAmount?: number;
   flow: 'mint' | 'unmint';
   blockchain: 'ethereum' | 'bitcoin';
   width: string;
@@ -42,6 +43,7 @@ interface TransactionSummaryProps {
 }
 
 export function TransactionSummary({
+  depositAmount,
   currentStep,
   flow,
   blockchain,
@@ -50,20 +52,19 @@ export function TransactionSummary({
 }: TransactionSummaryProps): React.JSX.Element {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { allVaults } = useContext(VaultContext);
-  const currentVault = allVaults.find(vault => vault.uuid === currentStep[1]);
 
-  const showProcessing =
-    (flow === 'mint' && currentStep[0] === 2) || (flow === 'unmint' && currentStep[0] === 2);
+  const { allVaults } = useContext(VaultContext);
+
+  const currentVault = allVaults.find(vault => vault.uuid === currentStep[1]);
 
   return (
     <VStack alignItems={'start'} w={width} spacing={'15px'}>
       <HStack w={'100%'}>
-        {showProcessing && <Spinner color={'accent.lightBlue.01'} size={'md'} />}
+        {currentStep[0] === 2 && <Spinner color={'accent.lightBlue.01'} size={'md'} />}
         <Text color={'accent.lightBlue.01'}>{flowPropertyMap[flow][currentStep[0]].title}:</Text>
       </HStack>
       <VaultCard vault={currentVault} />
-      {showProcessing && (
+      {currentStep[0] === 2 && (
         <>
           <Text pt={'25px'} color={'white.01'}>
             b) {flowPropertyMap[flow][currentStep[0]].subtitle}:
@@ -71,9 +72,9 @@ export function TransactionSummary({
           <TransactionSummaryPreviewCard
             blockchain={blockchain}
             assetAmount={
-              currentVault?.valueLocked !== currentVault?.valueMinted
-                ? new Decimal(currentVault?.valueLocked! - currentVault?.valueMinted!).toNumber()
-                : currentVault?.valueLocked
+              flow === 'mint'
+                ? depositAmount
+                : new Decimal(currentVault?.valueLocked! - currentVault?.valueMinted!).toNumber()
             }
           />
         </>

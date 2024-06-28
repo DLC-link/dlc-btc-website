@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { RootState } from '@store/index';
@@ -54,7 +54,6 @@ export function useEthereumObserver(): void {
     });
 
     observerDLCManagerContract.on('SetStatusFunded', async (...args: any[]) => {
-      console.log('SetStatusFunded');
       const vaultOwner = args[2];
 
       console.log('vaultOwner', vaultOwner.toLowerCase());
@@ -67,11 +66,9 @@ export function useEthereumObserver(): void {
 
       console.log(`Vault ${vaultUUID} is minted`);
 
-      await getVault(vaultUUID, VaultState.FUNDED).then(vault => {
-        console.log('vaultFetched', vault);
+      await getVault(vaultUUID, VaultState.FUNDED).then(() => {
         dispatch(
           modalActions.toggleSuccessfulFlowModalVisibility({
-            flow: 'mint',
             vaultUUID,
           })
         );
@@ -83,8 +80,7 @@ export function useEthereumObserver(): void {
     });
 
     observerDLCManagerContract.on('SetStatusPending', async (...args: any[]) => {
-      console.log('SETSTATUSPENDING');
-      const vaultOwner = args[2];
+      // const vaultOwner = args[2];
 
       // if (vaultOwner.toLowerCase() !== address) return;
 
@@ -94,7 +90,6 @@ export function useEthereumObserver(): void {
 
       await getVault(vaultUUID, VaultState.PENDING).then(vault => {
         if (vault.valueLocked !== vault.valueMinted) {
-          console.log('vaultFetched', vault);
           dispatch(mintUnmintActions.setUnmintStep([2, vaultUUID]));
         } else {
           dispatch(mintUnmintActions.setMintStep([2, vaultUUID]));
@@ -115,7 +110,6 @@ export function useEthereumObserver(): void {
         dispatch(mintUnmintActions.setUnmintStep([0, vaultUUID]));
         dispatch(
           modalActions.toggleSuccessfulFlowModalVisibility({
-            flow: 'unmint',
             vaultUUID,
           })
         );

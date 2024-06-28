@@ -2,38 +2,29 @@ import { useContext, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { useToast } from '@chakra-ui/react';
-import {
-  BitcoinWalletContext,
-  BitcoinWalletContextState,
-} from '@providers/bitcoin-wallet-context-provider';
+import { BitcoinWalletContext } from '@providers/bitcoin-wallet-context-provider';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
 import { VaultContext } from '@providers/vault-context-provider';
 import { RootState } from '@store/index';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { modalActions } from '@store/slices/modal/modal.actions';
 
-import { TransactionForm } from './components/transaction-form';
-
-const ActionButtonTextMap = {
-  [BitcoinWalletContextState.INITIAL]: 'Connect Bitcoin Wallet',
-  [BitcoinWalletContextState.SELECTED]: 'Connect Bitcoin Wallet',
-  [BitcoinWalletContextState.READY]: 'Sign Funding Transaction',
-};
+import { DepositBitcoinTransactionForm } from './components/transaction-form';
 
 interface SignFundingTransactionScreenProps {
   handleSignFundingTransaction: (vaultUUID: string, depositAmount: number) => Promise<void>;
   isBitcoinWalletLoading: [boolean, string];
-  risk: string;
-  fetchRisk: () => Promise<string>;
-  isRiskLoading: boolean;
+  userEthereumAddressRiskLevel: string;
+  fetchUserEthereumAddressRiskLevel: () => Promise<string>;
+  isUserEthereumAddressRiskLevelLoading: boolean;
 }
 
 export function SignFundingTransactionScreen({
   handleSignFundingTransaction,
   isBitcoinWalletLoading,
-  risk,
-  fetchRisk,
-  isRiskLoading,
+  userEthereumAddressRiskLevel,
+  // fetchUserEthereumAddressRiskLevel,
+  isUserEthereumAddressRiskLevelLoading,
 }: SignFundingTransactionScreenProps): React.JSX.Element {
   const toast = useToast();
   const dispatch = useDispatch();
@@ -49,7 +40,7 @@ export function SignFundingTransactionScreen({
 
   const currentVault = allVaults.find(vault => vault.uuid === mintStep[1]);
 
-  async function handleSign(depositAmount: number) {
+  async function handleDeposit(depositAmount: number) {
     if (!currentVault) return;
 
     try {
@@ -60,7 +51,7 @@ export function SignFundingTransactionScreen({
     } catch (error: any) {
       setIsSubmitting(false);
       toast({
-        title: 'Failed to sign transaction',
+        title: 'Failed to sign Depost Transaction',
         description: error.message,
         status: 'error',
         duration: 9000,
@@ -79,18 +70,16 @@ export function SignFundingTransactionScreen({
   }
 
   return (
-    <TransactionForm
-      type={'deposit'}
-      bitcoinWalletContextState={bitcoinWalletContextState}
+    <DepositBitcoinTransactionForm
       vault={currentVault}
-      bitcoinPrice={bitcoinPrice}
+      bitcoinWalletContextState={bitcoinWalletContextState}
       isBitcoinWalletLoading={isBitcoinWalletLoading}
+      bitcoinPrice={bitcoinPrice}
       isSubmitting={isSubmitting}
-      risk={risk}
-      isRiskLoading={isRiskLoading}
-      actionButtonText={ActionButtonTextMap[bitcoinWalletContextState]}
+      userEthereumAddressRiskLevel={userEthereumAddressRiskLevel}
+      isUserEthereumAddressRiskLevelLoading={isUserEthereumAddressRiskLevelLoading}
       handleConnect={handleConnect}
-      handleSign={handleSign}
+      handleDeposit={handleDeposit}
       handleCancel={handleCancel}
     />
   );

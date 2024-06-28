@@ -12,7 +12,7 @@ interface UseAttestorsReturnType {
   ) => Promise<void>;
 }
 
-export interface FundingTXAttestorInfo {
+interface FundingTXAttestorInfo {
   vaultUUID: string;
   fundingPSBT: string;
   userEthereumAddress: string;
@@ -20,7 +20,7 @@ export interface FundingTXAttestorInfo {
   chain: string;
 }
 
-export interface WithdrawalTXAttestorInfo {
+interface WithdrawalTXAttestorInfo {
   vaultUUID: string;
   withdrawalPSBT: string;
   chain: string;
@@ -49,14 +49,11 @@ export function useAttestors(): UseAttestorsReturnType {
           return false;
         })
     );
-    console.log('createPSBTURLs', createPSBTURLs);
 
     const responses = await Promise.all(requests);
-    console.log('responses', responses);
     if (!responses.includes(true)) {
       throw new AttestorError('Error sending Funding Transaction to Attestors!');
     }
-    console.log('done');
   }
 
   async function sendDepositTransactionToAttestors(
@@ -79,15 +76,12 @@ export function useAttestors(): UseAttestorsReturnType {
           return false;
         })
     );
-    console.log('createPSBTURLs', createPSBTURLs);
 
     const responses = await Promise.all(requests);
 
-    console.log('responses', responses);
     if (!responses.includes(true)) {
       throw new AttestorError('Error sending Funding Transaction to Attestors!');
     }
-    console.log('done');
   }
 
   async function sendWithdrawalTransactionToAttestors(
@@ -110,13 +104,11 @@ export function useAttestors(): UseAttestorsReturnType {
           return false;
         })
     );
-    console.log('createPSBTURLs', createPSBTURLs);
     const responses = await Promise.all(requests);
-    console.log('responses', responses);
+
     if (!responses.includes(true)) {
       throw new AttestorError('Error sending Closing Transaction to Attestors!');
     }
-    console.log('done');
   }
 
   return {

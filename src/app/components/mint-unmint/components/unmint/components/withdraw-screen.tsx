@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { Button, HStack, Spinner, Text, VStack, useToast } from '@chakra-ui/react';
@@ -28,22 +28,15 @@ export function WithdrawScreen({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { bitcoinWalletContextState } = useContext(BitcoinWalletContext);
 
-  useEffect(() => {
-    console.log('bitcoinWalletContextState', bitcoinWalletContextState);
-    console.log('isBwC', BitcoinWalletContextState.INITIAL || BitcoinWalletContextState.SELECTED);
-  }, [bitcoinWalletContextState]);
-
   const { allVaults } = useContext(VaultContext);
   const currentVault = allVaults.find(vault => vault.uuid === currentStep[1]);
 
   async function handleWithdraw(): Promise<void> {
     if (currentVault) {
       try {
-        console.log('vault', currentVault);
         const withdrawAmount = new Decimal(currentVault.valueLocked).minus(
           currentVault.valueMinted
         );
-        console.log('withdrawAmount', withdrawAmount);
         setIsSubmitting(true);
         await handleSignWithdrawTransaction(currentVault.uuid, withdrawAmount.toNumber());
       } catch (error) {

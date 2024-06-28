@@ -17,57 +17,50 @@ import { ProtocolFeeBox } from './protocol-fee';
 import { TransactionFormInput } from './transaction-form/components/transaction-form-input';
 import { TransactionFormWarning } from './transaction-form/components/transaction-form-warning';
 
-interface TransactionFormValues {
+interface DepositBitcoinTransactionFormValues {
   amount: number;
 }
 
-const initialValues: TransactionFormValues = { amount: 0.01 };
+const initialValues: DepositBitcoinTransactionFormValues = { amount: 0.01 };
 
-const headerMap = {
-  deposit: 'Amount of BTC to deposit:',
-  withdraw: 'Amount of BTC to withdraw:',
-};
-
-interface TransactionFormProps {
-  type: 'deposit' | 'withdraw';
-  bitcoinWalletContextState: BitcoinWalletContextState;
+interface DepositBitcoinTransactionFormProps {
   vault?: Vault;
-  bitcoinPrice?: number;
+  bitcoinWalletContextState: BitcoinWalletContextState;
   isBitcoinWalletLoading: [boolean, string];
+  bitcoinPrice?: number;
   isSubmitting: boolean;
-  actionButtonText: string;
-  risk: string;
-  isRiskLoading: boolean;
+  userEthereumAddressRiskLevel: string;
+  isUserEthereumAddressRiskLevelLoading: boolean;
   handleConnect: () => void;
-  handleSign: (bitcoinAmount: number) => Promise<void>;
+  handleDeposit: (depositAmount: number) => Promise<void>;
   handleCancel: () => void;
 }
 
-export function TransactionForm({
-  type,
-  bitcoinWalletContextState,
+export function DepositBitcoinTransactionForm({
   vault,
-  bitcoinPrice,
+  bitcoinWalletContextState,
   isBitcoinWalletLoading,
+  bitcoinPrice,
   isSubmitting,
-  actionButtonText,
-  risk,
-  isRiskLoading,
+  userEthereumAddressRiskLevel,
+  isUserEthereumAddressRiskLevelLoading,
   handleConnect,
-  handleSign,
+  handleDeposit,
   handleCancel,
-}: TransactionFormProps): React.JSX.Element {
+}: DepositBitcoinTransactionFormProps): React.JSX.Element {
+  async function handleClick(depositAmount: number) {
+    if (bitcoinWalletContextState === BitcoinWalletContextState.READY) {
+      await handleDeposit(depositAmount);
+    } else {
+      handleConnect();
+    }
+  }
+
   return (
     <VStack w={'45%'}>
       <Formik
         initialValues={initialValues}
-        onSubmit={async values => {
-          if (bitcoinWalletContextState === BitcoinWalletContextState.READY) {
-            await handleSign(values.amount);
-          } else {
-            await handleConnect();
-          }
-        }}
+        onSubmit={async values => await handleClick(values.amount)}
       >
         {({ handleSubmit, errors, touched, values }) => (
           <Form onSubmit={handleSubmit}>
@@ -75,7 +68,7 @@ export function TransactionForm({
               <VStack w={'385px'} spacing={'16.5px'} h={'456.5px'}>
                 {vault && <VaultMiniCard vault={vault} />}
                 <TransactionFormInput
-                  header={headerMap[type]}
+                  header={'Amount of dlcBTC to mint:'}
                   values={values}
                   bitcoinPrice={bitcoinPrice}
                 />
@@ -87,7 +80,7 @@ export function TransactionForm({
                   bitcoinPrice={bitcoinPrice}
                   protocolFeeBasisPoints={vault?.btcMintFeeBasisPoints}
                 />
-                {type === 'deposit' && !errors.amount && !isBitcoinWalletLoading[0] && (
+                {!errors.amount && !isBitcoinWalletLoading[0] && (
                   <TransactionFormWarning assetAmount={values.amount} />
                 )}
                 {isBitcoinWalletLoading[0] && (
@@ -104,14 +97,21 @@ export function TransactionForm({
                     <Spinner size="xs" color="accent.lightBlue.01" />
                   </HStack>
                 )}
-                {risk === 'High' && <RiskBox risk={risk} isRiskLoading={isRiskLoading} />}
+                {userEthereumAddressRiskLevel === 'High' && (
+                  <RiskBox
+                    risk={userEthereumAddressRiskLevel}
+                    isRiskLoading={isUserEthereumAddressRiskLevelLoading}
+                  />
+                )}
                 <Button
                   isLoading={isSubmitting}
                   variant={'account'}
                   type={'submit'}
                   isDisabled={Boolean(errors.amount)}
                 >
-                  {actionButtonText}
+                  {bitcoinWalletContextState === BitcoinWalletContextState.READY
+                    ? 'Sign Deposit Transaction'
+                    : 'Connect Wallet'}
                 </Button>
                 <Button
                   isLoading={isSubmitting}

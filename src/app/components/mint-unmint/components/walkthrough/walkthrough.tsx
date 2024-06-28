@@ -25,7 +25,7 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
                 blockchain={'ethereum'}
               />
               <Text color={'white.01'} fontSize={'md'}>
-                Select an amount of dlcBTC you would like to mint and confirm it in your{' '}
+                Initiate a Vault on the blockchain and confirm it in your{' '}
                 <Link
                   color={'accent.lightBlue.01'}
                   href="https://metamask.io/"
@@ -35,9 +35,6 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
                   Ethereum Wallet
                 </Link>
                 .
-              </Text>
-              <Text color={'white.01'} fontSize={'md'} fontWeight={800}>
-                1 BTC = 1 dlcBTC
               </Text>
               <TutorialVideo />
             </WalkthroughLayout>
@@ -51,7 +48,8 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
                 blockchain={'bitcoin'}
               />
               <Text color={'white.01'} fontSize={'md'}>
-                Confirm the transaction in your{' '}
+                Enter the Bitcoin amount you wish to deposit into the vault, then verify the
+                transaction through your{' '}
                 <Link
                   color={'accent.lightBlue.01'}
                   href="https://leather.io/"
@@ -60,7 +58,7 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
                 >
                   Bitcoin Wallet{' '}
                 </Link>
-                which will lock your Bitcoin on-chain.
+                which will lock your Bitcoin on-chain. You will receive equivalent amount of dlcBTC.
               </Text>
             </WalkthroughLayout>
           );

@@ -17,9 +17,9 @@ import {
   BitcoinWalletContextState,
 } from '@providers/bitcoin-wallet-context-provider';
 import { SoftwareWalletDLCHandler } from 'dlc-btc-lib';
-import { RawVault } from 'dlc-btc-lib/models';
-import { Transaction } from 'dlc-btc-lib/models';
-import { createRangeFromLength, shiftValue } from 'dlc-btc-lib/utilities';
+import { finalizeUserInputs } from 'dlc-btc-lib/bitcoin-functions';
+import { RawVault, Transaction } from 'dlc-btc-lib/models';
+import { shiftValue } from 'dlc-btc-lib/utilities';
 
 import { BITCOIN_NETWORK_MAP } from '@shared/constants/bitcoin.constants';
 
@@ -207,47 +207,19 @@ export function useLeather(): UseLeatherReturnType {
         feeRateMultiplier
       );
 
-      const depositPaymentScript = dlcHandler.payment?.nativeSegwitPayment.script;
+      const depositPayment = dlcHandler.payment?.nativeSegwitPayment;
 
-      if (!depositPaymentScript) {
+      if (!depositPayment) {
         throw new LeatherError('Deposit Payment is not set');
       }
-
-      const indicesToFinalize: number[] = [];
-      createRangeFromLength(depositPSBT.inputsLength).forEach(index => {
-        const inputScript = depositPSBT.getInput(index).witnessUtxo?.script;
-
-        if (!inputScript) {
-          throw new LeatherError('Could not get input script');
-        }
-
-        if (
-          inputScript.length === depositPaymentScript.length &&
-          inputScript.every((value, index) => value === depositPaymentScript[index])
-        ) {
-          console.log('Index to Finalize', index);
-          indicesToFinalize.push(index);
-        }
-      });
-
-      console.log('Indices to Finalize', indicesToFinalize);
-
       setIsLoading([true, 'Sign Deposit Transaction in your Leather Wallet']);
 
       // ==> Sign Deposibt PSBT with Leather
       const depositTransactionHex = await signPSBT(depositPSBT.toPSBT());
 
-      console.log('Deposit Transaction Hex', depositTransactionHex);
-
       // ==> Finalize Deposit Transaction's Additional Deposit Input
       const depositTransaction = Transaction.fromPSBT(hexToBytes(depositTransactionHex));
-
-      console.log('depositTransaction', depositTransaction);
-
-      indicesToFinalize.forEach((index: number) => {
-        console.log('Finalizing Index', index);
-        depositTransaction.finalizeIdx(index);
-      });
+      finalizeUserInputs(depositTransaction, depositPayment);
 
       setIsLoading([false, '']);
       return depositTransaction;
@@ -265,11 +237,7 @@ export function useLeather(): UseLeatherReturnType {
     feeRateMultiplier: number
   ): Promise<string> {
     try {
-      console.log('bitcoinAmount', shiftValue(withdrawAmount));
-
       setIsLoading([true, 'Creating Withdrawal Transaction']);
-
-      console.log('vault', vault);
 
       const withdrawalTransaction = await dlcHandler.createWithdrawalPSBT(
         vault,

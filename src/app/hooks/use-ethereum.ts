@@ -29,7 +29,7 @@ interface UseEthereumReturnType {
   getVault: (vaultUUID: string, vaultState: VaultState) => Promise<Vault>;
   getRawVault: (vaultUUID: string) => Promise<RawVault>;
   getAllFundedVaults: (thereumNetwork: EthereumNetwork) => Promise<RawVault[]>;
-  setupVault: (depositAmount: number) => Promise<void>;
+  setupVault: () => Promise<void>;
   withdrawVault: (vaultUUID: string, withdrawAmount: bigint) => Promise<void>;
   closeVault: (vaultUUID: string) => Promise<void>;
 }
@@ -233,11 +233,8 @@ export function useEthereum(): UseEthereumReturnType {
   }
 
   async function withdrawVault(vaultUUID: string, withdrawAmount: bigint) {
-    console.log('vaultUUID', vaultUUID, 'withdrawAmount', withdrawAmount);
     if (!dlcManagerContract) throw new Error('Protocol contract not initialized');
-    console.log('withdrawing');
     await dlcManagerContract.callStatic.withdraw(vaultUUID, withdrawAmount);
-    console.log('static cal ssucceeded');
     await dlcManagerContract.withdraw(vaultUUID, withdrawAmount);
   }
 

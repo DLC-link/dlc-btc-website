@@ -1,6 +1,6 @@
 import { createContext } from 'react';
 
-import { UseVaultsReturnType, useVaults } from '@hooks/use-vaults';
+import { useVaults } from '@hooks/use-vaults';
 import { HasChildren } from '@models/has-children';
 import { Vault } from '@models/vault';
 

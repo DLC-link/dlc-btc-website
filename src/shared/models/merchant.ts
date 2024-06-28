@@ -6,5 +6,5 @@ export interface Merchant {
 
 export interface MerchantProofOfReserve {
   merchant: Merchant;
-  dlcxBTCAmount: number | undefined;
+  dlcBTCAmount: number | undefined;
 }
