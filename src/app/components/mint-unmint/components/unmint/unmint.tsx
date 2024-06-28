@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { HStack } from '@chakra-ui/react';
@@ -17,9 +16,7 @@ export function Unmint(): React.JSX.Element {
   const { handleSignWithdrawTransaction, isLoading: isBitcoinWalletLoading } = usePSBT();
 
   const { unmintStep } = useSelector((state: RootState) => state.mintunmint);
-  const { risk, fetchUserAddressRisk, isLoading } = useRisk();
-
-  const [withdrawAmount, setWithdrawAmount] = useState(0);
+  const { risk, isLoading } = useRisk();
 
   return (
     <UnmintLayout>
@@ -27,16 +24,15 @@ export function Unmint(): React.JSX.Element {
       <HStack w={'100%'} alignItems={'start'} justifyContent={'space-between'}>
         <Walkthrough flow={'unmint'} currentStep={unmintStep[0]} />
         {[0].includes(unmintStep[0]) && (
-          <UnmintVaultSelector
-            handleSignWithdrawTransaction={handleSignWithdrawTransaction}
-            risk={risk!}
-            fetchRisk={fetchUserAddressRisk}
-            isRiskLoading={isLoading}
+          <UnmintVaultSelector risk={risk!} isRiskLoading={isLoading} />
+        )}
+        {[1].includes(unmintStep[0]) && (
+          <WithdrawScreen
+            currentStep={unmintStep}
             isBitcoinWalletLoading={isBitcoinWalletLoading}
-            setWithdrawAmount={setWithdrawAmount}
+            handleSignWithdrawTransaction={handleSignWithdrawTransaction}
           />
         )}
-        {[1].includes(unmintStep[0]) && <WithdrawScreen withdrawAmount={withdrawAmount} />}
         {[2].includes(unmintStep[0]) && (
           <TransactionSummary
             currentStep={unmintStep}

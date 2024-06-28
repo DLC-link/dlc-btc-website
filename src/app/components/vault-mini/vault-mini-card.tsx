@@ -11,7 +11,7 @@ export function VaultMiniCard({ vault }: VaultMiniCardProps): React.JSX.Element 
   return (
     <VaultMiniCardLayout>
       <VaultMiniCardInformation
-        collateral={vault.collateral}
+        collateral={vault.valueLocked}
         uuid={vault.uuid}
         state={vault.state}
         timestamp={vault.timestamp}

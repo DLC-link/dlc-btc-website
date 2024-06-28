@@ -2,8 +2,8 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 import { Button, Divider, SlideFade, Stack, VStack } from '@chakra-ui/react';
-import { VaultState } from '@models/vault';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
+import { VaultState } from 'dlc-btc-lib/models';
 
 import { VaultExpandedInformationUUIDRow } from './components/vault-expanded-information-row';
 import { VaultExpandedInformationTransactionRow } from './components/vault-expanded-information-transaction-row';
@@ -12,7 +12,7 @@ interface VaultExpandedInformationProps {
   uuid: string;
   state: VaultState;
   fundingTX: string;
-  closingTX: string;
+  withdrawTX: string;
   isExpanded: boolean;
   isSelected?: boolean;
   close: () => void;
@@ -22,7 +22,7 @@ export function VaultExpandedInformation({
   uuid,
   state,
   fundingTX,
-  closingTX,
+  withdrawTX,
   isExpanded,
   isSelected,
   close,
@@ -41,11 +41,11 @@ export function VaultExpandedInformation({
               {Boolean(fundingTX) && (
                 <VaultExpandedInformationTransactionRow label={'Funding TX'} value={fundingTX} />
               )}
-              {Boolean(closingTX) && (
-                <VaultExpandedInformationTransactionRow label={'Closing TX'} value={closingTX} />
+              {Boolean(withdrawTX) && (
+                <VaultExpandedInformationTransactionRow label={'Withdraw TX'} value={withdrawTX} />
               )}
             </VStack>
-            {state === VaultState.READY && !isSelected && (
+            {[VaultState.READY, VaultState.FUNDED].includes(state) && !isSelected && (
               <Button
                 onClick={() => {
                   navigate('/');

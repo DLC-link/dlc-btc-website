@@ -12,6 +12,7 @@ export const VaultContext = createContext<VaultContextType>({
     allVaults: [],
     readyVaults: [],
     fundingVaults: [],
+    pendingVaults: [],
     fundedVaults: [],
     closingVaults: [],
     closedVaults: [],

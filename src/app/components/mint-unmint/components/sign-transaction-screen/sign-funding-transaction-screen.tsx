@@ -41,13 +41,13 @@ export function SignFundingTransactionScreen({
   const { bitcoinWalletContextState, resetBitcoinWalletContext } = useContext(BitcoinWalletContext);
 
   const { bitcoinPrice } = useContext(ProofOfReserveContext);
-  const { readyVaults } = useVaults();
+  const { allVaults } = useVaults();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { mintStep } = useSelector((state: RootState) => state.mintunmint);
 
-  const currentVault = readyVaults.find(vault => vault.uuid === mintStep[1]);
+  const currentVault = allVaults.find(vault => vault.uuid === mintStep[1]);
 
   async function handleSign(depositAmount: number) {
     if (!currentVault) return;

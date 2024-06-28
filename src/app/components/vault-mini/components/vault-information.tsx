@@ -1,7 +1,7 @@
 import { CheckCircleIcon, CopyIcon } from '@chakra-ui/icons';
 import { Button, Divider, HStack, Image, Text, Tooltip } from '@chakra-ui/react';
 import { useCopyToClipboard } from '@hooks/use-copy-to-clipboard';
-import { VaultState } from '@models/vault';
+import { VaultState } from 'dlc-btc-lib/models';
 import { truncateAddress } from 'dlc-btc-lib/utilities';
 
 const getAssetLogo = (state: VaultState) => {

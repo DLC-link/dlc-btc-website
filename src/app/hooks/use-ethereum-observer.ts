@@ -2,10 +2,10 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { VaultState } from '@models/vault';
 import { RootState } from '@store/index';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { modalActions } from '@store/slices/modal/modal.actions';
+import { VaultState } from 'dlc-btc-lib/models';
 
 import { useEthereum } from './use-ethereum';
 import { useEthereumContext } from './use-ethereum-context';
@@ -25,7 +25,7 @@ export function useEthereumObserver(): void {
     console.log(`Listening to [${observerProtocolContract.address}]`);
 
     observerProtocolContract.on('SetupVault', async (...args: any[]) => {
-      const vaultOwner: string = args[2];
+      const vaultOwner: string = args[1];
 
       if (vaultOwner.toLowerCase() !== address) return;
 
@@ -53,6 +53,7 @@ export function useEthereumObserver(): void {
     });
 
     observerProtocolContract.on('SetStatusFunded', async (...args: any[]) => {
+      console.log('SetStatusFunded');
       const vaultOwner = args[2];
 
       if (vaultOwner.toLowerCase() !== address) return;
@@ -62,13 +63,33 @@ export function useEthereumObserver(): void {
       console.log(`Vault ${vaultUUID} is minted`);
 
       await getVault(vaultUUID, VaultState.FUNDED).then(() => {
-        dispatch(mintUnmintActions.setMintStep([0, vaultUUID]));
         dispatch(
           modalActions.toggleSuccessfulFlowModalVisibility({
             flow: 'mint',
             vaultUUID,
           })
         );
+        dispatch(mintUnmintActions.setMintStep([0, vaultUUID]));
+        dispatch(mintUnmintActions.setUnmintStep([0, vaultUUID]));
+      });
+    });
+
+    observerProtocolContract.on('SetStatusPending', async (...args: any[]) => {
+      console.log('SetStatusPending');
+      const vaultOwner = args[2];
+
+      if (vaultOwner.toLowerCase() !== address) return;
+
+      const vaultUUID = args[0];
+
+      console.log(`Vault ${vaultUUID} is pending`);
+
+      await getVault(vaultUUID, VaultState.PENDING).then(vault => {
+        if (vault.valueLocked !== vault.valueMinted) {
+          dispatch(mintUnmintActions.setUnmintStep([2, vaultUUID]));
+        } else {
+          dispatch(mintUnmintActions.setMintStep([2, vaultUUID]));
+        }
       });
     });
 

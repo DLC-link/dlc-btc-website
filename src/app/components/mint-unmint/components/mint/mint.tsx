@@ -33,7 +33,7 @@ export function Mint(): React.JSX.Element {
             isBitcoinWalletLoading={isBitcoinWalletLoading}
           />
         )}
-        {[2, 3].includes(mintStep[0]) && (
+        {[2].includes(mintStep[0]) && (
           <TransactionSummary
             currentStep={mintStep}
             flow={'mint'}

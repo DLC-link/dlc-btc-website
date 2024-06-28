@@ -4,7 +4,6 @@ import { useContext, useState } from 'react';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { LedgerError } from '@models/error-types';
 import { LEDGER_APPS_MAP } from '@models/ledger';
-import { RawVault } from '@models/vault';
 import { bytesToHex } from '@noble/hashes/utils';
 import {
   BitcoinWalletContext,
@@ -13,6 +12,7 @@ import {
 import { LedgerDLCHandler } from 'dlc-btc-lib';
 import { getBalance } from 'dlc-btc-lib/bitcoin-functions';
 import { bitcoin } from 'dlc-btc-lib/constants';
+import { RawVault } from 'dlc-btc-lib/models';
 import { Transaction } from 'dlc-btc-lib/models';
 import { delay, shiftValue } from 'dlc-btc-lib/utilities';
 import { unshiftValue } from 'dlc-btc-lib/utilities';
@@ -29,6 +29,13 @@ interface UseLedgerReturnType {
     dlcHandler: LedgerDLCHandler,
     vault: RawVault,
     bitcoinAmount: number,
+    attestorGroupPublicKey: string,
+    feeRateMultiplier: number
+  ) => Promise<Transaction>;
+  handleDepositTransaction: (
+    dlcHandler: LedgerDLCHandler,
+    vault: RawVault,
+    withdrawAmount: number,
     attestorGroupPublicKey: string,
     feeRateMultiplier: number
   ) => Promise<Transaction>;
@@ -223,6 +230,36 @@ export function useLedger(): UseLedgerReturnType {
     }
   }
 
+  async function handleDepositTransaction(
+    dlcHandler: LedgerDLCHandler,
+    withdrawAmount: number,
+    attestorGroupPublicKey: string,
+    vault: RawVault,
+    feeRateMultiplier: number
+  ): Promise<Transaction> {
+    try {
+      setIsLoading([true, 'Creating Withdrawal Transaction']);
+
+      const depositPSBT = await dlcHandler.createDepositPSBT(
+        BigInt(shiftValue(withdrawAmount)),
+        vault,
+        attestorGroupPublicKey,
+        vault.fundingTxId,
+        feeRateMultiplier
+      );
+
+      setIsLoading([true, 'Sign Withdrawal Transaction in your Leather Wallet']);
+      // ==> Sign Withdrawal PSBT with Ledger
+      const withdrawalTransaction = await dlcHandler.signPSBT(depositPSBT, 'closing');
+
+      setIsLoading([false, '']);
+      return withdrawalTransaction;
+    } catch (error) {
+      setIsLoading([false, '']);
+      throw new LedgerError(`Error handling Withdrawal Transaction: ${error}`);
+    }
+  }
+
   async function handleWithdrawalTransaction(
     dlcHandler: LedgerDLCHandler,
     withdrawAmount: number,
@@ -257,6 +294,7 @@ export function useLedger(): UseLedgerReturnType {
     getLedgerAddressesWithBalances,
     connectLedgerWallet,
     handleFundingTransaction,
+    handleDepositTransaction,
     handleWithdrawalTransaction,
     isLoading,
   };

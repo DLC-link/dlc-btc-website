@@ -1,6 +1,7 @@
 import { EthereumNetworkID } from '@models/ethereum-network';
-import { Vault, VaultState } from '@models/vault';
+import { Vault } from '@models/vault';
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
+import { VaultState } from 'dlc-btc-lib/models';
 
 interface VaultSliceState {
   vaults: { [key in EthereumNetworkID]: Vault[] };

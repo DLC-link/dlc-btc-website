@@ -19,8 +19,8 @@ interface FlowPropertyMap {
 
 const flowPropertyMap: FlowPropertyMap = {
   mint: {
-    3: { title: 'a) Locking BTC in progress', subtitle: 'Minting dlcBTC' },
-    4: { title: 'Minted dlcBTC' },
+    2: { title: 'a) Locking BTC in progress', subtitle: 'Minting dlcBTC' },
+    3: { title: 'Minted dlcBTC' },
   },
   unmint: {
     1: {
@@ -52,7 +52,7 @@ export function TransactionSummary({
   const currentVault = allVaults.find(vault => vault.uuid === currentStep[1]);
 
   const showProcessing =
-    (flow === 'mint' && currentStep[0] === 3) || (flow === 'unmint' && currentStep[0] === 1);
+    (flow === 'mint' && currentStep[0] === 2) || (flow === 'unmint' && currentStep[0] === 2);
 
   return (
     <VStack alignItems={'start'} w={width} spacing={'15px'}>
@@ -68,7 +68,7 @@ export function TransactionSummary({
           </Text>
           <TransactionSummaryPreviewCard
             blockchain={blockchain}
-            assetAmount={currentVault?.collateral}
+            assetAmount={currentVault?.valueLocked}
           />
         </>
       )}
@@ -92,7 +92,7 @@ export function TransactionSummary({
         >
           View in My Vaults
         </Button>
-        {((flow === 'mint' && currentStep[0] === 3) ||
+        {((flow === 'mint' && currentStep[0] === 2) ||
           (flow === 'unmint' && currentStep[0] === 1)) && (
           <Button
             variant={'navigate'}

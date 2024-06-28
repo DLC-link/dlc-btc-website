@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { BitcoinError } from '@models/error-types';
 import { BitcoinWalletType } from '@models/wallet';
+import { bytesToHex } from '@noble/hashes/utils';
 import { BitcoinWalletContext } from '@providers/bitcoin-wallet-context-provider';
 import { RootState } from '@store/index';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
@@ -34,12 +35,14 @@ export function usePSBT(): UsePSBTReturnType {
   const {
     handleFundingTransaction: handleFundingTransactionWithLedger,
     handleWithdrawalTransaction: handleWithdrawalTransactionWithLedger,
+    handleDepositTransaction: handleDepositTransactionWithLedger,
     isLoading: isLedgerLoading,
   } = useLedger();
 
   const {
     handleFundingTransaction: handleFundingTransactionWithLeather,
     handleWithdrawalTransaction: handleWithdrawalTransactionWithLeather,
+    handleDepositTransaction: handleDepositTransactionWithLeather,
     isLoading: isLeatherLoading,
   } = useLeather();
 
@@ -48,8 +51,11 @@ export function usePSBT(): UsePSBTReturnType {
     [BitcoinWalletType.Ledger]: isLedgerLoading,
   };
 
-  const { sendFundingTransactionToAttestors, sendWithdrawalTransactionToAttestors } =
-    useAttestors();
+  const {
+    sendFundingTransactionToAttestors,
+    sendWithdrawalTransactionToAttestors,
+    sendDepositTransactionToAttestors,
+  } = useAttestors();
 
   const { getAttestorGroupPublicKey, getRawVault } = useEthereum();
 
@@ -74,22 +80,42 @@ export function usePSBT(): UsePSBTReturnType {
       let fundingTransaction: Transaction;
       switch (bitcoinWalletType) {
         case 'Ledger':
-          fundingTransaction = await handleFundingTransactionWithLedger(
-            dlcHandler as LedgerDLCHandler,
-            vault,
-            depositAmount,
-            attestorGroupPublicKey,
-            feeRateMultiplier
-          );
+          if (vault.valueLocked.toNumber() === 0) {
+            fundingTransaction = await handleFundingTransactionWithLedger(
+              dlcHandler as LedgerDLCHandler,
+              vault,
+              depositAmount,
+              attestorGroupPublicKey,
+              feeRateMultiplier
+            );
+          } else {
+            fundingTransaction = await handleDepositTransactionWithLedger(
+              dlcHandler as LedgerDLCHandler,
+              vault,
+              depositAmount,
+              attestorGroupPublicKey,
+              feeRateMultiplier
+            );
+          }
           break;
         case 'Leather':
-          fundingTransaction = await handleFundingTransactionWithLeather(
-            dlcHandler as SoftwareWalletDLCHandler,
-            vault,
-            depositAmount,
-            attestorGroupPublicKey,
-            feeRateMultiplier
-          );
+          if (vault.valueLocked.toNumber() === 0) {
+            fundingTransaction = await handleFundingTransactionWithLeather(
+              dlcHandler as SoftwareWalletDLCHandler,
+              vault,
+              depositAmount,
+              attestorGroupPublicKey,
+              feeRateMultiplier
+            );
+          } else {
+            fundingTransaction = await handleDepositTransactionWithLeather(
+              dlcHandler as SoftwareWalletDLCHandler,
+              vault,
+              depositAmount,
+              attestorGroupPublicKey,
+              feeRateMultiplier
+            );
+          }
           break;
         default:
           throw new BitcoinError('Invalid Bitcoin Wallet Type');
@@ -100,25 +126,34 @@ export function usePSBT(): UsePSBTReturnType {
       if (!address || !userTaprootPublicKey)
         throw new Error('Required Information is not available');
 
-      const fundingTXAttestorInfo: FundingTXAttestorInfo = {
-        vaultUUID,
-        fundingPSBT: fundingTransaction.hex,
-        userEthereumAddress: address,
-        userBitcoinPublicKey: userTaprootPublicKey,
-        chain: ethereumAttestorChainID,
-      };
+      if (vault.valueLocked.toNumber() === 0) {
+        const fundingTXAttestorInfo: FundingTXAttestorInfo = {
+          vaultUUID,
+          fundingPSBT: fundingTransaction.hex,
+          userEthereumAddress: address,
+          userBitcoinPublicKey: userTaprootPublicKey,
+          chain: ethereumAttestorChainID,
+        };
 
-      await sendFundingTransactionToAttestors(fundingTXAttestorInfo);
+        await sendFundingTransactionToAttestors(fundingTXAttestorInfo);
 
-      dispatch(
-        vaultActions.setVaultToFunding({
-          vaultUUID: mintStep[1],
-          fundingTX: fundingTransaction.id,
-          networkID: network.id,
-        })
-      );
+        dispatch(
+          vaultActions.setVaultToFunding({
+            vaultUUID: mintStep[1],
+            fundingTX: fundingTransaction.id,
+            networkID: network.id,
+          })
+        );
 
-      dispatch(mintUnmintActions.setMintStep([2, mintStep[1]]));
+        dispatch(mintUnmintActions.setMintStep([2, mintStep[1]]));
+      } else {
+        const withdrawalTXAttestorInfo: WithdrawalTXAttestorInfo = {
+          vaultUUID,
+          withdrawalPSBT: bytesToHex(fundingTransaction.toPSBT()),
+          chain: ethereumAttestorChainID,
+        };
+        await sendDepositTransactionToAttestors(withdrawalTXAttestorInfo);
+      }
 
       resetBitcoinWalletContext();
     } catch (error) {
@@ -170,9 +205,7 @@ export function usePSBT(): UsePSBTReturnType {
         chain: ethereumAttestorChainID,
       };
 
-      // await sendWithdrawalTransactionToAttestors(withdrawalTXAttestorInfo);
-
-      dispatch(mintUnmintActions.setUnmintStep([1, vaultUUID]));
+      await sendWithdrawalTransactionToAttestors(withdrawalTXAttestorInfo);
 
       resetBitcoinWalletContext();
     } catch (error) {
