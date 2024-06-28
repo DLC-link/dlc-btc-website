@@ -1,25 +1,39 @@
 import { useEffect, useState } from 'react';
 
-import { Menu, MenuButton, MenuList, SlideFade, Text } from '@chakra-ui/react';
+import {
+  HStack,
+  Menu,
+  MenuButton,
+  MenuList,
+  Radio,
+  RadioGroup,
+  SlideFade,
+  Text,
+  VStack,
+} from '@chakra-ui/react';
+import { SupportedPaymentType } from '@models/supported-payment-types';
 
 import { LedgerModalSelectAddressMenuItem } from './components/ledger-modal-select-address-menu-item';
 
 interface LedgerModalSelectAddressMenuProps {
   nativeSegwitAddresses: [string, number][] | undefined;
+  taprootAddresses: [string, number][] | undefined;
   isLoading: [boolean, string];
   isSuccesful: boolean;
   error: string | undefined;
-  setNativeSegwitAddressAndTaprootMultisigAddress: (index: number) => void;
+  setFundingAndTaprootAddress: (index: number, paymentType: SupportedPaymentType) => void;
 }
 
 export function LedgerModalSelectAddressMenu({
   nativeSegwitAddresses,
+  taprootAddresses,
   isLoading,
   isSuccesful,
   error,
-  setNativeSegwitAddressAndTaprootMultisigAddress,
+  setFundingAndTaprootAddress,
 }: LedgerModalSelectAddressMenuProps): React.JSX.Element {
   const [showComponent, setShowComponent] = useState(false);
+  const [paymentType, setPaymentType] = useState<string>('wpkh');
 
   useEffect(() => {
     if (nativeSegwitAddresses && !isLoading[0] && !isSuccesful && !error) {
@@ -31,23 +45,42 @@ export function LedgerModalSelectAddressMenu({
 
   return (
     <SlideFade in={showComponent} transition={{ enter: { delay: 0.25 } }} unmountOnExit>
+      <VStack pb={'15px'}>
+        <RadioGroup onChange={setPaymentType} value={paymentType}>
+          <HStack>
+            <Radio colorScheme="purple" value="wpkh">
+              Native Segwit
+            </Radio>
+            <Radio colorScheme="purple" value="tr">
+              Taproot
+            </Radio>
+          </HStack>
+        </RadioGroup>
+      </VStack>
       <Menu variant={'ledgerAddress'}>
         <MenuButton>
-          <Text>Select Native Segwit Address</Text>
+          <Text>Select Funding Address</Text>
         </MenuButton>
         <MenuList>
-          {nativeSegwitAddresses?.map((address, index) => {
-            return (
-              <LedgerModalSelectAddressMenuItem
-                key={index}
-                address={address}
-                index={index}
-                setNativeSegwitAddressAndTaprootMultisigAddress={
-                  setNativeSegwitAddressAndTaprootMultisigAddress
-                }
-              />
-            );
-          })}
+          {paymentType === 'wpkh'
+            ? nativeSegwitAddresses?.map((address, index) => (
+                <LedgerModalSelectAddressMenuItem
+                  key={index}
+                  address={address}
+                  paymentType={SupportedPaymentType.NATIVE_SEGWIT}
+                  index={index}
+                  setFundingAndTaprootAddress={setFundingAndTaprootAddress}
+                />
+              ))
+            : taprootAddresses?.map((address, index) => (
+                <LedgerModalSelectAddressMenuItem
+                  key={index}
+                  address={address}
+                  paymentType={SupportedPaymentType.TAPROOT}
+                  index={index}
+                  setFundingAndTaprootAddress={setFundingAndTaprootAddress}
+                />
+              ))}
         </MenuList>
       </Menu>
     </SlideFade>
