@@ -4,11 +4,8 @@ interface UseAttestorsReturnType {
   sendFundingTransactionToAttestors: (
     fundingTXAttestorInfo: FundingTXAttestorInfo
   ) => Promise<void>;
-  sendWithdrawalTransactionToAttestors: (
-    withdrawalTXAttestorInfo: WithdrawalTXAttestorInfo
-  ) => Promise<void>;
-  sendDepositTransactionToAttestors: (
-    withdrawalTXAttestorInfo: WithdrawalTXAttestorInfo
+  sendDepositWithdrawTransactionToAttestors: (
+    depositWithdrawTXInfo: DepositWithdrawTXAttestorInfo
   ) => Promise<void>;
 }
 
@@ -17,13 +14,13 @@ interface FundingTXAttestorInfo {
   fundingPSBT: string;
   userEthereumAddress: string;
   userBitcoinPublicKey: string;
-  chain: string;
+  chain: 'evm-arbitrum' | 'evm-arbsepolia' | 'evm-localhost';
 }
 
-interface WithdrawalTXAttestorInfo {
+interface DepositWithdrawTXAttestorInfo {
   vaultUUID: string;
-  withdrawalPSBT: string;
-  chain: string;
+  depositWithdrawPSBT: string;
+  chain: 'evm-arbitrum' | 'evm-arbsepolia' | 'evm-localhost';
 }
 
 export function useAttestors(): UseAttestorsReturnType {
@@ -56,36 +53,8 @@ export function useAttestors(): UseAttestorsReturnType {
     }
   }
 
-  async function sendDepositTransactionToAttestors(
-    withdrawalTXAttestorInfo: WithdrawalTXAttestorInfo
-  ): Promise<void> {
-    const createPSBTURLs = appConfiguration.attestorURLs.map(url => `${url}/app/deposit`);
-
-    const requests = createPSBTURLs.map(async url =>
-      fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-        body: JSON.stringify({
-          uuid: withdrawalTXAttestorInfo.vaultUUID,
-          wd_psbt: withdrawalTXAttestorInfo.withdrawalPSBT,
-          chain: withdrawalTXAttestorInfo.chain,
-        }),
-      })
-        .then(response => response.ok)
-        .catch(() => {
-          return false;
-        })
-    );
-
-    const responses = await Promise.all(requests);
-
-    if (!responses.includes(true)) {
-      throw new AttestorError('Error sending Funding Transaction to Attestors!');
-    }
-  }
-
-  async function sendWithdrawalTransactionToAttestors(
-    withdrawalTXAttestorInfo: WithdrawalTXAttestorInfo
+  async function sendDepositWithdrawTransactionToAttestors(
+    depositWithdrawTXInfo: DepositWithdrawTXAttestorInfo
   ): Promise<void> {
     const createPSBTURLs = appConfiguration.attestorURLs.map(url => `${url}/app/withdraw`);
 
@@ -94,9 +63,9 @@ export function useAttestors(): UseAttestorsReturnType {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
         body: JSON.stringify({
-          uuid: withdrawalTXAttestorInfo.vaultUUID,
-          wd_psbt: withdrawalTXAttestorInfo.withdrawalPSBT,
-          chain: withdrawalTXAttestorInfo.chain,
+          uuid: depositWithdrawTXInfo.vaultUUID,
+          wd_psbt: depositWithdrawTXInfo.depositWithdrawPSBT,
+          chain: depositWithdrawTXInfo.chain,
         }),
       })
         .then(response => response.ok)
@@ -113,7 +82,6 @@ export function useAttestors(): UseAttestorsReturnType {
 
   return {
     sendFundingTransactionToAttestors,
-    sendDepositTransactionToAttestors,
-    sendWithdrawalTransactionToAttestors,
+    sendDepositWithdrawTransactionToAttestors,
   };
 }

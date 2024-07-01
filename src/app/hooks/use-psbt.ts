@@ -53,11 +53,8 @@ export function usePSBT(): UsePSBTReturnType {
     [BitcoinWalletType.Ledger]: isLedgerLoading,
   };
 
-  const {
-    sendFundingTransactionToAttestors,
-    sendWithdrawalTransactionToAttestors,
-    sendDepositTransactionToAttestors,
-  } = useAttestors();
+  const { sendFundingTransactionToAttestors, sendDepositWithdrawTransactionToAttestors } =
+    useAttestors();
 
   const { getAttestorGroupPublicKey, getRawVault } = useEthereum();
 
@@ -154,9 +151,9 @@ export function usePSBT(): UsePSBTReturnType {
           dispatch(mintUnmintActions.setMintStep([2, vaultUUID]));
           break;
         default:
-          await sendDepositTransactionToAttestors({
+          await sendDepositWithdrawTransactionToAttestors({
             vaultUUID,
-            withdrawalPSBT: bytesToHex(fundingTransaction.toPSBT()),
+            depositWithdrawPSBT: bytesToHex(fundingTransaction.toPSBT()),
             chain: ethereumAttestorChainID,
           });
       }
@@ -209,9 +206,9 @@ export function usePSBT(): UsePSBTReturnType {
           throw new BitcoinError('Invalid Bitcoin Wallet Type');
       }
 
-      await sendWithdrawalTransactionToAttestors({
+      await sendDepositWithdrawTransactionToAttestors({
         vaultUUID,
-        withdrawalPSBT: withdrawalTransactionHex,
+        depositWithdrawPSBT: withdrawalTransactionHex,
         chain: ethereumAttestorChainID,
       });
 

@@ -6,7 +6,7 @@ import { RootState } from '@store/index';
 
 interface NetworkEndpoints {
   ethereumExplorerAPIURL: string;
-  ethereumAttestorChainID: string;
+  ethereumAttestorChainID: 'evm-arbitrum' | 'evm-arbsepolia' | 'evm-localhost';
   enabledEthereumNetworks: EthereumNetwork[];
 }
 
@@ -22,7 +22,9 @@ export function useEthereumConfiguration(): NetworkEndpoints {
   const { network } = useSelector((state: RootState) => state.account);
 
   const [ethereumExplorerAPIURL, setEthereumExplorerAPIURL] = useState<string>('');
-  const [ethereumAttestorChainID, setEthereumAttestorChainID] = useState<string>('');
+  const [ethereumAttestorChainID, setEthereumAttestorChainID] = useState<
+    'evm-arbitrum' | 'evm-arbsepolia' | 'evm-localhost'
+  >('evm-arbsepolia');
   const [enabledEthereumNetworks, setEnabledEthereumNetworks] = useState<EthereumNetwork[]>([]);
 
   useEffect(() => {
