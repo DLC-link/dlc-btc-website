@@ -7,7 +7,7 @@ export interface Vault {
   userPublicKey: string;
   fundingTX: string;
   closingTX: string;
-  withdrawTX: string;
+  withdrawDepositTX: string;
   btcFeeRecipient: string;
   btcMintFeeBasisPoints: number;
   btcRedeemFeeBasisPoints: number;

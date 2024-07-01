@@ -1,14 +1,15 @@
 {
   "appEnvironment": "localhost",
   "attestorURLs": [
-    "https://777c-89-133-125-239.ngrok-free.app",
-    "https://d224-89-133-125-239.ngrok-free.app"
+    "http://192.168.86.31:8811",
+    "http://192.168.86.31:8812",
+    "http://192.168.86.31:8813"
   ],
   "enabledEthereumNetworkIDs": ["421614", "31337"],
   "bitcoinNetwork": "regtest",
   "bitcoinNetworkPreFix": "bcrt1",
-  "bitcoinBlockchainURL": "https://devnet.dlc.link/electrs",
-  "bitcoinBlockchainExplorerURL": "https://devnet.dlc.link/electrs",
+  "bitcoinBlockchainURL": "http://192.168.86.31:3004",
+  "bitcoinBlockchainExplorerURL": "http://192.168.86.31:3004",
   "bitcoinBlockchainFeeEstimateURL": "https://devnet.dlc.link/electrs/fee-estimates",
   "merchants": [
     {

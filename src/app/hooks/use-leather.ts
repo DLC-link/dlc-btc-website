@@ -207,7 +207,7 @@ export function useLeather(): UseLeatherReturnType {
         feeRateMultiplier
       );
 
-      const depositPayment = dlcHandler.payment?.nativeSegwitPayment;
+      const depositPayment = dlcHandler.payment?.fundingPayment;
 
       if (!depositPayment) {
         throw new LeatherError('Deposit Payment is not set');
@@ -237,6 +237,7 @@ export function useLeather(): UseLeatherReturnType {
     feeRateMultiplier: number
   ): Promise<string> {
     try {
+      console.log('dlcHandler', dlcHandler);
       setIsLoading([true, 'Creating Withdrawal Transaction']);
 
       const withdrawalTransaction = await dlcHandler.createWithdrawalPSBT(

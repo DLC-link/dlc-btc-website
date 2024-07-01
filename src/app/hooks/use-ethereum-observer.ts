@@ -39,20 +39,6 @@ export function useEthereumObserver(): void {
       });
     });
 
-    observerDLCManagerContract.on('CloseDLC', async (...args: any[]) => {
-      const vaultOwner: string = args[1];
-
-      if (vaultOwner.toLowerCase() !== address) return;
-
-      const vaultUUID = args[0];
-
-      console.log(`Vault ${vaultUUID} is closing`);
-
-      await getVault(vaultUUID, VaultState.CLOSING).then(() => {
-        dispatch(mintUnmintActions.setUnmintStep([1, vaultUUID]));
-      });
-    });
-
     observerDLCManagerContract.on('SetStatusFunded', async (...args: any[]) => {
       const vaultOwner = args[2];
 
@@ -94,25 +80,6 @@ export function useEthereumObserver(): void {
         } else {
           dispatch(mintUnmintActions.setMintStep([2, vaultUUID]));
         }
-      });
-    });
-
-    observerDLCManagerContract.on('PostCloseDLC', async (...args: any[]) => {
-      const vaultOwner = args[2];
-
-      if (vaultOwner.toLowerCase() !== address) return;
-
-      const vaultUUID = args[0];
-
-      console.log(`Vault ${vaultUUID} is closed`);
-
-      await getVault(vaultUUID, VaultState.CLOSED).then(() => {
-        dispatch(mintUnmintActions.setUnmintStep([0, vaultUUID]));
-        dispatch(
-          modalActions.toggleSuccessfulFlowModalVisibility({
-            vaultUUID,
-          })
-        );
       });
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps

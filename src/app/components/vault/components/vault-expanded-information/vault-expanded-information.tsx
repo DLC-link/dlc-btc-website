@@ -25,7 +25,7 @@ export function VaultExpandedInformation({
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { fundingTX, withdrawTX, state, uuid } = vault;
+  const { fundingTX, withdrawDepositTX, state, uuid } = vault;
 
   function handleWithdraw() {
     navigate('/');
@@ -48,8 +48,11 @@ export function VaultExpandedInformation({
               {!!fundingTX && (
                 <VaultExpandedInformationTransactionRow label={'Funding TX'} value={fundingTX} />
               )}
-              {!!withdrawTX && (
-                <VaultExpandedInformationTransactionRow label={'Withdraw TX'} value={withdrawTX} />
+              {!!withdrawDepositTX && (
+                <VaultExpandedInformationTransactionRow
+                  label={'Withdraw TX'}
+                  value={withdrawDepositTX}
+                />
               )}
             </VStack>
             {[VaultState.READY, VaultState.FUNDED].includes(state) && !isSelected && (

@@ -14,7 +14,7 @@ export function useConfirmationChecker(vault?: Vault): number {
       txID = vault?.fundingTX;
       break;
     case VaultState.PENDING:
-      txID = vault?.withdrawTX;
+      txID = vault?.withdrawDepositTX;
       break;
     default:
       txID = undefined;

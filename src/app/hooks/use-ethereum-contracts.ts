@@ -84,7 +84,7 @@ export function useEthereumContracts(): UseEthereumContractsReturnType {
         deploymentPlanURL = `${SOLIDITY_CONTRACT_URL}/${branchName}/deploymentFiles/${ethereumNetwork.name.toLowerCase()}/${contractName}.json`;
         break;
       case 'localhost':
-        deploymentPlanURL = `${import.meta.env.VITE_ETHEREUM_DEPLOYMENT_FILES_URL}/${contractName}.json`;
+        deploymentPlanURL = `${import.meta.env.VITE_ETHEREUM_DEPLOYMENT_FILES_URL}/contracts/localhost/${contractName}.json`;
         break;
       default:
         throw new EthereumError('Invalid Ethereum Network');

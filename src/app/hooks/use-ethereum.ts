@@ -61,7 +61,7 @@ export function useEthereum(): UseEthereumReturnType {
       userPublicKey: vault.taprootPubKey,
       fundingTX: vault.fundingTxId,
       closingTX: vault.closingTxId,
-      withdrawTX: vault.withdrawTxId,
+      withdrawDepositTX: vault.wdTxId,
       btcFeeRecipient: vault.btcFeeRecipient,
       btcMintFeeBasisPoints: vault.btcMintFeeBasisPoints.toNumber(),
       btcRedeemFeeBasisPoints: vault.btcRedeemFeeBasisPoints.toNumber(),
@@ -87,7 +87,7 @@ export function useEthereum(): UseEthereumReturnType {
           deploymentPlanURL = `${SOLIDITY_CONTRACT_URL}/${deploymentBranchName}/deploymentFiles/${ethereumNetworkName}/${contractName}.json`;
           break;
         case 'localhost':
-          deploymentPlanURL = `${import.meta.env.VITE_ETHEREUM_DEPLOYMENT_FILES_URL}/${contractName}.json`;
+          deploymentPlanURL = `${import.meta.env.VITE_ETHEREUM_DEPLOYMENT_FILES_URL}//contracts/localhost/${contractName}.json`;
           break;
         default:
           throw new EthereumError('Invalid Ethereum Network');

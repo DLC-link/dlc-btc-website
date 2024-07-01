@@ -67,7 +67,7 @@ export function useAttestors(): UseAttestorsReturnType {
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
         body: JSON.stringify({
           uuid: withdrawalTXAttestorInfo.vaultUUID,
-          withdraw_psbt: withdrawalTXAttestorInfo.withdrawalPSBT,
+          wd_psbt: withdrawalTXAttestorInfo.withdrawalPSBT,
           chain: withdrawalTXAttestorInfo.chain,
         }),
       })
@@ -95,7 +95,7 @@ export function useAttestors(): UseAttestorsReturnType {
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
         body: JSON.stringify({
           uuid: withdrawalTXAttestorInfo.vaultUUID,
-          withdraw_psbt: withdrawalTXAttestorInfo.withdrawalPSBT,
+          wd_psbt: withdrawalTXAttestorInfo.withdrawalPSBT,
           chain: withdrawalTXAttestorInfo.chain,
         }),
       })
