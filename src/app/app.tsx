@@ -3,6 +3,7 @@ import { Route } from 'react-router-dom';
 
 import { AppLayout } from '@components/app.layout';
 import { AttestorDetailsPage } from '@pages/attestor-details/attestor-details-page';
+import { MerchantFocusPage } from '@pages/merchant-focus/merchant-focus-page';
 import { MyVaults } from '@pages/my-vaults/my-vaults';
 import { PointsPage } from '@pages/points/points-page';
 import { ProofOfReservePage } from '@pages/proof-of-reserve/proof-of-reserve-page';
@@ -36,6 +37,7 @@ export function App(): React.JSX.Element {
                       <Route path="/proof-of-reserve" element={<ProofOfReservePage />} />
                       <Route path="/points" element={<PointsPage />} />
                       <Route path="/attestor-details" element={<AttestorDetailsPage />} />
+                      <Route path="/merchant-focus" element={<MerchantFocusPage />} />
                     </AppLayout>
                   </ProofOfReserveContextProvider>
                 </BalanceContextProvider>
