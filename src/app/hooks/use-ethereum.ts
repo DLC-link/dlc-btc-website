@@ -24,7 +24,7 @@ interface UseEthereumReturnType {
   ) => Promise<ethers.Contract>;
   getDLCBTCBalance: () => Promise<number | undefined>;
   getLockedBTCBalance: () => Promise<number | undefined>;
-  getAttestorGroupPublicKey: (ethereumNetwork: EthereumNetwork) => Promise<string>;
+  getAttestorGroupPublicKey: () => Promise<string>;
   getAllVaults: () => Promise<void>;
   getVault: (vaultUUID: string, vaultState: VaultState) => Promise<Vault>;
   getRawVault: (vaultUUID: string) => Promise<RawVault>;
@@ -131,9 +131,8 @@ export function useEthereum(): UseEthereumReturnType {
     }
   }
 
-  async function getAttestorGroupPublicKey(ethereumNetwork: EthereumNetwork): Promise<string> {
+  async function getAttestorGroupPublicKey(): Promise<string> {
     try {
-      // const dlcManagerContract = await getDefaultProvider(ethereumNetwork, 'DLCManager');
       const attestorGroupPubKey = await observerDLCManagerContract.attestorGroupPubKey();
       return attestorGroupPubKey;
     } catch (error) {

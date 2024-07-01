@@ -8,7 +8,7 @@ import { VaultState } from 'dlc-btc-lib/models';
 import { useEthereum } from './use-ethereum';
 import { useEthereumContext } from './use-ethereum-context';
 
-export interface UseVaultsReturnType {
+interface UseVaultsReturnType {
   allVaults: Vault[];
   readyVaults: Vault[];
   fundingVaults: Vault[];

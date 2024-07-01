@@ -77,7 +77,7 @@ export function usePSBT(): UsePSBTReturnType {
 
       const feeRateMultiplier = import.meta.env.VITE_FEE_RATE_MULTIPLIER;
 
-      const attestorGroupPublicKey = await getAttestorGroupPublicKey(ethereumNetwork);
+      const attestorGroupPublicKey = await getAttestorGroupPublicKey();
       const vault = await getRawVault(vaultUUID);
 
       if (!bitcoinWalletType) throw new Error('Bitcoin Wallet is not setup');
@@ -178,7 +178,7 @@ export function usePSBT(): UsePSBTReturnType {
 
       const feeRateMultiplier = import.meta.env.VITE_FEE_RATE_MULTIPLIER;
 
-      const attestorGroupPublicKey = await getAttestorGroupPublicKey(ethereumNetwork);
+      const attestorGroupPublicKey = await getAttestorGroupPublicKey();
       const vault = await getRawVault(vaultUUID);
 
       if (!bitcoinWalletType) throw new Error('Bitcoin Wallet is not setup');

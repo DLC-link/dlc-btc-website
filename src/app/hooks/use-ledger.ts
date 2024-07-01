@@ -178,8 +178,8 @@ export function useLedger(): UseLedgerReturnType {
   }
 
   async function connectLedgerWallet(
-    walletAccountIndex: number
-    // paymentType: SupportedPaymentType
+    walletAccountIndex: number,
+    paymentType: SupportedPaymentType
   ): Promise<void> {
     try {
       setIsLoading([true, 'Connecting To Ledger Wallet']);
@@ -192,6 +192,7 @@ export function useLedger(): UseLedgerReturnType {
         ledgerApp,
         masterFingerprint,
         walletAccountIndex,
+        paymentType,
         BITCOIN_NETWORK_MAP[appConfiguration.bitcoinNetwork],
         appConfiguration.bitcoinBlockchainURL,
         appConfiguration.bitcoinBlockchainFeeEstimateURL
@@ -262,10 +263,10 @@ export function useLedger(): UseLedgerReturnType {
 
       setIsLoading([true, 'Sign Withdrawal Transaction in your Leather Wallet']);
       // ==> Sign Withdrawal PSBT with Ledger
-      const withdrawalTransaction = await dlcHandler.signPSBT(depositPSBT, 'closing');
+      const depositTransaction = await dlcHandler.signPSBT(depositPSBT, 'deposit');
 
       setIsLoading([false, '']);
-      return withdrawalTransaction;
+      return depositTransaction;
     } catch (error) {
       setIsLoading([false, '']);
       throw new LedgerError(`Error handling Withdrawal Transaction: ${error}`);
@@ -292,7 +293,7 @@ export function useLedger(): UseLedgerReturnType {
 
       setIsLoading([true, 'Sign Withdrawal Transaction in your Leather Wallet']);
       // ==> Sign Withdrawal PSBT with Ledger
-      const withdrawalTransaction = await dlcHandler.signPSBT(withdrawalPSBT, 'closing');
+      const withdrawalTransaction = await dlcHandler.signPSBT(withdrawalPSBT, 'withdraw');
 
       setIsLoading([false, '']);
       return bytesToHex(withdrawalTransaction.toPSBT());

@@ -42,9 +42,7 @@ export function useEthereumObserver(): void {
     observerDLCManagerContract.on('SetStatusFunded', async (...args: any[]) => {
       const vaultOwner = args[2];
 
-      console.log('vaultOwner', vaultOwner.toLowerCase());
-
-      // if (vaultOwner.toLowerCase() !== address) return;
+      if (vaultOwner.toLowerCase() !== address) return;
 
       const vaultUUID = args[0];
 
@@ -66,9 +64,9 @@ export function useEthereumObserver(): void {
     });
 
     observerDLCManagerContract.on('SetStatusPending', async (...args: any[]) => {
-      // const vaultOwner = args[2];
+      const vaultOwner = args[2];
 
-      // if (vaultOwner.toLowerCase() !== address) return;
+      if (vaultOwner.toLowerCase() !== address) return;
 
       const vaultUUID = args[0];
 
