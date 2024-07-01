@@ -8,7 +8,7 @@ import { Vault } from '@models/vault';
 import { VaultContext } from '@providers/vault-context-provider';
 import { RootState, store } from '@store/index';
 import { vaultActions } from '@store/slices/vault/vault.actions';
-import { RawVault, VaultState } from 'dlc-btc-lib/models';
+import { DLCEthereumContractName, RawVault, VaultState } from 'dlc-btc-lib/models';
 import { customShiftValue, unshiftValue } from 'dlc-btc-lib/utilities';
 import { ethers } from 'ethers';
 import { Logger } from 'ethers/lib/utils';
@@ -20,7 +20,7 @@ const SOLIDITY_CONTRACT_URL = 'https://raw.githubusercontent.com/DLC-link/dlc-so
 interface UseEthereumReturnType {
   getDefaultProvider: (
     ethereumNetwork: EthereumNetwork,
-    contractName: string
+    contractName: DLCEthereumContractName
   ) => Promise<ethers.Contract>;
   getDLCBTCBalance: () => Promise<number | undefined>;
   getLockedBTCBalance: () => Promise<number | undefined>;
@@ -71,7 +71,7 @@ export function useEthereum(): UseEthereumReturnType {
 
   async function getDefaultProvider(
     ethereumNetwork: EthereumNetwork,
-    contractName: string
+    contractName: DLCEthereumContractName
   ): Promise<ethers.Contract> {
     try {
       const ethereumNetworkName = ethereumNetwork.name.toLowerCase();
@@ -87,7 +87,7 @@ export function useEthereum(): UseEthereumReturnType {
           deploymentPlanURL = `${SOLIDITY_CONTRACT_URL}/${deploymentBranchName}/deploymentFiles/${ethereumNetworkName}/${contractName}.json`;
           break;
         case 'localhost':
-          deploymentPlanURL = `${import.meta.env.VITE_ETHEREUM_DEPLOYMENT_FILES_URL}//contracts/localhost/${contractName}.json`;
+          deploymentPlanURL = `${import.meta.env.VITE_ETHEREUM_DEPLOYMENT_FILES_URL}/contracts/localhost/${contractName}.json`;
           break;
         default:
           throw new EthereumError('Invalid Ethereum Network');
@@ -133,7 +133,8 @@ export function useEthereum(): UseEthereumReturnType {
 
   async function getAttestorGroupPublicKey(): Promise<string> {
     try {
-      const attestorGroupPubKey = await observerDLCManagerContract.attestorGroupPubKey();
+      const dlcManagerContract = await getDefaultProvider(network, 'DLCManager');
+      const attestorGroupPubKey = await dlcManagerContract.attestorGroupPubKey();
       return attestorGroupPubKey;
     } catch (error) {
       throw new EthereumError(`Could not fetch Attestor Public Key: ${error}`);

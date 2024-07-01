@@ -237,7 +237,6 @@ export function useLeather(): UseLeatherReturnType {
     feeRateMultiplier: number
   ): Promise<string> {
     try {
-      console.log('dlcHandler', dlcHandler);
       setIsLoading([true, 'Creating Withdrawal Transaction']);
 
       const withdrawalTransaction = await dlcHandler.createWithdrawalPSBT(
