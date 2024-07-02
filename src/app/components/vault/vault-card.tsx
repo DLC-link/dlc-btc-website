@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 
 import { CustomSkeleton } from '@components/custom-skeleton/custom-skeleton';
 import { useConfirmationChecker } from '@hooks/use-confirmation-checker';
-import { Vault, VaultState } from '@models/vault';
+import { Vault } from '@models/vault';
+import { VaultState } from 'dlc-btc-lib/models';
 
 import { VaultCardLayout } from './components/vault-card.layout';
 import { VaultExpandedInformation } from './components/vault-expanded-information/vault-expanded-information';
@@ -31,7 +32,9 @@ export function VaultCard({
   return (
     <VaultCardLayout isSelectable={isSelectable} handleClick={() => handleSelect && handleSelect()}>
       <VaultInformation
-        collateral={vault.collateral}
+        collateral={
+          [VaultState.PENDING].includes(vault.state) ? vault.valueMinted : vault.valueLocked
+        }
         state={vault.state}
         timestamp={vault.timestamp}
         isExpanded={isExpanded}
@@ -41,16 +44,13 @@ export function VaultCard({
       />
       {isExpanded && (
         <VaultExpandedInformation
-          uuid={vault.uuid}
-          state={vault.state}
-          fundingTX={vault.fundingTX}
-          closingTX={vault.closingTX}
+          vault={vault}
           isExpanded={isExpanded}
           isSelected={isSelected}
           close={() => setIsExpanded(false)}
         />
       )}
-      {[VaultState.FUNDING, VaultState.CLOSED].includes(vault.state) && (
+      {[VaultState.FUNDING, VaultState.PENDING].includes(vault.state) && (
         <VaultProgressBar confirmedBlocks={confirmations} vaultState={vault.state} />
       )}
     </VaultCardLayout>

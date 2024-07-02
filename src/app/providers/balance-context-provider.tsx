@@ -1,9 +1,10 @@
-import { createContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 
 import { useEthereum } from '@hooks/use-ethereum';
 import { useEthereumContext } from '@hooks/use-ethereum-context';
-import { useVaults } from '@hooks/use-vaults';
 import { HasChildren } from '@models/has-children';
+
+import { VaultContext } from './vault-context-provider';
 
 interface VaultContextType {
   dlcBTCBalance: number | undefined;
@@ -18,7 +19,7 @@ export const BalanceContext = createContext<VaultContextType>({
 export function BalanceContextProvider({ children }: HasChildren): React.JSX.Element {
   const { contractsLoaded } = useEthereumContext();
   const { getDLCBTCBalance, getLockedBTCBalance } = useEthereum();
-  const { fundedVaults } = useVaults();
+  const { fundedVaults } = useContext(VaultContext);
 
   const [dlcBTCBalance, setDLCBTCBalance] = useState<number | undefined>(undefined);
   const [lockedBTCBalance, setLockedBTCBalance] = useState<number | undefined>(undefined);

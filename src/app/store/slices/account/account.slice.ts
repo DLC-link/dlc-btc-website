@@ -11,7 +11,7 @@ interface AccountState {
   loadedAt: string | undefined;
 }
 
-const bitcoinNetworkName = import.meta.env.VITE_BITCOIN_NETWORK;
+const bitcoinNetworkName = appConfiguration.bitcoinNetwork;
 let ethereumNetwork: EthereumNetwork;
 switch (bitcoinNetworkName) {
   case 'mainnet':

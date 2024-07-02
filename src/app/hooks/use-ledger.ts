@@ -5,7 +5,6 @@ import Transport from '@ledgerhq/hw-transport-webusb';
 import { LedgerError } from '@models/error-types';
 import { LEDGER_APPS_MAP } from '@models/ledger';
 import { SupportedPaymentType } from '@models/supported-payment-types';
-import { RawVault } from '@models/vault';
 import { bytesToHex } from '@noble/hashes/utils';
 import {
   BitcoinWalletContext,
@@ -14,8 +13,9 @@ import {
 import { LedgerDLCHandler } from 'dlc-btc-lib';
 import { getBalance } from 'dlc-btc-lib/bitcoin-functions';
 import { bitcoin } from 'dlc-btc-lib/constants';
+import { RawVault } from 'dlc-btc-lib/models';
 import { Transaction } from 'dlc-btc-lib/models';
-import { delay } from 'dlc-btc-lib/utilities';
+import { delay, shiftValue } from 'dlc-btc-lib/utilities';
 import { unshiftValue } from 'dlc-btc-lib/utilities';
 import { AppClient, DefaultWalletPolicy } from 'ledger-bitcoin';
 
@@ -34,13 +34,22 @@ interface UseLedgerReturnType {
   handleFundingTransaction: (
     dlcHandler: LedgerDLCHandler,
     vault: RawVault,
+    bitcoinAmount: number,
     attestorGroupPublicKey: string,
     feeRateMultiplier: number
   ) => Promise<Transaction>;
-  handleClosingTransaction: (
+  handleDepositTransaction: (
     dlcHandler: LedgerDLCHandler,
     vault: RawVault,
-    fundingTransactionID: string,
+    withdrawAmount: number,
+    attestorGroupPublicKey: string,
+    feeRateMultiplier: number
+  ) => Promise<Transaction>;
+  handleWithdrawalTransaction: (
+    dlcHandler: LedgerDLCHandler,
+    withdrawAmount: number,
+    attestorGroupPublicKey: string,
+    vault: RawVault,
     feeRateMultiplier: number
   ) => Promise<string>;
   isLoading: [boolean, string];
@@ -206,6 +215,7 @@ export function useLedger(): UseLedgerReturnType {
   async function handleFundingTransaction(
     dlcHandler: LedgerDLCHandler,
     vault: RawVault,
+    bitcoinAmount: number,
     attestorGroupPublicKey: string,
     feeRateMultiplier: number
   ): Promise<Transaction> {
@@ -215,6 +225,7 @@ export function useLedger(): UseLedgerReturnType {
       // ==> Create Funding Transaction
       const fundingPSBT = await dlcHandler.createFundingPSBT(
         vault,
+        BigInt(shiftValue(bitcoinAmount)),
         attestorGroupPublicKey,
         feeRateMultiplier
       );
@@ -232,37 +243,63 @@ export function useLedger(): UseLedgerReturnType {
     }
   }
 
-  /**
-   * Creates the Closing Transaction and signs it with the Ledger Device.
-   * @param vaultUUID The Vault UUID.
-   * @param fundingTransactionID The Funding Transaction ID.
-   * @returns The Partially Signed Closing Transaction HEX.
-   */
-  async function handleClosingTransaction(
+  async function handleDepositTransaction(
     dlcHandler: LedgerDLCHandler,
     vault: RawVault,
-    fundingTransactionID: string,
+    withdrawAmount: number,
+    attestorGroupPublicKey: string,
     feeRateMultiplier: number
-  ): Promise<string> {
+  ): Promise<Transaction> {
     try {
-      setIsLoading([true, 'Creating Closing Transaction']);
+      setIsLoading([true, 'Creating Withdrawal Transaction']);
 
-      // ==> Create Closing PSBT
-      const closingPSBT = await dlcHandler.createClosingPSBT(
+      const depositPSBT = await dlcHandler.createDepositPSBT(
+        BigInt(shiftValue(withdrawAmount)),
         vault,
-        fundingTransactionID,
+        attestorGroupPublicKey,
+        vault.fundingTxId,
         feeRateMultiplier
       );
 
-      setIsLoading([true, 'Sign Closing Transaction on your Ledger Device']);
-      // ==> Sign Closing PSBT with Ledger
-      const closingTransaction = await dlcHandler.signPSBT(closingPSBT, 'closing');
+      setIsLoading([true, 'Sign Withdrawal Transaction in your Leather Wallet']);
+      // ==> Sign Withdrawal PSBT with Ledger
+      const depositTransaction = await dlcHandler.signPSBT(depositPSBT, 'deposit');
 
       setIsLoading([false, '']);
-      return bytesToHex(closingTransaction.toPSBT());
+      return depositTransaction;
     } catch (error) {
       setIsLoading([false, '']);
-      throw new LedgerError(`Error handling Closing Transaction: ${error}`);
+      throw new LedgerError(`Error handling Withdrawal Transaction: ${error}`);
+    }
+  }
+
+  async function handleWithdrawalTransaction(
+    dlcHandler: LedgerDLCHandler,
+    withdrawAmount: number,
+    attestorGroupPublicKey: string,
+    vault: RawVault,
+    feeRateMultiplier: number
+  ): Promise<string> {
+    try {
+      setIsLoading([true, 'Creating Withdrawal Transaction']);
+
+      const withdrawalPSBT = await dlcHandler.createWithdrawalPSBT(
+        vault,
+        BigInt(shiftValue(withdrawAmount)),
+        attestorGroupPublicKey,
+        vault.fundingTxId,
+        feeRateMultiplier
+      );
+
+      setIsLoading([true, 'Sign Withdrawal Transaction in your Leather Wallet']);
+      // ==> Sign Withdrawal PSBT with Ledger
+      const withdrawalTransaction = await dlcHandler.signPSBT(withdrawalPSBT, 'withdraw');
+
+      setIsLoading([false, '']);
+      return bytesToHex(withdrawalTransaction.toPSBT());
+    } catch (error) {
+      setIsLoading([false, '']);
+      throw new LedgerError(`Error handling Withdrawal Transaction: ${error}`);
     }
   }
 
@@ -270,7 +307,8 @@ export function useLedger(): UseLedgerReturnType {
     getLedgerAddressesWithBalances,
     connectLedgerWallet,
     handleFundingTransaction,
-    handleClosingTransaction,
+    handleDepositTransaction,
+    handleWithdrawalTransaction,
     isLoading,
   };
 }

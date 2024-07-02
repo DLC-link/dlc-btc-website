@@ -27,9 +27,7 @@ export function VaultsListGroupContainer({
       {label && (
         <HStack pt={'15px'} justifyContent={'space-between'} w={'100%'}>
           <HStack>
-            {['Locking BTC in Progress', 'Unlocking BTC in Progress'].includes(label) && (
-              <Spinner color={'accent.lightBlue.01'} size={'md'} />
-            )}
+            {['Pending'].includes(label) && <Spinner color={'accent.lightBlue.01'} size={'md'} />}
             <Text color={'white'}>{label}</Text>
           </HStack>
           {label === 'Minted dlcBTC' && (

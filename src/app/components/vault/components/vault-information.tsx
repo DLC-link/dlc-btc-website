@@ -1,11 +1,13 @@
 import { CheckIcon } from '@chakra-ui/icons';
 import { HStack, Image, Text, VStack } from '@chakra-ui/react';
-import { VaultState } from '@models/vault';
+import { VaultState } from 'dlc-btc-lib/models';
 
 import { VaultExpandButton } from './vault-expand-button';
 
 const getAssetLogo = (state: VaultState) => {
-  return [VaultState.FUNDED, VaultState.CLOSING, VaultState.CLOSED].includes(state)
+  return [VaultState.FUNDED, VaultState.CLOSING, VaultState.CLOSED, VaultState.PENDING].includes(
+    state
+  )
     ? '/images/logos/dlc-btc-logo.svg'
     : '/images/logos/bitcoin-logo.svg';
 };

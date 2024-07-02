@@ -1,5 +1,5 @@
 import { Box, Progress, Text, VStack } from '@chakra-ui/react';
-import { VaultState } from '@models/vault';
+import { VaultState } from 'dlc-btc-lib/models';
 
 interface VaultProgressBarProps {
   confirmedBlocks: number;
