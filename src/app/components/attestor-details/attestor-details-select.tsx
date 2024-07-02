@@ -31,85 +31,61 @@ export function AttestorDetailsSelect(): React.JSX.Element {
           width={'245px'}
           bgGradient={`linear(to-r, #AC50EF, #7059FB, #2ECFF6)`}
         >
-          <AttestorDetailsTotalCard
-            children={
-              <>
-                <AttestorDetailsCardItem
-                  label={'Validation Success Rate'}
-                  children={
-                    <Text fontSize={'4xl'} fontWeight={600} color={'white'}>
-                      100%
-                    </Text>
-                  }
-                />
-                <AttestorDetailsCardItem
-                  label={'Total Validations'}
-                  children={
-                    <Text color={'white'} fontSize={'xl'} fontWeight={600}>
-                      2
-                    </Text>
-                  }
-                />
-              </>
-            }
-          />
+          <AttestorDetailsTotalCard>
+            <>
+              <AttestorDetailsCardItem label={'Validation Success Rate'}>
+                <Text fontSize={'4xl'} fontWeight={600} color={'white'}>
+                  100%
+                </Text>
+              </AttestorDetailsCardItem>
+
+              <AttestorDetailsCardItem label={'Total Validations'}>
+                <Text color={'white'} fontSize={'xl'} fontWeight={600}>
+                  2
+                </Text>
+              </AttestorDetailsCardItem>
+            </>
+          </AttestorDetailsTotalCard>
         </AttestorDetailsCardLayout>
         <AttestorDetailsCardLayout
           width={'245px'}
           bgGradient={`linear(to-r, #AC50EF, #7059FB, #2ECFF6)`}
         >
-          <AttestorDetailsTotalCard
-            children={
-              <>
-                <AttestorDetailsCardItem
-                  label={'Total Delegation'}
-                  children={
-                    <Text fontSize={'4xl'} fontWeight={600} color={'white'}>
-                      100%
-                    </Text>
-                  }
-                />
-                <AttestorDetailsCardItem
-                  label={'Total Delegation'}
-                  children={
-                    <Text color={'white'} fontSize={'xl'} fontWeight={600}>
-                      5
-                    </Text>
-                  }
-                />
-              </>
-            }
-          />
+          <AttestorDetailsTotalCard>
+            <>
+              <AttestorDetailsCardItem label={'Total Delegation'}>
+                <Text fontSize={'4xl'} fontWeight={600} color={'white'}>
+                  100%
+                </Text>
+              </AttestorDetailsCardItem>
+              <AttestorDetailsCardItem label={'Total Delegation'}>
+                <Text color={'white'} fontSize={'xl'} fontWeight={600}>
+                  5
+                </Text>
+              </AttestorDetailsCardItem>
+            </>
+          </AttestorDetailsTotalCard>
         </AttestorDetailsCardLayout>
         <AttestorDetailsCardLayout width={'245px'}>
-          <AttestorDetailsActivityCard
-            label={'Active Delegation'}
-            children={
-              <>
-                <ActivityCardRow name={'Fee'} value={'2.00%'}></ActivityCardRow>
-                <ActivityCardRow name={'Max Yield'} value={'2.00%'}></ActivityCardRow>
-                <ActivityCardRow name={'Delegations'} value={'78'}></ActivityCardRow>
-              </>
-            }
-          ></AttestorDetailsActivityCard>
+          <AttestorDetailsActivityCard label={'Active Delegation'}>
+            <>
+              <ActivityCardRow name={'Fee'} value={'2.00%'}></ActivityCardRow>
+              <ActivityCardRow name={'Max Yield'} value={'2.00%'}></ActivityCardRow>
+              <ActivityCardRow name={'Delegations'} value={'78'}></ActivityCardRow>
+            </>
+          </AttestorDetailsActivityCard>
         </AttestorDetailsCardLayout>
         <AttestorDetailsCardLayout width={'480px'}>
-          <AttestorDetailsActivityCard
-            label={'Active Validation'}
-            children={
-              <>
-                <ActivityCardRow
-                  name={'Time Left'}
-                  value={'347 days and 20 hours'}
-                ></ActivityCardRow>
-                <ActivityCardRow name={'Average Response'} value={'100.00%'}></ActivityCardRow>
-                <ActivityCardRow
-                  name={'Potential rewards'}
-                  value={'1,354.121 dlcBTC'}
-                ></ActivityCardRow>
-              </>
-            }
-          ></AttestorDetailsActivityCard>
+          <AttestorDetailsActivityCard label={'Active Validation'}>
+            <>
+              <ActivityCardRow name={'Time Left'} value={'347 days and 20 hours'}></ActivityCardRow>
+              <ActivityCardRow name={'Average Response'} value={'100.00%'}></ActivityCardRow>
+              <ActivityCardRow
+                name={'Potential rewards'}
+                value={'1,354.121 dlcBTC'}
+              ></ActivityCardRow>
+            </>
+          </AttestorDetailsActivityCard>
         </AttestorDetailsCardLayout>
       </AttestorDetailsCard>
       <AttestorSelectTable />

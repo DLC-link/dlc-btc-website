@@ -9,27 +9,24 @@ import { AttestorSelectTableItem } from './components/attestor-select-table-item
 export function AttestorSelectTable(): React.JSX.Element {
   return (
     <AttestorDetailsTableLayout>
-      <AttestorDetailsTableHeader
-        children={
-          <>
-            <AttestorDetailsTableHeaderText width={'20%'}>#</AttestorDetailsTableHeaderText>
-            <AttestorDetailsTableHeaderText width={'16%'}>Time</AttestorDetailsTableHeaderText>
-            <AttestorDetailsTableHeaderText width={'16%'}>Action</AttestorDetailsTableHeaderText>
-            <AttestorDetailsTableHeaderText width={'16%'}>Programs</AttestorDetailsTableHeaderText>
-            <AttestorDetailsTableHeaderText width={'16%'}>Value</AttestorDetailsTableHeaderText>
-            <AttestorDetailsTableHeaderText width={'16%'}>Tokens</AttestorDetailsTableHeaderText>
-          </>
-        }
-      />
-      <AttestorDetailsTableBody
-        children={
-          <>
-            {exampleAttestorSelectTableItems.map(item => (
-              <AttestorSelectTableItem key={item.hash} {...item} />
-            ))}
-          </>
-        }
-      />
+      <AttestorDetailsTableHeader>
+        <>
+          <AttestorDetailsTableHeaderText width={'20%'}>#</AttestorDetailsTableHeaderText>
+          <AttestorDetailsTableHeaderText width={'16%'}>Time</AttestorDetailsTableHeaderText>
+          <AttestorDetailsTableHeaderText width={'16%'}>Action</AttestorDetailsTableHeaderText>
+          <AttestorDetailsTableHeaderText width={'16%'}>Programs</AttestorDetailsTableHeaderText>
+          <AttestorDetailsTableHeaderText width={'16%'}>Value</AttestorDetailsTableHeaderText>
+          <AttestorDetailsTableHeaderText width={'16%'}>Tokens</AttestorDetailsTableHeaderText>
+        </>
+      </AttestorDetailsTableHeader>
+
+      <AttestorDetailsTableBody>
+        <>
+          {exampleAttestorSelectTableItems.map(item => (
+            <AttestorSelectTableItem key={item.hash} {...item} />
+          ))}
+        </>
+      </AttestorDetailsTableBody>
     </AttestorDetailsTableLayout>
   );
 }
