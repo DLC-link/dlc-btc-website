@@ -5,34 +5,29 @@ import { AttestorDetailsCardItem } from './attestor-details-card-item';
 export function AttestorDetailsValidatorsCard(): React.JSX.Element {
   return (
     <VStack h={'100%'} alignItems={'flex-start'}>
-      <AttestorDetailsCardItem
-        label={'Active Validators'}
-        children={
-          <HStack alignItems={'baseline'}>
-            <Text
-              fontSize={'4xl'}
-              fontWeight={600}
-              bgGradient={`linear(to-r, #AC50EF, #7059FB, #2ECFF6)`}
-              bgClip="text"
-            >
-              1478
-            </Text>
-            <Text color={'white.03'}>(30.82%)</Text>
-          </HStack>
-        }
-      />
+      <AttestorDetailsCardItem label={'Active Validators'}>
+        <HStack alignItems={'baseline'}>
+          <Text
+            fontSize={'4xl'}
+            fontWeight={600}
+            bgGradient={`linear(to-r, #AC50EF, #7059FB, #2ECFF6)`}
+            bgClip="text"
+          >
+            1478
+          </Text>
+          <Text color={'white.03'}>(30.82%)</Text>
+        </HStack>
+      </AttestorDetailsCardItem>
+
       <Divider />
-      <AttestorDetailsCardItem
-        label={'Non-Vote Validators'}
-        children={
-          <HStack alignItems={'baseline'}>
-            <Text color={'white'} fontSize={'4xl'} fontWeight={600}>
-              3463
-            </Text>
-            <Text color={'white.03'}>(60.18%)</Text>
-          </HStack>
-        }
-      />
+      <AttestorDetailsCardItem label={'Non-Vote Validators'}>
+        <HStack alignItems={'baseline'}>
+          <Text color={'white'} fontSize={'4xl'} fontWeight={600}>
+            3463
+          </Text>
+          <Text color={'white.03'}>(60.18%)</Text>
+        </HStack>
+      </AttestorDetailsCardItem>
     </VStack>
   );
 }
