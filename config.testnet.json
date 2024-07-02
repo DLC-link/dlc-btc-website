@@ -3,7 +3,11 @@
   "attestorURLs": [
     "https://testnet.dlc.link/attestor-1",
     "https://testnet.dlc.link/attestor-2",
-    "https://testnet.dlc.link/attestor-3"
+    "https://testnet.dlc.link/attestor-3",
+    "https://attestor.testnet.dlc.despreadlabs.io",
+    "http://103.164.81.14:8811",
+    "https://arb-sepolia-dlc-attestor-0.public.linkpool.io/jK245aUH8GvfgFp5fmUKdnTJLlS9nnAz",
+    "http://dlc-testnet.stakin-nodes.com:8811"
   ],
   "enabledEthereumNetworkIDs": ["421614"],
   "bitcoinNetwork": "testnet",
