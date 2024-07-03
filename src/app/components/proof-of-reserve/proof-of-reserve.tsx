@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 
-import { Divider, HStack, Text, VStack } from '@chakra-ui/react';
+import { Divider, HStack, Text } from '@chakra-ui/react';
 import { Merchant } from '@models/merchant';
 import { bitcoin, dlcBTC } from '@models/token';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
@@ -33,23 +33,21 @@ export function ProofOfReserve(): React.JSX.Element {
       </Text>
       <TokenStatsBoardLayout>
         <HStack w={'100%'}>
-          <VStack w={'50%'} alignItems={'flex-start'}>
-            <TokenStatsBoardTVL totalSupply={totalSupply} bitcoinPrice={bitcoinPrice} />
-            <HStack w={'100%'} pl={'25px'}>
-              <TokenStatsBoardToken token={dlcBTC} totalSupply={totalSupply} />
-              <Divider orientation={'vertical'} px={'15px'} height={'75px'} variant={'thick'} />
-              <TokenStatsBoardToken token={bitcoin} totalSupply={proofOfReserveSum} />
-            </HStack>
-          </VStack>
-          <Divider orientation={'vertical'} px={'15px'} height={'275px'} variant={'thick'} />
-          <MerchantTableLayout>
-            <MerchantTableHeader />
-            {merchantProofOfReserves.map(item => (
-              <MerchantTableItem key={item.merchant.name} {...item} />
-            ))}
-          </MerchantTableLayout>
+          <TokenStatsBoardTVL totalSupply={totalSupply} bitcoinPrice={bitcoinPrice} />
+          <Divider orientation={'vertical'} px={'15px'} height={'75px'} variant={'thick'} />
+          <TokenStatsBoardToken token={dlcBTC} totalSupply={totalSupply} />
+          <Divider orientation={'vertical'} px={'15px'} height={'75px'} variant={'thick'} />
+          <TokenStatsBoardToken token={bitcoin} totalSupply={proofOfReserveSum} />
         </HStack>
         {/* <ProtocolHistoryTable /> */}
+      </TokenStatsBoardLayout>
+      <TokenStatsBoardLayout>
+        <MerchantTableLayout>
+          <MerchantTableHeader />
+          {merchantProofOfReserves.map(item => (
+            <MerchantTableItem key={item.merchant.name} {...item} />
+          ))}
+        </MerchantTableLayout>
       </TokenStatsBoardLayout>
     </ProofOfReserveLayout>
   );

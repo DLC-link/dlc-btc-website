@@ -1,4 +1,4 @@
-import { Divider, Skeleton, Text, VStack } from '@chakra-ui/react';
+import { Skeleton, Text, VStack } from '@chakra-ui/react';
 
 interface TokenStatsBoardTVLProps {
   totalSupply: number | undefined;
@@ -11,23 +11,17 @@ export function TokenStatsBoardTVL({
 }: TokenStatsBoardTVLProps): React.JSX.Element {
   return (
     <VStack w={'100%'} px={'25px'} py={'15px'} alignItems={'flex-start'}>
-      <Text color={'white.01'} fontSize={'3xl'} fontWeight={'200'} textAlign={'left'}>
+      <Text color={'white.01'} fontSize={'lg'} fontWeight={'600'} textAlign={'left'}>
         TVL
       </Text>
       <Skeleton w={'100%'} isLoaded={totalSupply !== undefined}>
-        <Text
-          fontSize={'5xl'}
-          fontWeight={600}
-          bgGradient={`linear(to-r, #AC50EF, #7059FB, #2ECFF6)`}
-          bgClip="text"
-        >
+        <Text fontSize={'2xl'} fontWeight={600} color={'white.01'}>
           $
           {totalSupply && bitcoinPrice
             ? `${Math.floor(totalSupply * bitcoinPrice).toLocaleString('en-US')} USD`
             : 0}
         </Text>
       </Skeleton>
-      <Divider h={'25px'} orientation={'horizontal'} variant={'thick'} />
     </VStack>
   );
 }

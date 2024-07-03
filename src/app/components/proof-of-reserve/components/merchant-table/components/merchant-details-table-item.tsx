@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { HStack, Text } from '@chakra-ui/react';
+import { HStack, Image, Text } from '@chakra-ui/react';
 import { CustomSkeleton } from '@components/custom-skeleton/custom-skeleton';
 
 interface MerchantFocusTableItemProps {
@@ -11,31 +11,48 @@ interface MerchantFocusTableItemProps {
   date: string;
 }
 
-export function MerchantFocusTableItem(
+export function MerchantDetailsTableItem(
   merchantFocusTableItem: MerchantFocusTableItemProps
 ): React.JSX.Element {
   if (!merchantFocusTableItem) return <CustomSkeleton height={'35px'} />;
 
   const { orderBook, amount, inUSD, txNumber, date } = merchantFocusTableItem;
 
+  const renderAmount = () => {
+    if (orderBook === 'REDEEM') {
+      return `- ${amount}`;
+    } else {
+      return amount;
+    }
+  };
+
   return (
     <HStack
       p={'10px'}
       w={'100%'}
       h={'50px'}
-      bg={'background.content.01'}
+      bg={orderBook === 'MINT' ? 'table.background.green' : 'table.background.red'}
       blendMode={'screen'}
       border={'1px solid'}
       borderRadius={'md'}
       borderColor={'border.white.01'}
       justifyContent={'space-between'}
     >
-      <Text w={'20%'} color={'white'} fontSize={'sm'} fontWeight={500}>
+      <Text
+        w={'20%'}
+        color={orderBook === 'MINT' ? 'green.mint' : 'red.redeem'}
+        fontSize={'sm'}
+        fontWeight={700}
+      >
         {orderBook}
       </Text>
-      <Text w={'20%'} color={'white'} fontSize={'sm'} fontWeight={800}>
-        {amount}
-      </Text>
+      <HStack w={'20%'}>
+        <Image src={'./images/logos/dlc-btc-logo.svg'} alt={'dlc BTC logo'} boxSize={'25px'} />
+        <Text color={'white'} fontSize={'sm'} fontWeight={800}>
+          {renderAmount()}
+        </Text>
+      </HStack>
+
       <Text w={'20%'} color={'white'} fontSize={'sm'}>
         {inUSD}
       </Text>

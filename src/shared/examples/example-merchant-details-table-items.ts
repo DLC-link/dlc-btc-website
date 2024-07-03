@@ -1,5 +1,5 @@
 
-export const exampleMerchantFocusTableItems = [
+export const exampleMerchantDetailsTableItems = [
     {
         id: '1',
         orderBook: 'MINT',

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { Button, HStack, Image, Skeleton, Text } from '@chakra-ui/react';
 import { Merchant } from '@models/merchant';
@@ -14,7 +15,7 @@ export function MerchantTableItem({
 }: MerchantTableItemProps): React.ReactElement {
   //TODO: replace name with logo when the logo is available
   const { name } = merchant;
-  //const navigate = useNavigate();
+  const navigate = useNavigate();
 
   //const { ethereumExplorerAPIURL } = useEthereumConfiguration();
   return (
@@ -41,8 +42,7 @@ export function MerchantTableItem({
         w={'150px'}
         variant={'merchantTableItem'}
         onClick={
-          () => {}
-          //() => navigate('/merchant-focus')
+          () => navigate(`/merchant-details/${merchant.name}`)
           // window.open(`${ethereumExplorerAPIURL}/address/${merchant.address}`, '_blank')
         }
       >

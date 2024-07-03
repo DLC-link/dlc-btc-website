@@ -54,6 +54,10 @@ export const appTheme = extendTheme({
     'white.03': 'rgba(255,255,255,0.35)',
     'warning.01': 'rgba(255,204,85, 1)',
     'error.01': 'rgba(255,51,102, 1)',
+    'table.background.green': 'rgba(50, 201, 247, 0.1)',
+    'table.background.red': 'rgba(172, 80, 239, 0.2)',
+    'green.mint': 'rgba(50, 201, 247, 1)',
+    'red.redeem': 'rgba(233, 97, 255, 1)'
   },
   fonts: {
     body: "'Onest', onest, sans-serif",
