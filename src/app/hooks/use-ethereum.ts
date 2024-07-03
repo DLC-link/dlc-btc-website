@@ -3,14 +3,17 @@ import { useContext } from 'react';
 import { useSelector } from 'react-redux';
 
 import { EthereumError } from '@models/error-types';
+import { DetailedEvent } from '@models/ethereum-models';
 import { EthereumNetwork } from '@models/ethereum-network';
 import { RawVault, Vault, VaultState } from '@models/vault';
 import { VaultContext } from '@providers/vault-context-provider';
 import { RootState, store } from '@store/index';
 import { vaultActions } from '@store/slices/vault/vault.actions';
 import { customShiftValue, unshiftValue } from 'dlc-btc-lib/utilities';
-import { ethers } from 'ethers';
+import { Event, ethers } from 'ethers';
 import { Logger } from 'ethers/lib/utils';
+
+import { BURN_ADDRESS } from '@shared/constants/ethereum.constants';
 
 import { useEthereumContext } from './use-ethereum-context';
 
@@ -30,6 +33,7 @@ interface UseEthereumReturnType {
   getAllFundedVaults: (thereumNetwork: EthereumNetwork) => Promise<RawVault[]>;
   setupVault: (btcDepositAmount: number) => Promise<void>;
   closeVault: (vaultUUID: string) => Promise<void>;
+  fetchMintBurnEvents: (userAddress: string) => Promise<DetailedEvent[]>;
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -224,6 +228,39 @@ export function useEthereum(): UseEthereumReturnType {
     }
   }
 
+  function formatTransferEvent(event: any, timestamp: number, txHash: string): DetailedEvent {
+    return {
+      from: event.from.toLowerCase(),
+      to: event.to.toLowerCase(),
+      value: event.value,
+      timestamp,
+      txHash,
+    };
+  }
+
+  async function fetchMintBurnEvents(userAddress: string): Promise<DetailedEvent[]> {
+    const dlcBTCContract = await getDefaultProvider(network, 'DLCBTC');
+    const eventFilterTo = dlcBTCContract.filters.Transfer(BURN_ADDRESS, userAddress);
+    const eventFilterFrom = dlcBTCContract.filters.Transfer(userAddress, BURN_ADDRESS);
+    const eventsTo = await dlcBTCContract.queryFilter(eventFilterTo);
+    const eventsFrom = await dlcBTCContract.queryFilter(eventFilterFrom);
+    const events = [...eventsTo, ...eventsFrom];
+    const detailedEvents: DetailedEvent[] = [];
+
+    await Promise.all(
+      events.map(async (event: Event) => {
+        const block = await dlcBTCContract.provider.getBlock(event.blockNumber);
+        detailedEvents.push(
+          formatTransferEvent(event.args, block.timestamp, event.transactionHash)
+        );
+      })
+    );
+
+    detailedEvents.sort((a, b) => b.timestamp - a.timestamp);
+
+    return detailedEvents;
+  }
+
   return {
     getDefaultProvider,
     getDLCBTCBalance,
@@ -235,5 +272,6 @@ export function useEthereum(): UseEthereumReturnType {
     getAllFundedVaults,
     setupVault,
     closeVault,
+    fetchMintBurnEvents,
   };
 }

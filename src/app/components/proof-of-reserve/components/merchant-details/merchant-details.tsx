@@ -1,4 +1,5 @@
 import { useContext } from 'react';
+import { useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
 
 import { Divider, HStack, Image, Text } from '@chakra-ui/react';
@@ -6,13 +7,15 @@ import { GenericTableBody } from '@components/generic-table/components/generic-t
 import { GenericTableHeader } from '@components/generic-table/components/generic-table-header';
 import { GenericTableHeaderText } from '@components/generic-table/components/generic-table-header-text';
 import { GenericTableLayout } from '@components/generic-table/components/generic-table-layout';
+import { useEthereum } from '@hooks/use-ethereum';
 import { Merchant } from '@models/merchant';
 import { bitcoin, dlcBTC } from '@models/token';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
 
-import { exampleMerchantDetailsTableItems } from '@shared/examples/example-merchant-details-table-items';
-
-import { MerchantDetailsTableItem } from '../merchant-table/components/merchant-details-table-item';
+import {
+  MerchantDetailsTableItem,
+  MerchantFocusTableItemProps,
+} from '../merchant-table/components/merchant-details-table-item';
 import { TokenStatsBoardToken } from '../token-stats-board/components/token-stats-board-token';
 import { TokenStatsBoardTVL } from '../token-stats-board/components/token-stats-board-tvl';
 import { TokenStatsBoardLayout } from '../token-stats-board/token-stats-board.layout';
@@ -20,7 +23,8 @@ import { MerchantDetailsLayout } from './components/merchant-details-layout';
 
 export function MerchantDetails(): React.JSX.Element {
   const { name } = useParams();
-  const { proofOfReserve, totalSupply, bitcoinPrice } = useContext(ProofOfReserveContext);
+  const { proofOfReserve, bitcoinPrice } = useContext(ProofOfReserveContext);
+  const { fetchMintBurnEvents } = useEthereum();
 
   const [proofOfReserveSum, merchantProofOfReserves] = proofOfReserve || [
     undefined,
@@ -33,14 +37,28 @@ export function MerchantDetails(): React.JSX.Element {
   ];
   const amberMerchant = merchantProofOfReserves.find(item => item.merchant.name === 'AMBER');
 
+  const { data: mintBurnEvents } = useQuery(['mintBurnEvents'], fetchMintBurnEventsHandler);
+
+  async function fetchMintBurnEventsHandler(): Promise<MerchantFocusTableItemProps[]> {
+    if (!amberMerchant?.merchant.address) return [];
+    const detailedEvents = await fetchMintBurnEvents(amberMerchant.merchant.address);
+    return detailedEvents.map((event, index) => {
+      return {
+        id: index,
+        orderBook:
+          event.from.toLowerCase() === amberMerchant.merchant.address.toLowerCase()
+            ? 'REDEEM'
+            : 'MINT',
+        amount: event.value.toString(),
+        inUSD: 'TODO', //TODO: calculate usd value at the time of mint
+        txHash: event.txHash,
+        date: new Date(event.timestamp * 1000).toDateString(),
+      };
+    });
+  }
+
   const renderMerchantFocusTableItems = () => {
-    return (
-      <>
-        {exampleMerchantDetailsTableItems.map(item => (
-          <MerchantDetailsTableItem key={item.id} {...item} />
-        ))}
-      </>
-    );
+    return <>{mintBurnEvents?.map(item => <MerchantDetailsTableItem key={item.id} {...item} />)}</>;
   };
 
   return (
@@ -67,7 +85,7 @@ export function MerchantDetails(): React.JSX.Element {
           <GenericTableHeaderText>Order Book</GenericTableHeaderText>
           <GenericTableHeaderText>Amount</GenericTableHeaderText>
           <GenericTableHeaderText>in USD</GenericTableHeaderText>
-          <GenericTableHeaderText>BTC Transaction</GenericTableHeaderText>
+          <GenericTableHeaderText>Transaction</GenericTableHeaderText>
           <GenericTableHeaderText>Date</GenericTableHeaderText>
         </GenericTableHeader>
 

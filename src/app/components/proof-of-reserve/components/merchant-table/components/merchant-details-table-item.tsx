@@ -1,13 +1,14 @@
 /* eslint-disable */
 import { HStack, Image, Text } from '@chakra-ui/react';
 import { CustomSkeleton } from '@components/custom-skeleton/custom-skeleton';
+import { truncateAddress, unshiftValue } from 'dlc-btc-lib/utilities';
 
-interface MerchantFocusTableItemProps {
-  id: string;
+export interface MerchantFocusTableItemProps {
+  id: number;
   orderBook: string;
   amount: string;
   inUSD: string;
-  txNumber: string;
+  txHash: string;
   date: string;
 }
 
@@ -16,13 +17,13 @@ export function MerchantDetailsTableItem(
 ): React.JSX.Element {
   if (!merchantFocusTableItem) return <CustomSkeleton height={'35px'} />;
 
-  const { orderBook, amount, inUSD, txNumber, date } = merchantFocusTableItem;
+  const { orderBook, amount, inUSD, txHash, date } = merchantFocusTableItem;
 
   const renderAmount = () => {
     if (orderBook === 'REDEEM') {
-      return `- ${amount}`;
+      return `- ${unshiftValue(parseInt(amount))}`;
     } else {
-      return amount;
+      return unshiftValue(parseInt(amount));
     }
   };
 
@@ -57,7 +58,7 @@ export function MerchantDetailsTableItem(
         {inUSD}
       </Text>
       <Text w={'20%'} color={'white'} fontSize={'sm'}>
-        {txNumber}
+        {truncateAddress(txHash)}
       </Text>
       <Text w={'20%'} color={'white'} fontSize={'sm'}>
         {date}
