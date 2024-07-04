@@ -1,8 +1,9 @@
 import { useContext } from 'react';
+import { MdArrowBack } from 'react-icons/md';
 import { useQuery } from 'react-query';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
-import { Divider, HStack, Image, Text } from '@chakra-ui/react';
+import { Divider, HStack, Icon, Image, Skeleton, Text } from '@chakra-ui/react';
 import { GenericTableBody } from '@components/generic-table/components/generic-table-body';
 import { GenericTableHeader } from '@components/generic-table/components/generic-table-header';
 import { GenericTableHeaderText } from '@components/generic-table/components/generic-table-header-text';
@@ -25,6 +26,7 @@ export function MerchantDetails(): React.JSX.Element {
   const { name } = useParams();
   const { proofOfReserve, bitcoinPrice } = useContext(ProofOfReserveContext);
   const { fetchMintBurnEvents } = useEthereum();
+  const navigate = useNavigate();
 
   const [proofOfReserveSum, merchantProofOfReserves] = proofOfReserve || [
     undefined,
@@ -57,30 +59,62 @@ export function MerchantDetails(): React.JSX.Element {
     });
   }
 
+  const itemHeight = 65;
+  const padding = 20;
+  const dynamicHeight = mintBurnEvents ? mintBurnEvents.length * itemHeight + padding : padding;
+
   const renderMerchantFocusTableItems = () => {
     return <>{mintBurnEvents?.map(item => <MerchantDetailsTableItem key={item.id} {...item} />)}</>;
   };
 
+  const formatName = (name: any) => {
+    return name
+      .split(' ')
+      .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  };
+
   return (
     <MerchantDetailsLayout>
-      <Text w={'100%'} color={'white'} fontSize={'6xl'} fontWeight={500}>
-        {name} Group Dashboard
+      <Text
+        w={'100%'}
+        color={'white'}
+        fontSize={'5xl'}
+        fontWeight={600}
+        pt={'50px'}
+        lineHeight={'60px'}
+      >
+        {`${formatName(name)} Group`}
+        <br />
+        {'Dashboard'}
       </Text>
-      <TokenStatsBoardLayout width="100%">
-        <HStack w={'100%'} alignItems={'center'}>
-          <Image src={'public/images/logos/amber-logo.svg'} alt={'amber logo'} boxSize={'100px'} />
-          <Divider orientation={'vertical'} px={'15px'} height={'75px'} variant={'thick'} />
+      <Text variant={'navigate'} fontSize={'xl'} onClick={() => navigate('/proof-of-reserve')}>
+        <HStack spacing={2} alignItems="center">
+          <Icon as={MdArrowBack} />
+          <Text>Back to the List</Text>
+        </HStack>
+      </Text>
+
+      <TokenStatsBoardLayout width={'100%'}>
+        <HStack w={'100%'} alignItems={'center'} justifyContent={'space-evenly'}>
+          <Image
+            src={'/images/logos/amber-logo.svg'}
+            alt={'amber logo'}
+            boxSize={'100px'}
+            mx={'30px'}
+          />
+          <Divider orientation={'vertical'} px={'10px'} height={'75px'} variant={'thick'} />
           <TokenStatsBoardTVL
             totalSupply={amberMerchant?.dlcBTCAmount}
             bitcoinPrice={bitcoinPrice}
           />
-          <Divider orientation={'vertical'} px={'15px'} height={'75px'} variant={'thick'} />
+          <Divider orientation={'vertical'} px={'10px'} height={'75px'} variant={'thick'} />
           <TokenStatsBoardToken token={dlcBTC} totalSupply={amberMerchant?.dlcBTCAmount} />
-          <Divider orientation={'vertical'} px={'15px'} height={'75px'} variant={'thick'} />
-          <TokenStatsBoardToken token={bitcoin} totalSupply={proofOfReserveSum} />
+          <Divider orientation={'vertical'} px={'10px'} height={'75px'} variant={'thick'} />
+          <TokenStatsBoardToken token={bitcoin} totalSupply={amberMerchant?.dlcBTCAmount} />
         </HStack>
       </TokenStatsBoardLayout>
-      <GenericTableLayout height={'300px'}>
+      <GenericTableLayout height={`${dynamicHeight}px`}>
         <GenericTableHeader>
           <GenericTableHeaderText>Order Book</GenericTableHeaderText>
           <GenericTableHeaderText>Amount</GenericTableHeaderText>
@@ -88,8 +122,9 @@ export function MerchantDetails(): React.JSX.Element {
           <GenericTableHeaderText>Transaction</GenericTableHeaderText>
           <GenericTableHeaderText>Date</GenericTableHeaderText>
         </GenericTableHeader>
-
-        <GenericTableBody renderItems={renderMerchantFocusTableItems} />
+        <Skeleton isLoaded={mintBurnEvents !== undefined} height={'50px'} w={'100%'}>
+          <GenericTableBody renderItems={renderMerchantFocusTableItems} />
+        </Skeleton>
       </GenericTableLayout>
     </MerchantDetailsLayout>
   );

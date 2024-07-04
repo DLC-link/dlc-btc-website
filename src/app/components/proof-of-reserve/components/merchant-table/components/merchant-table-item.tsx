@@ -19,7 +19,7 @@ export function MerchantTableItem({
 
   //const { ethereumExplorerAPIURL } = useEthereumConfiguration();
   return (
-    <HStack px={'25px'} w={'100%'} justifyContent={'space-between'}>
+    <HStack w={'100%'} justifyContent={'space-between'}>
       <HStack w={'150px'}>
         <Text
           fontSize={'2xl'}

@@ -1,6 +1,7 @@
 /* eslint-disable */
 import { HStack, Image, Text } from '@chakra-ui/react';
 import { CustomSkeleton } from '@components/custom-skeleton/custom-skeleton';
+import { useEthereumConfiguration } from '@hooks/use-ethereum-configuration';
 import { truncateAddress, unshiftValue } from 'dlc-btc-lib/utilities';
 
 export interface MerchantFocusTableItemProps {
@@ -18,6 +19,8 @@ export function MerchantDetailsTableItem(
   if (!merchantFocusTableItem) return <CustomSkeleton height={'35px'} />;
 
   const { orderBook, amount, inUSD, txHash, date } = merchantFocusTableItem;
+
+  const { ethereumExplorerAPIURL } = useEthereumConfiguration();
 
   const renderAmount = () => {
     if (orderBook === 'REDEEM') {
@@ -48,7 +51,7 @@ export function MerchantDetailsTableItem(
         {orderBook}
       </Text>
       <HStack w={'20%'}>
-        <Image src={'./images/logos/dlc-btc-logo.svg'} alt={'dlc BTC logo'} boxSize={'25px'} />
+        <Image src={'/images/logos/dlc-btc-logo.svg'} alt={'dlc BTC logo'} boxSize={'25px'} />
         <Text color={'white'} fontSize={'sm'} fontWeight={800}>
           {renderAmount()}
         </Text>
@@ -57,7 +60,14 @@ export function MerchantDetailsTableItem(
       <Text w={'20%'} color={'white'} fontSize={'sm'}>
         {inUSD}
       </Text>
-      <Text w={'20%'} color={'white'} fontSize={'sm'}>
+      <Text
+        w={'20%'}
+        color={'accent.lightBlue.01'}
+        fontSize={'sm'}
+        onClick={() => window.open(`${ethereumExplorerAPIURL}/tx/${txHash}`, '_blank')}
+        cursor={'pointer'}
+        textDecoration={'underline'}
+      >
         {truncateAddress(txHash)}
       </Text>
       <Text w={'20%'} color={'white'} fontSize={'sm'}>

@@ -23,6 +23,7 @@ export function GenericTableLayout({
     <VStack
       w={width}
       h={height}
+      minH={'100px'}
       padding={padding}
       alignItems={alignItems}
       borderRadius={borderRadius}
