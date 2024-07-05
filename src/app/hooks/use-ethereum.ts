@@ -248,8 +248,6 @@ export function useEthereum(): UseEthereumReturnType {
     const events = [...eventsTo, ...eventsFrom];
     const detailedEvents: DetailedEvent[] = [];
 
-
-
     await Promise.all(
       events.map(async (event: Event) => {
         const block = await dlcBTCContract.provider.getBlock(event.blockNumber);
@@ -270,10 +268,16 @@ export function useEthereum(): UseEthereumReturnType {
     const eventFilterFrom = dlcBTCContract.filters.Transfer(null, BURN_ADDRESS);
     const eventsTo = await dlcBTCContract.queryFilter(eventFilterTo);
     const eventsFrom = await dlcBTCContract.queryFilter(eventFilterFrom);
-    const events = [...eventsTo, ...eventsFrom];
-    const detailedEvents: DetailedEvent[] = [];
 
+    const lastNEvents = (n: number, events: Event[]) => {
+      return events.slice(events.length - n);
+    };
+    const n = 10;
 
+    const events = [...lastNEvents(n, eventsTo), ...lastNEvents(n, eventsFrom)];
+    let detailedEvents: DetailedEvent[] = [];
+
+    console.log('events:', events);
 
     await Promise.all(
       events.map(async (event: Event) => {
@@ -284,7 +288,12 @@ export function useEthereum(): UseEthereumReturnType {
       })
     );
 
+    console.log('detailedEvents:', detailedEvents);
+
     detailedEvents.sort((a, b) => b.timestamp - a.timestamp);
+    detailedEvents = detailedEvents.slice(0, n);
+
+    console.log('detailedEvents sorted:', detailedEvents);
 
     return detailedEvents;
   }

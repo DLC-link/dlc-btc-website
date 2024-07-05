@@ -1,7 +1,7 @@
 /* eslint-disable */
 import { HStack, Image, Text } from '@chakra-ui/react';
 import { CustomSkeleton } from '@components/custom-skeleton/custom-skeleton';
-import { truncateAddress } from 'dlc-btc-lib/utilities';
+import { truncateAddress, unshiftValue } from 'dlc-btc-lib/utilities';
 
 export interface ProtocolHistoryTableItemProps {
   id: number;
@@ -32,11 +32,11 @@ export function ProtocolHistoryTableItem(
       <HStack w={'25%'}>
         <Image src={'/images/logos/dlc-btc-logo.svg'} alt={'dlcBTC Logo'} boxSize={'20px'} />
         <Text color={'white'} fontWeight={800}>
-          {dlcBTCAmount}
+          {unshiftValue(dlcBTCAmount)}
         </Text>
       </HStack>
       <Text w={'25%'} color={'white'} fontSize={'sm'} fontWeight={800}>
-        {merchant}
+        {truncateAddress(merchant)}
       </Text>
       <Text w={'25%'} color={'white'} fontSize={'sm'}>
         {truncateAddress(txHash)}
