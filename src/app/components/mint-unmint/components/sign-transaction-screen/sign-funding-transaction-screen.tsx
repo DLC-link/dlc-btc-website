@@ -23,7 +23,7 @@ export function SignFundingTransactionScreen({
   handleSignFundingTransaction,
   isBitcoinWalletLoading,
   userEthereumAddressRiskLevel,
-  // fetchUserEthereumAddressRiskLevel,
+  fetchUserEthereumAddressRiskLevel,
   isUserEthereumAddressRiskLevelLoading,
 }: SignFundingTransactionScreenProps): React.JSX.Element {
   const toast = useToast();
@@ -45,8 +45,8 @@ export function SignFundingTransactionScreen({
 
     try {
       setIsSubmitting(true);
-      // const currentRisk = await fetchRisk();
-      // if (currentRisk === 'High') throw new Error('Risk Level is too high');
+      const currentRisk = await fetchUserEthereumAddressRiskLevel();
+      if (currentRisk === 'High') throw new Error('Risk Level is too high');
       await handleSignFundingTransaction(currentVault.uuid, depositAmount);
     } catch (error: any) {
       setIsSubmitting(false);

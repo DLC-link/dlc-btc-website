@@ -16,13 +16,15 @@ import { shiftValue } from 'dlc-btc-lib/utilities';
 import { BurnTokenTransactionForm } from '../../sign-transaction-screen/components/ethereum-transaction-form';
 
 interface UnmintVaultSelectorProps {
-  risk: string;
-  isRiskLoading: boolean;
+  userEthereumAddressRiskLevel: string;
+  fetchUserEthereumAddressRiskLevel: () => Promise<string>;
+  isUserEthereumAddressRiskLevelLoading: boolean;
 }
 
 export function UnmintVaultSelector({
-  risk,
-  isRiskLoading,
+  userEthereumAddressRiskLevel,
+  fetchUserEthereumAddressRiskLevel,
+  isUserEthereumAddressRiskLevelLoading,
 }: UnmintVaultSelectorProps): React.JSX.Element {
   const toast = useToast();
   const dispatch = useDispatch();
@@ -50,8 +52,8 @@ export function UnmintVaultSelector({
     if (selectedVault) {
       try {
         setIsSubmitting(true);
-        // const currentRisk = await fetchRisk();
-        // if (currentRisk === 'High') throw new Error('Risk Level is too high');
+        const currentRisk = await fetchUserEthereumAddressRiskLevel();
+        if (currentRisk === 'High') throw new Error('Risk Level is too high');
         const formattedWithdrawAmount = BigInt(shiftValue(withdrawAmount));
         await withdrawVault(selectedVault.uuid, formattedWithdrawAmount);
         await getVault(selectedVault.uuid, VaultState.FUNDED).then(() => {
@@ -81,8 +83,8 @@ export function UnmintVaultSelector({
           vault={selectedVault}
           bitcoinPrice={bitcoinPrice}
           isSubmitting={isSubmitting}
-          risk={risk}
-          isRiskLoading={isRiskLoading}
+          risk={userEthereumAddressRiskLevel}
+          isRiskLoading={isUserEthereumAddressRiskLevelLoading}
           handleBurn={handleBurn}
           handleCancel={handleCancel}
         />

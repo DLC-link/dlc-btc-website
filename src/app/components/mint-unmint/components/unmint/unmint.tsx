@@ -16,7 +16,7 @@ export function Unmint(): React.JSX.Element {
   const { handleSignWithdrawTransaction, isLoading: isBitcoinWalletLoading } = usePSBT();
 
   const { unmintStep } = useSelector((state: RootState) => state.mintunmint);
-  const { risk, isLoading } = useRisk();
+  const { risk, fetchUserAddressRisk, isLoading } = useRisk();
 
   return (
     <UnmintLayout>
@@ -24,7 +24,11 @@ export function Unmint(): React.JSX.Element {
       <HStack w={'100%'} alignItems={'start'} justifyContent={'space-between'}>
         <Walkthrough flow={'unmint'} currentStep={unmintStep[0]} />
         {[0].includes(unmintStep[0]) && (
-          <UnmintVaultSelector risk={risk!} isRiskLoading={isLoading} />
+          <UnmintVaultSelector
+            userEthereumAddressRiskLevel={risk!}
+            fetchUserEthereumAddressRiskLevel={fetchUserAddressRisk}
+            isUserEthereumAddressRiskLevelLoading={isLoading}
+          />
         )}
         {[1].includes(unmintStep[0]) && (
           <WithdrawScreen

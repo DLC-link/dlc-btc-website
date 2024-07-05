@@ -13,10 +13,8 @@ import {
 import { LedgerDLCHandler } from 'dlc-btc-lib';
 import { getBalance } from 'dlc-btc-lib/bitcoin-functions';
 import { bitcoin } from 'dlc-btc-lib/constants';
-import { RawVault } from 'dlc-btc-lib/models';
-import { Transaction } from 'dlc-btc-lib/models';
-import { delay, shiftValue } from 'dlc-btc-lib/utilities';
-import { unshiftValue } from 'dlc-btc-lib/utilities';
+import { RawVault, Transaction } from 'dlc-btc-lib/models';
+import { delay, shiftValue, unshiftValue } from 'dlc-btc-lib/utilities';
 import { AppClient, DefaultWalletPolicy } from 'ledger-bitcoin';
 
 import { BITCOIN_NETWORK_MAP } from '@shared/constants/bitcoin.constants';
@@ -251,7 +249,7 @@ export function useLedger(): UseLedgerReturnType {
     feeRateMultiplier: number
   ): Promise<Transaction> {
     try {
-      setIsLoading([true, 'Creating Withdrawal Transaction']);
+      setIsLoading([true, 'Accept Multisig Wallet Policy on your Ledger Device']);
 
       const depositPSBT = await dlcHandler.createDepositPSBT(
         BigInt(shiftValue(withdrawAmount)),
@@ -261,7 +259,7 @@ export function useLedger(): UseLedgerReturnType {
         feeRateMultiplier
       );
 
-      setIsLoading([true, 'Sign Withdrawal Transaction in your Leather Wallet']);
+      setIsLoading([true, 'Sign Deposit Transaction in your Leather Wallet']);
       // ==> Sign Withdrawal PSBT with Ledger
       const depositTransaction = await dlcHandler.signPSBT(depositPSBT, 'deposit');
 
@@ -269,7 +267,7 @@ export function useLedger(): UseLedgerReturnType {
       return depositTransaction;
     } catch (error) {
       setIsLoading([false, '']);
-      throw new LedgerError(`Error handling Withdrawal Transaction: ${error}`);
+      throw new LedgerError(`Error handling Deposit Transaction: ${error}`);
     }
   }
 
@@ -281,9 +279,9 @@ export function useLedger(): UseLedgerReturnType {
     feeRateMultiplier: number
   ): Promise<string> {
     try {
-      setIsLoading([true, 'Creating Withdrawal Transaction']);
+      setIsLoading([true, 'Accept Multisig Wallet Policy on your Ledger Device']);
 
-      const withdrawalPSBT = await dlcHandler.createWithdrawalPSBT(
+      const withdrawalPSBT = await dlcHandler.createWithdrawPSBT(
         vault,
         BigInt(shiftValue(withdrawAmount)),
         attestorGroupPublicKey,

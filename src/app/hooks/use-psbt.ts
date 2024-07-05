@@ -48,19 +48,12 @@ export function usePSBT(): UsePSBTReturnType {
     isLoading: isLeatherLoading,
   } = useLeather();
 
-  const isLoadingMap = {
-    [BitcoinWalletType.Leather]: isLeatherLoading,
-    [BitcoinWalletType.Ledger]: isLedgerLoading,
-  };
-
   const { sendFundingTransactionToAttestors, sendDepositWithdrawTransactionToAttestors } =
     useAttestors();
 
   const { getAttestorGroupPublicKey, getRawVault } = useEthereum();
 
   const { ethereumAttestorChainID } = useEthereumConfiguration();
-
-  const [isLoading, setIsLoading] = useState<[boolean, string]>([false, '']);
 
   const [bitcoinDepositAmount, setBitcoinDepositAmount] = useState(0);
 
@@ -78,8 +71,6 @@ export function usePSBT(): UsePSBTReturnType {
       const vault = await getRawVault(vaultUUID);
 
       if (!bitcoinWalletType) throw new Error('Bitcoin Wallet is not setup');
-
-      setIsLoading(isLoadingMap[bitcoinWalletType]);
 
       let fundingTransaction: Transaction;
       switch (bitcoinWalletType) {
@@ -180,8 +171,6 @@ export function usePSBT(): UsePSBTReturnType {
 
       if (!bitcoinWalletType) throw new Error('Bitcoin Wallet is not setup');
 
-      setIsLoading(isLoadingMap[bitcoinWalletType]);
-
       let withdrawalTransactionHex: string;
       switch (bitcoinWalletType) {
         case 'Ledger':
@@ -222,6 +211,6 @@ export function usePSBT(): UsePSBTReturnType {
     handleSignFundingTransaction,
     handleSignWithdrawTransaction,
     bitcoinDepositAmount,
-    isLoading,
+    isLoading: bitcoinWalletType === BitcoinWalletType.Ledger ? isLedgerLoading : isLeatherLoading,
   };
 }

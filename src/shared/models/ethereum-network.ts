@@ -29,7 +29,7 @@ const ethereumHardhat: EthereumNetwork = {
   name: 'Hardhat',
   displayName: 'Hardhat',
   id: EthereumNetworkID.Hardhat,
-  defaultNodeURL: 'http://192.168.86.32:8545',
+  defaultNodeURL: 'http://localhost:8545',
 };
 
 export const ethereumNetworks: EthereumNetwork[] = [

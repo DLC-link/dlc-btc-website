@@ -239,7 +239,7 @@ export function useLeather(): UseLeatherReturnType {
     try {
       setIsLoading([true, 'Creating Withdrawal Transaction']);
 
-      const withdrawalTransaction = await dlcHandler.createWithdrawalPSBT(
+      const withdrawalTransaction = await dlcHandler.createWithdrawPSBT(
         vault,
         BigInt(shiftValue(withdrawAmount)),
         attestorGroupPublicKey,
