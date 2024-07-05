@@ -3,18 +3,20 @@ import { HStack, Image, Text } from '@chakra-ui/react';
 import { CustomSkeleton } from '@components/custom-skeleton/custom-skeleton';
 import { truncateAddress } from 'dlc-btc-lib/utilities';
 
-interface ProtocolHistoryItem {
+export interface ProtocolHistoryTableItemProps {
   id: number;
   merchant: string;
   dlcBTCAmount: number;
-  btcReserve: string;
+  txHash: string;
   date: string;
 }
 
-export function ProtocolHistoryItem(protocolHistoryItem: ProtocolHistoryItem): React.JSX.Element {
-  if (!protocolHistoryItem) return <CustomSkeleton height={'35px'} />;
+export function ProtocolHistoryTableItem(
+  protocolHistoryTableItem: ProtocolHistoryTableItemProps
+): React.JSX.Element {
+  if (!protocolHistoryTableItem) return <CustomSkeleton height={'35px'} />;
 
-  const { merchant, dlcBTCAmount, btcReserve, date } = protocolHistoryItem;
+  const { merchant, dlcBTCAmount, txHash, date } = protocolHistoryTableItem;
 
   return (
     <HStack
@@ -37,7 +39,7 @@ export function ProtocolHistoryItem(protocolHistoryItem: ProtocolHistoryItem): R
         {merchant}
       </Text>
       <Text w={'25%'} color={'white'} fontSize={'sm'}>
-        {truncateAddress(btcReserve)}
+        {truncateAddress(txHash)}
       </Text>
       <Text w={'25%'} color={'white'} fontSize={'sm'}>
         {date}

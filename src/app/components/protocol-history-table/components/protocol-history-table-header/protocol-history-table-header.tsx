@@ -7,7 +7,7 @@ export function ProtocolHistoryTableHeader(): React.JSX.Element {
     <HStack w={'95%'} pl={'10px'}>
       <ProtocolHistoryTableHeaderText>Order Book</ProtocolHistoryTableHeaderText>
       <ProtocolHistoryTableHeaderText>Merchant</ProtocolHistoryTableHeaderText>
-      <ProtocolHistoryTableHeaderText>BTC Reserve</ProtocolHistoryTableHeaderText>
+      <ProtocolHistoryTableHeaderText>BTC Transaction</ProtocolHistoryTableHeaderText>
       <ProtocolHistoryTableHeaderText>Date</ProtocolHistoryTableHeaderText>
     </HStack>
   );

@@ -3,7 +3,7 @@ import { scrollBarCSS } from '@styles/css-styles';
 
 import { exampleProtocolHistoryItems } from '@shared/examples/example-protocol-history-table-items';
 
-import { ProtocolHistoryItem } from '../protocol-history-table-item';
+import { ProtocolHistoryTableItem } from '../protocol-history-table-item';
 
 export function ProtocolHistoryTableBody(): React.JSX.Element {
   return (
@@ -17,7 +17,7 @@ export function ProtocolHistoryTableBody(): React.JSX.Element {
       css={scrollBarCSS}
     >
       {exampleProtocolHistoryItems.map(item => (
-        <ProtocolHistoryItem key={item.id} {...item} />
+        <ProtocolHistoryTableItem key={item.id} {...item} />
       ))}
     </VStack>
   );

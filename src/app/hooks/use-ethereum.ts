@@ -34,6 +34,7 @@ interface UseEthereumReturnType {
   setupVault: (btcDepositAmount: number) => Promise<void>;
   closeVault: (vaultUUID: string) => Promise<void>;
   fetchMintBurnEvents: (userAddress: string) => Promise<DetailedEvent[]>;
+  fetchAllMintBurnEvents: () => Promise<DetailedEvent[]>;
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -247,6 +248,33 @@ export function useEthereum(): UseEthereumReturnType {
     const events = [...eventsTo, ...eventsFrom];
     const detailedEvents: DetailedEvent[] = [];
 
+
+
+    await Promise.all(
+      events.map(async (event: Event) => {
+        const block = await dlcBTCContract.provider.getBlock(event.blockNumber);
+        detailedEvents.push(
+          formatTransferEvent(event.args, block.timestamp, event.transactionHash)
+        );
+      })
+    );
+
+    detailedEvents.sort((a, b) => b.timestamp - a.timestamp);
+
+    return detailedEvents;
+  }
+
+  async function fetchAllMintBurnEvents(): Promise<DetailedEvent[]> {
+    const dlcBTCContract = await getDefaultProvider(network, 'DLCBTC');
+    const eventFilterTo = dlcBTCContract.filters.Transfer(BURN_ADDRESS);
+    const eventFilterFrom = dlcBTCContract.filters.Transfer(null, BURN_ADDRESS);
+    const eventsTo = await dlcBTCContract.queryFilter(eventFilterTo);
+    const eventsFrom = await dlcBTCContract.queryFilter(eventFilterFrom);
+    const events = [...eventsTo, ...eventsFrom];
+    const detailedEvents: DetailedEvent[] = [];
+
+
+
     await Promise.all(
       events.map(async (event: Event) => {
         const block = await dlcBTCContract.provider.getBlock(event.blockNumber);
@@ -273,5 +301,6 @@ export function useEthereum(): UseEthereumReturnType {
     setupVault,
     closeVault,
     fetchMintBurnEvents,
+    fetchAllMintBurnEvents,
   };
 }

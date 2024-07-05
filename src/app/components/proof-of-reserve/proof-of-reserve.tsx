@@ -1,6 +1,17 @@
 import { useContext } from 'react';
+import { useQuery } from 'react-query';
 
-import { Divider, HStack, Text } from '@chakra-ui/react';
+import { Divider, HStack, Skeleton, Text } from '@chakra-ui/react';
+import { GenericTableBody } from '@components/generic-table/components/generic-table-body';
+import { GenericTableHeader } from '@components/generic-table/components/generic-table-header';
+import { GenericTableHeaderText } from '@components/generic-table/components/generic-table-header-text';
+import { GenericTableLayout } from '@components/generic-table/components/generic-table-layout';
+import {
+  ProtocolHistoryTableItem,
+  ProtocolHistoryTableItemProps,
+} from '@components/protocol-history-table/components/protocol-history-table-item';
+import { ProtocolHistoryTable } from '@components/protocol-history-table/protocol-history-table';
+import { useEthereum } from '@hooks/use-ethereum';
 import { Merchant } from '@models/merchant';
 import { bitcoin, dlcBTC } from '@models/token';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
@@ -15,6 +26,7 @@ import { TokenStatsBoardLayout } from './components/token-stats-board/token-stat
 
 export function ProofOfReserve(): React.JSX.Element {
   const { proofOfReserve, totalSupply, bitcoinPrice } = useContext(ProofOfReserveContext);
+  const { fetchAllMintBurnEvents } = useEthereum();
 
   const [proofOfReserveSum, merchantProofOfReserves] = proofOfReserve || [
     undefined,
@@ -25,6 +37,36 @@ export function ProofOfReserve(): React.JSX.Element {
       };
     }),
   ];
+
+  const { data: allMintBurnEvents } = useQuery(
+    ['allMintBurnEvents'],
+    fetchAllMintBurnEventsHandler
+  );
+
+  async function fetchAllMintBurnEventsHandler(): Promise<ProtocolHistoryTableItemProps[]> {
+    const detailedEvents = await fetchAllMintBurnEvents();
+    return detailedEvents.map((event, index) => {
+      return {
+        id: index,
+        dlcBTCAmount: event.value.toNumber(),
+        merchant: event.from,
+        txHash: event.txHash,
+        date: new Date(event.timestamp * 1000).toDateString(),
+      };
+    });
+  }
+
+  const itemHeight = 65;
+  const padding = 20;
+  const dynamicHeight = allMintBurnEvents
+    ? allMintBurnEvents.length * itemHeight + padding
+    : padding;
+
+  const renderProtocolHistoryTableItems = () => {
+    return (
+      <>{allMintBurnEvents?.map(item => <ProtocolHistoryTableItem key={item.id} {...item} />)}</>
+    );
+  };
 
   return (
     <ProofOfReserveLayout>
@@ -39,16 +81,32 @@ export function ProofOfReserve(): React.JSX.Element {
           <Divider orientation={'vertical'} px={'15px'} height={'75px'} variant={'thick'} />
           <TokenStatsBoardToken token={bitcoin} totalSupply={proofOfReserveSum} />
         </HStack>
-        {/* <ProtocolHistoryTable /> */}
       </TokenStatsBoardLayout>
-      <TokenStatsBoardLayout>
+      <HStack
+        w={'100%'}
+        gap={'20px'}
+        alignItems={'flex-start'}
+        bg={'background.container.01'}
+        px={'20px'}
+      >
         <MerchantTableLayout>
           <MerchantTableHeader />
           {merchantProofOfReserves.map(item => (
             <MerchantTableItem key={item.merchant.name} {...item} />
           ))}
         </MerchantTableLayout>
-      </TokenStatsBoardLayout>
+        <GenericTableLayout height={`${dynamicHeight}px`} width={'50%'}>
+          <GenericTableHeader>
+            <GenericTableHeaderText>Order Book</GenericTableHeaderText>
+            <GenericTableHeaderText>Merchant</GenericTableHeaderText>
+            <GenericTableHeaderText>Transaction</GenericTableHeaderText>
+            <GenericTableHeaderText>Date</GenericTableHeaderText>
+          </GenericTableHeader>
+          {/* <Skeleton isLoaded={allMintBurnEvents !== undefined} height={'50px'} w={'100%'}>
+            <GenericTableBody renderItems={renderProtocolHistoryTableItems} />
+          </Skeleton> */}
+        </GenericTableLayout>
+      </HStack>
     </ProofOfReserveLayout>
   );
 }
