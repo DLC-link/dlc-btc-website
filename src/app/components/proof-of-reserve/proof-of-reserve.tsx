@@ -1,9 +1,15 @@
 import { useContext } from 'react';
+import { useQuery } from 'react-query';
 
-import { Divider, HStack, Text, VStack } from '@chakra-ui/react';
+import { Divider, HStack, Text } from '@chakra-ui/react';
+import { ProtocolHistoryTableItemProps } from '@components/protocol-history-table/components/protocol-history-table-item';
+import { ProtocolHistoryTable } from '@components/protocol-history-table/protocol-history-table';
+import { useEthereum } from '@hooks/use-ethereum';
 import { Merchant } from '@models/merchant';
 import { bitcoin, dlcBTC } from '@models/token';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
+
+import { BURN_ADDRESS } from '@shared/constants/ethereum.constants';
 
 import { MerchantTableHeader } from './components/merchant-table/components/merchant-table-header';
 import { MerchantTableItem } from './components/merchant-table/components/merchant-table-item';
@@ -15,6 +21,7 @@ import { TokenStatsBoardLayout } from './components/token-stats-board/token-stat
 
 export function ProofOfReserve(): React.JSX.Element {
   const { proofOfReserve, totalSupply, bitcoinPrice } = useContext(ProofOfReserveContext);
+  const { fetchAllMintBurnEvents } = useEthereum();
 
   const [proofOfReserveSum, merchantProofOfReserves] = proofOfReserve || [
     undefined,
@@ -26,6 +33,25 @@ export function ProofOfReserve(): React.JSX.Element {
     }),
   ];
 
+  const { data: allMintBurnEvents } = useQuery(
+    ['allMintBurnEvents'],
+    fetchAllMintBurnEventsHandler
+  );
+
+  async function fetchAllMintBurnEventsHandler(): Promise<ProtocolHistoryTableItemProps[]> {
+    const detailedEvents = await fetchAllMintBurnEvents();
+    return detailedEvents.map((event, index) => {
+      const isMint = event.from.toLowerCase() === BURN_ADDRESS.toLowerCase();
+      return {
+        id: index,
+        dlcBTCAmount: isMint ? event.value.toNumber() : event.value.toNumber() * -1,
+        merchant: isMint ? event.to : event.from,
+        txHash: event.txHash,
+        date: new Date(event.timestamp * 1000).toDateString(),
+      };
+    });
+  }
+
   return (
     <ProofOfReserveLayout>
       <Text w={'100%'} color={'white'} fontSize={'6xl'} fontWeight={500}>
@@ -33,24 +59,22 @@ export function ProofOfReserve(): React.JSX.Element {
       </Text>
       <TokenStatsBoardLayout>
         <HStack w={'100%'}>
-          <VStack w={'50%'} alignItems={'flex-start'}>
-            <TokenStatsBoardTVL totalSupply={totalSupply} bitcoinPrice={bitcoinPrice} />
-            <HStack w={'100%'} pl={'25px'}>
-              <TokenStatsBoardToken token={dlcBTC} totalSupply={totalSupply} />
-              <Divider orientation={'vertical'} px={'15px'} height={'75px'} variant={'thick'} />
-              <TokenStatsBoardToken token={bitcoin} totalSupply={proofOfReserveSum} />
-            </HStack>
-          </VStack>
-          <Divider orientation={'vertical'} px={'15px'} height={'275px'} variant={'thick'} />
-          <MerchantTableLayout>
-            <MerchantTableHeader />
-            {merchantProofOfReserves.map(item => (
-              <MerchantTableItem key={item.merchant.name} {...item} />
-            ))}
-          </MerchantTableLayout>
+          <TokenStatsBoardTVL totalSupply={totalSupply} bitcoinPrice={bitcoinPrice} />
+          <Divider orientation={'vertical'} px={'15px'} height={'75px'} variant={'thick'} />
+          <TokenStatsBoardToken token={dlcBTC} totalSupply={totalSupply} />
+          <Divider orientation={'vertical'} px={'15px'} height={'75px'} variant={'thick'} />
+          <TokenStatsBoardToken token={bitcoin} totalSupply={proofOfReserveSum} />
         </HStack>
-        {/* <ProtocolHistoryTable /> */}
       </TokenStatsBoardLayout>
+      <HStack w={'100%'} gap={'20px'} alignItems={'flex-start'}>
+        <MerchantTableLayout>
+          <MerchantTableHeader />
+          {merchantProofOfReserves.map(item => (
+            <MerchantTableItem key={item.merchant.name} {...item} />
+          ))}
+        </MerchantTableLayout>
+        <ProtocolHistoryTable items={allMintBurnEvents} />
+      </HStack>
     </ProofOfReserveLayout>
   );
 }

@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { Route } from 'react-router-dom';
 
 import { AppLayout } from '@components/app.layout';
+import { MerchantDetails } from '@components/proof-of-reserve/components/merchant-details/merchant-details';
 import { AttestorDetailsPage } from '@pages/attestor-details/attestor-details-page';
 import { AttestorDetailsSelectPage } from '@pages/attestor-details/attestor-details-select-page';
 import { MyVaults } from '@pages/my-vaults/my-vaults';
@@ -41,6 +42,7 @@ export function App(): React.JSX.Element {
                         path="/attestor-details-select"
                         element={<AttestorDetailsSelectPage />}
                       />
+                      <Route path="/merchant-details/:name" element={<MerchantDetails />} />
                     </AppLayout>
                   </ProofOfReserveContextProvider>
                 </BalanceContextProvider>
