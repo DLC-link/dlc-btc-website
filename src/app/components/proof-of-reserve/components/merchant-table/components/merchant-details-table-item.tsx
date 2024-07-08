@@ -7,7 +7,7 @@ import { truncateAddress, unshiftValue } from 'dlc-btc-lib/utilities';
 export interface MerchantFocusTableItemProps {
   id: number;
   orderBook: string;
-  amount: string;
+  amount: number;
   inUSD: string;
   txHash: string;
   date: string;
@@ -24,9 +24,9 @@ export function MerchantDetailsTableItem(
 
   const renderAmount = () => {
     if (orderBook === 'REDEEM') {
-      return `- ${unshiftValue(parseInt(amount))}`;
+      return unshiftValue(amount) * -1;
     } else {
-      return unshiftValue(parseInt(amount));
+      return unshiftValue(amount);
     }
   };
 

@@ -37,21 +37,21 @@ export function MerchantDetails(): React.JSX.Element {
       };
     }),
   ];
-  const amberMerchant = merchantProofOfReserves.find(item => item.merchant.name === 'AMBER');
+  const selectedMerchant = merchantProofOfReserves.find(item => item.merchant.name === name);
 
   const { data: mintBurnEvents } = useQuery(['mintBurnEvents'], fetchMintBurnEventsHandler);
 
   async function fetchMintBurnEventsHandler(): Promise<MerchantFocusTableItemProps[]> {
-    if (!amberMerchant?.merchant.address) return [];
-    const detailedEvents = await fetchMintBurnEvents(amberMerchant.merchant.address);
+    if (!selectedMerchant?.merchant.address) return [];
+    const detailedEvents = await fetchMintBurnEvents(selectedMerchant.merchant.address);
     return detailedEvents.map((event, index) => {
       return {
         id: index,
         orderBook:
-          event.from.toLowerCase() === amberMerchant.merchant.address.toLowerCase()
+          event.from.toLowerCase() === selectedMerchant.merchant.address.toLowerCase()
             ? 'REDEEM'
             : 'MINT',
-        amount: event.value.toString(),
+        amount: event.value.toNumber(),
         inUSD: 'TODO', //TODO: calculate usd value at the time of mint
         txHash: event.txHash,
         date: new Date(event.timestamp * 1000).toDateString(),
@@ -105,13 +105,13 @@ export function MerchantDetails(): React.JSX.Element {
           />
           <Divider orientation={'vertical'} px={'10px'} height={'75px'} variant={'thick'} />
           <TokenStatsBoardTVL
-            totalSupply={amberMerchant?.dlcBTCAmount}
+            totalSupply={selectedMerchant?.dlcBTCAmount}
             bitcoinPrice={bitcoinPrice}
           />
           <Divider orientation={'vertical'} px={'10px'} height={'75px'} variant={'thick'} />
-          <TokenStatsBoardToken token={dlcBTC} totalSupply={amberMerchant?.dlcBTCAmount} />
+          <TokenStatsBoardToken token={dlcBTC} totalSupply={selectedMerchant?.dlcBTCAmount} />
           <Divider orientation={'vertical'} px={'10px'} height={'75px'} variant={'thick'} />
-          <TokenStatsBoardToken token={bitcoin} totalSupply={amberMerchant?.dlcBTCAmount} />
+          <TokenStatsBoardToken token={bitcoin} totalSupply={selectedMerchant?.dlcBTCAmount} />
         </HStack>
       </TokenStatsBoardLayout>
       <GenericTableLayout height={`${dynamicHeight}px`}>

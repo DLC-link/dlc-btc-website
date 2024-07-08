@@ -10,7 +10,6 @@ import {
   ProtocolHistoryTableItem,
   ProtocolHistoryTableItemProps,
 } from '@components/protocol-history-table/components/protocol-history-table-item';
-import { ProtocolHistoryTable } from '@components/protocol-history-table/protocol-history-table';
 import { useEthereum } from '@hooks/use-ethereum';
 import { Merchant } from '@models/merchant';
 import { bitcoin, dlcBTC } from '@models/token';
@@ -64,12 +63,6 @@ export function ProofOfReserve(): React.JSX.Element {
     });
   }
 
-  const itemHeight = 65;
-  const padding = 20;
-  const dynamicHeight = allMintBurnEvents
-    ? allMintBurnEvents.length * itemHeight + padding
-    : padding;
-
   const renderProtocolHistoryTableItems = () => {
     return (
       <>{allMintBurnEvents?.map(item => <ProtocolHistoryTableItem key={item.id} {...item} />)}</>
@@ -90,24 +83,18 @@ export function ProofOfReserve(): React.JSX.Element {
           <TokenStatsBoardToken token={bitcoin} totalSupply={proofOfReserveSum} />
         </HStack>
       </TokenStatsBoardLayout>
-      <HStack
-        w={'100%'}
-        gap={'20px'}
-        alignItems={'flex-start'}
-        bg={'background.container.01'}
-        px={'20px'}
-      >
+      <HStack w={'100%'} gap={'20px'} alignItems={'flex-start'} px={'20px'}>
         <MerchantTableLayout>
           <MerchantTableHeader />
           {merchantProofOfReserves.map(item => (
             <MerchantTableItem key={item.merchant.name} {...item} />
           ))}
         </MerchantTableLayout>
-        <GenericTableLayout height={`${dynamicHeight}px`} width={'50%'}>
+        <GenericTableLayout height={'630px'} width={'50%'}>
           <GenericTableHeader>
-            <GenericTableHeaderText>Order Book</GenericTableHeaderText>
-            <GenericTableHeaderText>Merchant</GenericTableHeaderText>
-            <GenericTableHeaderText>Transaction</GenericTableHeaderText>
+            <GenericTableHeaderText w={'25%'}>Order Book</GenericTableHeaderText>
+            <GenericTableHeaderText w={'21%'}>Merchant</GenericTableHeaderText>
+            <GenericTableHeaderText w={'25%'}>Transaction</GenericTableHeaderText>
             <GenericTableHeaderText>Date</GenericTableHeaderText>
           </GenericTableHeader>
           <Skeleton isLoaded={allMintBurnEvents !== undefined} height={'50px'} w={'100%'}>
