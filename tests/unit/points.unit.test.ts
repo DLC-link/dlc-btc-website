@@ -13,10 +13,34 @@ const txHash = '0x456';
 describe('calculateRollingTVL', () => {
   it('should correctly calculate total value locked over time', () => {
     const events: DetailedEvent[] = [
-      { from: BURN_ADDRESS, to: '0x123', value: BigNumber.from(50000000), timestamp: 1000, txHash: txHash },
-      { from: '0x123', to: BURN_ADDRESS, value: BigNumber.from(1000000), timestamp: 2000, txHash: txHash },
-      { from: '0x123', to: BURN_ADDRESS, value: BigNumber.from(200000), timestamp: 3000, txHash: txHash },
-      { from: BURN_ADDRESS, to: '0x123', value: BigNumber.from(1000000), timestamp: 4000, txHash: txHash },
+      {
+        from: BURN_ADDRESS,
+        to: '0x123',
+        value: BigNumber.from(50000000),
+        timestamp: 1000,
+        txHash: txHash,
+      },
+      {
+        from: '0x123',
+        to: BURN_ADDRESS,
+        value: BigNumber.from(1000000),
+        timestamp: 2000,
+        txHash: txHash,
+      },
+      {
+        from: '0x123',
+        to: BURN_ADDRESS,
+        value: BigNumber.from(200000),
+        timestamp: 3000,
+        txHash: txHash,
+      },
+      {
+        from: BURN_ADDRESS,
+        to: '0x123',
+        value: BigNumber.from(1000000),
+        timestamp: 4000,
+        txHash: txHash,
+      },
     ];
 
     const result = calculateRollingTVL(events);
