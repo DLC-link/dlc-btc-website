@@ -41,10 +41,7 @@ export function MerchantTableItem({
       <Button
         w={'150px'}
         variant={'merchantTableItem'}
-        onClick={
-          () => navigate(`/merchant-details/${merchant.name}`)
-          // window.open(`${ethereumExplorerAPIURL}/address/${merchant.address}`, '_blank')
-        }
+        onClick={() => navigate(`/merchant-details/${merchant.name}`)}
       >
         <Text color={'white.01'} fontSize={'xs'}>
           Mint/Redeem History

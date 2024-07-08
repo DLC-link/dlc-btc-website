@@ -1,9 +1,6 @@
 import { VStack } from '@chakra-ui/react';
+import { HasChildren } from '@models/has-children';
 
-interface GenericTableBodyProps {
-  renderItems: () => React.JSX.Element;
-}
-
-export function GenericTableBody({ renderItems }: GenericTableBodyProps): React.JSX.Element {
-  return <VStack w={'100%'}>{renderItems()}</VStack>;
+export function GenericTableBody({ children }: HasChildren): React.JSX.Element {
+  return <VStack w={'100%'}>{children}</VStack>;
 }

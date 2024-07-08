@@ -4,7 +4,7 @@ import { CustomSkeleton } from '@components/custom-skeleton/custom-skeleton';
 import { useEthereumConfiguration } from '@hooks/use-ethereum-configuration';
 import { truncateAddress, unshiftValue } from 'dlc-btc-lib/utilities';
 
-export interface MerchantFocusTableItemProps {
+export interface MerchantDetailsTableItemProps {
   id: number;
   orderBook: string;
   amount: number;
@@ -14,7 +14,7 @@ export interface MerchantFocusTableItemProps {
 }
 
 export function MerchantDetailsTableItem(
-  merchantFocusTableItem: MerchantFocusTableItemProps
+  merchantFocusTableItem: MerchantDetailsTableItemProps
 ): React.JSX.Element {
   if (!merchantFocusTableItem) return <CustomSkeleton height={'35px'} />;
 
@@ -23,11 +23,8 @@ export function MerchantDetailsTableItem(
   const { ethereumExplorerAPIURL } = useEthereumConfiguration();
 
   const renderAmount = () => {
-    if (orderBook === 'REDEEM') {
-      return unshiftValue(amount) * -1;
-    } else {
-      return unshiftValue(amount);
-    }
+    const unshiftedValue = unshiftValue(amount);
+    return orderBook === 'REDEEM' ? -unshiftedValue : unshiftedValue;
   };
 
   return (

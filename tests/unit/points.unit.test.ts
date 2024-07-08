@@ -8,14 +8,15 @@ import { BigNumber } from 'ethers';
 import { describe, expect, it } from 'vitest';
 
 const BURN_ADDRESS = '0x0000000000000000000000000000000000000000';
+const txHash = '0x456';
 
 describe('calculateRollingTVL', () => {
   it('should correctly calculate total value locked over time', () => {
     const events: DetailedEvent[] = [
-      { from: BURN_ADDRESS, to: '0x123', value: BigNumber.from(50000000), timestamp: 1000 },
-      { from: '0x123', to: BURN_ADDRESS, value: BigNumber.from(1000000), timestamp: 2000 },
-      { from: '0x123', to: BURN_ADDRESS, value: BigNumber.from(200000), timestamp: 3000 },
-      { from: BURN_ADDRESS, to: '0x123', value: BigNumber.from(1000000), timestamp: 4000 },
+      { from: BURN_ADDRESS, to: '0x123', value: BigNumber.from(50000000), timestamp: 1000, txHash: txHash },
+      { from: '0x123', to: BURN_ADDRESS, value: BigNumber.from(1000000), timestamp: 2000, txHash: txHash },
+      { from: '0x123', to: BURN_ADDRESS, value: BigNumber.from(200000), timestamp: 3000, txHash: txHash },
+      { from: BURN_ADDRESS, to: '0x123', value: BigNumber.from(1000000), timestamp: 4000, txHash: txHash },
     ];
 
     const result = calculateRollingTVL(events);
@@ -30,7 +31,7 @@ describe('calculateRollingTVL', () => {
 
   it('should throw an error if neither FROM nor TO address is BURN_ADDRESS', () => {
     const events: DetailedEvent[] = [
-      { from: '0x123', to: '0x456', value: BigNumber.from(100), timestamp: 1000 },
+      { from: '0x123', to: '0x456', value: BigNumber.from(100), timestamp: 1000, txHash: txHash },
     ];
 
     expect(() => calculateRollingTVL(events)).toThrow('Invalid event in calculateRollingTVL');
