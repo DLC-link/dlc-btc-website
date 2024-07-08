@@ -10,7 +10,6 @@ import {
   RpcResponse,
   SignPsbtRequestParams,
 } from '@models/leather';
-import { RawVault } from '@models/vault';
 import { BitcoinWalletType } from '@models/wallet';
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
 import {
@@ -18,7 +17,9 @@ import {
   BitcoinWalletContextState,
 } from '@providers/bitcoin-wallet-context-provider';
 import { SoftwareWalletDLCHandler } from 'dlc-btc-lib';
-import { Transaction } from 'dlc-btc-lib/models';
+import { finalizeUserInputs } from 'dlc-btc-lib/bitcoin-functions';
+import { RawVault, Transaction } from 'dlc-btc-lib/models';
+import { shiftValue } from 'dlc-btc-lib/utilities';
 
 import { BITCOIN_NETWORK_MAP } from '@shared/constants/bitcoin.constants';
 
@@ -27,13 +28,22 @@ interface UseLeatherReturnType {
   handleFundingTransaction: (
     dlcHandler: SoftwareWalletDLCHandler,
     vault: RawVault,
+    bitcoinAmount: number,
     attestorGroupPublicKey: string,
     feeRateMultiplier: number
   ) => Promise<Transaction>;
-  handleClosingTransaction: (
+  handleDepositTransaction: (
     dlcHandler: SoftwareWalletDLCHandler,
     vault: RawVault,
-    fundingTransactionID: string,
+    bitcoinAmount: number,
+    attestorGroupPublicKey: string,
+    feeRateMultiplier: number
+  ) => Promise<Transaction>;
+  handleWithdrawalTransaction: (
+    dlcHandler: SoftwareWalletDLCHandler,
+    withdrawAmount: number,
+    attestorGroupPublicKey: string,
+    vault: RawVault,
     feeRateMultiplier: number
   ) => Promise<string>;
   isLoading: [boolean, string];
@@ -142,6 +152,7 @@ export function useLeather(): UseLeatherReturnType {
   async function handleFundingTransaction(
     dlcHandler: SoftwareWalletDLCHandler,
     vault: RawVault,
+    bitcoinAmount: number,
     attestorGroupPublicKey: string,
     feeRateMultiplier: number
   ): Promise<Transaction> {
@@ -151,6 +162,7 @@ export function useLeather(): UseLeatherReturnType {
       // ==> Create Funding Transaction
       const fundingPSBT = await dlcHandler?.createFundingPSBT(
         vault,
+        BigInt(shiftValue(bitcoinAmount)),
         attestorGroupPublicKey,
         feeRateMultiplier
       );
@@ -172,42 +184,86 @@ export function useLeather(): UseLeatherReturnType {
   }
 
   /**
-   * Creates the Closing Transaction and signs it with Leather Wallet.
+   * Creates a Deposit Transaction and signs it with Leather Wallet.
    * @param vaultUUID The Vault UUID.
-   * @param fundingTransactionID The Funding Transaction ID.
-   * @returns The Partially Signed Closing Transaction HEX.
+   * @returns The Signed Deposit Transaction.
    */
-  async function handleClosingTransaction(
+  async function handleDepositTransaction(
     dlcHandler: SoftwareWalletDLCHandler,
     vault: RawVault,
-    fundingTransactionID: string,
+    bitcoinAmount: number,
+    attestorGroupPublicKey: string,
     feeRateMultiplier: number
-  ): Promise<string> {
+  ): Promise<Transaction> {
     try {
-      setIsLoading([true, 'Creating Closing Transaction']);
+      setIsLoading([true, 'Creating Deposit Transaction']);
 
-      const closingTransaction = await dlcHandler.createClosingPSBT(
+      // ==> Create Deposit Transaction
+      const depositPSBT = await dlcHandler?.createDepositPSBT(
+        BigInt(shiftValue(bitcoinAmount)),
         vault,
-        fundingTransactionID,
+        attestorGroupPublicKey,
+        vault.fundingTxId,
         feeRateMultiplier
       );
 
-      setIsLoading([true, 'Sign Closing Transaction in your Leather Wallet']);
-      // ==> Sign Closing PSBT with Ledger
-      const closingTransactionHex = await signPSBT(closingTransaction.toPSBT());
+      const depositPayment = dlcHandler.payment?.fundingPayment;
+
+      if (!depositPayment) {
+        throw new LeatherError('Deposit Payment is not set');
+      }
+      setIsLoading([true, 'Sign Deposit Transaction in your Leather Wallet']);
+
+      // ==> Sign Deposibt PSBT with Leather
+      const depositTransactionHex = await signPSBT(depositPSBT.toPSBT());
+
+      // ==> Finalize Deposit Transaction's Additional Deposit Input
+      const depositTransaction = Transaction.fromPSBT(hexToBytes(depositTransactionHex));
+      finalizeUserInputs(depositTransaction, depositPayment);
 
       setIsLoading([false, '']);
-      return closingTransactionHex;
+      return depositTransaction;
     } catch (error) {
       setIsLoading([false, '']);
-      throw new LeatherError(`Error handling Closing Transaction: ${error}`);
+      throw new LeatherError(`Error handling Deposit Transaction: ${error}`);
+    }
+  }
+
+  async function handleWithdrawalTransaction(
+    dlcHandler: SoftwareWalletDLCHandler,
+    withdrawAmount: number,
+    attestorGroupPublicKey: string,
+    vault: RawVault,
+    feeRateMultiplier: number
+  ): Promise<string> {
+    try {
+      setIsLoading([true, 'Creating Withdrawal Transaction']);
+
+      const withdrawalTransaction = await dlcHandler.createWithdrawPSBT(
+        vault,
+        BigInt(shiftValue(withdrawAmount)),
+        attestorGroupPublicKey,
+        vault.fundingTxId,
+        feeRateMultiplier
+      );
+
+      setIsLoading([true, 'Sign Withdrawal Transaction in your Leather Wallet']);
+      // ==> Sign Withdrawal PSBT with Ledger
+      const withdrawalTransactionHex = await signPSBT(withdrawalTransaction.toPSBT());
+
+      setIsLoading([false, '']);
+      return withdrawalTransactionHex;
+    } catch (error) {
+      setIsLoading([false, '']);
+      throw new LeatherError(`Error handling Withdrawal Transaction: ${error}`);
     }
   }
 
   return {
     connectLeatherWallet,
     handleFundingTransaction,
-    handleClosingTransaction,
+    handleDepositTransaction,
+    handleWithdrawalTransaction,
     isLoading,
   };
 }

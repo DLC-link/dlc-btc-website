@@ -13,7 +13,7 @@ export function NavigationTabs({
   return (
     <HStack spacing={'25px'} marginRight={'150px'}>
       <TabButton
-        title={'Mint/Redeem dlcBTC'}
+        title={'Mint/Withdraw dlcBTC'}
         isActive={activeTab === '/'}
         handleClick={() => handleTabClick('/')}
       />

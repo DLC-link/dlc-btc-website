@@ -1,10 +1,12 @@
+import { useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 import { Button, HStack, Spinner, Stack, Text, VStack } from '@chakra-ui/react';
 import { VaultCard } from '@components/vault/vault-card';
-import { useVaults } from '@hooks/use-vaults';
+import { VaultContext } from '@providers/vault-context-provider';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
+import Decimal from 'decimal.js';
 
 import { TransactionSummaryPreviewCard } from './components/transaction-summary-preview-card';
 
@@ -19,20 +21,21 @@ interface FlowPropertyMap {
 
 const flowPropertyMap: FlowPropertyMap = {
   mint: {
-    3: { title: 'a) Locking BTC in progress', subtitle: 'Minting dlcBTC' },
-    4: { title: 'Minted dlcBTC' },
+    2: { title: 'a) Locking BTC in progress', subtitle: 'Minting dlcBTC' },
+    3: { title: 'Vault Updated' },
   },
   unmint: {
-    1: {
-      title: 'a) Closing vault in progress',
+    2: {
+      title: 'a) Withdrawing from Vault in progress',
       subtitle: 'BTC is being unlocked',
     },
-    2: { title: 'Vault closed' },
+    3: { title: 'Vault Updated' },
   },
 };
 
 interface TransactionSummaryProps {
   currentStep: [number, string];
+  depositAmount?: number;
   flow: 'mint' | 'unmint';
   blockchain: 'ethereum' | 'bitcoin';
   width: string;
@@ -40,6 +43,7 @@ interface TransactionSummaryProps {
 }
 
 export function TransactionSummary({
+  depositAmount,
   currentStep,
   flow,
   blockchain,
@@ -48,27 +52,30 @@ export function TransactionSummary({
 }: TransactionSummaryProps): React.JSX.Element {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { allVaults } = useVaults();
-  const currentVault = allVaults.find(vault => vault.uuid === currentStep[1]);
 
-  const showProcessing =
-    (flow === 'mint' && currentStep[0] === 3) || (flow === 'unmint' && currentStep[0] === 1);
+  const { allVaults } = useContext(VaultContext);
+
+  const currentVault = allVaults.find(vault => vault.uuid === currentStep[1]);
 
   return (
     <VStack alignItems={'start'} w={width} spacing={'15px'}>
       <HStack w={'100%'}>
-        {showProcessing && <Spinner color={'accent.lightBlue.01'} size={'md'} />}
+        {currentStep[0] === 2 && <Spinner color={'accent.lightBlue.01'} size={'md'} />}
         <Text color={'accent.lightBlue.01'}>{flowPropertyMap[flow][currentStep[0]].title}:</Text>
       </HStack>
       <VaultCard vault={currentVault} />
-      {showProcessing && (
+      {currentStep[0] === 2 && (
         <>
           <Text pt={'25px'} color={'white.01'}>
             b) {flowPropertyMap[flow][currentStep[0]].subtitle}:
           </Text>
           <TransactionSummaryPreviewCard
             blockchain={blockchain}
-            assetAmount={currentVault?.collateral}
+            assetAmount={
+              flow === 'mint'
+                ? depositAmount
+                : new Decimal(currentVault?.valueLocked! - currentVault?.valueMinted!).toNumber()
+            }
           />
         </>
       )}
@@ -92,8 +99,8 @@ export function TransactionSummary({
         >
           View in My Vaults
         </Button>
-        {((flow === 'mint' && currentStep[0] === 3) ||
-          (flow === 'unmint' && currentStep[0] === 1)) && (
+        {((flow === 'mint' && currentStep[0] === 2) ||
+          (flow === 'unmint' && currentStep[0] === 2)) && (
           <Button
             variant={'navigate'}
             onClick={() => {
@@ -105,7 +112,7 @@ export function TransactionSummary({
               handleClose && handleClose();
             }}
           >
-            {flow === 'mint' ? 'Create Another Vault' : 'Close Another Vault'}
+            {flow === 'mint' ? 'Create Another Vault' : 'Withdraw More'}
           </Button>
         )}
       </HStack>

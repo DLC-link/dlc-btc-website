@@ -20,12 +20,13 @@ export function MyVaultsSmall({ address }: MyVaultsSmallProps): React.JSX.Elemen
   const {
     readyVaults,
     fundingVaults,
+    pendingVaults,
     fundedVaults,
     closingVaults,
     closedVaults,
     isLoading,
     allVaults,
-  } = vaultContext.vaults;
+  } = vaultContext;
 
   return (
     <MyVaultsSmallLayout>
@@ -36,9 +37,12 @@ export function MyVaultsSmall({ address }: MyVaultsSmallProps): React.JSX.Elemen
       >
         {address ? (
           <Skeleton isLoaded={!isLoading} w={'100%'}>
-            <VaultsListGroupContainer label="Locking BTC in Progress" vaults={fundingVaults} />
+            <VaultsListGroupContainer
+              label="Pending"
+              vaults={[...fundingVaults, ...pendingVaults]}
+            />
             <VaultsListGroupContainer label="Unlocking BTC in Progress" vaults={closingVaults} />
-            <VaultsListGroupContainer label="Lock BTC" vaults={readyVaults} />
+            <VaultsListGroupContainer label="Empty Vaults" vaults={readyVaults} />
             <VaultsListGroupContainer label="Minted dlcBTC" vaults={fundedVaults} />
             <VaultsListGroupContainer label="Closed Vaults" vaults={closedVaults} />
           </Skeleton>

@@ -1,4 +1,5 @@
 {
+  "appEnvironment": "mainnet",
   "attestorURLs": [
     "https://mainnet.dlc.link/attestor-1",
     "https://mainnet.dlc.link/attestor-2",

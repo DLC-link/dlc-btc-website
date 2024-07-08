@@ -2,14 +2,14 @@ import { createSlice } from '@reduxjs/toolkit';
 
 interface ModalState {
   isSelectWalletModalOpen: boolean;
-  isSuccesfulFlowModalOpen: [boolean, 'mint' | 'unmint', string?];
+  isSuccesfulFlowModalOpen: [boolean, string];
   isSelectBitcoinWalletModalOpen: boolean;
   isLedgerModalOpen: boolean;
 }
 
 const initialModalState: ModalState = {
   isSelectWalletModalOpen: false,
-  isSuccesfulFlowModalOpen: [false, 'mint'],
+  isSuccesfulFlowModalOpen: [false, ''],
   isSelectBitcoinWalletModalOpen: false,
   isLedgerModalOpen: false,
 };
@@ -22,8 +22,8 @@ export const modalSlice = createSlice({
       state.isSelectWalletModalOpen = !state.isSelectWalletModalOpen;
     },
     toggleSuccessfulFlowModalVisibility: (state, action) => {
-      const { flow, vaultUUID } = action.payload;
-      state.isSuccesfulFlowModalOpen = [!state.isSuccesfulFlowModalOpen[0], flow, vaultUUID];
+      const { vaultUUID } = action.payload;
+      state.isSuccesfulFlowModalOpen = [!state.isSuccesfulFlowModalOpen[0], vaultUUID];
     },
     toggleSelectBitcoinWalletModalVisibility: state => {
       state.isSelectBitcoinWalletModalOpen = !state.isSelectBitcoinWalletModalOpen;

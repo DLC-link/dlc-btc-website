@@ -6,8 +6,16 @@ enum BitcoinNetworkName {
   REGTEST = 'regtest',
 }
 
+enum AppEnvironment {
+  MAINNET = 'mainnet',
+  TESTNET = 'testnet',
+  DEVNET = 'devnet',
+  LOCALHOST = 'localhost',
+}
+
 type BitcoinNetworkPrefix = 'bc1' | 'tb1' | 'bcrt1';
 export interface Configuration {
+  appEnvironment: AppEnvironment;
   attestorURLs: string[];
   enabledEthereumNetworkIDs: string[];
   bitcoinNetwork: BitcoinNetworkName;

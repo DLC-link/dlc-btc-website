@@ -2,104 +2,192 @@ import { useContext, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { BitcoinError } from '@models/error-types';
-import { Vault } from '@models/vault';
 import { BitcoinWalletType } from '@models/wallet';
+import { bytesToHex } from '@noble/hashes/utils';
 import { BitcoinWalletContext } from '@providers/bitcoin-wallet-context-provider';
 import { RootState } from '@store/index';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { vaultActions } from '@store/slices/vault/vault.actions';
 import { LedgerDLCHandler, SoftwareWalletDLCHandler } from 'dlc-btc-lib';
-import { broadcastTransaction } from 'dlc-btc-lib/bitcoin-functions';
-import { Transaction } from 'dlc-btc-lib/models';
+import { Transaction, VaultState } from 'dlc-btc-lib/models';
 
 import { useAttestors } from './use-attestors';
 import { useEthereum } from './use-ethereum';
+import { useEthereumConfiguration } from './use-ethereum-configuration';
 import { useLeather } from './use-leather';
 import { useLedger } from './use-ledger';
 
 interface UsePSBTReturnType {
-  handleSignFundingTransaction: (vault: Vault) => Promise<void>;
-  handleSignClosingTransaction: () => Promise<void>;
+  handleSignFundingTransaction: (vaultUUID: string, depositAmount: number) => Promise<void>;
+  handleSignWithdrawTransaction: (vaultUUID: string, withdrawAmount: number) => Promise<void>;
+  bitcoinDepositAmount: number;
   isLoading: [boolean, string];
 }
 
 export function usePSBT(): UsePSBTReturnType {
   const dispatch = useDispatch();
-  const {
-    handleFundingTransaction: handleFundingTransactionWithLedger,
-    handleClosingTransaction: handleClosingTransactionWithLedger,
-    isLoading: isLedgerLoading,
-  } = useLedger();
-  const {
-    handleFundingTransaction: handleFundingTransactionWithLeather,
-    handleClosingTransaction: handleClosingTransactionWithLeather,
-    isLoading: isLeatherLoading,
-  } = useLeather();
+
+  const { network: ethereumNetwork, address: ethereumUserAddress } = useSelector(
+    (state: RootState) => state.account
+  );
+
   const { bitcoinWalletType, dlcHandler, resetBitcoinWalletContext } =
     useContext(BitcoinWalletContext);
-  const { sendClosingTransactionToAttestors } = useAttestors();
+
+  const {
+    handleFundingTransaction: handleFundingTransactionWithLedger,
+    handleWithdrawalTransaction: handleWithdrawalTransactionWithLedger,
+    handleDepositTransaction: handleDepositTransactionWithLedger,
+    isLoading: isLedgerLoading,
+  } = useLedger();
+
+  const {
+    handleFundingTransaction: handleFundingTransactionWithLeather,
+    handleWithdrawalTransaction: handleWithdrawalTransactionWithLeather,
+    handleDepositTransaction: handleDepositTransactionWithLeather,
+    isLoading: isLeatherLoading,
+  } = useLeather();
+
+  const { sendFundingTransactionToAttestors, sendDepositWithdrawTransactionToAttestors } =
+    useAttestors();
+
   const { getAttestorGroupPublicKey, getRawVault } = useEthereum();
 
-  const { network } = useSelector((state: RootState) => state.account);
+  const { ethereumAttestorChainID } = useEthereumConfiguration();
 
-  const { mintStep } = useSelector((state: RootState) => state.mintunmint);
+  const [bitcoinDepositAmount, setBitcoinDepositAmount] = useState(0);
 
-  const [fundingTransaction, setFundingTransaction] = useState<Transaction | undefined>();
-
-  async function handleSignFundingTransaction(): Promise<void> {
+  async function handleSignFundingTransaction(
+    vaultUUID: string,
+    depositAmount: number
+  ): Promise<void> {
     try {
-      const attestorGroupPublicKey = await getAttestorGroupPublicKey(network);
-      const vault = await getRawVault(mintStep[1]);
-      let fundingTransaction: Transaction;
+      if (!dlcHandler) throw new Error('DLC Handler is not setup');
+      if (!ethereumUserAddress) throw new Error('User Address is not setup');
+
       const feeRateMultiplier = import.meta.env.VITE_FEE_RATE_MULTIPLIER;
 
+      const attestorGroupPublicKey = await getAttestorGroupPublicKey();
+      const vault = await getRawVault(vaultUUID);
+
+      if (!bitcoinWalletType) throw new Error('Bitcoin Wallet is not setup');
+
+      let fundingTransaction: Transaction;
       switch (bitcoinWalletType) {
         case 'Ledger':
-          fundingTransaction = await handleFundingTransactionWithLedger(
-            dlcHandler as LedgerDLCHandler,
-            vault,
-            attestorGroupPublicKey,
-            feeRateMultiplier
-          );
+          switch (vault.valueLocked.toNumber()) {
+            case 0:
+              fundingTransaction = await handleFundingTransactionWithLedger(
+                dlcHandler as LedgerDLCHandler,
+                vault,
+                depositAmount,
+                attestorGroupPublicKey,
+                feeRateMultiplier
+              );
+              break;
+            default:
+              fundingTransaction = await handleDepositTransactionWithLedger(
+                dlcHandler as LedgerDLCHandler,
+                vault,
+                depositAmount,
+                attestorGroupPublicKey,
+                feeRateMultiplier
+              );
+          }
           break;
         case 'Leather':
-          fundingTransaction = await handleFundingTransactionWithLeather(
-            dlcHandler as SoftwareWalletDLCHandler,
-            vault,
-            attestorGroupPublicKey,
-            feeRateMultiplier
-          );
+          switch (vault.valueLocked.toNumber()) {
+            case 0:
+              fundingTransaction = await handleFundingTransactionWithLeather(
+                dlcHandler as SoftwareWalletDLCHandler,
+                vault,
+                depositAmount,
+                attestorGroupPublicKey,
+                feeRateMultiplier
+              );
+              break;
+            default:
+              fundingTransaction = await handleDepositTransactionWithLeather(
+                dlcHandler as SoftwareWalletDLCHandler,
+                vault,
+                depositAmount,
+                attestorGroupPublicKey,
+                feeRateMultiplier
+              );
+              break;
+          }
           break;
         default:
           throw new BitcoinError('Invalid Bitcoin Wallet Type');
       }
 
-      setFundingTransaction(fundingTransaction);
+      switch (vault.status) {
+        case VaultState.READY:
+          await sendFundingTransactionToAttestors({
+            vaultUUID,
+            fundingPSBT: fundingTransaction.hex,
+            userEthereumAddress: ethereumUserAddress,
+            userBitcoinPublicKey: dlcHandler.getTaprootDerivedPublicKey(),
+            chain: ethereumAttestorChainID,
+          });
+
+          dispatch(
+            vaultActions.setVaultToFunding({
+              vaultUUID: vaultUUID,
+              fundingTX: fundingTransaction.id,
+              networkID: ethereumNetwork.id,
+            })
+          );
+
+          dispatch(mintUnmintActions.setMintStep([2, vaultUUID]));
+          break;
+        default:
+          await sendDepositWithdrawTransactionToAttestors({
+            vaultUUID,
+            depositWithdrawPSBT: bytesToHex(fundingTransaction.toPSBT()),
+            chain: ethereumAttestorChainID,
+          });
+      }
+
+      setBitcoinDepositAmount(depositAmount);
+      resetBitcoinWalletContext();
     } catch (error) {
       throw new BitcoinError(`Error signing Funding Transaction: ${error}`);
     }
   }
 
-  async function handleSignClosingTransaction() {
+  async function handleSignWithdrawTransaction(
+    vaultUUID: string,
+    withdrawAmount: number
+  ): Promise<void> {
     try {
-      if (!fundingTransaction) throw new BitcoinError('Funding Transaction is not yet signed.');
-      let closingTransactionHex: string;
-      const vault = await getRawVault(mintStep[1]);
+      if (!dlcHandler) throw new Error('DLC Handler is not setup');
+      if (!ethereumUserAddress) throw new Error('User Address is not setup');
+
       const feeRateMultiplier = import.meta.env.VITE_FEE_RATE_MULTIPLIER;
+
+      const attestorGroupPublicKey = await getAttestorGroupPublicKey();
+      const vault = await getRawVault(vaultUUID);
+
+      if (!bitcoinWalletType) throw new Error('Bitcoin Wallet is not setup');
+
+      let withdrawalTransactionHex: string;
       switch (bitcoinWalletType) {
         case 'Ledger':
-          closingTransactionHex = await handleClosingTransactionWithLedger(
+          withdrawalTransactionHex = await handleWithdrawalTransactionWithLedger(
             dlcHandler as LedgerDLCHandler,
+            withdrawAmount,
+            attestorGroupPublicKey,
             vault,
-            fundingTransaction.id,
             feeRateMultiplier
           );
           break;
         case 'Leather':
-          closingTransactionHex = await handleClosingTransactionWithLeather(
+          withdrawalTransactionHex = await handleWithdrawalTransactionWithLeather(
             dlcHandler as SoftwareWalletDLCHandler,
+            withdrawAmount,
+            attestorGroupPublicKey,
             vault,
-            fundingTransaction.id,
             feeRateMultiplier
           );
           break;
@@ -107,37 +195,22 @@ export function usePSBT(): UsePSBTReturnType {
           throw new BitcoinError('Invalid Bitcoin Wallet Type');
       }
 
-      const fundingAddress = dlcHandler?.getVaultRelatedAddress('funding');
+      await sendDepositWithdrawTransactionToAttestors({
+        vaultUUID,
+        depositWithdrawPSBT: withdrawalTransactionHex,
+        chain: ethereumAttestorChainID,
+      });
 
-      if (!fundingAddress) throw new BitcoinError('Funding Address is not defined');
-
-      await sendClosingTransactionToAttestors(
-        fundingTransaction?.hex,
-        closingTransactionHex,
-        mintStep[1],
-        fundingAddress
-      );
-
-      await broadcastTransaction(fundingTransaction.hex, appConfiguration.bitcoinBlockchainURL);
-
-      dispatch(
-        vaultActions.setVaultToFunding({
-          vaultUUID: mintStep[1],
-          fundingTX: fundingTransaction.id,
-          networkID: network.id,
-        })
-      );
-
-      dispatch(mintUnmintActions.setMintStep([3, mintStep[1]]));
       resetBitcoinWalletContext();
     } catch (error) {
-      throw new BitcoinError(`Error signing Closing Transaction: ${error}`);
+      throw new BitcoinError(`Error signing Withdraw Transaction: ${error}`);
     }
   }
 
   return {
     handleSignFundingTransaction,
-    handleSignClosingTransaction,
-    isLoading: bitcoinWalletType === BitcoinWalletType.Leather ? isLeatherLoading : isLedgerLoading,
+    handleSignWithdrawTransaction,
+    bitcoinDepositAmount,
+    isLoading: bitcoinWalletType === BitcoinWalletType.Ledger ? isLedgerLoading : isLeatherLoading,
   };
 }

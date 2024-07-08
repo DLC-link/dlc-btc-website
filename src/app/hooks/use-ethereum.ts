@@ -5,10 +5,11 @@ import { useSelector } from 'react-redux';
 import { EthereumError } from '@models/error-types';
 import { DetailedEvent } from '@models/ethereum-models';
 import { EthereumNetwork } from '@models/ethereum-network';
-import { RawVault, Vault, VaultState } from '@models/vault';
+import { Vault } from '@models/vault';
 import { VaultContext } from '@providers/vault-context-provider';
 import { RootState, store } from '@store/index';
 import { vaultActions } from '@store/slices/vault/vault.actions';
+import { DLCEthereumContractName, RawVault, VaultState } from 'dlc-btc-lib/models';
 import { customShiftValue, unshiftValue } from 'dlc-btc-lib/utilities';
 import { Event, ethers } from 'ethers';
 import { Logger } from 'ethers/lib/utils';
@@ -22,16 +23,17 @@ const SOLIDITY_CONTRACT_URL = 'https://raw.githubusercontent.com/DLC-link/dlc-so
 interface UseEthereumReturnType {
   getDefaultProvider: (
     ethereumNetwork: EthereumNetwork,
-    contractName: string
+    contractName: DLCEthereumContractName
   ) => Promise<ethers.Contract>;
   getDLCBTCBalance: () => Promise<number | undefined>;
   getLockedBTCBalance: () => Promise<number | undefined>;
-  getAttestorGroupPublicKey: (ethereumNetwork: EthereumNetwork) => Promise<string>;
+  getAttestorGroupPublicKey: () => Promise<string>;
   getAllVaults: () => Promise<void>;
-  getVault: (vaultUUID: string, vaultState: VaultState) => Promise<void>;
+  getVault: (vaultUUID: string, vaultState: VaultState) => Promise<Vault>;
   getRawVault: (vaultUUID: string) => Promise<RawVault>;
   getAllFundedVaults: (thereumNetwork: EthereumNetwork) => Promise<RawVault[]>;
-  setupVault: (btcDepositAmount: number) => Promise<void>;
+  setupVault: () => Promise<void>;
+  withdrawVault: (vaultUUID: string, withdrawAmount: bigint) => Promise<void>;
   closeVault: (vaultUUID: string) => Promise<void>;
   fetchMintBurnEvents: (userAddress: string) => Promise<DetailedEvent[]>;
   fetchAllMintBurnEvents: () => Promise<DetailedEvent[]>;
@@ -49,7 +51,7 @@ export function throwEthereumError(message: string, error: any): void {
 }
 
 export function useEthereum(): UseEthereumReturnType {
-  const { vaults } = useContext(VaultContext);
+  const { fundedVaults } = useContext(VaultContext);
   const { dlcManagerContract, dlcBTCContract, observerDLCManagerContract } = useEthereumContext();
 
   const { address, network } = useSelector((state: RootState) => state.account);
@@ -58,21 +60,23 @@ export function useEthereum(): UseEthereumReturnType {
     return {
       uuid: vault.uuid,
       timestamp: vault.timestamp.toNumber(),
-      collateral: unshiftValue(vault.valueLocked.toNumber()),
+      valueLocked: unshiftValue(vault.valueLocked.toNumber()),
+      valueMinted: unshiftValue(vault.valueMinted.toNumber()),
       state: vault.status,
       userPublicKey: vault.taprootPubKey,
       fundingTX: vault.fundingTxId,
       closingTX: vault.closingTxId,
+      withdrawDepositTX: vault.wdTxId,
       btcFeeRecipient: vault.btcFeeRecipient,
-      btcMintFeeBasisPoints: customShiftValue(vault.btcMintFeeBasisPoints.toNumber(), 4, true),
-      btcRedeemFeeBasisPoints: customShiftValue(vault.btcRedeemFeeBasisPoints.toNumber(), 4, true),
+      btcMintFeeBasisPoints: vault.btcMintFeeBasisPoints.toNumber(),
+      btcRedeemFeeBasisPoints: vault.btcRedeemFeeBasisPoints.toNumber(),
       taprootPubKey: vault.taprootPubKey,
     };
   }
 
   async function getDefaultProvider(
     ethereumNetwork: EthereumNetwork,
-    contractName: string
+    contractName: DLCEthereumContractName
   ): Promise<ethers.Contract> {
     try {
       const ethereumNetworkName = ethereumNetwork.name.toLowerCase();
@@ -80,7 +84,19 @@ export function useEthereum(): UseEthereumReturnType {
 
       const deploymentBranchName = import.meta.env.VITE_ETHEREUM_DEPLOYMENT_BRANCH;
 
-      const deploymentPlanURL = `${SOLIDITY_CONTRACT_URL}/${deploymentBranchName}/deploymentFiles/${ethereumNetworkName}/${contractName}.json`;
+      let deploymentPlanURL: string;
+      switch (appConfiguration.appEnvironment) {
+        case 'mainnet':
+        case 'testnet':
+        case 'devnet':
+          deploymentPlanURL = `${SOLIDITY_CONTRACT_URL}/${deploymentBranchName}/deploymentFiles/${ethereumNetworkName}/${contractName}.json`;
+          break;
+        case 'localhost':
+          deploymentPlanURL = `${import.meta.env.VITE_ETHEREUM_DEPLOYMENT_FILES_URL}/contracts/localhost/${contractName}.json`;
+          break;
+        default:
+          throw new EthereumError('Invalid Ethereum Network');
+      }
 
       const response = await fetch(deploymentPlanURL);
       const contractData = await response.json();
@@ -99,8 +115,8 @@ export function useEthereum(): UseEthereumReturnType {
 
   async function getLockedBTCBalance(): Promise<number | undefined> {
     try {
-      const totalCollateral = vaults.fundedVaults.reduce(
-        (sum: number, vault: Vault) => sum + vault.collateral,
+      const totalCollateral = fundedVaults.reduce(
+        (sum: number, vault: Vault) => sum + vault.valueLocked,
         0
       );
       return Number(totalCollateral.toFixed(5));
@@ -120,9 +136,9 @@ export function useEthereum(): UseEthereumReturnType {
     }
   }
 
-  async function getAttestorGroupPublicKey(ethereumNetwork: EthereumNetwork): Promise<string> {
+  async function getAttestorGroupPublicKey(): Promise<string> {
     try {
-      const dlcManagerContract = await getDefaultProvider(ethereumNetwork, 'DLCManager');
+      const dlcManagerContract = await getDefaultProvider(network, 'DLCManager');
       const attestorGroupPubKey = await dlcManagerContract.attestorGroupPubKey();
       return attestorGroupPubKey;
     } catch (error) {
@@ -160,7 +176,7 @@ export function useEthereum(): UseEthereumReturnType {
     vaultState: VaultState,
     retryInterval = 5000,
     maxRetries = 10
-  ): Promise<void> {
+  ): Promise<Vault> {
     for (let i = 0; i < maxRetries; i++) {
       try {
         if (!observerDLCManagerContract) throw new Error('Protocol contract not initialized');
@@ -168,7 +184,9 @@ export function useEthereum(): UseEthereumReturnType {
         if (!vault) throw new Error('Vault is undefined');
         if (vault.status !== vaultState) throw new Error('Vault is not in the correct state');
         const formattedVault: Vault = formatVault(vault);
-        if (!network) return;
+        if (!network) {
+          throw new Error('Network is undefined');
+        }
         store.dispatch(
           vaultActions.swapVault({
             vaultUUID,
@@ -176,7 +194,7 @@ export function useEthereum(): UseEthereumReturnType {
             networkID: network?.id,
           })
         );
-        return;
+        return formattedVault;
       } catch (error) {
         // eslint-disable-next-line no-console
         console.log(`Vault with uuid: ${vaultUUID} is not yet updated. Retrying...`);
@@ -209,14 +227,20 @@ export function useEthereum(): UseEthereumReturnType {
     }
   }
 
-  async function setupVault(btcDepositAmount: number): Promise<void> {
+  async function setupVault(): Promise<void> {
     try {
       if (!dlcManagerContract) throw new Error('Protocol contract not initialized');
-      await dlcManagerContract.callStatic.setupVault(btcDepositAmount);
-      await dlcManagerContract.setupVault(btcDepositAmount);
+      await dlcManagerContract.callStatic.setupVault();
+      await dlcManagerContract.setupVault();
     } catch (error: any) {
       throwEthereumError(`Could not setup Vault: `, error);
     }
+  }
+
+  async function withdrawVault(vaultUUID: string, withdrawAmount: bigint) {
+    if (!dlcManagerContract) throw new Error('Protocol contract not initialized');
+    await dlcManagerContract.callStatic.withdraw(vaultUUID, withdrawAmount);
+    await dlcManagerContract.withdraw(vaultUUID, withdrawAmount);
   }
 
   async function closeVault(vaultUUID: string) {
@@ -302,6 +326,7 @@ export function useEthereum(): UseEthereumReturnType {
     getRawVault,
     getAllFundedVaults,
     setupVault,
+    withdrawVault,
     closeVault,
     fetchMintBurnEvents,
     fetchAllMintBurnEvents,

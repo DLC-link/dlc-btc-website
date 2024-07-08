@@ -1,0 +1,26 @@
+{
+  "appEnvironment": "devnet",
+  "attestorURLs": [
+    "https://devnet.dlc.link/attestor-1",
+    "https://devnet.dlc.link/attestor-2",
+    "https://devnet.dlc.link/attestor-3"
+  ],
+  "enabledEthereumNetworkIDs": ["421614"],
+  "bitcoinNetwork": "regtest",
+  "bitcoinNetworkPreFix": "bcrt1",
+  "bitcoinBlockchainURL": "https://devnet.dlc.link/electrs",
+  "bitcoinBlockchainExplorerURL": "https://devnet.dlc.link/electrs",
+  "bitcoinBlockchainFeeEstimateURL": "https://devnet.dlc.link/electrs/fee-estimates",
+  "merchants": [
+    {
+      "name": "Amber",
+      "address": "0xff200709bf9bbc5209ba4b5dd767913a8a06b73f",
+      "logo": "/images/logos/amber-logo.svg"
+    },
+    {
+      "name": "DLC.Link",
+      "address": "0x0DD4f29E21F10cb2E485cf9bDAb9F2dD1f240Bfa",
+      "logo": "/images/logos/dlc-link-logo-horizontal.svg"
+    }
+  ]
+}
