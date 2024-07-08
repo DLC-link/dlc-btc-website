@@ -45,7 +45,7 @@ export function MerchantTableItem({
         }
       >
         <Text color={'white.01'} fontSize={'xs'}>
-          Mint/Redeem History
+          Mint/Withdraw History
         </Text>
       </Button>
     </HStack>

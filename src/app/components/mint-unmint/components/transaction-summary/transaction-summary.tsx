@@ -22,14 +22,14 @@ interface FlowPropertyMap {
 const flowPropertyMap: FlowPropertyMap = {
   mint: {
     2: { title: 'a) Locking BTC in progress', subtitle: 'Minting dlcBTC' },
-    3: { title: 'Vault Funded' },
+    3: { title: 'Vault Updated' },
   },
   unmint: {
     2: {
       title: 'a) Withdrawing from Vault in progress',
       subtitle: 'BTC is being unlocked',
     },
-    3: { title: 'Vault Funded' },
+    3: { title: 'Vault Updated' },
   },
 };
 

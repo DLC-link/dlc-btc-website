@@ -95,7 +95,7 @@ export function UnmintVaultSelector({
       ) : (
         <VStack w={'45%'}>
           <Text color={'accent.lightBlue.01'} fontSize={'md'} fontWeight={600}>
-            Select vault to withdraw dlcBTC:
+            Select vault to withdraw Bitcoin:
           </Text>
           <VaultsList height={'425.5px'} isScrollable={!selectedVault}>
             <VaultsListGroupContainer
