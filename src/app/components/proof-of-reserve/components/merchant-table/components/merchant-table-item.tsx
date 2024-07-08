@@ -1,7 +1,7 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { Button, HStack, Image, Skeleton, Text } from '@chakra-ui/react';
-import { useEthereumConfiguration } from '@hooks/use-ethereum-configuration';
 import { Merchant } from '@models/merchant';
 
 interface MerchantTableItemProps {
@@ -15,10 +15,11 @@ export function MerchantTableItem({
 }: MerchantTableItemProps): React.ReactElement {
   //TODO: replace name with logo when the logo is available
   const { name } = merchant;
+  const navigate = useNavigate();
 
-  const { ethereumExplorerAPIURL } = useEthereumConfiguration();
+  //const { ethereumExplorerAPIURL } = useEthereumConfiguration();
   return (
-    <HStack px={'25px'} w={'100%'} justifyContent={'space-between'}>
+    <HStack w={'100%'} justifyContent={'space-between'}>
       <HStack w={'150px'}>
         <Text
           fontSize={'2xl'}
@@ -40,9 +41,7 @@ export function MerchantTableItem({
       <Button
         w={'150px'}
         variant={'merchantTableItem'}
-        onClick={() =>
-          window.open(`${ethereumExplorerAPIURL}/address/${merchant.address}`, '_blank')
-        }
+        onClick={() => navigate(`/merchant-details/${merchant.name}`)}
       >
         <Text color={'white.01'} fontSize={'xs'}>
           Mint/Withdraw History

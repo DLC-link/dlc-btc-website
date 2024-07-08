@@ -91,9 +91,8 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
     ethereumAddress: string
   ): Promise<number> {
     if (!proofOfReserveHandler) return 0;
-
     const filteredVaults = fundedVaults.filter(
-      vault => vault.creator.toLowerCase() === ethereumAddress
+      vault => vault.creator.toLowerCase() === ethereumAddress.toLowerCase()
     );
 
     const proofOfReserve = await proofOfReserveHandler.calculateProofOfReserve(filteredVaults);

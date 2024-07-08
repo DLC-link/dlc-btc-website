@@ -3,11 +3,13 @@ import { VStack } from '@chakra-ui/react';
 interface AttestorDetailsCardLayoutProps {
   children: React.ReactNode;
   width: string;
+  bgGradient?: string;
 }
 
 export function AttestorDetailsCardLayout({
   children,
   width,
+  bgGradient,
 }: AttestorDetailsCardLayoutProps): React.JSX.Element {
   return (
     <VStack
@@ -20,6 +22,7 @@ export function AttestorDetailsCardLayout({
       borderColor={'white.03'}
       align={'stretch'}
       justifyContent={'center'}
+      bgGradient={bgGradient}
     >
       {children}
     </VStack>

@@ -3,6 +3,7 @@ import { useContext } from 'react';
 import { useSelector } from 'react-redux';
 
 import { EthereumError } from '@models/error-types';
+import { DetailedEvent } from '@models/ethereum-models';
 import { EthereumNetwork } from '@models/ethereum-network';
 import { Vault } from '@models/vault';
 import { VaultContext } from '@providers/vault-context-provider';
@@ -10,8 +11,10 @@ import { RootState, store } from '@store/index';
 import { vaultActions } from '@store/slices/vault/vault.actions';
 import { DLCEthereumContractName, RawVault, VaultState } from 'dlc-btc-lib/models';
 import { customShiftValue, unshiftValue } from 'dlc-btc-lib/utilities';
-import { ethers } from 'ethers';
+import { Event, ethers } from 'ethers';
 import { Logger } from 'ethers/lib/utils';
+
+import { BURN_ADDRESS } from '@shared/constants/ethereum.constants';
 
 import { useEthereumContext } from './use-ethereum-context';
 
@@ -32,6 +35,8 @@ interface UseEthereumReturnType {
   setupVault: () => Promise<void>;
   withdrawVault: (vaultUUID: string, withdrawAmount: bigint) => Promise<void>;
   closeVault: (vaultUUID: string) => Promise<void>;
+  fetchMintBurnEvents: (userAddress: string) => Promise<DetailedEvent[]>;
+  fetchAllMintBurnEvents: () => Promise<DetailedEvent[]>;
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -248,6 +253,69 @@ export function useEthereum(): UseEthereumReturnType {
     }
   }
 
+  function formatTransferEvent(event: any, timestamp: number, txHash: string): DetailedEvent {
+    return {
+      from: event.from.toLowerCase(),
+      to: event.to.toLowerCase(),
+      value: event.value,
+      timestamp,
+      txHash,
+    };
+  }
+
+  async function fetchMintBurnEvents(userAddress: string): Promise<DetailedEvent[]> {
+    const dlcBTCContract = await getDefaultProvider(network, 'DLCBTC');
+    const eventFilterTo = dlcBTCContract.filters.Transfer(BURN_ADDRESS, userAddress);
+    const eventFilterFrom = dlcBTCContract.filters.Transfer(userAddress, BURN_ADDRESS);
+    const eventsTo = await dlcBTCContract.queryFilter(eventFilterTo);
+    const eventsFrom = await dlcBTCContract.queryFilter(eventFilterFrom);
+    const events = [...eventsTo, ...eventsFrom];
+    const detailedEvents: DetailedEvent[] = [];
+
+    await Promise.all(
+      events.map(async (event: Event) => {
+        const block = await dlcBTCContract.provider.getBlock(event.blockNumber);
+        detailedEvents.push(
+          formatTransferEvent(event.args, block.timestamp, event.transactionHash)
+        );
+      })
+    );
+
+    detailedEvents.sort((a, b) => b.timestamp - a.timestamp);
+
+    return detailedEvents;
+  }
+
+  async function fetchAllMintBurnEvents(): Promise<DetailedEvent[]> {
+    const dlcBTCContract = await getDefaultProvider(network, 'DLCBTC');
+    const eventFilterTo = dlcBTCContract.filters.Transfer(BURN_ADDRESS);
+    const eventFilterFrom = dlcBTCContract.filters.Transfer(null, BURN_ADDRESS);
+    const eventsTo = await dlcBTCContract.queryFilter(eventFilterTo);
+    const eventsFrom = await dlcBTCContract.queryFilter(eventFilterFrom);
+
+    const lastNEvents = (n: number, events: Event[]) => {
+      return events.slice(events.length - n);
+    };
+    const n = 10;
+
+    const events = [...lastNEvents(n, eventsTo), ...lastNEvents(n, eventsFrom)];
+    let detailedEvents: DetailedEvent[] = [];
+
+    await Promise.all(
+      events.map(async (event: Event) => {
+        const block = await dlcBTCContract.provider.getBlock(event.blockNumber);
+        detailedEvents.push(
+          formatTransferEvent(event.args, block.timestamp, event.transactionHash)
+        );
+      })
+    );
+
+    detailedEvents.sort((a, b) => b.timestamp - a.timestamp);
+    detailedEvents = detailedEvents.slice(0, n);
+
+    return detailedEvents;
+  }
+
   return {
     getDefaultProvider,
     getDLCBTCBalance,
@@ -260,5 +328,7 @@ export function useEthereum(): UseEthereumReturnType {
     setupVault,
     withdrawVault,
     closeVault,
+    fetchMintBurnEvents,
+    fetchAllMintBurnEvents,
   };
 }

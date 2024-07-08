@@ -10,4 +10,5 @@ export interface DetailedEvent {
   to: string;
   value: BigNumber;
   timestamp: number;
+  txHash: string;
 }
