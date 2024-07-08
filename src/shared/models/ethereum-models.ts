@@ -8,7 +8,7 @@ export interface TimeStampedEvent {
 export interface DetailedEvent {
   from: string;
   to: string;
-  value: BigNumber;
+  value: number;
   timestamp: number;
   txHash: string;
 }

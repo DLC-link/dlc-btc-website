@@ -20,7 +20,7 @@ export function calculateRollingTVL(events: DetailedEvent[]): TimeStampedEvent[]
     }
     const currentTotalValueLocked =
       rollingTVL.length > 0 ? rollingTVL[rollingTVL.length - 1].totalValueLocked : 0;
-    const amount = to === BURN_ADDRESS ? -value.toNumber() : value.toNumber();
+    const amount = to === BURN_ADDRESS ? -value : value;
 
     rollingTVL.push({
       timestamp,
@@ -97,7 +97,7 @@ export function usePoints(): UsePointsReturnType {
     if (!rewardsRate) {
       throw new Error('Rewards Rate not set');
     }
-    const events = await fetchMintBurnEvents(currentUserAddress);
+    const events = await fetchMintBurnEvents(currentUserAddress, undefined);
     events.sort((a, b) => a.timestamp - b.timestamp);
     const rollingTVL = calculateRollingTVL(events);
     setUserPoints(calculatePoints(rollingTVL, rewardsRate));
