@@ -50,7 +50,7 @@ export function VaultExpandedInformation({
               )}
               {!!withdrawDepositTX && (
                 <VaultExpandedInformationTransactionRow
-                  label={'Withdraw TX'}
+                  label={'Withdraw/Deposit TX'}
                   value={withdrawDepositTX}
                 />
               )}

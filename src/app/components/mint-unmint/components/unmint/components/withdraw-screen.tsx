@@ -31,6 +31,8 @@ export function WithdrawScreen({
   const { allVaults } = useContext(VaultContext);
   const currentVault = allVaults.find(vault => vault.uuid === currentStep[1]);
 
+  const withdrawValue = new Decimal(currentVault?.valueLocked!).minus(currentVault?.valueMinted!);
+
   async function handleWithdraw(): Promise<void> {
     if (currentVault) {
       try {
@@ -58,6 +60,14 @@ export function WithdrawScreen({
 
   return (
     <VStack w={'45%'} h={'445px'} justifyContent={'center'}>
+      <VStack py={'25px'}>
+        <Text fontSize={'md'} color={'white.01'}>
+          {`Sign the Bitcoin transaction below to withdraw`}
+        </Text>
+        <Text fontSize={'md'} color={'white.01'} fontWeight={'bold'}>
+          {`${withdrawValue.toNumber()} BTC from your Vault`}
+        </Text>
+      </VStack>
       {currentVault && <VaultMiniCard vault={currentVault} />}
       {isBitcoinWalletLoading[0] && (
         <HStack
@@ -87,9 +97,7 @@ export function WithdrawScreen({
           bitcoinWalletContextState
         )
           ? 'Connect Bitcoin Wallet'
-          : `Withdraw ${new Decimal(currentVault?.valueLocked!).minus(
-              currentVault?.valueMinted!
-            )} BTC`}
+          : `Withdraw ${withdrawValue} BTC`}
       </Button>
     </VStack>
   );

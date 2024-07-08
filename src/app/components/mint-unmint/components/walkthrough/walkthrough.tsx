@@ -96,40 +96,6 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
               </Button>
             </WalkthroughLayout>
           );
-        // case 3:
-        //   return (
-        //     <WalkthroughLayout>
-        //       <WalkthroughHeader
-        //         currentStep={currentStep}
-        //         title={'Mint dlcBTC'}
-        //         blockchain={'ethereum'}
-        //       />
-        //       <Text color={'white.01'} fontSize={'sm'}>
-        //         Wait for Bitcoin to get locked on chain{' '}
-        //         <Link
-        //           color={'accent.lightBlue.01'}
-        //           href="https://ethereum.org/"
-        //           isExternal
-        //           textDecoration={'underline'}
-        //         >
-        //           (~1 hour)
-        //         </Link>
-        //         . After 6 confirmations, dlcBTC tokens will appear in your Ethereum Wallet.
-        //       </Text>
-        //       <Text color={'white.01'} fontSize={'sm'}>
-        //         To ensure your <span style={{ fontWeight: 800 }}>dlcBTC tokens </span>
-        //         are <span style={{ fontWeight: 800 }}>visible </span>
-        //         simply <span style={{ fontWeight: 800 }}>add them </span>
-        //         to your Ethereum Wallet.
-        //       </Text>
-        //       <Button variant={'vault'} onClick={async () => await recommendTokenToMetamask()}>
-        //         <HStack>
-        //           <Image src={'/images/logos/dlc-btc-logo.svg'} alt={'dlcBTC'} boxSize={'25px'} />
-        //           <Text> Add Token to Wallet</Text>
-        //         </HStack>
-        //       </Button>
-        //     </WalkthroughLayout>
-        //   );
         default:
           return (
             <WalkthroughLayout>
@@ -148,7 +114,7 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
             <WalkthroughLayout>
               <WalkthroughHeader
                 currentStep={currentStep}
-                title={'Withdraw dlcBTC'}
+                title={'Burn dlcBTC'}
                 blockchain={'ethereum'}
               />
               <Text color={'white.01'} fontSize={'md'}>
@@ -165,8 +131,12 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
                 title={'Sign Withdraw Transaction'}
                 blockchain={'bitcoin'}
               />
-              <Text color={'white.01'} fontSize={'md'}>
-                Sign the withdraw transaction in your Bitcoin Wallet.
+              <Text fontSize={'md'} color={'white.01'}>
+                {`Once the dlcBTC has been burned, you can withdraw an `}
+                <Text as="span" fontWeight="bold">
+                  {` equivalent amount of Bitcoin `}
+                </Text>
+                {` from the Vault. To do this, sign the Bitcoin transaction using your Bitcoin wallet. After signing, the transaction will be broadcasted, and the amount will be returned to your address.`}
               </Text>
             </WalkthroughLayout>
           );
@@ -190,7 +160,7 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
             <WalkthroughLayout>
               <WalkthroughHeader
                 currentStep={undefined}
-                title={'Redeemed dlcBTC'}
+                title={'Withdrawn dlcBTC'}
                 blockchain={'ethereum'}
               />
             </WalkthroughLayout>

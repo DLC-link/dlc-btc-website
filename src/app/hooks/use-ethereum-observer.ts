@@ -48,7 +48,7 @@ export function useEthereumObserver(): void {
 
       console.log('vaultUUID', vaultUUID);
 
-      console.log(`Vault ${vaultUUID} is minted`);
+      console.log(`Vault ${vaultUUID} is funded`);
 
       await getVault(vaultUUID, VaultState.FUNDED).then(() => {
         dispatch(
@@ -58,7 +58,6 @@ export function useEthereumObserver(): void {
         );
         void delay(2000).then(() => {
           dispatch(mintUnmintActions.setMintStep([0, '']));
-          dispatch(mintUnmintActions.setUnmintStep([0, '']));
         });
       });
     });
