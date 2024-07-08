@@ -18,7 +18,7 @@ export function MerchantDetailsTableItem(
 ): React.JSX.Element {
   if (!merchantFocusTableItem) return <CustomSkeleton height={'35px'} />;
 
-  const { orderBook, amount, inUSD, txHash, date } = merchantFocusTableItem;
+  const { orderBook, amount, txHash, date } = merchantFocusTableItem;
 
   const { ethereumExplorerAPIURL } = useEthereumConfiguration();
 
