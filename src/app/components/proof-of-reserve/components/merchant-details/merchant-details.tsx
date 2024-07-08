@@ -67,7 +67,7 @@ export function MerchantDetails(): React.JSX.Element {
         pt={'50px'}
         lineHeight={'60px'}
       >
-        {`${formatName(name)} Group`}
+        {`${name} Group`}
         <br />
         {'Dashboard'}
       </Text>
@@ -81,7 +81,7 @@ export function MerchantDetails(): React.JSX.Element {
       <TokenStatsBoardLayout width={'100%'}>
         <HStack w={'100%'} alignItems={'center'} justifyContent={'space-evenly'}>
           <Image
-            src={'/images/logos/amber-logo.svg'}
+            src={selectedMerchant?.merchant.logo}
             alt={'amber logo'}
             boxSize={'100px'}
             mx={'30px'}

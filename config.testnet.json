@@ -12,9 +12,14 @@
   "bitcoinBlockchainFeeEstimateURL": "https://mempool.space/testnet/api/v1/fees/recommended",
   "merchants": [
     {
-      "name": "AMBER",
-      "address": "",
-      "logo": ""
+      "name": "Amber",
+      "address": "0xff200709bf9bbc5209ba4b5dd767913a8a06b73f",
+      "logo": "/images/logos/amber-logo.svg"
+    },
+    {
+      "name": "DLC.Link",
+      "address": "0x0DD4f29E21F10cb2E485cf9bDAb9F2dD1f240Bfa",
+      "logo": "/images/logos/dlc-link-logo-horizontal.svg"
     }
   ]
 }
