@@ -9,8 +9,6 @@ import { Merchant } from '@models/merchant';
 import { bitcoin, dlcBTC } from '@models/token';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
 
-import { formatName } from '@shared/utilities';
-
 import { MerchantDetailsTableItemProps } from '../merchant-table/components/merchant-details-table-item';
 import { MerchantDetailsTable } from '../merchant-table/merchant-details-table';
 import { TokenStatsBoardToken } from '../token-stats-board/components/token-stats-board-token';
