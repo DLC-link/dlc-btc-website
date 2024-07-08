@@ -40,25 +40,25 @@ export function MerchantDetailsTableItem(
       justifyContent={'space-between'}
     >
       <Text
-        w={'20%'}
+        w={'18%'}
         color={orderBook === 'MINT' ? 'green.mint' : 'red.redeem'}
         fontSize={'sm'}
         fontWeight={700}
       >
         {orderBook}
       </Text>
-      <HStack w={'20%'}>
+      <HStack w={'18%'}>
         <Image src={'/images/logos/dlc-btc-logo.svg'} alt={'dlc BTC logo'} boxSize={'25px'} />
         <Text color={'white'} fontSize={'sm'} fontWeight={800}>
           {renderAmount()}
         </Text>
       </HStack>
-
-      <Text w={'20%'} color={'white'} fontSize={'sm'}>
+      {/* add back the USD calculation later and adjus the width accordingly */}
+      {/* <Text w={'20%'} color={'white'} fontSize={'sm'}>
         {inUSD}
-      </Text>
+      </Text> */}
       <Text
-        w={'20%'}
+        w={'15%'}
         color={'accent.lightBlue.01'}
         fontSize={'sm'}
         onClick={() => window.open(`${ethereumExplorerAPIURL}/tx/${txHash}`, '_blank')}
@@ -67,7 +67,7 @@ export function MerchantDetailsTableItem(
       >
         {truncateAddress(txHash)}
       </Text>
-      <Text w={'20%'} color={'white'} fontSize={'sm'}>
+      <Text w={'25%'} color={'white'} fontSize={'sm'}>
         {date}
       </Text>
     </HStack>
