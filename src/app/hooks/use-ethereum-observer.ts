@@ -13,18 +13,18 @@ import { useEthereumContext } from './use-ethereum-context';
 export function useEthereumObserver(): void {
   const dispatch = useDispatch();
 
-  const { observerProtocolContract } = useEthereumContext();
+  const { observerDLCManagerContract } = useEthereumContext();
   const { getVault } = useEthereum();
 
   const { address, network } = useSelector((state: RootState) => state.account);
 
   useEffect(() => {
-    if (!observerProtocolContract) return;
+    if (!observerDLCManagerContract) return;
 
     console.log(`Listening to [${network?.name}]`);
-    console.log(`Listening to [${observerProtocolContract.address}]`);
+    console.log(`Listening to [${observerDLCManagerContract.address}]`);
 
-    observerProtocolContract.on('SetupVault', async (...args: any[]) => {
+    observerDLCManagerContract.on('CreateDLC', async (...args: any[]) => {
       const vaultOwner: string = args[2];
 
       if (vaultOwner.toLowerCase() !== address) return;
@@ -38,7 +38,7 @@ export function useEthereumObserver(): void {
       });
     });
 
-    observerProtocolContract.on('CloseVault', async (...args: any[]) => {
+    observerDLCManagerContract.on('CloseDLC', async (...args: any[]) => {
       const vaultOwner: string = args[1];
 
       if (vaultOwner.toLowerCase() !== address) return;
@@ -52,7 +52,7 @@ export function useEthereumObserver(): void {
       });
     });
 
-    observerProtocolContract.on('SetStatusFunded', async (...args: any[]) => {
+    observerDLCManagerContract.on('SetStatusFunded', async (...args: any[]) => {
       const vaultOwner = args[2];
 
       if (vaultOwner.toLowerCase() !== address) return;
@@ -72,7 +72,7 @@ export function useEthereumObserver(): void {
       });
     });
 
-    observerProtocolContract.on('PostCloseDLCHandler', async (...args: any[]) => {
+    observerDLCManagerContract.on('PostCloseDLC', async (...args: any[]) => {
       const vaultOwner = args[2];
 
       if (vaultOwner.toLowerCase() !== address) return;
@@ -92,5 +92,5 @@ export function useEthereumObserver(): void {
       });
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [observerProtocolContract, network]);
+  }, [observerDLCManagerContract, network]);
 }
