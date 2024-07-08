@@ -4,7 +4,6 @@ import {
   calculateRollingTVL,
 } from '@hooks/use-points';
 import { DetailedEvent, TimeStampedEvent } from '@models/ethereum-models';
-import { BigNumber } from 'ethers';
 import { describe, expect, it } from 'vitest';
 
 const BURN_ADDRESS = '0x0000000000000000000000000000000000000000';
@@ -12,10 +11,10 @@ const BURN_ADDRESS = '0x0000000000000000000000000000000000000000';
 describe('calculateRollingTVL', () => {
   it('should correctly calculate total value locked over time', () => {
     const events: DetailedEvent[] = [
-      { from: BURN_ADDRESS, to: '0x123', value: BigNumber.from(50000000), timestamp: 1000 },
-      { from: '0x123', to: BURN_ADDRESS, value: BigNumber.from(1000000), timestamp: 2000 },
-      { from: '0x123', to: BURN_ADDRESS, value: BigNumber.from(200000), timestamp: 3000 },
-      { from: BURN_ADDRESS, to: '0x123', value: BigNumber.from(1000000), timestamp: 4000 },
+      { from: BURN_ADDRESS, to: '0x123', value: 50000000, timestamp: 1000, txHash: '0x' },
+      { from: '0x123', to: BURN_ADDRESS, value: 1000000, timestamp: 2000, txHash: '0x' },
+      { from: '0x123', to: BURN_ADDRESS, value: 200000, timestamp: 3000, txHash: '0x' },
+      { from: BURN_ADDRESS, to: '0x123', value: 1000000, timestamp: 4000, txHash: '0x' },
     ];
 
     const result = calculateRollingTVL(events);
@@ -30,7 +29,7 @@ describe('calculateRollingTVL', () => {
 
   it('should throw an error if neither FROM nor TO address is BURN_ADDRESS', () => {
     const events: DetailedEvent[] = [
-      { from: '0x123', to: '0x456', value: BigNumber.from(100), timestamp: 1000 },
+      { from: '0x123', to: '0x456', value: 100, timestamp: 1000, txHash: '0x' },
     ];
 
     expect(() => calculateRollingTVL(events)).toThrow('Invalid event in calculateRollingTVL');
