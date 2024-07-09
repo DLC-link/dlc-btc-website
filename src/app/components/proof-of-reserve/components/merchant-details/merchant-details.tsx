@@ -47,7 +47,7 @@ export function MerchantDetails(): React.JSX.Element {
           event.from.toLowerCase() === selectedMerchant.merchant.address.toLowerCase()
             ? 'REDEEM'
             : 'MINT',
-        amount: event.value.toString(),
+        amount: event.value,
         inUSD: 'TODO', //TODO: calculate usd value at the time of mint
         txHash: event.txHash,
         date: new Date(event.timestamp * 1000).toDateString(),
