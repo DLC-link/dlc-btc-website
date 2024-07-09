@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers';
+
 
 export interface TimeStampedEvent {
   timestamp: number;

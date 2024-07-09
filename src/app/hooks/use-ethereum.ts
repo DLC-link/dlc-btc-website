@@ -11,10 +11,9 @@ import { RootState, store } from '@store/index';
 import { vaultActions } from '@store/slices/vault/vault.actions';
 import { DLCEthereumContractName, RawVault, VaultState } from 'dlc-btc-lib/models';
 import { customShiftValue, unshiftValue } from 'dlc-btc-lib/utilities';
-import { Event, ethers } from 'ethers';
+import { ethers } from 'ethers';
 import { Logger } from 'ethers/lib/utils';
 
-import { BURN_ADDRESS } from '@shared/constants/ethereum.constants';
 
 import { useEthereumContext } from './use-ethereum-context';
 
