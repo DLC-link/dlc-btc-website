@@ -1,4 +1,5 @@
 import { Merchant } from './merchant';
+import { Protocol } from './protocol';
 
 enum BitcoinNetworkName {
   MAINNET = 'mainnet',
@@ -24,4 +25,5 @@ export interface Configuration {
   bitcoinBlockchainExplorerURL: string;
   bitcoinBlockchainFeeEstimateURL: string;
   merchants: Merchant[];
+  protocols: Protocol[];
 }

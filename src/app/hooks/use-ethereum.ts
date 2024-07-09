@@ -11,10 +11,8 @@ import { RootState, store } from '@store/index';
 import { vaultActions } from '@store/slices/vault/vault.actions';
 import { DLCEthereumContractName, RawVault, VaultState } from 'dlc-btc-lib/models';
 import { customShiftValue, unshiftValue } from 'dlc-btc-lib/utilities';
-import { Event, ethers } from 'ethers';
+import { ethers } from 'ethers';
 import { Logger } from 'ethers/lib/utils';
-
-import { BURN_ADDRESS } from '@shared/constants/ethereum.constants';
 
 import { useEthereumContext } from './use-ethereum-context';
 
@@ -36,6 +34,10 @@ interface UseEthereumReturnType {
   withdrawVault: (vaultUUID: string, withdrawAmount: bigint) => Promise<void>;
   closeVault: (vaultUUID: string) => Promise<void>;
   fetchMintBurnEvents: (userAddress?: string, lastN?: number) => Promise<DetailedEvent[]>;
+  fetchTransfersForUser: (
+    userAddress: string,
+    contractAddress?: string
+  ) => Promise<DetailedEvent[]>;
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -273,6 +275,30 @@ export function useEthereum(): UseEthereumReturnType {
     return detailedEvents;
   }
 
+  async function fetchTransfersForUser(
+    userAddress: string,
+    contractAddress: string | undefined
+  ): Promise<DetailedEvent[]> {
+    const providerURL = network.defaultNodeURL;
+    if (!contractAddress) {
+      const dlcBTCContract = await getDefaultProvider(network, 'DLCBTC');
+      contractAddress = dlcBTCContract.address;
+    }
+
+    const req = await fetch(
+      `/.netlify/functions/fetch-transfer-events?providerURL=${providerURL}&contractAddress=${contractAddress}&userAddress=${userAddress}`
+    );
+
+    if (!req.ok) {
+      throw new Error(`HTTP error! status: ${req.status}`);
+    }
+
+    const events = await req.json();
+    const detailedEvents: DetailedEvent[] = events.detailedEvents;
+
+    return detailedEvents;
+  }
+
   return {
     getDefaultProvider,
     getDLCBTCBalance,
@@ -286,5 +312,6 @@ export function useEthereum(): UseEthereumReturnType {
     withdrawVault,
     closeVault,
     fetchMintBurnEvents,
+    fetchTransfersForUser,
   };
 }

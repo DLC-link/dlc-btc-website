@@ -50,16 +50,22 @@ export function Points(): React.JSX.Element {
           <TokenStatsBoardLayout>
             <HStack w={'100%'}>
               <VStack w={'50%'} alignItems={'flex-start'}>
-                <TokenStatsBoardTotalPoints totalPoints={userPoints} />
+                <TokenStatsBoardTotalPoints totalPoints={userPoints?.total} />
                 <HStack w={'100%'} pl={'25px'}>
-                  <PointsStatsBoardAction token={dlcBTC} totalSupply={0} />
+                  <PointsStatsBoardAction
+                    token={dlcBTC}
+                    totalSupply={userPoints?.protocols.find(p => p.name == 'dlcBTC')?.points}
+                  />
                   <Divider
                     orientation={'vertical'}
                     px={'15px'}
                     height={'125px'}
                     variant={'thick'}
                   />
-                  <PointsStatsBoardAction token={bitcoin} totalSupply={userPoints} />
+                  <PointsStatsBoardAction
+                    token={bitcoin}
+                    totalSupply={userPoints?.protocols.find(p => p.name == 'Curve')?.points}
+                  />
                 </HStack>
               </VStack>
               <VStack w={'50%'} alignItems={'flex-start'} spacing={'65px'} px={'25px'}>
