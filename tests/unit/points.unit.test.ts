@@ -71,4 +71,15 @@ describe('calculatePoints', () => {
 
     expect(result).toEqual(0);
   });
+
+  it('should return correct value if there is only one event', () => {
+    const events: TimeStampedEvent[] = [
+      { timestamp: 1000, amount: 50000000, totalValueLocked: 50000000 },
+    ];
+    const rewardsRate = 0.01;
+
+    const result = calculatePoints(events, rewardsRate);
+
+    expect(result).not.toEqual(0);
+  });
 });
