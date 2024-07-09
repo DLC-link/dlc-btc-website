@@ -290,7 +290,8 @@ export function useEthereum(): UseEthereumReturnType {
     );
 
     if (!req.ok) {
-      throw new Error(`HTTP error! status: ${req.status}`);
+      // throw new Error(`HTTP error! status: ${req.status}`);
+      return [];
     }
 
     const events = await req.json();

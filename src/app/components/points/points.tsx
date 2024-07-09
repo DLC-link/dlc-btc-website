@@ -81,7 +81,7 @@ export function Points(): React.JSX.Element {
                   </Text>
                   <Text color={'white.02'}>
                     Put your dlcBTC to work in various activities like lending, staking, or trading.
-                    Participate and earn points for your involvement.
+                    Participate and earn extra points for your involvement.
                   </Text>
                 </VStack>
                 <VStack w={'100%'} alignItems={'start'} spacing={'25px'}>
@@ -90,11 +90,11 @@ export function Points(): React.JSX.Element {
                     bgGradient={`linear(to-r, #AC50EF, #7059FB, #2ECFF6)`}
                     bgClip="text"
                   >
-                    Earn points by providing Bitcoin
+                    Earn points by holding dlcBTC
                   </Text>
                   <Text color={'white.02'}>
-                    Become a merchant by providing BTC. Support the network and earn points for your
-                    contributions.
+                    Simply hold dlcBTC in your wallet and earn points for your loyalty. The longer
+                    you hold, the more points you earn.
                   </Text>
                 </VStack>
               </VStack>
