@@ -1,5 +1,3 @@
-
-
 export interface TimeStampedEvent {
   timestamp: number;
   amount: number;

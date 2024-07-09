@@ -1,17 +1,7 @@
-import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-
 import { DetailedEvent, TimeStampedEvent } from '@models/ethereum-models';
 import Decimal from 'decimal.js';
 
 import { BURN_ADDRESS } from '@shared/constants/ethereum.constants';
-
-import { RootState } from '../store';
-import { useEthereum } from './use-ethereum';
-
-interface UsePointsReturnType {
-  userPoints: number | undefined;
-}
 
 export function calculateRollingTVL(events: DetailedEvent[]): TimeStampedEvent[] {
   return events.reduce<TimeStampedEvent[]>((rollingTVL, { from, to, value, timestamp }) => {
@@ -74,36 +64,4 @@ export function calculatePoints(
   }, 0);
 
   return totalRewards;
-}
-
-export function usePoints(): UsePointsReturnType {
-  const { address: userAddress } = useSelector((state: RootState) => state.account);
-  const { fetchMintBurnEvents } = useEthereum();
-
-  const [userPoints, setUserPoints] = useState<number | undefined>(undefined);
-
-  useEffect(() => {
-    const fetchUserPoints = async (currentUserAddress: string) => {
-      void fetchPoints(currentUserAddress);
-    };
-    if (userAddress) {
-      void fetchUserPoints(userAddress);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userAddress]);
-
-  async function fetchPoints(currentUserAddress: string): Promise<void> {
-    const rewardsRate = import.meta.env.VITE_REWARDS_RATE;
-    if (!rewardsRate) {
-      throw new Error('Rewards Rate not set');
-    }
-    const events = await fetchMintBurnEvents(currentUserAddress, undefined);
-    events.sort((a, b) => a.timestamp - b.timestamp);
-    const rollingTVL = calculateRollingTVL(events);
-    setUserPoints(calculatePoints(rollingTVL, rewardsRate));
-  }
-
-  return {
-    userPoints,
-  };
 }

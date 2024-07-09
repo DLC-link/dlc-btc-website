@@ -14,7 +14,6 @@ import { customShiftValue, unshiftValue } from 'dlc-btc-lib/utilities';
 import { ethers } from 'ethers';
 import { Logger } from 'ethers/lib/utils';
 
-
 import { useEthereumContext } from './use-ethereum-context';
 
 const SOLIDITY_CONTRACT_URL = 'https://raw.githubusercontent.com/DLC-link/dlc-solidity';
