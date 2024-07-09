@@ -2,11 +2,10 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { Button, Divider, HStack, Image, Text, VStack } from '@chakra-ui/react';
 import { TokenStatsBoardLayout } from '@components/proof-of-reserve/components/token-stats-board/token-stats-board.layout';
+import { usePoints } from '@hooks/use-points';
 import { dlcBTC } from '@models/token';
 import { RootState } from '@store/index';
 import { modalActions } from '@store/slices/modal/modal.actions';
-
-import { examplePointsData } from '@shared/examples/example-points-data';
 
 import { TokenStatsBoardTotalPoints } from './components/point-stats-board-total-points';
 import { PointsLayout } from './components/points-layout';
@@ -14,7 +13,7 @@ import { PointsStatsBoardAction } from './components/points-stats-board-action';
 
 export function Points(): React.JSX.Element {
   const dispatch = useDispatch();
-  const userPoints = examplePointsData;
+  const { userPoints } = usePoints();
   const { address } = useSelector((state: RootState) => state.account);
 
   function onConnectWalletClick(): void {
@@ -51,7 +50,7 @@ export function Points(): React.JSX.Element {
           <TokenStatsBoardLayout>
             <HStack w={'100%'}>
               <VStack w={'50%'} alignItems={'flex-start'}>
-                <TokenStatsBoardTotalPoints totalPoints={userPoints.total} />
+                <TokenStatsBoardTotalPoints totalPoints={userPoints?.total} />
                 <HStack w={'100%'} pl={'25px'}>
                   <PointsStatsBoardAction
                     token={dlcBTC}

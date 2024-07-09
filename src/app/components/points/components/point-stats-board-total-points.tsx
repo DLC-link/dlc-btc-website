@@ -19,7 +19,7 @@ export function TokenStatsBoardTotalPoints({
           bgGradient={`linear(to-r, #AC50EF, #7059FB, #2ECFF6)`}
           bgClip="text"
         >
-          {totalPoints} Points
+          {totalPoints?.toFixed(2)} Points
         </Text>
       </Skeleton>
       <Divider orientation={'horizontal'} variant={'thick'} />
