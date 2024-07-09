@@ -22,8 +22,8 @@ export function ProtocolHistoryTableItem(
     <HStack
       p={'10px'}
       w={'100%'}
-      h={'35px'}
-      bg={'background.content.01'}
+      h={'50px'}
+      bg={dlcBTCAmount >= 0 ? 'table.background.green' : 'table.background.red'}
       blendMode={'screen'}
       border={'1px solid'}
       borderRadius={'md'}

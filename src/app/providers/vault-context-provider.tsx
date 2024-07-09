@@ -1,26 +1,57 @@
 import { createContext } from 'react';
 
-import { UseVaultsReturnType, useVaults } from '@hooks/use-vaults';
+import { useVaults } from '@hooks/use-vaults';
 import { HasChildren } from '@models/has-children';
+import { Vault } from '@models/vault';
 
 interface VaultContextType {
-  vaults: UseVaultsReturnType;
+  allVaults: Vault[];
+  readyVaults: Vault[];
+  fundingVaults: Vault[];
+  pendingVaults: Vault[];
+  fundedVaults: Vault[];
+  closingVaults: Vault[];
+  closedVaults: Vault[];
+  isLoading: boolean;
 }
 
 export const VaultContext = createContext<VaultContextType>({
-  vaults: {
-    allVaults: [],
-    readyVaults: [],
-    fundingVaults: [],
-    fundedVaults: [],
-    closingVaults: [],
-    closedVaults: [],
-    isLoading: true,
-  },
+  allVaults: [],
+  readyVaults: [],
+  fundingVaults: [],
+  pendingVaults: [],
+  fundedVaults: [],
+  closingVaults: [],
+  closedVaults: [],
+  isLoading: true,
 });
 
 export function VaultContextProvider({ children }: HasChildren): React.JSX.Element {
-  const vaults = useVaults();
+  const {
+    allVaults,
+    readyVaults,
+    fundingVaults,
+    fundedVaults,
+    pendingVaults,
+    closingVaults,
+    closedVaults,
+    isLoading,
+  } = useVaults();
 
-  return <VaultContext.Provider value={{ vaults }}>{children}</VaultContext.Provider>;
+  return (
+    <VaultContext.Provider
+      value={{
+        allVaults,
+        readyVaults,
+        fundingVaults,
+        pendingVaults,
+        fundedVaults,
+        closingVaults,
+        closedVaults,
+        isLoading,
+      }}
+    >
+      {children}
+    </VaultContext.Provider>
+  );
 }

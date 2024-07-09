@@ -36,7 +36,7 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
   }, [network]);
 
   async function getProofOfReserveHandler(): Promise<void> {
-    const attestorPublicKey = await getAttestorGroupPublicKey(network);
+    const attestorPublicKey = await getAttestorGroupPublicKey();
 
     const proofOfReserveHandler = new ProofOfReserveHandler(
       appConfiguration.bitcoinBlockchainURL,

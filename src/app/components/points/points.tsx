@@ -85,7 +85,7 @@ export function Points(): React.JSX.Element {
                     Earn points by providing Bitcoin
                   </Text>
                   <Text color={'white.02'}>
-                    Become a merchany by providing BTC. Support the network and earn points for your
+                    Become a merchant by providing BTC. Support the network and earn points for your
                     contributions.
                   </Text>
                 </VStack>

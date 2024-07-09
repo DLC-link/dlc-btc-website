@@ -10,9 +10,9 @@ export default defineConfig(({ mode }) =>  {
 
   const env = loadEnv(mode, process.cwd(), '')
 
-  const bitcoinNetworkName = env.VITE_BITCOIN_NETWORK;
+  const environmentName = env.VITE_APP_ENVIRONMENT;
 
-  const appConfigurationJSON = readFileSync(resolve(__dirname, `./config.${bitcoinNetworkName}.json`), 'utf-8');
+  const appConfigurationJSON = readFileSync(resolve(__dirname, `./config.${environmentName}.json`), 'utf-8');
   const appConfiguration = JSON.parse(appConfigurationJSON);
   
 

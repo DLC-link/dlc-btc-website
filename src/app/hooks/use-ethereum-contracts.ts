@@ -12,17 +12,15 @@ interface UseEthereumContractsReturnType {
     ethereumSigner: ethers.providers.JsonRpcSigner,
     ethereumNetwork: EthereumNetwork
   ) => Promise<void>;
-  protocolContract: Contract | undefined;
-  observerProtocolContract: Contract | undefined;
   dlcManagerContract: Contract | undefined;
+  observerDLCManagerContract: Contract | undefined;
   dlcBTCContract: Contract | undefined;
   contractsLoaded: boolean;
 }
 
 export function useEthereumContracts(): UseEthereumContractsReturnType {
-  const protocolContract = useRef<Contract | undefined>(undefined);
-  const observerProtocolContract = useRef<Contract | undefined>(undefined);
   const dlcManagerContract = useRef<Contract | undefined>(undefined);
+  const observerDLCManagerContract = useRef<Contract | undefined>(undefined);
   const dlcBTCContract = useRef<Contract | undefined>(undefined);
 
   const [contractsLoaded, setContractsLoaded] = useState<boolean>(false);
@@ -32,32 +30,6 @@ export function useEthereumContracts(): UseEthereumContractsReturnType {
     ethereumNetwork: EthereumNetwork
   ): Promise<void> {
     setContractsLoaded(false);
-
-    if (!protocolContract.current) {
-      const protocolContractData = await fetchEthereumDeploymentPlan(
-        'TokenManager',
-        ethereumNetwork
-      );
-      const contract = new ethers.Contract(
-        protocolContractData.contract.address,
-        protocolContractData.contract.abi,
-        ethereumSigner
-      );
-      protocolContract.current = contract;
-    }
-
-    if (!observerProtocolContract.current) {
-      const observerProtocolContractData = await fetchEthereumDeploymentPlan(
-        'TokenManager',
-        ethereumNetwork
-      );
-      const contract = new ethers.Contract(
-        observerProtocolContractData.contract.address,
-        observerProtocolContractData.contract.abi,
-        new ethers.providers.WebSocketProvider(import.meta.env.VITE_ARBITRUM_OBSERVER_NODE)
-      );
-      observerProtocolContract.current = contract;
-    }
 
     if (!dlcManagerContract.current) {
       const dlcManagerContractData = await fetchEthereumDeploymentPlan(
@@ -70,6 +42,19 @@ export function useEthereumContracts(): UseEthereumContractsReturnType {
         ethereumSigner
       );
       dlcManagerContract.current = contract;
+    }
+
+    if (!observerDLCManagerContract.current) {
+      const dlcManagerContractData = await fetchEthereumDeploymentPlan(
+        'DLCManager',
+        ethereumNetwork
+      );
+      const contract = new ethers.Contract(
+        dlcManagerContractData.contract.address,
+        dlcManagerContractData.contract.abi,
+        new ethers.providers.WebSocketProvider(import.meta.env.VITE_ARBITRUM_OBSERVER_NODE)
+      );
+      observerDLCManagerContract.current = contract;
     }
 
     if (!dlcBTCContract.current) {
@@ -90,7 +75,20 @@ export function useEthereumContracts(): UseEthereumContractsReturnType {
     ethereumNetwork: EthereumNetwork
   ) {
     const branchName = import.meta.env.VITE_ETHEREUM_DEPLOYMENT_BRANCH;
-    const deploymentPlanURL = `${SOLIDITY_CONTRACT_URL}/${branchName}/deploymentFiles/${ethereumNetwork.name.toLowerCase()}/${contractName}.json`;
+
+    let deploymentPlanURL: string;
+    switch (appConfiguration.appEnvironment) {
+      case 'mainnet':
+      case 'testnet':
+      case 'devnet':
+        deploymentPlanURL = `${SOLIDITY_CONTRACT_URL}/${branchName}/deploymentFiles/${ethereumNetwork.name.toLowerCase()}/${contractName}.json`;
+        break;
+      case 'localhost':
+        deploymentPlanURL = `${import.meta.env.VITE_ETHEREUM_DEPLOYMENT_FILES_URL}/contracts/localhost/${contractName}.json`;
+        break;
+      default:
+        throw new EthereumError('Invalid Ethereum Network');
+    }
 
     // eslint-disable-next-line no-console
     console.log(
@@ -110,8 +108,7 @@ export function useEthereumContracts(): UseEthereumContractsReturnType {
 
   return {
     getEthereumContracts,
-    protocolContract: protocolContract.current,
-    observerProtocolContract: observerProtocolContract.current,
+    observerDLCManagerContract: observerDLCManagerContract.current,
     dlcManagerContract: dlcManagerContract.current,
     dlcBTCContract: dlcBTCContract.current,
     contractsLoaded,

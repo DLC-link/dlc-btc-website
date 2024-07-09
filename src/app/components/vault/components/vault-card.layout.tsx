@@ -17,7 +17,6 @@ export function VaultCardLayout({
     <VStack
       alignContent={'start'}
       p={'7.5px'}
-      h={'auto'}
       w={'100%'}
       spacing={'15px'}
       bg={'background.content.01'}

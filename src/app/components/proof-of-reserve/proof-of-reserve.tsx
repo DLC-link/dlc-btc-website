@@ -1,15 +1,8 @@
 import { useContext } from 'react';
 import { useQuery } from 'react-query';
 
-import { Divider, HStack, Skeleton, Text } from '@chakra-ui/react';
-import { GenericTableBody } from '@components/generic-table/components/generic-table-body';
-import { GenericTableHeader } from '@components/generic-table/components/generic-table-header';
-import { GenericTableHeaderText } from '@components/generic-table/components/generic-table-header-text';
-import { GenericTableLayout } from '@components/generic-table/components/generic-table-layout';
-import {
-  ProtocolHistoryTableItem,
-  ProtocolHistoryTableItemProps,
-} from '@components/protocol-history-table/components/protocol-history-table-item';
+import { Divider, HStack, Text } from '@chakra-ui/react';
+import { ProtocolHistoryTableItemProps } from '@components/protocol-history-table/components/protocol-history-table-item';
 import { ProtocolHistoryTable } from '@components/protocol-history-table/protocol-history-table';
 import { useEthereum } from '@hooks/use-ethereum';
 import { Merchant } from '@models/merchant';
@@ -61,18 +54,6 @@ export function ProofOfReserve(): React.JSX.Element {
     });
   }
 
-  const itemHeight = 65;
-  const padding = 20;
-  const dynamicHeight = allMintBurnEvents
-    ? allMintBurnEvents.length * itemHeight + padding
-    : padding;
-
-  const renderProtocolHistoryTableItems = () => {
-    return (
-      <>{allMintBurnEvents?.map(item => <ProtocolHistoryTableItem key={item.id} {...item} />)}</>
-    );
-  };
-
   return (
     <ProofOfReserveLayout>
       <Text w={'100%'} color={'white'} fontSize={'6xl'} fontWeight={500}>
@@ -87,30 +68,14 @@ export function ProofOfReserve(): React.JSX.Element {
           <TokenStatsBoardToken token={bitcoin} totalSupply={proofOfReserveSum} />
         </HStack>
       </TokenStatsBoardLayout>
-      <HStack
-        w={'100%'}
-        gap={'20px'}
-        alignItems={'flex-start'}
-        bg={'background.container.01'}
-        px={'20px'}
-      >
+      <HStack w={'100%'} gap={'20px'} alignItems={'flex-start'}>
         <MerchantTableLayout>
           <MerchantTableHeader />
           {merchantProofOfReserves.map(item => (
             <MerchantTableItem key={item.merchant.name} {...item} />
           ))}
         </MerchantTableLayout>
-        <GenericTableLayout height={`${dynamicHeight}px`} width={'50%'}>
-          <GenericTableHeader>
-            <GenericTableHeaderText>Order Book</GenericTableHeaderText>
-            <GenericTableHeaderText>Merchant</GenericTableHeaderText>
-            <GenericTableHeaderText>Transaction</GenericTableHeaderText>
-            <GenericTableHeaderText>Date</GenericTableHeaderText>
-          </GenericTableHeader>
-          <Skeleton isLoaded={allMintBurnEvents !== undefined} height={'50px'} w={'100%'}>
-            <GenericTableBody renderItems={renderProtocolHistoryTableItems} />
-          </Skeleton>
-        </GenericTableLayout>
+        <ProtocolHistoryTable items={allMintBurnEvents} />
       </HStack>
     </ProofOfReserveLayout>
   );

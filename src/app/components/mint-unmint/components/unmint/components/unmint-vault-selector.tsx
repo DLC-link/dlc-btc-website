@@ -1,35 +1,43 @@
-import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useContext, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
-import { Button, Text, VStack } from '@chakra-ui/react';
-import { VaultCard } from '@components/vault/vault-card';
+import { Text, VStack, useToast } from '@chakra-ui/react';
 import { VaultsListGroupContainer } from '@components/vaults-list/components/vaults-list-group-container';
 import { VaultsList } from '@components/vaults-list/vaults-list';
 import { useEthereum } from '@hooks/use-ethereum';
-import { useVaults } from '@hooks/use-vaults';
 import { Vault } from '@models/vault';
+import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
+import { VaultContext } from '@providers/vault-context-provider';
 import { RootState } from '@store/index';
-import { scrollBarCSS } from '@styles/css-styles';
+import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
+import { VaultState } from 'dlc-btc-lib/models';
+import { shiftValue } from 'dlc-btc-lib/utilities';
 
-import { RiskBox } from '../../risk-box/risk-box';
+import { BurnTokenTransactionForm } from '../../sign-transaction-screen/components/ethereum-transaction-form';
 
 interface UnmintVaultSelectorProps {
-  risk: string;
-  fetchRisk: () => Promise<string>;
-  isRiskLoading: boolean;
+  userEthereumAddressRiskLevel: string;
+  fetchUserEthereumAddressRiskLevel: () => Promise<string>;
+  isUserEthereumAddressRiskLevelLoading: boolean;
 }
+
 export function UnmintVaultSelector({
-  risk,
-  fetchRisk,
-  isRiskLoading,
+  userEthereumAddressRiskLevel,
+  fetchUserEthereumAddressRiskLevel,
+  isUserEthereumAddressRiskLevelLoading,
 }: UnmintVaultSelectorProps): React.JSX.Element {
-  const { fundedVaults } = useVaults();
-  const { closeVault } = useEthereum();
+  const toast = useToast();
+  const dispatch = useDispatch();
+  const { withdrawVault, getVault } = useEthereum();
+
+  const { bitcoinPrice } = useContext(ProofOfReserveContext);
+  const { fundedVaults } = useContext(VaultContext);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { unmintStep } = useSelector((state: RootState) => state.mintunmint);
 
   const [selectedVault, setSelectedVault] = useState<Vault | undefined>();
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   function handleSelect(uuid: string): void {
     const vault = fundedVaults.find(vault => vault.uuid === uuid);
@@ -40,64 +48,64 @@ export function UnmintVaultSelector({
     setSelectedVault(fundedVaults.find(vault => vault.uuid === unmintStep[1]));
   }, [fundedVaults, unmintStep]);
 
-  async function handleUnmint(): Promise<void> {
+  async function handleBurn(withdrawAmount: number): Promise<void> {
     if (selectedVault) {
       try {
         setIsSubmitting(true);
-        const currentRisk = await fetchRisk();
+        const currentRisk = await fetchUserEthereumAddressRiskLevel();
         if (currentRisk === 'High') throw new Error('Risk Level is too high');
-        await closeVault(selectedVault.uuid);
+        const formattedWithdrawAmount = BigInt(shiftValue(withdrawAmount));
+        await withdrawVault(selectedVault.uuid, formattedWithdrawAmount);
+        await getVault(selectedVault.uuid, VaultState.FUNDED).then(() => {
+          dispatch(mintUnmintActions.setUnmintStep([1, selectedVault.uuid]));
+        });
       } catch (error) {
         setIsSubmitting(false);
-        throw new Error('Error closing vault');
+        toast({
+          title: 'Failed to sign Transaction',
+          description: error instanceof Error ? error.message : '',
+          status: 'error',
+          duration: 9000,
+          isClosable: true,
+        });
       }
     }
   }
 
+  function handleCancel() {
+    setSelectedVault(undefined);
+  }
+
   return (
-    <VStack alignItems={'start'} py={'2.5px'} px={'15px'} w={'45%'} h={'445px'} spacing={'15px'}>
-      <Text color={'accent.lightBlue.01'} fontSize={'md'} fontWeight={600}>
-        Select vault to redeem dlcBTC:
-      </Text>
+    <>
       {selectedVault ? (
-        <VStack alignItems={'start'} py={'15px'} w={'100%'} css={scrollBarCSS}>
-          <VaultCard
-            vault={selectedVault}
-            isSelectable
-            isSelected
-            handleSelect={() => setSelectedVault(undefined)}
-          />
-        </VStack>
+        <BurnTokenTransactionForm
+          vault={selectedVault}
+          bitcoinPrice={bitcoinPrice}
+          isSubmitting={isSubmitting}
+          risk={userEthereumAddressRiskLevel}
+          isRiskLoading={isUserEthereumAddressRiskLevelLoading}
+          handleBurn={handleBurn}
+          handleCancel={handleCancel}
+        />
       ) : fundedVaults.length == 0 ? (
-        <Text color={'white'}>You don't have any active vaults.</Text>
+        <VStack w={'45%'}>
+          <Text color={'white'}>You don't have any active vaults.</Text>
+        </VStack>
       ) : (
-        <VaultsList height="223.5px" isScrollable={!selectedVault}>
-          <VaultsListGroupContainer
-            vaults={fundedVaults}
-            isSelectable
-            handleSelect={handleSelect}
-          />
-        </VaultsList>
+        <VStack w={'45%'}>
+          <Text color={'accent.lightBlue.01'} fontSize={'md'} fontWeight={600}>
+            Select vault to withdraw Bitcoin:
+          </Text>
+          <VaultsList height={'425.5px'} isScrollable={!selectedVault}>
+            <VaultsListGroupContainer
+              vaults={fundedVaults}
+              isSelectable
+              handleSelect={handleSelect}
+            />
+          </VaultsList>
+        </VStack>
       )}
-      {risk === 'High' && <RiskBox risk={risk} isRiskLoading={isRiskLoading} />}
-      <Button
-        isLoading={isSubmitting}
-        variant={'account'}
-        isDisabled={!selectedVault || risk === 'High'}
-        onClick={() => handleUnmint()}
-      >
-        Redeem dlcBTC
-      </Button>
-      {selectedVault && (
-        <Button
-          isDisabled={true}
-          isLoading={isSubmitting}
-          variant={'navigate'}
-          onClick={() => setSelectedVault(undefined)}
-        >
-          Cancel
-        </Button>
-      )}
-    </VStack>
+    </>
   );
 }
