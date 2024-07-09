@@ -3,7 +3,7 @@ import { MdArrowBack } from 'react-icons/md';
 import { useQuery } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { Divider, HStack, Icon, Image, Text } from '@chakra-ui/react';
+import { Divider, HStack, Icon, Image, Link, Text } from '@chakra-ui/react';
 import { useEthereum } from '@hooks/use-ethereum';
 import { Merchant } from '@models/merchant';
 import { bitcoin, dlcBTC } from '@models/token';
@@ -33,7 +33,7 @@ export function MerchantDetails(): React.JSX.Element {
   ];
   const selectedMerchant = merchantProofOfReserves.find(item => item.merchant.name === name);
 
-  const { data: mintBurnEvents } = useQuery(['mintBurnEvents'], fetchMintBurnEventsHandler);
+  const { data: mintBurnEvents } = useQuery([`mintBurnEvents${name}`], fetchMintBurnEventsHandler);
 
   if (!name) return <Text>Error: No merchant name provided</Text>;
 
@@ -65,22 +65,28 @@ export function MerchantDetails(): React.JSX.Element {
         pt={'50px'}
         lineHeight={'60px'}
       >
-        {`${name} Group`}
+        {`${name}`}
         <br />
         {'Dashboard'}
       </Text>
-      <Text variant={'navigate'} fontSize={'xl'} onClick={() => navigate('/proof-of-reserve')}>
+      <Link
+        color="accent.lightBlue.01"
+        fontSize="lg"
+        fontWeight="regular"
+        textDecoration="underline"
+        onClick={() => navigate('/proof-of-reserve')}
+      >
         <HStack spacing={2} alignItems="center">
           <Icon as={MdArrowBack} />
           <Text>Back to the List</Text>
         </HStack>
-      </Text>
+      </Link>
 
       <TokenStatsBoardLayout width={'100%'}>
         <HStack w={'100%'} alignItems={'center'} justifyContent={'space-evenly'}>
           <Image
             src={selectedMerchant?.merchant.logo}
-            alt={'amber logo'}
+            alt={'Merchant logo'}
             boxSize={'100px'}
             mx={'30px'}
           />

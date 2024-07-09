@@ -39,14 +39,9 @@ export function ProofOfReserve(): React.JSX.Element {
     const detailedEvents = await fetchMintBurnEvents(undefined, 10);
     return detailedEvents.map((event, index) => {
       const isMint = event.from.toLowerCase() === BURN_ADDRESS.toLowerCase();
-      // const knownMerchant = appConfiguration.merchants.find(
-      //   merchant => merchant.address === (isMint ? event.to : event.from)
-      // );
-      // console.log('knownMerchant', knownMerchant);
       return {
         id: index,
         dlcBTCAmount: isMint ? event.value : event.value * -1,
-        // merchant: knownMerchant ? knownMerchant.name : isMint ? event.to : event.from,
         merchant: isMint ? event.to : event.from,
         txHash: event.txHash,
         date: new Date(event.timestamp * 1000).toDateString(),
