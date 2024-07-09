@@ -22,13 +22,13 @@ export function TokenStatsBoardToken({
 
   return (
     <VStack w={'100%'} h={'100%'} alignItems={'start'}>
-      <Text color={'accent.lightBlue.01'} fontWeight={600} fontSize={'md'}>
+      <Text color={'white.01'} fontWeight={600} fontSize={'lg'}>
         {`${token.name} ${tokenSuffix}`}
       </Text>
       <Skeleton isLoaded={totalSupply !== undefined} h={'auto'} w={'100%'}>
         <HStack>
           <Image src={token.logo} alt={token.logoAlt} boxSize={'25px'} />
-          <Text color={'white'} fontWeight={200} fontSize={'3xl'}>
+          <Text color={'white.01'} fontWeight={200} fontSize={'2xl'}>
             {totalSupply}
           </Text>
         </HStack>

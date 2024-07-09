@@ -1,8 +1,10 @@
 /* eslint-disable */
+import { useNavigate } from 'react-router-dom';
+
 import { HStack, Image, Text } from '@chakra-ui/react';
 import { CustomSkeleton } from '@components/custom-skeleton/custom-skeleton';
 
-interface AttestorDetailsTableItem {
+interface AttestorDetailsTableItemProps {
   node: string;
   observedResponse: string;
   totalStake: number;
@@ -14,12 +16,14 @@ interface AttestorDetailsTableItem {
 }
 
 export function AttestorDetailsTableItem(
-  attestorDetailsTableItem: AttestorDetailsTableItem
+  attestorDetailsTableItem: AttestorDetailsTableItemProps
 ): React.JSX.Element {
   if (!attestorDetailsTableItem) return <CustomSkeleton height={'35px'} />;
 
   const { node, observedResponse, totalStake, del, fee, ownerRewards, maxYield, startDate } =
     attestorDetailsTableItem;
+
+  const navigate = useNavigate();
 
   return (
     <HStack
@@ -35,7 +39,13 @@ export function AttestorDetailsTableItem(
     >
       <HStack w={'20%'}>
         <Image src={'/images/logos/dlc-btc-logo.svg'} alt={'dlcBTC Logo'} boxSize={'30px'} />
-        <Text color={'white'} fontSize={'sm'} fontWeight={500}>
+        <Text
+          color={'white'}
+          fontSize={'sm'}
+          fontWeight={500}
+          variant={'navigate'}
+          onClick={() => navigate('/attestor-details-select')}
+        >
           {node}
         </Text>
       </HStack>

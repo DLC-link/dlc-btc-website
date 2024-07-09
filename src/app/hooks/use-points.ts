@@ -3,12 +3,11 @@ import { useSelector } from 'react-redux';
 
 import { DetailedEvent, TimeStampedEvent } from '@models/ethereum-models';
 import Decimal from 'decimal.js';
-import { Event } from 'ethers';
+
+import { BURN_ADDRESS } from '@shared/constants/ethereum.constants';
 
 import { RootState } from '../store';
 import { useEthereum } from './use-ethereum';
-
-const BURN_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 interface UsePointsReturnType {
   userPoints: number | undefined;
@@ -78,8 +77,8 @@ export function calculatePoints(
 }
 
 export function usePoints(): UsePointsReturnType {
-  const { address: userAddress, network } = useSelector((state: RootState) => state.account);
-  const { getDefaultProvider } = useEthereum();
+  const { address: userAddress } = useSelector((state: RootState) => state.account);
+  const { fetchMintBurnEvents } = useEthereum();
 
   const [userPoints, setUserPoints] = useState<number | undefined>(undefined);
 
@@ -93,42 +92,13 @@ export function usePoints(): UsePointsReturnType {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userAddress]);
 
-  function formatTransferEvent(event: any, timestamp: number): DetailedEvent {
-    return {
-      from: event.from.toLowerCase(),
-      to: event.to.toLowerCase(),
-      value: event.value,
-      timestamp,
-    };
-  }
-
-  async function fetchTransferEvents(userAddress: string): Promise<DetailedEvent[]> {
-    const dlcBTCContract = await getDefaultProvider(network, 'DLCBTC');
-    const eventFilterTo = dlcBTCContract.filters.Transfer(BURN_ADDRESS, userAddress);
-    const eventFilterFrom = dlcBTCContract.filters.Transfer(userAddress, BURN_ADDRESS);
-    const eventsTo = await dlcBTCContract.queryFilter(eventFilterTo);
-    const eventsFrom = await dlcBTCContract.queryFilter(eventFilterFrom);
-    const events = [...eventsTo, ...eventsFrom];
-    const detailedEvents: DetailedEvent[] = [];
-
-    await Promise.all(
-      events.map(async (event: Event) => {
-        const block = await dlcBTCContract.provider.getBlock(event.blockNumber);
-        detailedEvents.push(formatTransferEvent(event.args, block.timestamp));
-      })
-    );
-
-    detailedEvents.sort((a, b) => a.timestamp - b.timestamp);
-
-    return detailedEvents;
-  }
-
   async function fetchPoints(currentUserAddress: string): Promise<void> {
     const rewardsRate = import.meta.env.VITE_REWARDS_RATE;
     if (!rewardsRate) {
       throw new Error('Rewards Rate not set');
     }
-    const events = await fetchTransferEvents(currentUserAddress);
+    const events = await fetchMintBurnEvents(currentUserAddress);
+    events.sort((a, b) => a.timestamp - b.timestamp);
     const rollingTVL = calculateRollingTVL(events);
     setUserPoints(calculatePoints(rollingTVL, rewardsRate));
   }
