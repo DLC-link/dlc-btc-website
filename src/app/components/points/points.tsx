@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button, Divider, HStack, Image, Text, VStack } from '@chakra-ui/react';
 import { TokenStatsBoardLayout } from '@components/proof-of-reserve/components/token-stats-board/token-stats-board.layout';
 import { usePoints } from '@hooks/use-points';
-import { bitcoin, dlcBTC } from '@models/token';
+import { dlcBTC } from '@models/token';
 import { RootState } from '@store/index';
 import { modalActions } from '@store/slices/modal/modal.actions';
 
@@ -50,16 +50,24 @@ export function Points(): React.JSX.Element {
           <TokenStatsBoardLayout>
             <HStack w={'100%'}>
               <VStack w={'50%'} alignItems={'flex-start'}>
-                <TokenStatsBoardTotalPoints totalPoints={userPoints} />
+                <TokenStatsBoardTotalPoints totalPoints={userPoints?.total} />
                 <HStack w={'100%'} pl={'25px'}>
-                  <PointsStatsBoardAction token={dlcBTC} totalSupply={0} />
+                  <PointsStatsBoardAction
+                    token={dlcBTC}
+                    totalSupply={userPoints?.protocols.find(p => p.name == 'Curve')?.points}
+                    tokenSuffix={'Use'}
+                  />
                   <Divider
                     orientation={'vertical'}
                     px={'15px'}
                     height={'125px'}
                     variant={'thick'}
                   />
-                  <PointsStatsBoardAction token={bitcoin} totalSupply={userPoints} />
+                  <PointsStatsBoardAction
+                    token={dlcBTC}
+                    totalSupply={userPoints?.protocols.find(p => p.name == 'dlcBTC')?.points}
+                    tokenSuffix={'Hold'}
+                  />
                 </HStack>
               </VStack>
               <VStack w={'50%'} alignItems={'flex-start'} spacing={'65px'} px={'25px'}>
@@ -73,7 +81,7 @@ export function Points(): React.JSX.Element {
                   </Text>
                   <Text color={'white.02'}>
                     Put your dlcBTC to work in various activities like lending, staking, or trading.
-                    Participate and earn points for your involvement.
+                    Participate and earn extra points for your involvement.
                   </Text>
                 </VStack>
                 <VStack w={'100%'} alignItems={'start'} spacing={'25px'}>
@@ -82,11 +90,11 @@ export function Points(): React.JSX.Element {
                     bgGradient={`linear(to-r, #AC50EF, #7059FB, #2ECFF6)`}
                     bgClip="text"
                   >
-                    Earn points by providing Bitcoin
+                    Earn points by holding dlcBTC
                   </Text>
                   <Text color={'white.02'}>
-                    Become a merchany by providing BTC. Support the network and earn points for your
-                    contributions.
+                    Simply hold dlcBTC in your wallet and earn points for your loyalty. The longer
+                    you hold, the more points you earn.
                   </Text>
                 </VStack>
               </VStack>

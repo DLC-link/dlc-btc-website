@@ -1,8 +1,13 @@
 {
+  "appEnvironment": "testnet",
   "attestorURLs": [
     "https://testnet.dlc.link/attestor-1",
     "https://testnet.dlc.link/attestor-2",
-    "https://testnet.dlc.link/attestor-3"
+    "https://testnet.dlc.link/attestor-3",
+    "https://attestor.testnet.dlc.despreadlabs.io",
+    "http://103.164.81.14:8811",
+    "https://arb-sepolia-dlc-attestor-0.public.linkpool.io/jK245aUH8GvfgFp5fmUKdnTJLlS9nnAz",
+    "http://dlc-testnet.stakin-nodes.com:8811"
   ],
   "enabledEthereumNetworkIDs": ["421614"],
   "bitcoinNetwork": "testnet",
@@ -20,6 +25,14 @@
       "name": "DLC.Link",
       "address": "0x0DD4f29E21F10cb2E485cf9bDAb9F2dD1f240Bfa",
       "logo": "/images/logos/dlc-link-logo-horizontal.svg"
+    }
+  ],
+  "protocols": [
+    {
+      "name": "Curve",
+      "lpTokenAddress": "0xe957ce03ccdd88f02ed8b05c9a3a28abef38514a",
+      "gaugeAddress": "0x02b8e750e68cb648db2c2ac4bbb47a10a5c12588",
+      "logo": ""
     }
   ]
 }

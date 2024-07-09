@@ -1,16 +1,16 @@
 {
-  "appEnvironment": "mainnet",
+  "appEnvironment": "localhost",
   "attestorURLs": [
-    "https://mainnet.dlc.link/attestor-1",
-    "https://mainnet.dlc.link/attestor-2",
-    "https://mainnet.dlc.link/attestor-3"
+    "http://192.168.86.31:8811",
+    "http://192.168.86.31:8812",
+    "http://192.168.86.31:8813"
   ],
-  "enabledEthereumNetworkIDs": ["42161"],
-  "bitcoinNetwork": "mainnet",
-  "bitcoinNetworkPreFix": "bc1",
-  "bitcoinBlockchainURL": "https://mainnet.dlc.link/electrs",
-  "bitcoinBlockchainExplorerURL": "https://mempool.space",
-  "bitcoinBlockchainFeeEstimateURL": "https://mempool.space/api/v1/fees/recommended",
+  "enabledEthereumNetworkIDs": ["421614", "31337"],
+  "bitcoinNetwork": "regtest",
+  "bitcoinNetworkPreFix": "bcrt1",
+  "bitcoinBlockchainURL": "http://192.168.86.31:3004",
+  "bitcoinBlockchainExplorerURL": "http://192.168.86.31:3004",
+  "bitcoinBlockchainFeeEstimateURL": "https://devnet.dlc.link/electrs/fee-estimates",
   "merchants": [
     {
       "name": "Amber",

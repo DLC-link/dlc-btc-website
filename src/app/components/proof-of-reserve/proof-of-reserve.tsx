@@ -21,7 +21,7 @@ import { TokenStatsBoardLayout } from './components/token-stats-board/token-stat
 
 export function ProofOfReserve(): React.JSX.Element {
   const { proofOfReserve, totalSupply, bitcoinPrice } = useContext(ProofOfReserveContext);
-  const { fetchAllMintBurnEvents } = useEthereum();
+  const { fetchMintBurnEvents } = useEthereum();
 
   const [proofOfReserveSum, merchantProofOfReserves] = proofOfReserve || [
     undefined,
@@ -33,18 +33,15 @@ export function ProofOfReserve(): React.JSX.Element {
     }),
   ];
 
-  const { data: allMintBurnEvents } = useQuery(
-    ['allMintBurnEvents'],
-    fetchAllMintBurnEventsHandler
-  );
+  const { data: allMintBurnEvents } = useQuery(['allMintBurnEvents'], fetchMintBurnEventsHandler);
 
-  async function fetchAllMintBurnEventsHandler(): Promise<ProtocolHistoryTableItemProps[]> {
-    const detailedEvents = await fetchAllMintBurnEvents();
+  async function fetchMintBurnEventsHandler(): Promise<ProtocolHistoryTableItemProps[]> {
+    const detailedEvents = await fetchMintBurnEvents(undefined, 10);
     return detailedEvents.map((event, index) => {
       const isMint = event.from.toLowerCase() === BURN_ADDRESS.toLowerCase();
       return {
         id: index,
-        dlcBTCAmount: isMint ? event.value.toNumber() : event.value.toNumber() * -1,
+        dlcBTCAmount: isMint ? event.value : event.value * -1,
         merchant: isMint ? event.to : event.from,
         txHash: event.txHash,
         date: new Date(event.timestamp * 1000).toDateString(),
