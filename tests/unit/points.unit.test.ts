@@ -7,17 +7,19 @@ import { DetailedEvent, TimeStampedEvent } from '@models/ethereum-models';
 import { describe, expect, it } from 'vitest';
 
 const BURN_ADDRESS = '0x0000000000000000000000000000000000000000';
+const USER_ADDRESS = '0x123';
+const OTHER_EOA = '0x456';
 
 describe('calculateRollingTVL', () => {
   it('should correctly calculate total value locked over time', () => {
     const events: DetailedEvent[] = [
-      { from: BURN_ADDRESS, to: '0x123', value: 50000000, timestamp: 1000, txHash: '0x' },
-      { from: '0x123', to: BURN_ADDRESS, value: 1000000, timestamp: 2000, txHash: '0x' },
-      { from: '0x123', to: BURN_ADDRESS, value: 200000, timestamp: 3000, txHash: '0x' },
-      { from: BURN_ADDRESS, to: '0x123', value: 1000000, timestamp: 4000, txHash: '0x' },
+      { from: BURN_ADDRESS, to: USER_ADDRESS, value: 50000000, timestamp: 1000, txHash: '0x' },
+      { from: USER_ADDRESS, to: BURN_ADDRESS, value: 1000000, timestamp: 2000, txHash: '0x' },
+      { from: USER_ADDRESS, to: OTHER_EOA, value: 200000, timestamp: 3000, txHash: '0x' },
+      { from: BURN_ADDRESS, to: USER_ADDRESS, value: 1000000, timestamp: 4000, txHash: '0x' },
     ];
 
-    const result = calculateRollingTVL(events);
+    const result = calculateRollingTVL(events, USER_ADDRESS);
 
     expect(result).toEqual([
       { timestamp: 1000, amount: 50000000, totalValueLocked: 50000000 },
@@ -25,14 +27,6 @@ describe('calculateRollingTVL', () => {
       { timestamp: 3000, amount: -200000, totalValueLocked: 50000000 - 1000000 - 200000 },
       { timestamp: 4000, amount: 1000000, totalValueLocked: 50000000 - 1000000 - 200000 + 1000000 },
     ]);
-  });
-
-  it('should throw an error if neither FROM nor TO address is BURN_ADDRESS', () => {
-    const events: DetailedEvent[] = [
-      { from: '0x123', to: '0x456', value: 100, timestamp: 1000, txHash: '0x' },
-    ];
-
-    expect(() => calculateRollingTVL(events)).toThrow('Invalid event in calculateRollingTVL');
   });
 });
 describe('calculatePoints', () => {
