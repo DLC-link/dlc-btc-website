@@ -23,7 +23,7 @@ export function calculateRollingTVL(
   events: DetailedEvent[],
   userAddress: string
 ): TimeStampedEvent[] {
-  return events.reduce<TimeStampedEvent[]>((rollingTVL, { from, to, value, timestamp }) => {
+  return events.reduce<TimeStampedEvent[]>((rollingTVL, { from, value, timestamp }) => {
     const currentTotalValueLocked =
       rollingTVL.length > 0 ? rollingTVL[rollingTVL.length - 1].totalValueLocked : 0;
     const amount = from === userAddress ? -value : value;
