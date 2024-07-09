@@ -13,11 +13,5 @@ export const examplePointsData = {
       currentDLCBTC: 345,
       multiplier: 5,
     },
-    {
-      name: 'Ajna',
-      points: 100000,
-      currentDLCBTC: 10,
-      multiplier: 5,
-    },
   ],
 };

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button, Divider, HStack, Image, Text, VStack } from '@chakra-ui/react';
 import { TokenStatsBoardLayout } from '@components/proof-of-reserve/components/token-stats-board/token-stats-board.layout';
 import { usePoints } from '@hooks/use-points';
-import { bitcoin, dlcBTC } from '@models/token';
+import { dlcBTC } from '@models/token';
 import { RootState } from '@store/index';
 import { modalActions } from '@store/slices/modal/modal.actions';
 
@@ -54,7 +54,8 @@ export function Points(): React.JSX.Element {
                 <HStack w={'100%'} pl={'25px'}>
                   <PointsStatsBoardAction
                     token={dlcBTC}
-                    totalSupply={userPoints?.protocols.find(p => p.name == 'dlcBTC')?.points}
+                    totalSupply={userPoints?.protocols.find(p => p.name == 'Curve')?.points}
+                    tokenSuffix={'Use'}
                   />
                   <Divider
                     orientation={'vertical'}
@@ -63,8 +64,9 @@ export function Points(): React.JSX.Element {
                     variant={'thick'}
                   />
                   <PointsStatsBoardAction
-                    token={bitcoin}
-                    totalSupply={userPoints?.protocols.find(p => p.name == 'Curve')?.points}
+                    token={dlcBTC}
+                    totalSupply={userPoints?.protocols.find(p => p.name == 'dlcBTC')?.points}
+                    tokenSuffix={'Hold'}
                   />
                 </HStack>
               </VStack>
