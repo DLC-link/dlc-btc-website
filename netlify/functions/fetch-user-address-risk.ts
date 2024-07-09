@@ -1,9 +1,29 @@
-export async function handler(event) {
+import { Handler } from '@netlify/functions';
+
+const handler: Handler = async (event, context) => {
   const chainalysisURL = process.env.VITE_CHAINALYSIS_API_URL;
   const chainalysisToken = process.env.VITE_CHAINALYSIS_TOKEN;
 
+  if (!chainalysisURL || !chainalysisToken) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        message: 'Chainalysis API URL and token are required',
+      }),
+    };
+  }
+
+  if (!event.queryStringParameters) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({
+        message: 'Address is required',
+      }),
+    };
+  }
+
   const userAddressRiskURL = `${chainalysisURL}/${event.queryStringParameters.address}`;
-  const options = {
+  const options: RequestInit = {
     method: 'GET',
     headers: {
       Token: chainalysisToken,
@@ -28,4 +48,6 @@ export async function handler(event) {
       message: await response.json(),
     }),
   };
-}
+};
+
+export { handler };

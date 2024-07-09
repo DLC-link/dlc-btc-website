@@ -11,10 +11,8 @@ import { RootState, store } from '@store/index';
 import { vaultActions } from '@store/slices/vault/vault.actions';
 import { DLCEthereumContractName, RawVault, VaultState } from 'dlc-btc-lib/models';
 import { customShiftValue, unshiftValue } from 'dlc-btc-lib/utilities';
-import { Event, ethers } from 'ethers';
+import { ethers } from 'ethers';
 import { Logger } from 'ethers/lib/utils';
-
-import { BURN_ADDRESS } from '@shared/constants/ethereum.constants';
 
 import { useEthereumContext } from './use-ethereum-context';
 
@@ -35,8 +33,11 @@ interface UseEthereumReturnType {
   setupVault: () => Promise<void>;
   withdrawVault: (vaultUUID: string, withdrawAmount: bigint) => Promise<void>;
   closeVault: (vaultUUID: string) => Promise<void>;
-  fetchMintBurnEvents: (userAddress: string) => Promise<DetailedEvent[]>;
-  fetchAllMintBurnEvents: () => Promise<DetailedEvent[]>;
+  fetchMintBurnEvents: (userAddress?: string, lastN?: number) => Promise<DetailedEvent[]>;
+  fetchTransfersForUser: (
+    userAddress: string,
+    contractAddress?: string
+  ) => Promise<DetailedEvent[]>;
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -252,66 +253,49 @@ export function useEthereum(): UseEthereumReturnType {
       throwEthereumError(`Could not close Vault: `, error);
     }
   }
-
-  function formatTransferEvent(event: any, timestamp: number, txHash: string): DetailedEvent {
-    return {
-      from: event.from.toLowerCase(),
-      to: event.to.toLowerCase(),
-      value: event.value,
-      timestamp,
-      txHash,
-    };
-  }
-
-  async function fetchMintBurnEvents(userAddress: string): Promise<DetailedEvent[]> {
+  async function fetchMintBurnEvents(
+    userAddress?: string,
+    lastN?: number
+  ): Promise<DetailedEvent[]> {
     const dlcBTCContract = await getDefaultProvider(network, 'DLCBTC');
-    const eventFilterTo = dlcBTCContract.filters.Transfer(BURN_ADDRESS, userAddress);
-    const eventFilterFrom = dlcBTCContract.filters.Transfer(userAddress, BURN_ADDRESS);
-    const eventsTo = await dlcBTCContract.queryFilter(eventFilterTo);
-    const eventsFrom = await dlcBTCContract.queryFilter(eventFilterFrom);
-    const events = [...eventsTo, ...eventsFrom];
-    const detailedEvents: DetailedEvent[] = [];
+    const providerURL = network.defaultNodeURL;
+    const contractAddress = dlcBTCContract.address;
 
-    await Promise.all(
-      events.map(async (event: Event) => {
-        const block = await dlcBTCContract.provider.getBlock(event.blockNumber);
-        detailedEvents.push(
-          formatTransferEvent(event.args, block.timestamp, event.transactionHash)
-        );
-      })
+    const req = await fetch(
+      `/.netlify/functions/fetch-mint-burn-events?providerURL=${providerURL}&contractAddress=${contractAddress}${userAddress ? `&userAddress=${userAddress}` : ''}&lastN=${lastN}`
     );
 
-    detailedEvents.sort((a, b) => b.timestamp - a.timestamp);
+    if (!req.ok) {
+      throw new Error(`HTTP error! status: ${req.status}`);
+    }
+
+    const events = await req.json();
+    const detailedEvents: DetailedEvent[] = events.detailedEvents;
 
     return detailedEvents;
   }
 
-  async function fetchAllMintBurnEvents(): Promise<DetailedEvent[]> {
-    const dlcBTCContract = await getDefaultProvider(network, 'DLCBTC');
-    const eventFilterTo = dlcBTCContract.filters.Transfer(BURN_ADDRESS);
-    const eventFilterFrom = dlcBTCContract.filters.Transfer(null, BURN_ADDRESS);
-    const eventsTo = await dlcBTCContract.queryFilter(eventFilterTo);
-    const eventsFrom = await dlcBTCContract.queryFilter(eventFilterFrom);
+  async function fetchTransfersForUser(
+    userAddress: string,
+    contractAddress: string | undefined
+  ): Promise<DetailedEvent[]> {
+    const providerURL = network.defaultNodeURL;
+    if (!contractAddress) {
+      const dlcBTCContract = await getDefaultProvider(network, 'DLCBTC');
+      contractAddress = dlcBTCContract.address;
+    }
 
-    const lastNEvents = (n: number, events: Event[]) => {
-      return events.slice(events.length - n);
-    };
-    const n = 10;
-
-    const events = [...lastNEvents(n, eventsTo), ...lastNEvents(n, eventsFrom)];
-    let detailedEvents: DetailedEvent[] = [];
-
-    await Promise.all(
-      events.map(async (event: Event) => {
-        const block = await dlcBTCContract.provider.getBlock(event.blockNumber);
-        detailedEvents.push(
-          formatTransferEvent(event.args, block.timestamp, event.transactionHash)
-        );
-      })
+    const req = await fetch(
+      `/.netlify/functions/fetch-transfer-events?providerURL=${providerURL}&contractAddress=${contractAddress}&userAddress=${userAddress}`
     );
 
-    detailedEvents.sort((a, b) => b.timestamp - a.timestamp);
-    detailedEvents = detailedEvents.slice(0, n);
+    if (!req.ok) {
+      // throw new Error(`HTTP error! status: ${req.status}`);
+      return [];
+    }
+
+    const events = await req.json();
+    const detailedEvents: DetailedEvent[] = events.detailedEvents;
 
     return detailedEvents;
   }
@@ -329,6 +313,6 @@ export function useEthereum(): UseEthereumReturnType {
     withdrawVault,
     closeVault,
     fetchMintBurnEvents,
-    fetchAllMintBurnEvents,
+    fetchTransfersForUser,
   };
 }

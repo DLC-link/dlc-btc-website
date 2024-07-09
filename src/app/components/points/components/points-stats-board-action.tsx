@@ -1,25 +1,17 @@
-import { Button, HStack, Image, Skeleton, Text, VStack } from '@chakra-ui/react';
+import { HStack, Image, Skeleton, Text, VStack } from '@chakra-ui/react';
 import { Token } from '@models/token';
 
 interface PointsStatsBoardActionProps {
   token: Token;
   totalSupply: number | undefined;
+  tokenSuffix: string;
 }
 
 export function PointsStatsBoardAction({
   token,
   totalSupply,
+  tokenSuffix,
 }: PointsStatsBoardActionProps): React.JSX.Element {
-  let tokenSuffix: string;
-  switch (token.name) {
-    case 'dlcBTC':
-      tokenSuffix = 'Use';
-      break;
-    default:
-      tokenSuffix = 'Provide';
-      break;
-  }
-
   return (
     <VStack w={'100%'} h={'100%'} pr={'25px'} py={'15px'} alignItems={'start'}>
       <Skeleton isLoaded={totalSupply !== undefined} h={'100%'} w={'100%'}>
@@ -35,22 +27,6 @@ export function PointsStatsBoardAction({
           </Text>
         </VStack>
       </Skeleton>
-      <Button
-        w={'100%'}
-        variant={'points'}
-        onClick={() =>
-          window.open(
-            token.name === 'dlcBTC'
-              ? 'https://www.dlc.link/earn-with-dlcbtc'
-              : 'https://www.dlc.link/merchants',
-            '_blank'
-          )
-        }
-      >
-        <Text bgGradient={`linear(to-r, #AC50EF, #7059FB, #2ECFF6)`} bgClip="text">
-          {token.name === 'dlcBTC' ? 'Earn More Points' : 'Become a Merchant'}
-        </Text>
-      </Button>
     </VStack>
   );
 }
