@@ -33,7 +33,7 @@ export function MerchantDetails(): React.JSX.Element {
   ];
   const selectedMerchant = merchantProofOfReserves.find(item => item.merchant.name === name);
 
-  const { data: mintBurnEvents } = useQuery(['mintBurnEvents'], fetchMintBurnEventsHandler);
+  const { data: mintBurnEvents } = useQuery([`mintBurnEvents${name}`], fetchMintBurnEventsHandler);
 
   if (!name) return <Text>Error: No merchant name provided</Text>;
 
