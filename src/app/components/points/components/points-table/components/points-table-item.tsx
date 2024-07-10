@@ -1,17 +1,11 @@
 import { HStack, Image, Text } from '@chakra-ui/react';
 import { CustomSkeleton } from '@components/custom-skeleton/custom-skeleton';
+import { ProtocolRewards } from '@models/ethereum-models';
 import { unshiftValue } from 'dlc-btc-lib/utilities';
 
 import { formatNumber } from '@shared/utils';
 
-interface PointsTableItemProps {
-  name: string;
-  points: number;
-  currentDLCBTC: number;
-  multiplier: number;
-}
-
-export function PointsTableItem(pointsTableItem: PointsTableItemProps): React.JSX.Element {
+export function PointsTableItem(pointsTableItem: ProtocolRewards): React.JSX.Element {
   if (!pointsTableItem) return <CustomSkeleton height={'35px'} />;
 
   const { name, points, currentDLCBTC, multiplier } = pointsTableItem;
