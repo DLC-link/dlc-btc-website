@@ -1,9 +1,9 @@
 import { HStack, Image, Text } from '@chakra-ui/react';
 import { CustomSkeleton } from '@components/custom-skeleton/custom-skeleton';
+import { unshiftValue } from 'dlc-btc-lib/utilities';
 
 export interface PointsTableItemProps {
-  id: number;
-  protocol: string;
+  name: string;
   points: number;
   currentDLCBTC: number;
   multiplier: number;
@@ -12,7 +12,7 @@ export interface PointsTableItemProps {
 export function PointsTableItem(pointsTableItem: PointsTableItemProps): React.JSX.Element {
   if (!pointsTableItem) return <CustomSkeleton height={'35px'} />;
 
-  const { protocol, points, currentDLCBTC, multiplier } = pointsTableItem;
+  const { name, points, currentDLCBTC, multiplier } = pointsTableItem;
 
   return (
     <HStack
@@ -29,12 +29,12 @@ export function PointsTableItem(pointsTableItem: PointsTableItemProps): React.JS
       <HStack w={'25%'}>
         <Image src={'/images/logos/dlc-btc-logo.svg'} alt={'dlc BTC logo'} boxSize={'25px'} />
         <Text color={'white'} fontSize={'sm'} fontWeight={800}>
-          {currentDLCBTC}
+          {unshiftValue(currentDLCBTC)}
         </Text>
       </HStack>
       <HStack w={'50%'}>
         <Text color={'white'} fontSize={'sm'} fontWeight={800}>
-          {`${points} Points`}
+          {`${points.toFixed(3)} Points`}
         </Text>
         <Text
           bgGradient={`linear(to-r, #AC50EF, #7059FB, #2ECFF6)`}
@@ -42,11 +42,11 @@ export function PointsTableItem(pointsTableItem: PointsTableItemProps): React.JS
           fontSize={'sm'}
           fontWeight={800}
         >
-          {`(${multiplier} x)`}
+          {`(${multiplier}x)`}
         </Text>
       </HStack>
       <Text w={'25%'} color={'white'} fontSize={'sm'}>
-        {protocol}
+        {name}
       </Text>
     </HStack>
   );

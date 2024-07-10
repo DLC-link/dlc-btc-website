@@ -22,7 +22,7 @@ export function PointsTable({ items }: PointsTableProps): React.JSX.Element {
       </GenericTableHeader>
       <Skeleton isLoaded={items !== undefined} height={'50px'} w={'100%'}>
         <GenericTableBody>
-          {items?.map(item => <PointsTableItem key={item.id} {...item} />)}
+          {items?.map(item => <PointsTableItem key={item.name} {...item} />)}
         </GenericTableBody>
       </Skeleton>
     </GenericTableLayout>
