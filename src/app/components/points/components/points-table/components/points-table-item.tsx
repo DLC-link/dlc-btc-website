@@ -2,6 +2,8 @@ import { HStack, Image, Text } from '@chakra-ui/react';
 import { CustomSkeleton } from '@components/custom-skeleton/custom-skeleton';
 import { unshiftValue } from 'dlc-btc-lib/utilities';
 
+import { formatNumber } from '@shared/utils';
+
 export interface PointsTableItemProps {
   name: string;
   points: number;
@@ -34,7 +36,7 @@ export function PointsTableItem(pointsTableItem: PointsTableItemProps): React.JS
       </HStack>
       <HStack w={'50%'}>
         <Text color={'white'} fontSize={'sm'} fontWeight={800}>
-          {`${points.toFixed(3)} Points`}
+          {`${formatNumber(points)} Points`}
         </Text>
         <Text
           bgGradient={`linear(to-r, #AC50EF, #7059FB, #2ECFF6)`}
@@ -45,7 +47,7 @@ export function PointsTableItem(pointsTableItem: PointsTableItemProps): React.JS
           {`(${multiplier}x)`}
         </Text>
       </HStack>
-      <Text w={'25%'} color={'white'} fontSize={'sm'}>
+      <Text w={'20%'} color={'white'} fontSize={'sm'}>
         {name}
       </Text>
     </HStack>
