@@ -4,7 +4,7 @@ import { unshiftValue } from 'dlc-btc-lib/utilities';
 
 import { formatNumber } from '@shared/utils';
 
-export interface PointsTableItemProps {
+interface PointsTableItemProps {
   name: string;
   points: number;
   currentDLCBTC: number;
