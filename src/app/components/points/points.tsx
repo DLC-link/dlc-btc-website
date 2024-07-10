@@ -10,6 +10,7 @@ import { modalActions } from '@store/slices/modal/modal.actions';
 import { TokenStatsBoardTotalPoints } from './components/point-stats-board-total-points';
 import { PointsLayout } from './components/points-layout';
 import { PointsStatsBoardAction } from './components/points-stats-board-action';
+import { PointsTable } from './components/points-table/points-table';
 
 export function Points(): React.JSX.Element {
   const dispatch = useDispatch();
@@ -48,7 +49,7 @@ export function Points(): React.JSX.Element {
         )}
         {address && (
           <TokenStatsBoardLayout>
-            <HStack w={'100%'}>
+            <HStack w={'100%'} alignItems={'flex-start'}>
               <VStack w={'50%'} alignItems={'flex-start'}>
                 <TokenStatsBoardTotalPoints totalPoints={userPoints?.total} />
                 <HStack w={'100%'} pl={'25px'}>
@@ -70,34 +71,8 @@ export function Points(): React.JSX.Element {
                   />
                 </HStack>
               </VStack>
-              <VStack w={'50%'} alignItems={'flex-start'} spacing={'65px'} px={'25px'}>
-                <VStack w={'100%'} alignItems={'start'} spacing={'25px'}>
-                  <Text
-                    textAlign={'left'}
-                    bgGradient={`linear(to-r, #AC50EF, #7059FB, #2ECFF6)`}
-                    bgClip="text"
-                  >
-                    Earn points by using dlcBTC
-                  </Text>
-                  <Text color={'white.02'}>
-                    Put your dlcBTC to work in various activities like lending, staking, or trading.
-                    Participate and earn extra points for your involvement.
-                  </Text>
-                </VStack>
-                <VStack w={'100%'} alignItems={'start'} spacing={'25px'}>
-                  <Text
-                    textAlign={'left'}
-                    bgGradient={`linear(to-r, #AC50EF, #7059FB, #2ECFF6)`}
-                    bgClip="text"
-                  >
-                    Earn points by holding dlcBTC
-                  </Text>
-                  <Text color={'white.02'}>
-                    Simply hold dlcBTC in your wallet and earn points for your loyalty. The longer
-                    you hold, the more points you earn.
-                  </Text>
-                </VStack>
-              </VStack>
+              <Divider orientation={'vertical'} px={'5px'} height={'300px'} variant={'thick'} />
+              <PointsTable items={userPoints?.protocols} />
             </HStack>
           </TokenStatsBoardLayout>
         )}
