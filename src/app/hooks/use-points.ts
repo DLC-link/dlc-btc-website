@@ -60,6 +60,17 @@ export function calculatePoints(
 
   const currentTimestamp = Math.floor(Date.now() / 1000);
   const totalRewards = userTimeStampedEvents.reduce((acc, currentEvent, index, array) => {
+    if (array.length === 1) {
+      return calculateRewardBetweenEvents(
+        currentEvent,
+        {
+          timestamp: currentTimestamp,
+          totalValueLocked: currentEvent.totalValueLocked,
+          amount: 0,
+        },
+        rewardsRate
+      );
+    }
     if (index === 0) {
       return acc;
     }
