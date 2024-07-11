@@ -38,6 +38,8 @@ interface UseEthereumReturnType {
     userAddress: string,
     contractAddress?: string
   ) => Promise<DetailedEvent[]>;
+  isWhitelistingEnabled: () => Promise<boolean>;
+  isUserWhitelisted: (userAddress: string) => Promise<boolean>;
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -253,6 +255,17 @@ export function useEthereum(): UseEthereumReturnType {
       throwEthereumError(`Could not close Vault: `, error);
     }
   }
+
+  async function isWhitelistingEnabled(): Promise<boolean> {
+    if (!dlcManagerContract) throw new Error('Protocol contract not initialized');
+    return await dlcManagerContract.whitelistingEnabled();
+  }
+
+  async function isUserWhitelisted(userAddress: string): Promise<boolean> {
+    if (!dlcManagerContract) throw new Error('Protocol contract not initialized');
+    return await dlcManagerContract.isWhitelisted(userAddress);
+  }
+
   async function fetchMintBurnEvents(
     userAddress?: string,
     lastN?: number
@@ -314,5 +327,7 @@ export function useEthereum(): UseEthereumReturnType {
     closeVault,
     fetchMintBurnEvents,
     fetchTransfersForUser,
+    isWhitelistingEnabled,
+    isUserWhitelisted,
   };
 }
