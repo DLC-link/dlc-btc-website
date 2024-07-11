@@ -257,12 +257,12 @@ export function useEthereum(): UseEthereumReturnType {
   }
 
   async function isWhitelistingEnabled(): Promise<boolean> {
-    if (!dlcManagerContract) throw new Error('Protocol contract not initialized');
+    const dlcManagerContract = await getDefaultProvider(network, 'DLCManager');
     return await dlcManagerContract.whitelistingEnabled();
   }
 
   async function isUserWhitelisted(userAddress: string): Promise<boolean> {
-    if (!dlcManagerContract) throw new Error('Protocol contract not initialized');
+    const dlcManagerContract = await getDefaultProvider(network, 'DLCManager');
     return await dlcManagerContract.isWhitelisted(userAddress);
   }
 

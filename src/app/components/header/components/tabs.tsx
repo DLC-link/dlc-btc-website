@@ -19,23 +19,17 @@ export function NavigationTabs({
   const { isWhitelistingEnabled, isUserWhitelisted } = useEthereum();
   const [showDisplayMintBurn, setShowDisplayMintBurn] = useState<boolean>(false);
 
-  async function checkWhitelisting(address?: string): Promise<boolean> {
-    const result = async () => {
-      if (!address) return false;
-      if (!isWhitelistingEnabled) return true;
-      return await isUserWhitelisted(address);
-    };
-    const isWhitelisted = await result();
-
-    setShowDisplayMintBurn(isWhitelisted);
-    return isWhitelisted;
-  }
-
   useEffect(() => {
-    const checkShouldDisplay = async () => {
-      await checkWhitelisting(address);
-    };
-    void checkShouldDisplay();
+    async function checkWhitelisting(address?: string) {
+      const result = async () => {
+        if (!address) return false;
+        if (!isWhitelistingEnabled) return true;
+        return await isUserWhitelisted(address);
+      };
+      setShowDisplayMintBurn(await result());
+    }
+    void checkWhitelisting(address);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [address]);
 
   return (
