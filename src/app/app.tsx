@@ -32,17 +32,17 @@ export function App(): React.JSX.Element {
                 <BalanceContextProvider>
                   <ProofOfReserveContextProvider>
                     <AppLayout>
-                      <Route path="/" element={<Dashboard />} />
+                      <Route path="/" element={<PointsPage />} />
                       <Route path="/my-vaults" element={<MyVaults />} />
                       <Route path="/how-it-works" element={<About />} />
                       <Route path="/proof-of-reserve" element={<ProofOfReservePage />} />
-                      <Route path="/points" element={<PointsPage />} />
                       <Route path="/attestor-details" element={<AttestorDetailsPage />} />
                       <Route
                         path="/attestor-details-select"
                         element={<AttestorDetailsSelectPage />}
                       />
                       <Route path="/merchant-details/:name" element={<MerchantDetails />} />
+                      <Route path="/mint-withdraw" element={<Dashboard />} />
                     </AppLayout>
                   </ProofOfReserveContextProvider>
                 </BalanceContextProvider>
