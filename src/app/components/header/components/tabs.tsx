@@ -23,8 +23,7 @@ export function NavigationTabs({
     async function checkWhitelisting(address?: string) {
       const result = async () => {
         if (!address) return false;
-        if (!isWhitelistingEnabled) return true;
-        return await isUserWhitelisted(address);
+        return !(await isWhitelistingEnabled()) ? true : await isUserWhitelisted(address);
       };
       setShowDisplayMintBurn(await result());
     }
