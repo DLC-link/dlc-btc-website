@@ -76,7 +76,7 @@ export function HowToMint(): React.JSX.Element {
           <Box h={'10px'} />
           <Button
             onClick={() => {
-              navigate('/');
+              navigate('/mint-withdraw');
               dispatch(mintUnmintActions.setMintStep([0, '']));
               close();
             }}
