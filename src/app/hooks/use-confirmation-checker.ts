@@ -8,24 +8,12 @@ import { VaultState } from 'dlc-btc-lib/models';
 export function useConfirmationChecker(vault?: Vault): number {
   const { blockHeight } = useContext(BlockchainHeightContext);
 
-  let txID;
-  switch (vault?.state) {
-    case VaultState.FUNDING:
-      txID = vault?.fundingTX;
-      break;
-    case VaultState.PENDING:
-      txID = vault?.withdrawDepositTX;
-      break;
-    default:
-      txID = undefined;
-  }
-
   const [blockHeightAtBroadcast, setBlockHeightAtBroadcast] = useState<number | undefined>(
     undefined
   );
   const [transactionProgress, setTransactionProgress] = useState<number>(0);
 
-  const bitcoinExplorerTXURL = `${appConfiguration.bitcoinBlockchainURL}/tx/${txID}`;
+  const bitcoinExplorerTXURL = `${appConfiguration.bitcoinBlockchainURL}/tx/${vault?.withdrawDepositTX}`;
 
   async function fetchTransactionDetails() {
     const response = await fetch(bitcoinExplorerTXURL);
@@ -35,12 +23,12 @@ export function useConfirmationChecker(vault?: Vault): number {
   }
 
   const { data: txBlockHeightAtBroadcast } = useQuery(
-    ['transactionDetails', txID],
+    ['transactionDetails', vault?.withdrawDepositTX],
     () => fetchTransactionDetails(),
     {
       enabled:
-        !!txID &&
-        (vault?.state === VaultState.FUNDING || vault?.state === VaultState.PENDING) &&
+        !!vault?.withdrawDepositTX &&
+        vault?.state === VaultState.PENDING &&
         !blockHeightAtBroadcast,
       refetchInterval: 10000,
     }
@@ -53,11 +41,7 @@ export function useConfirmationChecker(vault?: Vault): number {
   }, [txBlockHeightAtBroadcast]);
 
   useEffect(() => {
-    if (
-      (vault?.state != VaultState.FUNDING && vault?.state != VaultState.PENDING) ||
-      transactionProgress > 6
-    )
-      return;
+    if (vault?.state != VaultState.PENDING || transactionProgress > 6) return;
 
     const blockHeightDifference = (blockHeight as number) + 1 - (blockHeightAtBroadcast as number);
     if (typeof blockHeightDifference === 'number' && blockHeightDifference >= 0) {

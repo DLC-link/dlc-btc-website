@@ -50,7 +50,7 @@ export function VaultCard({
           close={() => setIsExpanded(false)}
         />
       )}
-      {[VaultState.FUNDING, VaultState.PENDING].includes(vault.state) && (
+      {vault.state === VaultState.PENDING && (
         <VaultProgressBar confirmedBlocks={confirmations} vaultState={vault.state} />
       )}
     </VaultCardLayout>

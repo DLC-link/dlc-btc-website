@@ -30,7 +30,7 @@ export function HowToUnmint(): React.JSX.Element {
           />
           <Button
             onClick={() => {
-              navigate('/');
+              navigate('/mint-withdraw');
               dispatch(mintUnmintActions.setUnmintStep([0, '']));
               close();
             }}
