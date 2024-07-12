@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 
+import { Button } from '@chakra-ui/react';
 import { useLedger } from '@hooks/use-ledger';
 import { SupportedPaymentType } from '@models/supported-payment-types';
 import { BitcoinWalletType } from '@models/wallet';
@@ -30,6 +31,7 @@ export function LedgerModal({ isOpen, handleClose }: ModalComponentProps): React
   const [taprootAddresses, setTaprootAddresses] = useState<[string, number][] | undefined>(
     undefined
   );
+  const [startIndex, setStartIndex] = useState(0);
 
   useEffect(() => {
     if (isOpen) {
@@ -37,15 +39,21 @@ export function LedgerModal({ isOpen, handleClose }: ModalComponentProps): React
       getLedgerAddresses();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]);
+  }, [isOpen, startIndex]);
 
   async function getLedgerAddresses() {
     try {
       setError(undefined);
       const nativeSegwitAddresses = await getLedgerAddressesWithBalances(
-        SupportedPaymentType.NATIVE_SEGWIT
+        SupportedPaymentType.NATIVE_SEGWIT,
+        0,
+        startIndex
       );
-      const taprootAddresses = await getLedgerAddressesWithBalances(SupportedPaymentType.TAPROOT);
+      const taprootAddresses = await getLedgerAddressesWithBalances(
+        SupportedPaymentType.TAPROOT,
+        0,
+        startIndex
+      );
       setNativeSegwitAddresses(nativeSegwitAddresses);
       setTaprootAddresses(taprootAddresses);
     } catch (error: any) {
@@ -81,6 +89,7 @@ export function LedgerModal({ isOpen, handleClose }: ModalComponentProps): React
         error={error}
         setFundingAndTaprootAddress={setFundingAndTaprootAddress}
       />
+      <Button onClick={() => setStartIndex(startIndex + 5)}>Show Next Five Address</Button>
       <LedgerModalErrorBox error={error} />
     </LedgerModalLayout>
   );
