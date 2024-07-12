@@ -11,7 +11,6 @@ import { useEthereumContext } from './use-ethereum-context';
 interface UseVaultsReturnType {
   allVaults: Vault[];
   readyVaults: Vault[];
-  fundingVaults: Vault[];
   pendingVaults: Vault[];
   fundedVaults: Vault[];
   closingVaults: Vault[];
@@ -61,13 +60,6 @@ export function useVaults(): UseVaultsReturnType {
         .sort((a, b) => b.timestamp - a.timestamp),
     [vaults, network]
   );
-  const fundingVaults = useMemo(
-    () =>
-      vaults[network.id]
-        .filter(vault => vault.state === VaultState.FUNDING)
-        .sort((a, b) => b.timestamp - a.timestamp),
-    [vaults, network]
-  );
   const pendingVaults = useMemo(
     () =>
       vaults[network.id]
@@ -93,7 +85,6 @@ export function useVaults(): UseVaultsReturnType {
   return {
     allVaults,
     readyVaults,
-    fundingVaults,
     pendingVaults,
     closingVaults,
     fundedVaults,

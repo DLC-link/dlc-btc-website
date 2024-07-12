@@ -1,7 +1,6 @@
 import { EthereumNetworkID } from '@models/ethereum-network';
 import { Vault } from '@models/vault';
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import { VaultState } from 'dlc-btc-lib/models';
 
 interface VaultSliceState {
   vaults: { [key in EthereumNetworkID]: Vault[] };
@@ -31,15 +30,7 @@ export const vaultSlice = createSlice({
       const vaultMap = new Map(state.vaults[networkID].map(vault => [vault.uuid, vault]));
 
       state.vaults[networkID] = newVaults.map((newVault: Vault) => {
-        const existingVault = vaultMap.get(newVault.uuid);
-
-        if (!existingVault) {
-          return newVault;
-        } else {
-          const shouldUpdate =
-            existingVault.state !== VaultState.FUNDING || newVault.state === VaultState.FUNDED;
-          return shouldUpdate ? { ...existingVault, ...newVault } : existingVault;
-        }
+        return vaultMap.get(newVault.uuid) ?? newVault;
       });
     },
     swapVault: (
@@ -58,23 +49,6 @@ export const vaultSlice = createSlice({
       } else {
         state.vaults[networkID][vaultIndex] = updatedVault;
       }
-    },
-    setVaultToFunding: (
-      state,
-      action: PayloadAction<{
-        vaultUUID: string;
-        fundingTX: string;
-        networkID: EthereumNetworkID;
-      }>
-    ) => {
-      const { vaultUUID, fundingTX, networkID } = action.payload;
-
-      const vaultIndex = state.vaults[networkID].findIndex(vault => vault.uuid === vaultUUID);
-
-      if (vaultIndex === -1) return;
-
-      state.vaults[networkID][vaultIndex].state = VaultState.FUNDING;
-      state.vaults[networkID][vaultIndex].fundingTX = fundingTX;
     },
   },
 });

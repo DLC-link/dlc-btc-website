@@ -17,15 +17,8 @@ export function MyVaultsLarge(): React.JSX.Element {
   const { address } = useSelector((state: RootState) => state.account);
   const { dlcBTCBalance, lockedBTCBalance } = useContext(BalanceContext);
   const vaultContext = useContext(VaultContext);
-  const {
-    allVaults,
-    readyVaults,
-    fundingVaults,
-    fundedVaults,
-    closingVaults,
-    closedVaults,
-    pendingVaults,
-  } = vaultContext;
+  const { allVaults, readyVaults, fundedVaults, closingVaults, closedVaults, pendingVaults } =
+    vaultContext;
 
   return (
     <MyVaultsLargeLayout>
@@ -42,10 +35,7 @@ export function MyVaultsLarge(): React.JSX.Element {
             isScrollable={!!address && allVaults.length > 0}
           >
             <VaultsListGroupContainer label="Empty Vaults" vaults={readyVaults} />
-            <VaultsListGroupContainer
-              label="Pending"
-              vaults={[...fundingVaults, ...pendingVaults]}
-            />
+            <VaultsListGroupContainer label="Pending" vaults={pendingVaults} />
             <VaultsListGroupContainer label="Unlocking BTC in Progress" vaults={closingVaults} />
           </VaultsList>
         ) : (
