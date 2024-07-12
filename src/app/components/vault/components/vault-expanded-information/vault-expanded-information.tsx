@@ -28,7 +28,7 @@ export function VaultExpandedInformation({
   const { fundingTX, withdrawDepositTX, state, uuid } = vault;
 
   function handleWithdraw() {
-    navigate('/');
+    navigate('/mint-withdraw');
     if (vault.valueLocked === vault.valueMinted) {
       dispatch(mintUnmintActions.setUnmintStep([0, uuid]));
     } else {
@@ -58,7 +58,7 @@ export function VaultExpandedInformation({
             {[VaultState.READY, VaultState.FUNDED].includes(state) && !isSelected && (
               <Button
                 onClick={() => {
-                  navigate('/');
+                  navigate('/mint-withdraw');
                   dispatch(mintUnmintActions.setMintStep([1, uuid]));
                   close();
                 }}
