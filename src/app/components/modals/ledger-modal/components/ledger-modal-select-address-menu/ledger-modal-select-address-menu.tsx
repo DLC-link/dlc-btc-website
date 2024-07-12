@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import {
+  Button,
   HStack,
   Menu,
   MenuButton,
@@ -21,6 +22,8 @@ interface LedgerModalSelectAddressMenuProps {
   isLoading: [boolean, string];
   isSuccesful: boolean;
   error: string | undefined;
+  startIndex: number;
+  setStartIndex: React.Dispatch<React.SetStateAction<number>>;
   setFundingAndTaprootAddress: (index: number, paymentType: SupportedPaymentType) => void;
 }
 
@@ -30,6 +33,8 @@ export function LedgerModalSelectAddressMenu({
   isLoading,
   isSuccesful,
   error,
+  startIndex,
+  setStartIndex,
   setFundingAndTaprootAddress,
 }: LedgerModalSelectAddressMenuProps): React.JSX.Element {
   const [showComponent, setShowComponent] = useState(false);
@@ -54,6 +59,10 @@ export function LedgerModalSelectAddressMenu({
             <Radio colorScheme="purple" value="tr">
               Taproot
             </Radio>
+            <Button isDisabled={startIndex === 0} onClick={() => setStartIndex(startIndex - 5)}>
+              -
+            </Button>
+            <Button onClick={() => setStartIndex(startIndex + 5)}>+</Button>
           </HStack>
         </RadioGroup>
       </VStack>

@@ -87,9 +87,10 @@ export function LedgerModal({ isOpen, handleClose }: ModalComponentProps): React
         isLoading={isLoading}
         isSuccesful={isSuccesful}
         error={error}
+        startIndex={startIndex}
+        setStartIndex={setStartIndex}
         setFundingAndTaprootAddress={setFundingAndTaprootAddress}
       />
-      <Button onClick={() => setStartIndex(startIndex + 5)}>Show Next Five Address</Button>
       <LedgerModalErrorBox error={error} />
     </LedgerModalLayout>
   );
