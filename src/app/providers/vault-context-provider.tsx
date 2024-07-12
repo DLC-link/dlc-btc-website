@@ -7,7 +7,6 @@ import { Vault } from '@models/vault';
 interface VaultContextType {
   allVaults: Vault[];
   readyVaults: Vault[];
-  fundingVaults: Vault[];
   pendingVaults: Vault[];
   fundedVaults: Vault[];
   closingVaults: Vault[];
@@ -18,7 +17,6 @@ interface VaultContextType {
 export const VaultContext = createContext<VaultContextType>({
   allVaults: [],
   readyVaults: [],
-  fundingVaults: [],
   pendingVaults: [],
   fundedVaults: [],
   closingVaults: [],
@@ -30,7 +28,6 @@ export function VaultContextProvider({ children }: HasChildren): React.JSX.Eleme
   const {
     allVaults,
     readyVaults,
-    fundingVaults,
     fundedVaults,
     pendingVaults,
     closingVaults,
@@ -43,7 +40,6 @@ export function VaultContextProvider({ children }: HasChildren): React.JSX.Eleme
       value={{
         allVaults,
         readyVaults,
-        fundingVaults,
         pendingVaults,
         fundedVaults,
         closingVaults,

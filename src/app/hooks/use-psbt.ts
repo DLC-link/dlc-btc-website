@@ -1,13 +1,11 @@
 import { useContext, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { BitcoinError } from '@models/error-types';
 import { BitcoinWalletType } from '@models/wallet';
 import { bytesToHex } from '@noble/hashes/utils';
 import { BitcoinWalletContext } from '@providers/bitcoin-wallet-context-provider';
 import { RootState } from '@store/index';
-import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
-import { vaultActions } from '@store/slices/vault/vault.actions';
 import { LedgerDLCHandler, SoftwareWalletDLCHandler } from 'dlc-btc-lib';
 import { Transaction, VaultState } from 'dlc-btc-lib/models';
 
@@ -25,11 +23,7 @@ interface UsePSBTReturnType {
 }
 
 export function usePSBT(): UsePSBTReturnType {
-  const dispatch = useDispatch();
-
-  const { network: ethereumNetwork, address: ethereumUserAddress } = useSelector(
-    (state: RootState) => state.account
-  );
+  const { address: ethereumUserAddress } = useSelector((state: RootState) => state.account);
 
   const { bitcoinWalletType, dlcHandler, resetBitcoinWalletContext } =
     useContext(BitcoinWalletContext);
@@ -130,16 +124,6 @@ export function usePSBT(): UsePSBTReturnType {
             userBitcoinPublicKey: dlcHandler.getTaprootDerivedPublicKey(),
             chain: ethereumAttestorChainID,
           });
-
-          dispatch(
-            vaultActions.setVaultToFunding({
-              vaultUUID: vaultUUID,
-              fundingTX: fundingTransaction.id,
-              networkID: ethereumNetwork.id,
-            })
-          );
-
-          dispatch(mintUnmintActions.setMintStep([2, vaultUUID]));
           break;
         default:
           await sendDepositWithdrawTransactionToAttestors({
