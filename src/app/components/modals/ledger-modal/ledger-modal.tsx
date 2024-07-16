@@ -1,6 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
 
-import { Button } from '@chakra-ui/react';
 import { useLedger } from '@hooks/use-ledger';
 import { SupportedPaymentType } from '@models/supported-payment-types';
 import { BitcoinWalletType } from '@models/wallet';
@@ -23,75 +22,96 @@ export function LedgerModal({ isOpen, handleClose }: ModalComponentProps): React
 
   const { setBitcoinWalletType, setBitcoinWalletContextState } = useContext(BitcoinWalletContext);
 
-  const [isSuccesful, setIsSuccesful] = useState(false);
-  const [error, setError] = useState<string | undefined>(undefined);
   const [nativeSegwitAddresses, setNativeSegwitAddresses] = useState<
-    [string, number][] | undefined
+    [number, string, number][] | undefined
   >(undefined);
-  const [taprootAddresses, setTaprootAddresses] = useState<[string, number][] | undefined>(
+  const [taprootAddresses, setTaprootAddresses] = useState<[number, string, number][] | undefined>(
     undefined
   );
-  const [startIndex, setStartIndex] = useState(0);
+
+  const [isSuccesful, setIsSuccesful] = useState(false);
+  const [isLoadingAddressList, setIsLoadingAddressList] = useState(true);
+  const [ledgerError, setLedgerError] = useState<string | undefined>(undefined);
+
+  const [walletAccountIndex, setWalletAccountIndex] = useState(0);
+  const [displayedAddressesStartIndex, setDisplayedAddressesStartIndex] = useState(0);
 
   useEffect(() => {
     if (isOpen) {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      getLedgerAddresses();
+      void getLedgerAddresses();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, startIndex]);
+  }, [isOpen, displayedAddressesStartIndex, walletAccountIndex]);
 
   async function getLedgerAddresses() {
     try {
-      setError(undefined);
+      setLedgerError(undefined);
+      setIsLoadingAddressList(true);
       const nativeSegwitAddresses = await getLedgerAddressesWithBalances(
         SupportedPaymentType.NATIVE_SEGWIT,
-        0,
-        startIndex
+        walletAccountIndex,
+        displayedAddressesStartIndex
       );
+
       const taprootAddresses = await getLedgerAddressesWithBalances(
         SupportedPaymentType.TAPROOT,
-        0,
-        startIndex
+        walletAccountIndex,
+        displayedAddressesStartIndex
       );
+
       setNativeSegwitAddresses(nativeSegwitAddresses);
       setTaprootAddresses(taprootAddresses);
+      setIsLoadingAddressList(false);
     } catch (error: any) {
-      setError(error.message);
+      setLedgerError(error.message);
     }
   }
 
-  async function setFundingAndTaprootAddress(index: number, paymentType: SupportedPaymentType) {
+  function resetLedgerModalValues() {
+    setIsSuccesful(false);
+    setNativeSegwitAddresses(undefined);
+    setTaprootAddresses(undefined);
+    setIsLoadingAddressList(true);
+    setLedgerError(undefined);
+    setWalletAccountIndex(0);
+    setDisplayedAddressesStartIndex(0);
+  }
+
+  async function setFundingAndTaprootAddress(
+    addressIndex: number,
+    paymentType: SupportedPaymentType
+  ) {
     try {
-      setError(undefined);
-      await connectLedgerWallet(index, paymentType);
+      await connectLedgerWallet(Number(walletAccountIndex), addressIndex, paymentType);
       setIsSuccesful(true);
       await delay(2500);
-      setIsSuccesful(false);
+      resetLedgerModalValues();
       setBitcoinWalletType(BitcoinWalletType.Ledger);
       setBitcoinWalletContextState(BitcoinWalletContextState.READY);
       handleClose();
     } catch (error: any) {
-      setError(error.message);
+      setLedgerError(error.message);
     }
   }
 
   return (
     <LedgerModalLayout logo={'/images/logos/ledger-logo.svg'} isOpen={isOpen} onClose={handleClose}>
       <LedgerModalSuccessIcon isSuccesful={isSuccesful} />
-      <LedgerModalConnectButton error={error} getLedgerAddresses={getLedgerAddresses} />
+      <LedgerModalConnectButton error={ledgerError} getLedgerAddresses={getLedgerAddresses} />
       <LedgerModalLoadingStack isLoading={isLoading} />
       <LedgerModalSelectAddressMenu
         nativeSegwitAddresses={nativeSegwitAddresses}
         taprootAddresses={taprootAddresses}
-        isLoading={isLoading}
+        isLoading={isLoadingAddressList}
         isSuccesful={isSuccesful}
-        error={error}
-        startIndex={startIndex}
-        setStartIndex={setStartIndex}
+        error={ledgerError}
+        displayedAddressesStartIndex={displayedAddressesStartIndex}
+        setDisplayedAddressesStartIndex={setDisplayedAddressesStartIndex}
+        walletAccountIndex={walletAccountIndex}
+        setWalletAccountIndex={setWalletAccountIndex}
         setFundingAndTaprootAddress={setFundingAndTaprootAddress}
       />
-      <LedgerModalErrorBox error={error} />
+      <LedgerModalErrorBox error={ledgerError} />
     </LedgerModalLayout>
   );
 }

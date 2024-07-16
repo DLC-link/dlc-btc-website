@@ -1,29 +1,21 @@
-import { useEffect, useState } from 'react';
-
-import {
-  Button,
-  HStack,
-  Menu,
-  MenuButton,
-  MenuList,
-  Radio,
-  RadioGroup,
-  SlideFade,
-  Text,
-  VStack,
-} from '@chakra-ui/react';
+import { ButtonGroup, Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react';
 import { SupportedPaymentType } from '@models/supported-payment-types';
 
-import { LedgerModalSelectAddressMenuItem } from './components/ledger-modal-select-address-menu-item';
+import { LedgerModalAddressButton } from './components/ledger-modal-address-button';
+import { LedgerModalSelectAddressMenuAccountIndexInput } from './components/ledger-modal-select-address-menu-account-index-input';
+import { LedgerModalSelectAddressMenuAddressPaginator } from './components/ledger-modal-select-address-menu-address-paginator';
+import { LedgerModalSelectAddressMenuTableHeader } from './components/ledger-modal-select-address-menu-table-header';
 
 interface LedgerModalSelectAddressMenuProps {
-  nativeSegwitAddresses: [string, number][] | undefined;
-  taprootAddresses: [string, number][] | undefined;
-  isLoading: [boolean, string];
+  nativeSegwitAddresses: [number, string, number][] | undefined;
+  taprootAddresses: [number, string, number][] | undefined;
+  isLoading: boolean;
   isSuccesful: boolean;
   error: string | undefined;
-  startIndex: number;
-  setStartIndex: React.Dispatch<React.SetStateAction<number>>;
+  displayedAddressesStartIndex: number;
+  setDisplayedAddressesStartIndex: React.Dispatch<React.SetStateAction<number>>;
+  walletAccountIndex: number;
+  setWalletAccountIndex: React.Dispatch<React.SetStateAction<number>>;
   setFundingAndTaprootAddress: (index: number, paymentType: SupportedPaymentType) => void;
 }
 
@@ -33,65 +25,55 @@ export function LedgerModalSelectAddressMenu({
   isLoading,
   isSuccesful,
   error,
-  startIndex,
-  setStartIndex,
+  displayedAddressesStartIndex,
+  setDisplayedAddressesStartIndex,
+  walletAccountIndex,
+  setWalletAccountIndex,
   setFundingAndTaprootAddress,
-}: LedgerModalSelectAddressMenuProps): React.JSX.Element {
-  const [showComponent, setShowComponent] = useState(false);
-  const [paymentType, setPaymentType] = useState<string>('wpkh');
-
-  useEffect(() => {
-    if (nativeSegwitAddresses && !isLoading[0] && !isSuccesful && !error) {
-      setShowComponent(true);
-    } else {
-      setShowComponent(false);
-    }
-  }, [nativeSegwitAddresses, isLoading, error, isSuccesful]);
-
+}: LedgerModalSelectAddressMenuProps): React.JSX.Element | false {
   return (
-    <SlideFade in={showComponent} transition={{ enter: { delay: 0.25 } }} unmountOnExit>
-      <VStack pb={'15px'}>
-        <RadioGroup onChange={setPaymentType} value={paymentType}>
-          <HStack>
-            <Radio colorScheme="purple" value="wpkh">
-              Native Segwit
-            </Radio>
-            <Radio colorScheme="purple" value="tr">
-              Taproot
-            </Radio>
-            <Button isDisabled={startIndex === 0} onClick={() => setStartIndex(startIndex - 5)}>
-              -
-            </Button>
-            <Button onClick={() => setStartIndex(startIndex + 5)}>+</Button>
-          </HStack>
-        </RadioGroup>
-      </VStack>
-      <Menu variant={'ledgerAddress'}>
-        <MenuButton>
-          <Text>Select Funding Address</Text>
-        </MenuButton>
-        <MenuList>
-          {paymentType === 'wpkh'
-            ? nativeSegwitAddresses?.map((address, index) => (
-                <LedgerModalSelectAddressMenuItem
-                  key={index}
-                  address={address}
+    !isLoading &&
+    !isSuccesful &&
+    !error && (
+      <Tabs w={'350px'} p={'0px'}>
+        <TabList w={'100%'}>
+          <Tab>Native Segwit</Tab>
+          <Tab>Taproot</Tab>
+        </TabList>
+        <LedgerModalSelectAddressMenuAccountIndexInput
+          walletAccountIndex={walletAccountIndex}
+          setWalletAccountIndex={setWalletAccountIndex}
+        />
+        <LedgerModalSelectAddressMenuTableHeader />
+        <TabPanels pt={'2.5%'}>
+          <TabPanel>
+            <ButtonGroup orientation="vertical" w={'100%'}>
+              {nativeSegwitAddresses?.map(address => (
+                <LedgerModalAddressButton
+                  addressInformation={address}
                   paymentType={SupportedPaymentType.NATIVE_SEGWIT}
-                  index={index}
-                  setFundingAndTaprootAddress={setFundingAndTaprootAddress}
-                />
-              ))
-            : taprootAddresses?.map((address, index) => (
-                <LedgerModalSelectAddressMenuItem
-                  key={index}
-                  address={address}
-                  paymentType={SupportedPaymentType.TAPROOT}
-                  index={index}
                   setFundingAndTaprootAddress={setFundingAndTaprootAddress}
                 />
               ))}
-        </MenuList>
-      </Menu>
-    </SlideFade>
+            </ButtonGroup>
+          </TabPanel>
+          <TabPanel>
+            <ButtonGroup orientation="vertical" w={'100%'}>
+              {taprootAddresses?.map(address => (
+                <LedgerModalAddressButton
+                  addressInformation={address}
+                  paymentType={SupportedPaymentType.TAPROOT}
+                  setFundingAndTaprootAddress={setFundingAndTaprootAddress}
+                />
+              ))}
+            </ButtonGroup>
+          </TabPanel>
+        </TabPanels>
+        <LedgerModalSelectAddressMenuAddressPaginator
+          displayedAddressesStartIndex={displayedAddressesStartIndex}
+          setDisplayedAddressesStartIndex={setDisplayedAddressesStartIndex}
+        />
+      </Tabs>
+    )
   );
 }
