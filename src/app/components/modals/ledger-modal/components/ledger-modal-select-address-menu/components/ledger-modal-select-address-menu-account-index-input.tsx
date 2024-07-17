@@ -32,7 +32,7 @@ export function LedgerModalSelectAddressMenuAccountIndexInput({
         defaultValue={walletAccountIndex}
         onChange={walletAccountIndex => setCurrentWalletAccountIndex(Number(walletAccountIndex))}
       >
-        <HStack w={'100%'} justifyContent={'end'}>
+        <HStack w={'100%'} justifyContent={'space-between'}>
           <NumberInputField
             autoFocus={true}
             max={100}
@@ -42,14 +42,10 @@ export function LedgerModalSelectAddressMenuAccountIndexInput({
             h={'25px'}
           />
           <Button
-            h={'25px'}
-            fontSize={'xs'}
-            borderColor={'border.lightBlue.01'}
             variant={'ledgerAccountIndexUpdate'}
-            color={'white.01'}
             onClick={() => setWalletAccountIndex(currentWalletAccountIndex)}
           >
-            update
+            load addresses
           </Button>
         </HStack>
       </NumberInput>

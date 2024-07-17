@@ -16,7 +16,7 @@ export function LedgerModalSelectAddressMenuTableHeader(): React.JSX.Element {
             address
           </Text>
         </Stack>
-        <Stack w={'35%'} alignItems={'flex-start'}>
+        <Stack w={'35%'} alignItems={'flex-end'}>
           <Text fontSize={'xs'} fontStyle={'italic'}>
             balance
           </Text>

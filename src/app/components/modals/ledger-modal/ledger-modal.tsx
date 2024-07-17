@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 
-import { useLedger } from '@hooks/use-ledger';
+import { BitcoinAddressInformation, useLedger } from '@hooks/use-ledger';
 import { SupportedPaymentType } from '@models/supported-payment-types';
 import { BitcoinWalletType } from '@models/wallet';
 import {
@@ -23,9 +23,9 @@ export function LedgerModal({ isOpen, handleClose }: ModalComponentProps): React
   const { setBitcoinWalletType, setBitcoinWalletContextState } = useContext(BitcoinWalletContext);
 
   const [nativeSegwitAddresses, setNativeSegwitAddresses] = useState<
-    [number, string, number][] | undefined
+    BitcoinAddressInformation[] | undefined
   >(undefined);
-  const [taprootAddresses, setTaprootAddresses] = useState<[number, string, number][] | undefined>(
+  const [taprootAddresses, setTaprootAddresses] = useState<BitcoinAddressInformation[] | undefined>(
     undefined
   );
 

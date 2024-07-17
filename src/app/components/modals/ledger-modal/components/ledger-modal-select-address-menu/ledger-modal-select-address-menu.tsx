@@ -1,4 +1,5 @@
 import { ButtonGroup, Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react';
+import { BitcoinAddressInformation } from '@hooks/use-ledger';
 import { SupportedPaymentType } from '@models/supported-payment-types';
 
 import { LedgerModalAddressButton } from './components/ledger-modal-address-button';
@@ -7,8 +8,8 @@ import { LedgerModalSelectAddressMenuAddressPaginator } from './components/ledge
 import { LedgerModalSelectAddressMenuTableHeader } from './components/ledger-modal-select-address-menu-table-header';
 
 interface LedgerModalSelectAddressMenuProps {
-  nativeSegwitAddresses: [number, string, number][] | undefined;
-  taprootAddresses: [number, string, number][] | undefined;
+  nativeSegwitAddresses: BitcoinAddressInformation[] | undefined;
+  taprootAddresses: BitcoinAddressInformation[] | undefined;
   isLoading: boolean;
   isSuccesful: boolean;
   error: string | undefined;
@@ -50,6 +51,7 @@ export function LedgerModalSelectAddressMenu({
             <ButtonGroup orientation="vertical" w={'100%'}>
               {nativeSegwitAddresses?.map(address => (
                 <LedgerModalAddressButton
+                  key={address.address}
                   addressInformation={address}
                   paymentType={SupportedPaymentType.NATIVE_SEGWIT}
                   setFundingAndTaprootAddress={setFundingAndTaprootAddress}
@@ -61,6 +63,7 @@ export function LedgerModalSelectAddressMenu({
             <ButtonGroup orientation="vertical" w={'100%'}>
               {taprootAddresses?.map(address => (
                 <LedgerModalAddressButton
+                  key={address.address}
                   addressInformation={address}
                   paymentType={SupportedPaymentType.TAPROOT}
                   setFundingAndTaprootAddress={setFundingAndTaprootAddress}

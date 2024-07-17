@@ -1,9 +1,10 @@
 import { Button, HStack, Stack, Text } from '@chakra-ui/react';
+import { BitcoinAddressInformation } from '@hooks/use-ledger';
 import { SupportedPaymentType } from '@models/supported-payment-types';
 import { truncateAddress } from 'dlc-btc-lib/utilities';
 
 interface LedgerModalAddressButtonProps {
-  addressInformation: [number, string, number];
+  addressInformation: BitcoinAddressInformation;
   paymentType: SupportedPaymentType;
   setFundingAndTaprootAddress: (index: number, paymentType: SupportedPaymentType) => void;
 }
@@ -13,7 +14,7 @@ export function LedgerModalAddressButton({
   paymentType,
   setFundingAndTaprootAddress,
 }: LedgerModalAddressButtonProps): React.JSX.Element {
-  const [index, address, balance] = addressInformation;
+  const { index, address, balance } = addressInformation;
   return (
     <Button
       variant={'bitcoinAddress'}
