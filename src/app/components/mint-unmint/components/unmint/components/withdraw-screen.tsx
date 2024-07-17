@@ -26,6 +26,7 @@ export function WithdrawScreen({
   const toast = useToast();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAttestorApprovePending, setIsAttestorApprovePending] = useState(false);
   const { bitcoinWalletContextState } = useContext(BitcoinWalletContext);
 
   const { allVaults } = useContext(VaultContext);
@@ -41,8 +42,10 @@ export function WithdrawScreen({
         );
         setIsSubmitting(true);
         await handleSignWithdrawTransaction(currentVault.uuid, withdrawAmount.toNumber());
+        setIsAttestorApprovePending(true);
       } catch (error) {
         setIsSubmitting(false);
+        setIsAttestorApprovePending(false);
         toast({
           title: 'Failed to sign transaction',
           description: error instanceof Error ? error.message : '',
@@ -83,22 +86,31 @@ export function WithdrawScreen({
           <Spinner size="xs" color="accent.lightBlue.01" />
         </HStack>
       )}
-      <Button
-        isLoading={isSubmitting}
-        variant={'account'}
-        type={'submit'}
-        onClick={async () =>
-          bitcoinWalletContextState === BitcoinWalletContextState.READY
-            ? await handleWithdraw()
-            : handleConnect()
-        }
-      >
-        {[BitcoinWalletContextState.INITIAL, BitcoinWalletContextState.SELECTED].includes(
-          bitcoinWalletContextState
-        )
-          ? 'Connect Bitcoin Wallet'
-          : `Withdraw ${withdrawValue} BTC`}
-      </Button>
+      {isAttestorApprovePending ? (
+        <HStack w={'100%'}>
+          <Spinner color={'accent.lightBlue.01'} size={'lg'} />
+          <Text color={'accent.lightBlue.01'}>
+            Please wait while we confirm your transaction with attestors.
+          </Text>
+        </HStack>
+      ) : (
+        <Button
+          isLoading={isSubmitting}
+          variant={'account'}
+          type={'submit'}
+          onClick={async () =>
+            bitcoinWalletContextState === BitcoinWalletContextState.READY
+              ? await handleWithdraw()
+              : handleConnect()
+          }
+        >
+          {[BitcoinWalletContextState.INITIAL, BitcoinWalletContextState.SELECTED].includes(
+            bitcoinWalletContextState
+          )
+            ? 'Connect Bitcoin Wallet'
+            : `Withdraw ${withdrawValue} BTC`}
+        </Button>
+      )}
     </VStack>
   );
 }

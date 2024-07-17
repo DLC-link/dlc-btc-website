@@ -29,6 +29,7 @@ interface DepositBitcoinTransactionFormProps {
   isBitcoinWalletLoading: [boolean, string];
   bitcoinPrice?: number;
   isSubmitting: boolean;
+  isAttestorApprovePending: boolean;
   userEthereumAddressRiskLevel: string;
   isUserEthereumAddressRiskLevelLoading: boolean;
   handleConnect: () => void;
@@ -42,6 +43,7 @@ export function DepositBitcoinTransactionForm({
   isBitcoinWalletLoading,
   bitcoinPrice,
   isSubmitting,
+  isAttestorApprovePending,
   userEthereumAddressRiskLevel,
   isUserEthereumAddressRiskLevelLoading,
   handleConnect,
@@ -103,23 +105,34 @@ export function DepositBitcoinTransactionForm({
                     isRiskLoading={isUserEthereumAddressRiskLevelLoading}
                   />
                 )}
-                <Button
-                  isLoading={isSubmitting}
-                  variant={'account'}
-                  type={'submit'}
-                  isDisabled={Boolean(errors.amount)}
-                >
-                  {bitcoinWalletContextState === BitcoinWalletContextState.READY
-                    ? 'Sign Deposit Transaction'
-                    : 'Connect Wallet'}
-                </Button>
-                <Button
-                  isLoading={isSubmitting}
-                  variant={'navigate'}
-                  onClick={() => handleCancel()}
-                >
-                  Cancel
-                </Button>
+                {isAttestorApprovePending ? (
+                  <HStack w={'100%'}>
+                    <Spinner color={'accent.lightBlue.01'} size={'lg'} />
+                    <Text color={'accent.lightBlue.01'}>
+                      Please wait while we confirm your transaction with attestors.
+                    </Text>
+                  </HStack>
+                ) : (
+                  <>
+                    <Button
+                      isLoading={isSubmitting}
+                      variant={'account'}
+                      type={'submit'}
+                      isDisabled={Boolean(errors.amount)}
+                    >
+                      {bitcoinWalletContextState === BitcoinWalletContextState.READY
+                        ? 'Sign Deposit Transaction'
+                        : 'Connect Wallet'}
+                    </Button>
+                    <Button
+                      isLoading={isSubmitting}
+                      variant={'navigate'}
+                      onClick={() => handleCancel()}
+                    >
+                      Cancel
+                    </Button>
+                  </>
+                )}
               </VStack>
             </FormControl>
           </Form>
