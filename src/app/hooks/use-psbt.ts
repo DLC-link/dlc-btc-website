@@ -119,7 +119,7 @@ export function usePSBT(): UsePSBTReturnType {
         case VaultState.READY:
           await sendFundingTransactionToAttestors({
             vaultUUID,
-            fundingPSBT: fundingTransaction.hex,
+            fundingPSBT: bytesToHex(fundingTransaction.toPSBT()),
             userEthereumAddress: ethereumUserAddress,
             userBitcoinPublicKey: dlcHandler.getTaprootDerivedPublicKey(),
             chain: ethereumAttestorChainID,
