@@ -11,6 +11,8 @@ import { VaultContext } from '@providers/vault-context-provider';
 import { modalActions } from '@store/slices/modal/modal.actions';
 import Decimal from 'decimal.js';
 
+import { AttestorApprovementPendingStack } from '../../attestor-approvement-pending-stack/attestor-approvement-pending-stack';
+
 interface WithdrawScreenProps {
   currentStep: [number, string];
   isBitcoinWalletLoading: [boolean, string];
@@ -87,12 +89,7 @@ export function WithdrawScreen({
         </HStack>
       )}
       {isAttestorApprovePending ? (
-        <HStack w={'100%'}>
-          <Spinner color={'accent.lightBlue.01'} size={'lg'} />
-          <Text color={'accent.lightBlue.01'}>
-            Please wait while we confirm your transaction with attestors.
-          </Text>
-        </HStack>
+        <AttestorApprovementPendingStack />
       ) : (
         <Button
           isLoading={isSubmitting}

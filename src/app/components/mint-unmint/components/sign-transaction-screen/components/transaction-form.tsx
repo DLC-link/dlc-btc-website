@@ -12,6 +12,7 @@ import { Vault } from '@models/vault';
 import { BitcoinWalletContextState } from '@providers/bitcoin-wallet-context-provider';
 import { Form, Formik } from 'formik';
 
+import { AttestorApprovementPendingStack } from '../../attestor-approvement-pending-stack/attestor-approvement-pending-stack';
 import { RiskBox } from '../../risk-box/risk-box';
 import { ProtocolFeeBox } from './protocol-fee';
 import { TransactionFormInput } from './transaction-form/components/transaction-form-input';
@@ -59,7 +60,7 @@ export function DepositBitcoinTransactionForm({
   }
 
   return (
-    <VStack w={'45%'}>
+    <VStack w={'45%'} blur={'250px'}>
       <Formik
         initialValues={initialValues}
         onSubmit={async values => await handleClick(values.amount)}
@@ -106,12 +107,7 @@ export function DepositBitcoinTransactionForm({
                   />
                 )}
                 {isAttestorApprovePending ? (
-                  <HStack w={'100%'}>
-                    <Spinner color={'accent.lightBlue.01'} size={'lg'} />
-                    <Text color={'accent.lightBlue.01'}>
-                      Please wait while we confirm your transaction with attestors.
-                    </Text>
-                  </HStack>
+                  <AttestorApprovementPendingStack />
                 ) : (
                   <>
                     <Button
