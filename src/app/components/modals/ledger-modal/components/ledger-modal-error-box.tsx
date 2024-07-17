@@ -1,4 +1,4 @@
-import { HStack, SlideFade, Text } from '@chakra-ui/react';
+import { HStack, Text } from '@chakra-ui/react';
 
 interface LedgerModalErrorBoxProps {
   error: string | undefined;
@@ -14,14 +14,16 @@ function formatErrorMessage(error: string): string {
   }
 }
 
-export function LedgerModalErrorBox({ error }: LedgerModalErrorBoxProps): React.JSX.Element {
+export function LedgerModalErrorBox({
+  error,
+}: LedgerModalErrorBoxProps): React.JSX.Element | false {
   return (
-    <SlideFade in={!!error} transition={{ enter: { delay: 0.25 } }} unmountOnExit>
+    !!error && (
       <HStack p={'5%'} w={'375px'} spacing={4} bgColor={'red'} justifyContent={'center'}>
         <Text fontFamily={'Inter'} fontSize={'xs'} fontWeight={'600'}>
           {formatErrorMessage(error || '')}
         </Text>
       </HStack>
-    </SlideFade>
+    )
   );
 }

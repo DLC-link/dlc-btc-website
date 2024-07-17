@@ -111,6 +111,35 @@ const ledger = defineStyle({
   },
 });
 
+const bitcoinAddress = defineStyle({
+  bg: 'transparent',
+  px: '2.5%',
+  py: '5%',
+  fontSize: 'sm',
+  fontWeight: 'normal',
+  border: '1px solid',
+  borderColor: 'white.03',
+  _hover: {
+    bgColor: 'white.03',
+  },
+});
+
+const ledgerAccountIndexUpdate = defineStyle({
+  bg: 'transparent',
+  px: '2.5%',
+  py: '5%',
+  h: '25px',
+  borderRadius: '5%',
+  borderColor: 'border.lightBlue.01',
+  color: 'white.01',
+  fontSize: 'xs',
+  fontWeight: 'normal',
+  border: '1px solid',
+  _hover: {
+    bgColor: 'white.03',
+  },
+});
+
 const points = defineStyle({
   py: '18px',
   px: '2px',
@@ -135,6 +164,8 @@ export const buttonTheme = defineStyleConfig({
     company,
     wallet,
     account,
+    bitcoinAddress,
+    ledgerAccountIndexUpdate,
     vault,
     navigate,
     merchantHistory,

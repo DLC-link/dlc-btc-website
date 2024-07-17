@@ -1,4 +1,4 @@
-import { Button, SlideFade } from '@chakra-ui/react';
+import { Button } from '@chakra-ui/react';
 
 interface LedgerModalConnectButtonProps {
   error: string | undefined;
@@ -8,12 +8,12 @@ interface LedgerModalConnectButtonProps {
 export function LedgerModalConnectButton({
   error,
   getLedgerAddresses,
-}: LedgerModalConnectButtonProps): React.JSX.Element {
+}: LedgerModalConnectButtonProps): React.JSX.Element | false {
   return (
-    <SlideFade in={!!error} transition={{ enter: { delay: 0.25 } }} unmountOnExit>
+    !!error && (
       <Button variant={'ledger'} onClick={() => getLedgerAddresses()}>
         Connect Ledger
       </Button>
-    </SlideFade>
+    )
   );
 }

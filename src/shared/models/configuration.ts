@@ -20,6 +20,7 @@ export interface Configuration {
   attestorURLs: string[];
   enabledEthereumNetworkIDs: string[];
   bitcoinNetwork: BitcoinNetworkName;
+  bitcoinNetworkIndex: number;
   bitcoinNetworkPreFix: BitcoinNetworkPrefix;
   bitcoinBlockchainURL: string;
   bitcoinBlockchainExplorerURL: string;

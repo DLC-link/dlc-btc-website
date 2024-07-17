@@ -2518,6 +2518,13 @@
   resolved "https://registry.npmjs.org/@types/raf/-/raf-3.4.3.tgz"
   integrity sha512-c4YAvMedbPZ5tEyxzQdMoOhhJ4RD3rngZIdwC2/qDN3d7JpEhB6fiBRKVY1lg5B7Wk+uPBjn5f39j1/2MY1oOw==
 
+"@types/ramda@^0.30.1":
+  version "0.30.1"
+  resolved "https://registry.yarnpkg.com/@types/ramda/-/ramda-0.30.1.tgz#316257fec12747bb39a2e921df48a9dcb8c164a9"
+  integrity sha512-aoyF/ADPL6N+/NXXfhPWF+Qj6w1Cql59m9wX0Gi15uyF+bpzXeLd63HPdiTDE2bmLXfNcVufsDPKmbfOrOzTBA==
+  dependencies:
+    types-ramda "^0.30.1"
+
 "@types/react-dom@^17.0.9":
   version "17.0.25"
   resolved "https://registry.npmjs.org/@types/react-dom/-/react-dom-17.0.25.tgz"
@@ -3865,10 +3872,10 @@ dir-glob@^3.0.1:
   dependencies:
     path-type "^4.0.0"
 
-dlc-btc-lib@1.0.19:
-  version "1.0.19"
-  resolved "https://registry.yarnpkg.com/dlc-btc-lib/-/dlc-btc-lib-1.0.19.tgz#8329b868f11b964588db3e83a3d4c8e7695b52c3"
-  integrity sha512-aaGkophX4RfdffK/Z+ETlUCGT/eeze9hwuXX1qDrVzfxaS9ntRFZevFzuyHRKgbX/Z9g+7cSNL2yK1MQQ69Dqg==
+dlc-btc-lib@1.0.21:
+  version "1.0.21"
+  resolved "https://registry.yarnpkg.com/dlc-btc-lib/-/dlc-btc-lib-1.0.21.tgz#52aa5ab46f318b9fe1fefcbd983659c05f5adef2"
+  integrity sha512-OehM2AkYxaDmYokFsYOUA95WGa454l2wnQgm2zaYxXVfGZ7e2T8rAqael5YGZscHAzCD6Rgj70aGOw6W8kNVVA==
   dependencies:
     "@ledgerhq/hw-app-btc" "^10.2.4"
     "@noble/hashes" "^1.4.0"
@@ -5602,6 +5609,11 @@ queue-microtask@^1.2.2:
   resolved "https://registry.npmjs.org/queue-microtask/-/queue-microtask-1.2.3.tgz"
   integrity sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==
 
+ramda@^0.30.1:
+  version "0.30.1"
+  resolved "https://registry.yarnpkg.com/ramda/-/ramda-0.30.1.tgz#7108ac95673062b060025052cd5143ae8fc605bf"
+  integrity sha512-tEF5I22zJnuclswcZMc8bDIrwRHRzf+NqVEmqg50ShAZMP7MWeR/RGDthfM/p+BlqvF2fXAzpn8i+SJcYD3alw==
+
 randombytes@^2.0.1, randombytes@^2.1.0:
   version "2.1.0"
   resolved "https://registry.npmjs.org/randombytes/-/randombytes-2.1.0.tgz"
@@ -6479,6 +6491,13 @@ typeforce@^1.11.3, typeforce@^1.11.5, typeforce@^1.18.0:
   version "1.18.0"
   resolved "https://registry.npmjs.org/typeforce/-/typeforce-1.18.0.tgz"
   integrity sha512-7uc1O8h1M1g0rArakJdf0uLRSSgFcYexrVoKo+bzJd32gd4gDy2L/Z+8/FjPnU9ydY3pEnVPtr9FyscYY60K1g==
+
+types-ramda@^0.30.1:
+  version "0.30.1"
+  resolved "https://registry.yarnpkg.com/types-ramda/-/types-ramda-0.30.1.tgz#03d255128e3696aeaac76281ca19949e01dddc78"
+  integrity sha512-1HTsf5/QVRmLzcGfldPFvkVsAdi1db1BBKzi7iW3KBUlOICg/nKnFS+jGqDJS3YD8VsWbAh7JiHeBvbsw8RPxA==
+  dependencies:
+    ts-toolbelt "^9.6.0"
 
 typescript@^5.2.2:
   version "5.4.3"
