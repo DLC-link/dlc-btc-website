@@ -1,13 +1,13 @@
-import { HStack, SlideFade, Spinner, Text } from '@chakra-ui/react';
+import { HStack, Spinner, Text } from '@chakra-ui/react';
 
 interface LedgerModalLoadingStackProps {
   isLoading: [boolean, string];
 }
 export function LedgerModalLoadingStack({
   isLoading,
-}: LedgerModalLoadingStackProps): React.JSX.Element {
+}: LedgerModalLoadingStackProps): React.JSX.Element | false {
   return (
-    <SlideFade in={isLoading[0]} transition={{ enter: { delay: 0.25 } }} unmountOnExit>
+    isLoading[0] && (
       <HStack
         py={'5%'}
         w={'375px'}
@@ -20,6 +20,6 @@ export function LedgerModalLoadingStack({
         </Text>
         <Spinner size={'sm'} />
       </HStack>
-    </SlideFade>
+    )
   );
 }

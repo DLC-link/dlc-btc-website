@@ -21,7 +21,7 @@ const baseStyle = definePartsStyle({
 
 const ledgerModalStyle = definePartsStyle({
   dialogContainer: {
-    top: '19.5%',
+    top: '13.5%',
   },
   dialog: {
     padding: '15px',

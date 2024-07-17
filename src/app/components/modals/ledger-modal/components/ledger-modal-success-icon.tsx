@@ -9,7 +9,7 @@ export function LedgerModalSuccessIcon({
   isSuccesful,
 }: LedgerModalSuccessIconProps): React.JSX.Element {
   return (
-    <SlideFade in={isSuccesful} transition={{ enter: { delay: 0.25 } }} unmountOnExit>
+    <SlideFade in={isSuccesful} unmountOnExit>
       <CheckCircleIcon w={'25px'} h={'25px'} color={'accent.lightBlue.01'} />
     </SlideFade>
   );

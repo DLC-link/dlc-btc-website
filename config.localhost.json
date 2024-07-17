@@ -7,6 +7,7 @@
   ],
   "enabledEthereumNetworkIDs": ["421614", "31337"],
   "bitcoinNetwork": "regtest",
+  "bitcoinNetworkIndex": 1,
   "bitcoinNetworkPreFix": "bcrt1",
   "bitcoinBlockchainURL": "http://192.168.86.31:3004",
   "bitcoinBlockchainExplorerURL": "http://192.168.86.31:3004",

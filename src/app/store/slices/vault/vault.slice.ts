@@ -27,11 +27,8 @@ export const vaultSlice = createSlice({
       action: PayloadAction<{ newVaults: Vault[]; networkID: EthereumNetworkID }>
     ) => {
       const { newVaults, networkID } = action.payload;
-      const vaultMap = new Map(state.vaults[networkID].map(vault => [vault.uuid, vault]));
 
-      state.vaults[networkID] = newVaults.map((newVault: Vault) => {
-        return vaultMap.get(newVault.uuid) ?? newVault;
-      });
+      state.vaults[networkID] = newVaults;
     },
     swapVault: (
       state,
