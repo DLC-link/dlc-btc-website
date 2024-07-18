@@ -7,6 +7,8 @@ import { dlcBTC } from '@models/token';
 import { RootState } from '@store/index';
 import { modalActions } from '@store/slices/modal/modal.actions';
 
+import { formatNumber } from '@shared/utils';
+
 import { TokenStatsBoardTotalPoints } from './components/point-stats-board-total-points';
 import { PointsLayout } from './components/points-layout';
 import { PointsStatsBoardAction } from './components/points-stats-board-action';
