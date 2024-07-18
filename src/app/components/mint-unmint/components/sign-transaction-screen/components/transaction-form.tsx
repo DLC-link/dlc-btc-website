@@ -60,7 +60,7 @@ export function DepositBitcoinTransactionForm({
   }
 
   return (
-    <VStack w={'45%'} blur={'250px'}>
+    <VStack w={'45%'}>
       <Formik
         initialValues={initialValues}
         onSubmit={async values => await handleClick(values.amount)}
