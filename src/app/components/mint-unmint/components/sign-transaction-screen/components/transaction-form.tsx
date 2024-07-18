@@ -97,12 +97,14 @@ export function DepositBitcoinTransactionForm({
                     <Spinner size="xs" color="accent.lightBlue.01" />
                   </HStack>
                 )}
-                {userEthereumAddressRiskLevel === 'High' && (
-                  <RiskBox
-                    risk={userEthereumAddressRiskLevel}
-                    isRiskLoading={isUserEthereumAddressRiskLevelLoading}
-                  />
-                )}
+
+                {userEthereumAddressRiskLevel === 'High' ||
+                  (userEthereumAddressRiskLevel === 'Severe' && (
+                    <RiskBox
+                      risk={userEthereumAddressRiskLevel}
+                      isRiskLoading={isUserEthereumAddressRiskLevelLoading}
+                    />
+                  ))}
                 <Button
                   isLoading={isSubmitting}
                   variant={'account'}

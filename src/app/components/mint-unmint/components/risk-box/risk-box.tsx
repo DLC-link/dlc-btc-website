@@ -18,11 +18,14 @@ export function RiskBox({ risk }: RiskBoxProps): React.JSX.Element {
           {risk}
         </Text>
       </HStack>
-      <VStack>
+      <VStack gap={'0px'}>
+        <Text color={'accent.lightBlue.01'} fontWeight={200}>
+          Potential suspicious activity detected, redemptions are temporarily suspended.
+        </Text>
+        <Text color={'white.01'} fontWeight={200}>
+          Contact your account representative for further assistance.
+        </Text>
         <Text color={'white.01'}>
-          <Text color={'white.01'} fontWeight={800}>
-            Redemptions are temporarily suspended.
-          </Text>
           <Link
             color={'accent.lightBlue.01'}
             href="mailto:support@dlc.link"
