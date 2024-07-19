@@ -36,6 +36,8 @@ export function SignFundingTransactionScreen({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [isAttestorApprovePending, setIsAttestorApprovePending] = useState(false);
+
   const { mintStep } = useSelector((state: RootState) => state.mintunmint);
 
   const currentVault = allVaults.find(vault => vault.uuid === mintStep[1]);
@@ -48,8 +50,10 @@ export function SignFundingTransactionScreen({
       const currentRisk = await fetchUserEthereumAddressRiskLevel();
       if (currentRisk === 'High') throw new Error('Risk Level is too high');
       await handleSignFundingTransaction(currentVault.uuid, depositAmount);
+      setIsAttestorApprovePending(true);
     } catch (error: any) {
       setIsSubmitting(false);
+      setIsAttestorApprovePending(false);
       toast({
         title: 'Failed to sign Depost Transaction',
         description: error.message,
@@ -76,6 +80,7 @@ export function SignFundingTransactionScreen({
       isBitcoinWalletLoading={isBitcoinWalletLoading}
       bitcoinPrice={bitcoinPrice}
       isSubmitting={isSubmitting}
+      isAttestorApprovePending={isAttestorApprovePending}
       userEthereumAddressRiskLevel={userEthereumAddressRiskLevel}
       isUserEthereumAddressRiskLevelLoading={isUserEthereumAddressRiskLevelLoading}
       handleConnect={handleConnect}

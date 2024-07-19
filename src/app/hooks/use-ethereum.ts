@@ -29,7 +29,7 @@ interface UseEthereumReturnType {
   getAllVaults: () => Promise<void>;
   getVault: (vaultUUID: string, vaultState: VaultState) => Promise<Vault>;
   getRawVault: (vaultUUID: string) => Promise<RawVault>;
-  getAllFundedVaults: (thereumNetwork: EthereumNetwork) => Promise<RawVault[]>;
+  retrieveAllVaults: (ethereumNetwork: EthereumNetwork) => Promise<RawVault[]>;
   setupVault: () => Promise<void>;
   withdrawVault: (vaultUUID: string, withdrawAmount: bigint) => Promise<void>;
   closeVault: (vaultUUID: string) => Promise<void>;
@@ -207,7 +207,7 @@ export function useEthereum(): UseEthereumReturnType {
     throw new EthereumError(`Failed to fetch Vault ${vaultUUID} after ${maxRetries} retries`);
   }
 
-  async function getAllFundedVaults(
+  async function retrieveAllVaults(
     ethereumNetwork: EthereumNetwork,
     amount: number = 50
   ): Promise<RawVault[]> {
@@ -327,7 +327,7 @@ export function useEthereum(): UseEthereumReturnType {
     getAllVaults,
     getVault,
     getRawVault,
-    getAllFundedVaults,
+    retrieveAllVaults,
     setupVault,
     withdrawVault,
     closeVault,

@@ -12,13 +12,6 @@ export class EthereumError extends Error {
   }
 }
 
-export class AttestorError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'AttestorError';
-  }
-}
-
 export class LedgerError extends Error {
   constructor(message: string) {
     super(message);

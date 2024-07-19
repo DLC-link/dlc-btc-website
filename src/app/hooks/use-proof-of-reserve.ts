@@ -11,15 +11,13 @@ import { unshiftValue } from 'dlc-btc-lib/utilities';
 import { BITCOIN_NETWORK_MAP } from '@shared/constants/bitcoin.constants';
 
 import { useEthereum } from './use-ethereum';
-import { useEthereumConfiguration } from './use-ethereum-configuration';
 
 interface UseProofOfReserveReturnType {
   proofOfReserve: [number | undefined, MerchantProofOfReserve[]] | undefined;
 }
 
 export function useProofOfReserve(): UseProofOfReserveReturnType {
-  const { enabledEthereumNetworks } = useEthereumConfiguration();
-  const { getAllFundedVaults, getAttestorGroupPublicKey } = useEthereum();
+  const { retrieveAllVaults, getAttestorGroupPublicKey } = useEthereum();
   const { network } = useSelector((state: RootState) => state.account);
 
   const [proofOfReserveHandler, setProofOfReserveHandler] = useState<
@@ -55,9 +53,7 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
   async function calculateProofOfReserve(): Promise<
     [number | undefined, MerchantProofOfReserve[]]
   > {
-    const fundedVaults = await Promise.all(
-      enabledEthereumNetworks.map(network => getAllFundedVaults(network))
-    ).then(vaultsArrays => vaultsArrays.flat());
+    const allVaults = await retrieveAllVaults(network);
 
     if (!proofOfReserveHandler) {
       return [
@@ -71,10 +67,10 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
       ];
     }
 
-    const proofOfReserve = await proofOfReserveHandler.calculateProofOfReserve(fundedVaults);
+    const proofOfReserve = await proofOfReserveHandler.calculateProofOfReserve(allVaults);
 
     const promises = appConfiguration.merchants.map(async (merchant: Merchant) => {
-      const proofOfReserve = await calculateProofOfReserveOfAddress(fundedVaults, merchant.address);
+      const proofOfReserve = await calculateProofOfReserveOfAddress(allVaults, merchant.address);
       return {
         merchant,
         dlcBTCAmount: proofOfReserve,
@@ -87,11 +83,11 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
   }
 
   async function calculateProofOfReserveOfAddress(
-    fundedVaults: RawVault[],
+    allVaults: RawVault[],
     ethereumAddress: string
   ): Promise<number> {
     if (!proofOfReserveHandler) return 0;
-    const filteredVaults = fundedVaults.filter(
+    const filteredVaults = allVaults.filter(
       vault => vault.creator.toLowerCase() === ethereumAddress.toLowerCase()
     );
 

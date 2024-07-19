@@ -1,4 +1,4 @@
-import { Skeleton } from '@chakra-ui/react';
+import { Skeleton, Text } from '@chakra-ui/react';
 import { GenericTableBody } from '@components/generic-table/components/generic-table-body';
 import { GenericTableHeader } from '@components/generic-table/components/generic-table-header';
 import { GenericTableHeaderText } from '@components/generic-table/components/generic-table-header-text';
@@ -23,6 +23,11 @@ export function MerchantDetailsTable({ items }: MerchantDetailsTableProps): Reac
         <GenericTableHeaderText>Date</GenericTableHeaderText>
       </GenericTableHeader>
       <Skeleton isLoaded={items !== undefined} height={'50px'} w={'100%'}>
+        {items?.length === 0 && (
+          <Text color={'white'} p={'10px'}>
+            No Transaction History to show.
+          </Text>
+        )}
         <GenericTableBody>
           {items?.map(item => <MerchantDetailsTableItem key={item.id} {...item} />)}
         </GenericTableBody>

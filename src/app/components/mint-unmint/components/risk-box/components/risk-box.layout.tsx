@@ -3,7 +3,7 @@ import { HasChildren } from '@models/has-children';
 
 export function RiskBoxLayout({ children }: HasChildren): React.JSX.Element {
   return (
-    <VStack p={'7.5px'} pr={'25px'} w={'100%'} alignItems={'flex-start'}>
+    <VStack w={'100%'} alignItems={'flex-start'} gap={'0px'}>
       {children}
     </VStack>
   );
