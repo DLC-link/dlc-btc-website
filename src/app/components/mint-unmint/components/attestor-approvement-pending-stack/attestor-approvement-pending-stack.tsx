@@ -8,7 +8,7 @@ export function AttestorApprovementPendingStack(): React.JSX.Element {
       <Spinner color={'accent.lightBlue.01'} size={'md'} />
       <HStack width={'85%'}>
         <Text color={'accent.lightBlue.01'} fontSize={'sm'}>
-          Please wait while we confirm your transaction with attestors.
+          Please wait while we verify your transaction.
         </Text>
       </HStack>
     </HStack>
