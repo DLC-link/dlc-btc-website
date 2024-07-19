@@ -3872,15 +3872,16 @@ dir-glob@^3.0.1:
   dependencies:
     path-type "^4.0.0"
 
-dlc-btc-lib@1.0.21:
-  version "1.0.21"
-  resolved "https://registry.yarnpkg.com/dlc-btc-lib/-/dlc-btc-lib-1.0.21.tgz#52aa5ab46f318b9fe1fefcbd983659c05f5adef2"
-  integrity sha512-OehM2AkYxaDmYokFsYOUA95WGa454l2wnQgm2zaYxXVfGZ7e2T8rAqael5YGZscHAzCD6Rgj70aGOw6W8kNVVA==
+dlc-btc-lib@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/dlc-btc-lib/-/dlc-btc-lib-2.0.0.tgz#6b6bcb9828efe5151e4992fc7d4fe356df991cae"
+  integrity sha512-huiF3OHtfhT9QVf1oOdswcxYDuMe5Ns/W6hepOqZ26iW9eX2BfY4u6xLUvfZwTvPxMovRSgrakJg9vc+pnYh1g==
   dependencies:
     "@ledgerhq/hw-app-btc" "^10.2.4"
     "@noble/hashes" "^1.4.0"
     "@scure/base" "^1.1.6"
     "@scure/btc-signer" "^1.3.1"
+    "@types/ramda" "^0.30.1"
     bip32 "^4.0.0"
     bitcoinjs-lib "^6.1.5"
     chalk "^5.3.0"
@@ -3888,6 +3889,7 @@ dlc-btc-lib@1.0.21:
     ethers "5.7.2"
     ledger-bitcoin "^0.2.3"
     prompts "^2.4.2"
+    ramda "^0.30.1"
     scure "^1.6.0"
     tiny-secp256k1 "^2.2.3"
 

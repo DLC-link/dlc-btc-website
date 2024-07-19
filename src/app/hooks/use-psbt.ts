@@ -7,9 +7,12 @@ import { bytesToHex } from '@noble/hashes/utils';
 import { BitcoinWalletContext } from '@providers/bitcoin-wallet-context-provider';
 import { RootState } from '@store/index';
 import { LedgerDLCHandler, SoftwareWalletDLCHandler } from 'dlc-btc-lib';
+import {
+  submitFundingPSBT,
+  submitWithdrawDepositPSBT,
+} from 'dlc-btc-lib/attestor-request-functions';
 import { Transaction, VaultState } from 'dlc-btc-lib/models';
 
-import { useAttestors } from './use-attestors';
 import { useEthereum } from './use-ethereum';
 import { useEthereumConfiguration } from './use-ethereum-configuration';
 import { useLeather } from './use-leather';
@@ -41,9 +44,6 @@ export function usePSBT(): UsePSBTReturnType {
     handleDepositTransaction: handleDepositTransactionWithLeather,
     isLoading: isLeatherLoading,
   } = useLeather();
-
-  const { sendFundingTransactionToAttestors, sendDepositWithdrawTransactionToAttestors } =
-    useAttestors();
 
   const { getAttestorGroupPublicKey, getRawVault } = useEthereum();
 
@@ -117,19 +117,18 @@ export function usePSBT(): UsePSBTReturnType {
 
       switch (vault.status) {
         case VaultState.READY:
-          await sendFundingTransactionToAttestors({
+          await submitFundingPSBT(appConfiguration.attestorURLs, {
             vaultUUID,
             fundingPSBT: bytesToHex(fundingTransaction.toPSBT()),
             userEthereumAddress: ethereumUserAddress,
-            userBitcoinPublicKey: dlcHandler.getTaprootDerivedPublicKey(),
-            chain: ethereumAttestorChainID,
+            userBitcoinTaprootPublicKey: dlcHandler.getTaprootDerivedPublicKey(),
+            attestorChainID: ethereumAttestorChainID,
           });
           break;
         default:
-          await sendDepositWithdrawTransactionToAttestors({
+          await submitWithdrawDepositPSBT(appConfiguration.attestorURLs, {
             vaultUUID,
-            depositWithdrawPSBT: bytesToHex(fundingTransaction.toPSBT()),
-            chain: ethereumAttestorChainID,
+            withdrawDepositPSBT: bytesToHex(fundingTransaction.toPSBT()),
           });
       }
 
@@ -179,10 +178,9 @@ export function usePSBT(): UsePSBTReturnType {
           throw new BitcoinError('Invalid Bitcoin Wallet Type');
       }
 
-      await sendDepositWithdrawTransactionToAttestors({
+      await submitWithdrawDepositPSBT(appConfiguration.attestorURLs, {
         vaultUUID,
-        depositWithdrawPSBT: withdrawalTransactionHex,
-        chain: ethereumAttestorChainID,
+        withdrawDepositPSBT: withdrawalTransactionHex,
       });
 
       resetBitcoinWalletContext();
