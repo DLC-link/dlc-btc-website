@@ -1,6 +1,8 @@
 import { HStack, Image, Skeleton, Text, VStack } from '@chakra-ui/react';
 import { Token } from '@models/token';
 
+import { formatNumber } from '@shared/utils';
+
 interface PointsStatsBoardActionProps {
   token: Token;
   totalSupply: number | undefined;
@@ -22,9 +24,15 @@ export function PointsStatsBoardAction({
               {`${tokenSuffix} ${token.name} `}
             </Text>
           </HStack>
-          <Text color={'white'} fontWeight={200} fontSize={'3xl'}>
-            {totalSupply?.toFixed(2)}
-          </Text>
+          {totalSupply !== undefined ? (
+            <Text color={'white'} fontWeight={200} fontSize={'3xl'}>
+              {formatNumber(totalSupply)}
+            </Text>
+          ) : (
+            <Text fontSize={'2xl'} fontWeight={200} color={'gray.500'}>
+              Loading...
+            </Text>
+          )}
         </VStack>
       </Skeleton>
     </VStack>
