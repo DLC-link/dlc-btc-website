@@ -207,26 +207,32 @@ export function useEthereum(): UseEthereumReturnType {
     throw new EthereumError(`Failed to fetch Vault ${vaultUUID} after ${maxRetries} retries`);
   }
 
-  async function getAllFundedVaults(ethereumNetwork: EthereumNetwork): Promise<RawVault[]> {
-    const FUNDED_STATUS = 1;
+  async function getAllFundedVaults(
+    ethereumNetwork: EthereumNetwork,
+    amount: number = 50
+  ): Promise<RawVault[]> {
     try {
       const dlcManagerContract = await getDefaultProvider(ethereumNetwork, 'DLCManager');
-      const numToFetch = 50;
+
       let totalFetched = 0;
-      const fundedVaults: RawVault[] = [];
-      // eslint-disable-next-line no-constant-condition
-      while (true) {
+      const allVaults: RawVault[] = [];
+
+      let shouldContinue = true;
+      while (shouldContinue) {
         const fetchedVaults: RawVault[] = await dlcManagerContract.getAllDLCs(
           totalFetched,
-          totalFetched + numToFetch
+          totalFetched + amount
         );
-        fundedVaults.push(...fetchedVaults.filter(vault => vault.status === FUNDED_STATUS));
-        totalFetched += numToFetch;
-        if (fetchedVaults.length !== numToFetch) break;
+
+        allVaults.push(...fetchedVaults);
+
+        totalFetched += amount;
+        shouldContinue = fetchedVaults.length === amount;
       }
-      return fundedVaults;
+
+      return allVaults;
     } catch (error) {
-      throw new EthereumError(`Could not fetch Funded Vaults: ${error}`);
+      throw new EthereumError(`Could not fetch All Vaults: ${error}`);
     }
   }
 
