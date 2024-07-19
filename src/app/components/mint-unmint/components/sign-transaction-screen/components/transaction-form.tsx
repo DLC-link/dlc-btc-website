@@ -12,6 +12,7 @@ import { Vault } from '@models/vault';
 import { BitcoinWalletContextState } from '@providers/bitcoin-wallet-context-provider';
 import { Form, Formik } from 'formik';
 
+import { AttestorApprovementPendingStack } from '../../attestor-approvement-pending-stack/attestor-approvement-pending-stack';
 import { RiskBox } from '../../risk-box/risk-box';
 import { ProtocolFeeBox } from './protocol-fee';
 import { TransactionFormInput } from './transaction-form/components/transaction-form-input';
@@ -29,6 +30,7 @@ interface DepositBitcoinTransactionFormProps {
   isBitcoinWalletLoading: [boolean, string];
   bitcoinPrice?: number;
   isSubmitting: boolean;
+  isAttestorApprovePending: boolean;
   userEthereumAddressRiskLevel: string;
   isUserEthereumAddressRiskLevelLoading: boolean;
   handleConnect: () => void;
@@ -42,6 +44,7 @@ export function DepositBitcoinTransactionForm({
   isBitcoinWalletLoading,
   bitcoinPrice,
   isSubmitting,
+  isAttestorApprovePending,
   userEthereumAddressRiskLevel,
   isUserEthereumAddressRiskLevelLoading,
   handleConnect,
@@ -103,23 +106,29 @@ export function DepositBitcoinTransactionForm({
                     isRiskLoading={isUserEthereumAddressRiskLevelLoading}
                   />
                 )}
-                <Button
-                  isLoading={isSubmitting}
-                  variant={'account'}
-                  type={'submit'}
-                  isDisabled={Boolean(errors.amount)}
-                >
-                  {bitcoinWalletContextState === BitcoinWalletContextState.READY
-                    ? 'Sign Deposit Transaction'
-                    : 'Connect Wallet'}
-                </Button>
-                <Button
-                  isLoading={isSubmitting}
-                  variant={'navigate'}
-                  onClick={() => handleCancel()}
-                >
-                  Cancel
-                </Button>
+                {isAttestorApprovePending ? (
+                  <AttestorApprovementPendingStack />
+                ) : (
+                  <>
+                    <Button
+                      isLoading={isSubmitting}
+                      variant={'account'}
+                      type={'submit'}
+                      isDisabled={Boolean(errors.amount)}
+                    >
+                      {bitcoinWalletContextState === BitcoinWalletContextState.READY
+                        ? 'Sign Deposit Transaction'
+                        : 'Connect Wallet'}
+                    </Button>
+                    <Button
+                      isLoading={isSubmitting}
+                      variant={'navigate'}
+                      onClick={() => handleCancel()}
+                    >
+                      Cancel
+                    </Button>
+                  </>
+                )}
               </VStack>
             </FormControl>
           </Form>
