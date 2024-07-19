@@ -5,6 +5,7 @@ import { ViteToml } from 'vite-plugin-toml'
 import { readFileSync } from 'fs';
 import wasm from 'vite-plugin-wasm';
 
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) =>  {
 
@@ -12,9 +13,14 @@ export default defineConfig(({ mode }) =>  {
 
   const environmentName = env.VITE_APP_ENVIRONMENT;
 
+  const contractConfigurationJSON = readFileSync(resolve(__dirname, `./contracts.${environmentName}.json`), 'utf-8');
+  const contractConfiguration = JSON.parse(contractConfigurationJSON);
+
   const appConfigurationJSON = readFileSync(resolve(__dirname, `./config.${environmentName}.json`), 'utf-8');
   const appConfiguration = JSON.parse(appConfigurationJSON);
-  
+
+  appConfiguration.ethereumContractInformations = contractConfiguration;
+  appConfiguration.ethereumInfuraWebsocketURL = env.VITE_ARBITRUM_OBSERVER_NODE;
 
   return {
   plugins: [react(), wasm(), ViteToml()],

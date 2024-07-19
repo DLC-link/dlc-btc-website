@@ -1,12 +1,12 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useContext, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
+import { formatVault } from '@functions/vault.functions';
 import { Vault } from '@models/vault';
+import { EthereumHandlerContext } from '@providers/ethereum-handler-context-provider';
 import { RootState } from '@store/index';
+import { vaultActions } from '@store/slices/vault/vault.actions';
 import { VaultState } from 'dlc-btc-lib/models';
-
-import { useEthereum } from './use-ethereum';
-import { useEthereumContext } from './use-ethereum-context';
 
 interface UseVaultsReturnType {
   allVaults: Vault[];
@@ -19,8 +19,8 @@ interface UseVaultsReturnType {
 }
 
 export function useVaults(): UseVaultsReturnType {
-  const { contractsLoaded } = useEthereumContext();
-  const { getAllVaults } = useEthereum();
+  const dispatch = useDispatch();
+  const { ethereumHandler, isEthereumHandlerSet } = useContext(EthereumHandlerContext);
 
   const { vaults } = useSelector((state: RootState) => state.vault);
   const { network } = useSelector((state: RootState) => state.account);
@@ -28,9 +28,21 @@ export function useVaults(): UseVaultsReturnType {
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchVaultsIfReady = async () => {
-    if (contractsLoaded) {
+    if (isEthereumHandlerSet) {
       setIsLoading(true);
-      await getAllVaults();
+      ethereumHandler
+        ?.getAllUserVaults()
+        .then(vaults => {
+          const formattedVaults = vaults.map(vault => {
+            return formatVault(vault);
+          });
+
+          dispatch(vaultActions.setVaults({ newVaults: formattedVaults, networkID: network.id }));
+        })
+        .catch(error => {
+          // eslint-disable-next-line no-console
+          console.error('Error fetching vaults', error);
+        });
       setIsLoading(false);
     }
   };
@@ -39,7 +51,7 @@ export function useVaults(): UseVaultsReturnType {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     fetchVaultsIfReady();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contractsLoaded]);
+  }, [isEthereumHandlerSet]);
 
   const allVaults = useMemo(
     () => [...vaults[network ? network.id : '42161']].sort((a, b) => b.timestamp - a.timestamp),

@@ -1,6 +1,8 @@
+import { useContext } from 'react';
+
 import { Button, HStack, Image, Link, Text } from '@chakra-ui/react';
 import { TutorialVideo } from '@components/tutorial-video/tutorial-video';
-import { useEthereumAccount } from '@hooks/use-ethereum-account';
+import { EthereumHandlerContext } from '@providers/ethereum-handler-context-provider';
 
 import { WalkthroughHeader } from './components/walkthrough-header';
 import { WalkthroughLayout } from './components/walkthrough.layout';
@@ -11,8 +13,7 @@ interface WalkthroughProps {
 }
 
 export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.Element {
-  const { recommendTokenToMetamask } = useEthereumAccount();
-
+  const { recommendTokenToMetamask } = useContext(EthereumHandlerContext);
   switch (flow) {
     case 'mint':
       switch (currentStep) {

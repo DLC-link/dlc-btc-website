@@ -3,8 +3,10 @@ import { useSelector } from 'react-redux';
 
 import { HStack } from '@chakra-ui/react';
 import { TabButton } from '@components/tab-button/tab-button';
-import { useEthereum } from '@hooks/use-ethereum';
+import { getEthereumContractWithDefaultNode } from '@functions/configuration.functions';
+import { useEthereumConfiguration } from '@hooks/use-ethereum-configuration';
 import { RootState } from '@store/index';
+import { isUserWhitelisted, isWhitelistingEnabled } from 'dlc-btc-lib/ethereum-functions';
 
 interface NavigationTabsProps {
   activeTab: string;
@@ -15,18 +17,28 @@ export function NavigationTabs({
   activeTab,
   handleTabClick,
 }: NavigationTabsProps): React.JSX.Element {
-  const { address } = useSelector((state: RootState) => state.account);
-  const { isWhitelistingEnabled, isUserWhitelisted } = useEthereum();
+  const { address, network: ethereumNetwork } = useSelector((state: RootState) => state.account);
   const [showDisplayMintBurn, setShowDisplayMintBurn] = useState<boolean>(false);
+  const { ethereumContractDeploymentPlans } = useEthereumConfiguration();
 
   useEffect(() => {
     async function checkWhitelisting(address?: string) {
       const result = async () => {
         if (!address) return false;
-        return !(await isWhitelistingEnabled()) ? true : await isUserWhitelisted(address);
+
+        const dlcManagerContract = getEthereumContractWithDefaultNode(
+          ethereumContractDeploymentPlans,
+          ethereumNetwork,
+          'DLCManager'
+        );
+
+        return !(await isWhitelistingEnabled(dlcManagerContract))
+          ? true
+          : await isUserWhitelisted(dlcManagerContract, address);
       };
       setShowDisplayMintBurn(await result());
     }
+
     void checkWhitelisting(address);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [address]);

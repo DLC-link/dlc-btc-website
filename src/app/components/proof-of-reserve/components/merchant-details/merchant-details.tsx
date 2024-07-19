@@ -1,13 +1,17 @@
 import { useContext } from 'react';
 import { MdArrowBack } from 'react-icons/md';
 import { useQuery } from 'react-query';
+import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { Divider, HStack, Icon, Image, Link, Text } from '@chakra-ui/react';
-import { useEthereum } from '@hooks/use-ethereum';
+import { getEthereumContractWithDefaultNode } from '@functions/configuration.functions';
+import { fetchMintBurnEvents } from '@functions/ethereum.functions';
+import { useEthereumConfiguration } from '@hooks/use-ethereum-configuration';
 import { Merchant } from '@models/merchant';
 import { bitcoin, dlcBTC } from '@models/token';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
+import { RootState } from '@store/index';
 
 import { MerchantDetailsTableItemProps } from '../merchant-table/components/merchant-details-table-item';
 import { MerchantDetailsTable } from '../merchant-table/merchant-details-table';
@@ -19,7 +23,6 @@ import { MerchantDetailsLayout } from './components/merchant-details-layout';
 export function MerchantDetails(): React.JSX.Element {
   const { name } = useParams();
   const { proofOfReserve, bitcoinPrice } = useContext(ProofOfReserveContext);
-  const { fetchMintBurnEvents } = useEthereum();
   const navigate = useNavigate();
 
   const [, merchantProofOfReserves] = proofOfReserve || [
@@ -33,13 +36,24 @@ export function MerchantDetails(): React.JSX.Element {
   ];
   const selectedMerchant = merchantProofOfReserves.find(item => item.merchant.name === name);
 
-  const { data: mintBurnEvents } = useQuery([`mintBurnEvents${name}`], fetchMintBurnEventsHandler);
+  const { ethereumContractDeploymentPlans } = useEthereumConfiguration();
 
+  const { data: mintBurnEvents } = useQuery([`mintBurnEvents${name}`], fetchMintBurnEventsHandler);
+  const { network: ethereumNetwork } = useSelector((state: RootState) => state.account);
   if (!name) return <Text>Error: No merchant name provided</Text>;
 
   async function fetchMintBurnEventsHandler(): Promise<MerchantDetailsTableItemProps[]> {
     if (!selectedMerchant?.merchant.address) return [];
-    const detailedEvents = await fetchMintBurnEvents(selectedMerchant.merchant.address);
+    const dlcBTCContract = getEthereumContractWithDefaultNode(
+      ethereumContractDeploymentPlans,
+      ethereumNetwork,
+      'DLCBTC'
+    );
+    const detailedEvents = await fetchMintBurnEvents(
+      dlcBTCContract,
+      ethereumNetwork.defaultNodeURL,
+      selectedMerchant.merchant.address
+    );
     return detailedEvents.map((event, index) => {
       return {
         id: index,

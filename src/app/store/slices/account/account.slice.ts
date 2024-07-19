@@ -1,6 +1,7 @@
-import { EthereumNetwork, ethereumArbSepolia, ethereumArbitrum } from '@models/ethereum-network';
 import { WalletType } from '@models/wallet';
 import { createSlice } from '@reduxjs/toolkit';
+import { ethereumArbitrum, ethereumArbitrumSepolia } from 'dlc-btc-lib/constants';
+import { EthereumNetwork } from 'dlc-btc-lib/models';
 
 interface AccountState {
   address: string | undefined;
@@ -18,10 +19,10 @@ switch (bitcoinNetworkName) {
     ethereumNetwork = ethereumArbitrum;
     break;
   case 'regtest':
-    ethereumNetwork = ethereumArbSepolia;
+    ethereumNetwork = ethereumArbitrumSepolia;
     break;
   default:
-    ethereumNetwork = ethereumArbSepolia;
+    ethereumNetwork = ethereumArbitrumSepolia;
 }
 
 export const initialAccountState: AccountState = {

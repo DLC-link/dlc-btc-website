@@ -1,3 +1,5 @@
+import { EthereumDeploymentPlan } from 'dlc-btc-lib/models';
+
 export interface TimeStampedEvent {
   timestamp: number;
   amount: number;
@@ -9,6 +11,11 @@ export interface DetailedEvent {
   value: number;
   timestamp: number;
   txHash: string;
+}
+
+export interface ContractInformation {
+  name: string;
+  contractInformation: EthereumDeploymentPlan[];
 }
 
 export interface ProtocolRewards {

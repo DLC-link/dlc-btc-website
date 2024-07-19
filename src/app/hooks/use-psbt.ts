@@ -5,6 +5,7 @@ import { BitcoinError } from '@models/error-types';
 import { BitcoinWalletType } from '@models/wallet';
 import { bytesToHex } from '@noble/hashes/utils';
 import { BitcoinWalletContext } from '@providers/bitcoin-wallet-context-provider';
+import { EthereumHandlerContext } from '@providers/ethereum-handler-context-provider';
 import { RootState } from '@store/index';
 import { LedgerDLCHandler, SoftwareWalletDLCHandler } from 'dlc-btc-lib';
 import {
@@ -13,7 +14,6 @@ import {
 } from 'dlc-btc-lib/attestor-request-functions';
 import { Transaction, VaultState } from 'dlc-btc-lib/models';
 
-import { useEthereum } from './use-ethereum';
 import { useEthereumConfiguration } from './use-ethereum-configuration';
 import { useLeather } from './use-leather';
 import { useLedger } from './use-ledger';
@@ -45,7 +45,7 @@ export function usePSBT(): UsePSBTReturnType {
     isLoading: isLeatherLoading,
   } = useLeather();
 
-  const { getAttestorGroupPublicKey, getRawVault } = useEthereum();
+  const { ethereumHandler } = useContext(EthereumHandlerContext);
 
   const { ethereumAttestorChainID } = useEthereumConfiguration();
 
@@ -56,13 +56,14 @@ export function usePSBT(): UsePSBTReturnType {
     depositAmount: number
   ): Promise<void> {
     try {
+      if (!ethereumHandler) throw new Error('Ethereum Handler is not setup');
       if (!dlcHandler) throw new Error('DLC Handler is not setup');
       if (!ethereumUserAddress) throw new Error('User Address is not setup');
 
       const feeRateMultiplier = import.meta.env.VITE_FEE_RATE_MULTIPLIER;
 
-      const attestorGroupPublicKey = await getAttestorGroupPublicKey();
-      const vault = await getRawVault(vaultUUID);
+      const attestorGroupPublicKey = await ethereumHandler.getAttestorGroupPublicKey();
+      const vault = await ethereumHandler.getRawVault(vaultUUID);
 
       if (!bitcoinWalletType) throw new Error('Bitcoin Wallet is not setup');
 
@@ -144,13 +145,14 @@ export function usePSBT(): UsePSBTReturnType {
     withdrawAmount: number
   ): Promise<void> {
     try {
+      if (!ethereumHandler) throw new Error('Ethereum Handler is not setup');
       if (!dlcHandler) throw new Error('DLC Handler is not setup');
       if (!ethereumUserAddress) throw new Error('User Address is not setup');
 
       const feeRateMultiplier = import.meta.env.VITE_FEE_RATE_MULTIPLIER;
 
-      const attestorGroupPublicKey = await getAttestorGroupPublicKey();
-      const vault = await getRawVault(vaultUUID);
+      const attestorGroupPublicKey = await ethereumHandler.getAttestorGroupPublicKey();
+      const vault = await ethereumHandler.getRawVault(vaultUUID);
 
       if (!bitcoinWalletType) throw new Error('Bitcoin Wallet is not setup');
 

@@ -1,13 +1,17 @@
 import { useContext } from 'react';
 import { useQuery } from 'react-query';
+import { useSelector } from 'react-redux';
 
 import { Divider, HStack, Text } from '@chakra-ui/react';
 import { ProtocolHistoryTableItemProps } from '@components/protocol-history-table/components/protocol-history-table-item';
 import { ProtocolHistoryTable } from '@components/protocol-history-table/protocol-history-table';
-import { useEthereum } from '@hooks/use-ethereum';
+import { getEthereumContractWithDefaultNode } from '@functions/configuration.functions';
+import { fetchMintBurnEvents } from '@functions/ethereum.functions';
+import { useEthereumConfiguration } from '@hooks/use-ethereum-configuration';
 import { Merchant } from '@models/merchant';
 import { bitcoin, dlcBTC } from '@models/token';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
+import { RootState } from '@store/index';
 
 import { BURN_ADDRESS } from '@shared/constants/ethereum.constants';
 
@@ -21,7 +25,6 @@ import { TokenStatsBoardLayout } from './components/token-stats-board/token-stat
 
 export function ProofOfReserve(): React.JSX.Element {
   const { proofOfReserve, totalSupply, bitcoinPrice } = useContext(ProofOfReserveContext);
-  const { fetchMintBurnEvents } = useEthereum();
 
   const [proofOfReserveSum, merchantProofOfReserves] = proofOfReserve || [
     undefined,
@@ -33,10 +36,24 @@ export function ProofOfReserve(): React.JSX.Element {
     }),
   ];
 
+  const { network: ethereumNetwork } = useSelector((state: RootState) => state.account);
+
   const { data: allMintBurnEvents } = useQuery(['allMintBurnEvents'], fetchMintBurnEventsHandler);
 
+  const { ethereumContractDeploymentPlans } = useEthereumConfiguration();
+
   async function fetchMintBurnEventsHandler(): Promise<ProtocolHistoryTableItemProps[]> {
-    const detailedEvents = await fetchMintBurnEvents(undefined, 10);
+    const dlcBTCContract = getEthereumContractWithDefaultNode(
+      ethereumContractDeploymentPlans,
+      ethereumNetwork,
+      'DLCBTC'
+    );
+    const detailedEvents = await fetchMintBurnEvents(
+      dlcBTCContract,
+      ethereumNetwork.defaultNodeURL,
+      undefined,
+      10
+    );
     return detailedEvents.map((event, index) => {
       const isMint = event.from.toLowerCase() === BURN_ADDRESS.toLowerCase();
       return {

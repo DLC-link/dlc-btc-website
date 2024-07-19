@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
+import { useSelector } from 'react-redux';
 
-import { EthereumError } from '@models/error-types';
-import { EthereumNetwork } from '@models/ethereum-network';
+import { getEthereumContractWithDefaultNode } from '@functions/configuration.functions';
+import { RootState } from '@store/index';
+import { getDLCBTCTotalSupply } from 'dlc-btc-lib/ethereum-functions';
 import { unshiftValue } from 'dlc-btc-lib/utilities';
+import { Contract } from 'ethers';
 
-import { useEthereum } from './use-ethereum';
 import { useEthereumConfiguration } from './use-ethereum-configuration';
 
 interface UseTotalSupplyReturnType {
@@ -13,17 +15,25 @@ interface UseTotalSupplyReturnType {
 }
 
 export function useTotalSupply(): UseTotalSupplyReturnType {
-  const { enabledEthereumNetworks } = useEthereumConfiguration();
-  const { getDefaultProvider } = useEthereum();
-
+  const { network: ethereumNetwork } = useSelector((state: RootState) => state.account);
   const [shouldFetch, setShouldFetch] = useState(false);
+  const [dlcBTCContract, setDLCBTCContract] = useState<Contract | undefined>(undefined);
+
+  const { ethereumContractDeploymentPlans } = useEthereumConfiguration();
+
+  useEffect(() => {
+    const dlcBTCContract = getEthereumContractWithDefaultNode(
+      ethereumContractDeploymentPlans,
+      ethereumNetwork,
+      'DLCBTC'
+    );
+    setDLCBTCContract(dlcBTCContract);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ethereumNetwork]);
 
   const fetchTotalSupply = async () => {
-    const supplies = await Promise.all(
-      enabledEthereumNetworks.map(network => getTotalSupply(network))
-    );
-
-    const totalSupply = supplies.reduce((a, b) => a + b, 0);
+    if (!dlcBTCContract) return;
+    const totalSupply = await getDLCBTCTotalSupply(dlcBTCContract);
 
     return unshiftValue(totalSupply);
   };
@@ -39,20 +49,6 @@ export function useTotalSupply(): UseTotalSupplyReturnType {
     }, 3500);
     return () => clearTimeout(delayFetching);
   }, []);
-
-  async function getTotalSupply(ethereumNetwork: EthereumNetwork): Promise<number> {
-    try {
-      const protocolContract = await getDefaultProvider(ethereumNetwork, 'DLCBTC');
-
-      const totalSupply = await protocolContract.totalSupply();
-
-      return totalSupply.toNumber();
-    } catch (error) {
-      throw new EthereumError(
-        `Could not fetch Total Supply Info for ${ethereumNetwork.name} : ${error}}`
-      );
-    }
-  }
 
   return {
     totalSupply,

@@ -1,20 +1,20 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 
 import { Button, VStack, useToast } from '@chakra-ui/react';
-import { useEthereum } from '@hooks/use-ethereum';
 import { EthereumError } from '@models/error-types';
+import { EthereumHandlerContext } from '@providers/ethereum-handler-context-provider';
 
 export function SetupVaultScreen(): React.JSX.Element {
   const toast = useToast();
 
-  const { setupVault } = useEthereum();
+  const { ethereumHandler } = useContext(EthereumHandlerContext);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSetup() {
     try {
       setIsSubmitting(true);
-      await setupVault();
+      await ethereumHandler?.setupVault();
     } catch (error) {
       setIsSubmitting(false);
       toast({

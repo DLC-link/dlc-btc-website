@@ -1,6 +1,6 @@
 import { Button, HStack, Image, Spinner, Text, VStack } from '@chakra-ui/react';
 import { VaultCard } from '@components/vault/vault-card';
-import { useEthereumAccount } from '@hooks/use-ethereum-account';
+import { useEthereumHandler } from '@hooks/use-ethereum-handler';
 import { Vault } from '@models/vault';
 
 interface VaultsListGroupContainerProps {
@@ -18,7 +18,7 @@ export function VaultsListGroupContainer({
   isSelectable = false,
   handleSelect,
 }: VaultsListGroupContainerProps): React.JSX.Element | boolean {
-  const { recommendTokenToMetamask } = useEthereumAccount();
+  const { recommendTokenToMetamask } = useEthereumHandler();
 
   if (vaults.length === 0) return false;
 

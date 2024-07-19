@@ -2,39 +2,50 @@ import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
 
+import { getEthereumContractWithDefaultNode } from '@functions/configuration.functions';
 import { Merchant, MerchantProofOfReserve } from '@models/merchant';
 import { RootState } from '@store/index';
 import { ProofOfReserveHandler } from 'dlc-btc-lib';
+import { getAttestorGroupPublicKey, getContractVaults } from 'dlc-btc-lib/ethereum-functions';
 import { RawVault } from 'dlc-btc-lib/models';
 import { unshiftValue } from 'dlc-btc-lib/utilities';
+import { Contract } from 'ethers';
 
 import { BITCOIN_NETWORK_MAP } from '@shared/constants/bitcoin.constants';
 
-import { useEthereum } from './use-ethereum';
+import { useEthereumConfiguration } from './use-ethereum-configuration';
 
 interface UseProofOfReserveReturnType {
   proofOfReserve: [number | undefined, MerchantProofOfReserve[]] | undefined;
 }
 
 export function useProofOfReserve(): UseProofOfReserveReturnType {
-  const { retrieveAllVaults, getAttestorGroupPublicKey } = useEthereum();
-  const { network } = useSelector((state: RootState) => state.account);
+  const { network: ethereumNetwork } = useSelector((state: RootState) => state.account);
 
+  const { ethereumContractDeploymentPlans } = useEthereumConfiguration();
+
+  const [dlcManagerContract, setDLCManagerContract] = useState<Contract | undefined>(undefined);
   const [proofOfReserveHandler, setProofOfReserveHandler] = useState<
     ProofOfReserveHandler | undefined
   >(undefined);
 
   useEffect(() => {
-    const fetchProofOfReserveHandler = async () => {
-      await getProofOfReserveHandler();
+    const fetchProofOfReserveHandlerAndDLCManagerContract = async () => {
+      await getProofOfReserveHandlerAndDLCManagerContract();
     };
-    void fetchProofOfReserveHandler();
+    void fetchProofOfReserveHandlerAndDLCManagerContract();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [network]);
+  }, [ethereumNetwork]);
 
-  async function getProofOfReserveHandler(): Promise<void> {
-    const attestorPublicKey = await getAttestorGroupPublicKey();
+  async function getProofOfReserveHandlerAndDLCManagerContract(): Promise<void> {
+    const dlcManagerContract = getEthereumContractWithDefaultNode(
+      ethereumContractDeploymentPlans,
+      ethereumNetwork,
+      'DLCManager'
+    );
+
+    const attestorPublicKey = await getAttestorGroupPublicKey(dlcManagerContract);
 
     const proofOfReserveHandler = new ProofOfReserveHandler(
       appConfiguration.bitcoinBlockchainURL,
@@ -42,6 +53,7 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
       attestorPublicKey
     );
 
+    setDLCManagerContract(dlcManagerContract);
     setProofOfReserveHandler(proofOfReserveHandler);
   }
 
@@ -53,9 +65,7 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
   async function calculateProofOfReserve(): Promise<
     [number | undefined, MerchantProofOfReserve[]]
   > {
-    const allVaults = await retrieveAllVaults(network);
-
-    if (!proofOfReserveHandler) {
+    if (!proofOfReserveHandler || !dlcManagerContract) {
       return [
         undefined,
         appConfiguration.merchants.map((merchant: Merchant) => {
@@ -66,6 +76,8 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
         }),
       ];
     }
+
+    const allVaults = await getContractVaults(dlcManagerContract);
 
     const proofOfReserve = await proofOfReserveHandler.calculateProofOfReserve(allVaults);
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
+import { getEthereumNetworkDeploymentPlans } from '@functions/configuration.functions';
 import {
   DetailedEvent,
   PointsData,
@@ -8,9 +9,9 @@ import {
   TimeStampedEvent,
 } from '@models/ethereum-models';
 import Decimal from 'decimal.js';
+import { EthereumNetwork } from 'dlc-btc-lib/models';
 
 import { RootState } from '../store';
-import { useEthereum } from './use-ethereum';
 
 interface UsePointsReturnType {
   userPoints: PointsData | undefined;
@@ -93,9 +94,43 @@ export function calculatePoints(
   return totalRewards;
 }
 
+async function fetchTransfersForUser(
+  ethereumNetwork: EthereumNetwork,
+  userAddress: string,
+  contractAddress?: string
+): Promise<DetailedEvent[]> {
+  const providerURL = ethereumNetwork.defaultNodeURL;
+
+  if (!contractAddress) {
+    const dlcBTCContract = getEthereumNetworkDeploymentPlans(ethereumNetwork).find(
+      plan => plan.contract.name === 'DLCBTC'
+    );
+
+    if (!dlcBTCContract) {
+      throw new Error('DLCBTC Contract not found in Deployment Plans');
+    }
+    contractAddress = dlcBTCContract.contract.address;
+  }
+
+  const req = await fetch(
+    `/.netlify/functions/fetch-transfer-events?providerURL=${providerURL}&contractAddress=${contractAddress}&userAddress=${userAddress}`
+  );
+
+  if (!req.ok) {
+    // throw new Error(`HTTP error! status: ${req.status}`);
+    return [];
+  }
+
+  const events = await req.json();
+  const detailedEvents: DetailedEvent[] = events.detailedEvents;
+
+  return detailedEvents;
+}
+
 export function usePoints(): UsePointsReturnType {
-  const { address: userAddress } = useSelector((state: RootState) => state.account);
-  const { fetchTransfersForUser } = useEthereum();
+  const { address: userAddress, network: ethereumNetwork } = useSelector(
+    (state: RootState) => state.account
+  );
 
   const [userPoints, setUserPoints] = useState<PointsData | undefined>(undefined);
 
@@ -105,7 +140,7 @@ export function usePoints(): UsePointsReturnType {
       name: 'dlcBTC',
       multiplier: 1,
       getRollingTVL: async (userAddress: string): Promise<TimeStampedEvent[]> => {
-        const events = await fetchTransfersForUser(userAddress);
+        const events = await fetchTransfersForUser(ethereumNetwork, userAddress);
         events.sort((a, b) => a.timestamp - b.timestamp);
         const rollingTVL = calculateRollingTVL(events, userAddress);
         return rollingTVL;
@@ -120,7 +155,7 @@ export function usePoints(): UsePointsReturnType {
         if (!gaugeAddress) {
           return [];
         }
-        const events = await fetchTransfersForUser(userAddress, gaugeAddress);
+        const events = await fetchTransfersForUser(ethereumNetwork, userAddress, gaugeAddress);
         events.sort((a, b) => a.timestamp - b.timestamp);
         const rollingTVL = calculateRollingTVL(events, userAddress);
         return rollingTVL;

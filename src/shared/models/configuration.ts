@@ -19,6 +19,8 @@ export interface Configuration {
   appEnvironment: AppEnvironment;
   attestorURLs: string[];
   enabledEthereumNetworkIDs: string[];
+  ethereumContractInformations: any[];
+  ethereumInfuraWebsocketURL: string;
   bitcoinNetwork: BitcoinNetworkName;
   bitcoinNetworkIndex: number;
   bitcoinNetworkPreFix: BitcoinNetworkPrefix;
