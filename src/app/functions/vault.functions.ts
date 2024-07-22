@@ -22,6 +22,9 @@ export function formatVault(vault: RawVault): Vault {
   };
 }
 
-export function getAndFormatVault(vaultUUID: string, dlcManagerContract: Contract): Promise<Vault> {
+export async function getAndFormatVault(
+  vaultUUID: string,
+  dlcManagerContract: Contract
+): Promise<Vault> {
   return getRawVault(dlcManagerContract, vaultUUID).then((vault: RawVault) => formatVault(vault));
 }

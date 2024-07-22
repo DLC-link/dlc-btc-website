@@ -1,7 +1,7 @@
 import { ContractInformation } from '@models/ethereum-models';
-import { getEthereumContract } from 'dlc-btc-lib/ethereum-functions';
+import { getEthereumContract, getProvider } from 'dlc-btc-lib/ethereum-functions';
 import { EthereumDeploymentPlan, EthereumNetwork } from 'dlc-btc-lib/models';
-import { Contract, ethers } from 'ethers';
+import { Contract } from 'ethers';
 import { isNil } from 'ramda';
 
 export function getEthereumNetworkDeploymentPlans(
@@ -20,12 +20,13 @@ export function getEthereumNetworkDeploymentPlans(
   return ethereumNetworkDeploymentPlans.contractInformation;
 }
 
-export function getEthereumContractWithDefaultNode(
+export function getEthereumContractWithProvider(
   contractDeploymentPlans: EthereumDeploymentPlan[],
   ethereumNetwork: EthereumNetwork,
-  contractName: string
+  contractName: string,
+  rpcEndpoint: string
 ): Contract {
-  const provider = new ethers.providers.JsonRpcProvider(ethereumNetwork.defaultNodeURL);
+  const provider = getProvider(rpcEndpoint ?? ethereumNetwork.defaultNodeURL);
 
   return getEthereumContract(contractDeploymentPlans, contractName, provider);
 }

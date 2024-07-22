@@ -2,15 +2,16 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { getEthereumNetworkDeploymentPlans } from '@functions/configuration.functions';
+import {
+  getEthereumContractWithProvider,
+  getEthereumNetworkDeploymentPlans,
+} from '@functions/configuration.functions';
 import { getAndFormatVault } from '@functions/vault.functions';
 import { RootState } from '@store/index';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { modalActions } from '@store/slices/modal/modal.actions';
 import { vaultActions } from '@store/slices/vault/vault.actions';
-import { getEthereumContract } from 'dlc-btc-lib/ethereum-functions';
 import { delay } from 'dlc-btc-lib/utilities';
-import { ethers } from 'ethers';
 
 export function useEthereumObserver(): void {
   const dispatch = useDispatch();
@@ -23,10 +24,12 @@ export function useEthereumObserver(): void {
     if (!ethereumUserAddress) return;
 
     const deploymentPlans = getEthereumNetworkDeploymentPlans(ethereumNetwork);
-    const provider = new ethers.providers.WebSocketProvider(
+    const dlcManagerContract = getEthereumContractWithProvider(
+      deploymentPlans,
+      ethereumNetwork,
+      'DLCManager',
       appConfiguration.ethereumInfuraWebsocketURL
     );
-    const dlcManagerContract = getEthereumContract(deploymentPlans, 'DLCManager', provider);
 
     console.log(`Listening to [${ethereumNetwork.name}]`);
     console.log(`Listening to [${dlcManagerContract.address}]`);
