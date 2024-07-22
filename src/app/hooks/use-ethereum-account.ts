@@ -34,13 +34,6 @@ function alertNonMetaMaskProvider(): void {
   throw new Error('Non-MetaMask Ethereum provider');
 }
 
-function alertNetworkNotSupported(ethereumNetworkID: string): void {
-  alert(
-    'Your current Ethereum network is not supported. Please switch to the Arbitrum network, then reload the page.'
-  );
-  throw new Error(`Unsupported Ethereum network, ID: ${ethereumNetworkID}`);
-}
-
 export function useEthereumAccount(): UseEthereumAccountReturnType {
   const { dlcBTCContract, getEthereumContracts } = useEthereumContext();
 
@@ -152,23 +145,11 @@ export function useEthereumAccount(): UseEthereumAccountReturnType {
     }
   }
 
-  async function getEthereumSigner(walletProvider: any, network: EthereumNetwork) {
+  async function getEthereumSigner(walletProvider: any) {
     try {
       const browserProvider = new ethers.providers.Web3Provider(walletProvider, 'any');
 
-      const signer = browserProvider.getSigner();
-      const walletNetwork = await browserProvider.getNetwork();
-      const walletNetworkID = walletNetwork.chainId.toString();
-
-      if (!Object.values(EthereumNetworkID).includes(walletNetworkID as EthereumNetworkID)) {
-        alertNetworkNotSupported(walletNetworkID);
-      }
-
-      if (walletNetworkID !== network.id) {
-        await switchEthereumNetwork(walletProvider, network.id);
-        window.location.reload();
-      }
-      return signer;
+      return browserProvider.getSigner();
     } catch (error) {
       throw new Error(`Could not get Ethereum signer: ${error}`);
     }
@@ -178,13 +159,20 @@ export function useEthereumAccount(): UseEthereumAccountReturnType {
     try {
       setIsLoaded(false);
 
-      const walletProvider = getWalletProvider(walletType);
+      let walletProvider = getWalletProvider(walletType);
+
+      const networkId = walletProvider.networkVersion;
+
+      if (networkId !== network.id) {
+        await switchEthereumNetwork(walletProvider, network.id);
+        walletProvider = getWalletProvider(walletType);
+      }
 
       const ethereumAccounts = await walletProvider.request({
         method: 'eth_requestAccounts',
       });
 
-      const ethereumSigner = await getEthereumSigner(walletProvider, ethereumNetwork);
+      const ethereumSigner = await getEthereumSigner(walletProvider);
 
       await getEthereumContracts(ethereumSigner, ethereumNetwork);
 
