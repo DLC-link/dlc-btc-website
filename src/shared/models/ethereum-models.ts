@@ -25,11 +25,6 @@ export interface DetailedEvent {
   txHash: string;
 }
 
-export interface ContractInformation {
-  name: string;
-  contractInformation: EthereumDeploymentPlan[];
-}
-
 export interface ProtocolRewards {
   name: string;
   points: number;

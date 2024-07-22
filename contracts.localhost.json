@@ -1,13 +1,13 @@
 {
-  "arbsepolia": [
+  "hardhat": [
     {
-      "network": "arbsepolia",
-      "updatedAt": "2024-07-15T15:09:23.623Z",
-      "gitSHA": "13f76b6",
+      "network": "localhost",
+      "updatedAt": "2024-07-16T09:27:49.731Z",
+      "gitSHA": "N/A",
       "contract": {
         "name": "DLCManager",
-        "address": "0xE8FA6399d1b60968f04888F23Ed13Ed499C1Fd51",
-        "signerAddress": "0xBf7184178d610D7B0239a5CB8D64c1Df22d306a9",
+        "address": "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9",
+        "signerAddress": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
         "abi": [
           "constructor()",
           "error ClosingFundedVault()",
@@ -137,13 +137,13 @@
       }
     },
     {
-      "network": "arbsepolia",
-      "updatedAt": "2024-06-17T13:33:28.663Z",
-      "gitSHA": "b0905e1",
+      "network": "localhost",
+      "updatedAt": "2024-07-16T09:27:49.232Z",
+      "gitSHA": "N/A",
       "contract": {
         "name": "DLCBTC",
-        "address": "0xFfb72b5f195F18741101A732e7AfAE72b61D48a4",
-        "signerAddress": "0xBf7184178d610D7B0239a5CB8D64c1Df22d306a9",
+        "address": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+        "signerAddress": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
         "abi": [
           "constructor()",
           "error BlacklistedRecipient()",

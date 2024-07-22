@@ -2,11 +2,11 @@
   "arbsepolia": [
     {
       "network": "arbsepolia",
-      "updatedAt": "2024-07-15T15:09:23.623Z",
-      "gitSHA": "13f76b6",
+      "updatedAt": "2024-07-11T11:37:40.298Z",
+      "gitSHA": "bd98401",
       "contract": {
         "name": "DLCManager",
-        "address": "0xE8FA6399d1b60968f04888F23Ed13Ed499C1Fd51",
+        "address": "0xe29d3648a1256F015D7A60F9aAC690187e156740",
         "signerAddress": "0xBf7184178d610D7B0239a5CB8D64c1Df22d306a9",
         "abi": [
           "constructor()",
@@ -14,8 +14,7 @@
           "error ContractNotWhitelisted()",
           "error DLCNotFound()",
           "error DLCNotFunded()",
-          "error DLCNotPending()",
-          "error DLCNotReadyOrFunded()",
+          "error DLCNotReadyOrPending()",
           "error DepositTooLarge(uint256 deposit, uint256 maximumDeposit)",
           "error DepositTooSmall(uint256 deposit, uint256 minimumDeposit)",
           "error DuplicateSignature()",
@@ -95,7 +94,6 @@
           "function hasRole(bytes32 role, address account) view returns (bool)",
           "function importData(address _dlcBTC, string _btcFeeRecipient, uint256 _minimumDeposit, uint256 _maximumDeposit, uint256 _btcMintFeeRate, uint256 _btcRedeemFeeRate, bool _whitelistingEnabled)",
           "function initialize(address defaultAdmin, address dlcAdminRole, uint16 threshold, address tokenContract, string btcFeeRecipientToSet)",
-          "function isWhitelisted(address account) view returns (bool)",
           "function maximumDeposit() view returns (uint256)",
           "function minimumDeposit() view returns (uint256)",
           "function owner() view returns (address)",
@@ -138,11 +136,11 @@
     },
     {
       "network": "arbsepolia",
-      "updatedAt": "2024-06-17T13:33:28.663Z",
-      "gitSHA": "b0905e1",
+      "updatedAt": "2024-07-01T13:16:33.314Z",
+      "gitSHA": "9e13221",
       "contract": {
         "name": "DLCBTC",
-        "address": "0xFfb72b5f195F18741101A732e7AfAE72b61D48a4",
+        "address": "0x685437f025c5f33A94818408C286bc1F023201Fc",
         "signerAddress": "0xBf7184178d610D7B0239a5CB8D64c1Df22d306a9",
         "abi": [
           "constructor()",

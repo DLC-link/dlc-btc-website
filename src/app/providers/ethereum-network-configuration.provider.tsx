@@ -38,7 +38,7 @@ const defaultEthereumNetworkConfiguration = {
     getEthereumNetworkByID(id as EthereumNetworkID)
   ),
   ethereumContractDeploymentPlans: getEthereumNetworkDeploymentPlans(
-    getEthereumNetworkByID(EthereumNetworkID.ArbitrumSepolia)
+    getEthereumNetworkByID(appConfiguration.enabledEthereumNetworkIDs[0])
   ),
 };
 
