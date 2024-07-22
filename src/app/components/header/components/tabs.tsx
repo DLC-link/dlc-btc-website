@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { HStack } from '@chakra-ui/react';
 import { TabButton } from '@components/tab-button/tab-button';
-import { getEthereumContractWithDefaultNode } from '@functions/configuration.functions';
-import { useEthereumConfiguration } from '@hooks/use-ethereum-configuration';
+import { getEthereumContractWithProvider } from '@functions/configuration.functions';
+import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { RootState } from '@store/index';
 import { isUserWhitelisted, isWhitelistingEnabled } from 'dlc-btc-lib/ethereum-functions';
 
@@ -19,14 +19,14 @@ export function NavigationTabs({
 }: NavigationTabsProps): React.JSX.Element {
   const { address, network: ethereumNetwork } = useSelector((state: RootState) => state.account);
   const [showDisplayMintBurn, setShowDisplayMintBurn] = useState<boolean>(false);
-  const { ethereumContractDeploymentPlans } = useEthereumConfiguration();
+  const { ethereumContractDeploymentPlans } = useContext(EthereumNetworkConfigurationContext);
 
   useEffect(() => {
     async function checkWhitelisting(address?: string) {
       const result = async () => {
         if (!address) return false;
 
-        const dlcManagerContract = getEthereumContractWithDefaultNode(
+        const dlcManagerContract = getEthereumContractWithProvider(
           ethereumContractDeploymentPlans,
           ethereumNetwork,
           'DLCManager'

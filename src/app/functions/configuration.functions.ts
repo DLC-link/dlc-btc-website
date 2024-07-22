@@ -24,9 +24,11 @@ export function getEthereumContractWithProvider(
   contractDeploymentPlans: EthereumDeploymentPlan[],
   ethereumNetwork: EthereumNetwork,
   contractName: string,
-  rpcEndpoint: string
+  rpcEndpoint?: string
 ): Contract {
-  const provider = getProvider(rpcEndpoint ?? ethereumNetwork.defaultNodeURL);
-
-  return getEthereumContract(contractDeploymentPlans, contractName, provider);
+  return getEthereumContract(
+    contractDeploymentPlans,
+    contractName,
+    getProvider(rpcEndpoint ?? ethereumNetwork.defaultNodeURL)
+  );
 }

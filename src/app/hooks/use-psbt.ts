@@ -6,6 +6,7 @@ import { BitcoinWalletType } from '@models/wallet';
 import { bytesToHex } from '@noble/hashes/utils';
 import { BitcoinWalletContext } from '@providers/bitcoin-wallet-context-provider';
 import { EthereumHandlerContext } from '@providers/ethereum-handler-context-provider';
+import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { RootState } from '@store/index';
 import { LedgerDLCHandler, SoftwareWalletDLCHandler } from 'dlc-btc-lib';
 import {
@@ -14,7 +15,6 @@ import {
 } from 'dlc-btc-lib/attestor-request-functions';
 import { Transaction, VaultState } from 'dlc-btc-lib/models';
 
-import { useEthereumConfiguration } from './use-ethereum-configuration';
 import { useLeather } from './use-leather';
 import { useLedger } from './use-ledger';
 
@@ -47,7 +47,7 @@ export function usePSBT(): UsePSBTReturnType {
 
   const { ethereumHandler } = useContext(EthereumHandlerContext);
 
-  const { ethereumAttestorChainID } = useEthereumConfiguration();
+  const { ethereumAttestorChainID } = useContext(EthereumNetworkConfigurationContext);
 
   const [bitcoinDepositAmount, setBitcoinDepositAmount] = useState(0);
 

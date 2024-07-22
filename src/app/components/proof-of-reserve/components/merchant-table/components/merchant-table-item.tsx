@@ -17,7 +17,6 @@ export function MerchantTableItem({
   const { name } = merchant;
   const navigate = useNavigate();
 
-  //const { ethereumExplorerAPIURL } = useEthereumConfiguration();
   return (
     <HStack w={'100%'} justifyContent={'space-between'}>
       <HStack w={'150px'}>

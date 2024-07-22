@@ -15,13 +15,6 @@ function alertNonMetaMaskProvider(): void {
   throw new Error('Non-MetaMask Ethereum provider');
 }
 
-function alertNetworkNotSupported(ethereumNetworkID: string): void {
-  alert(
-    'Your current Ethereum network is not supported. Please switch to the correct Ethereum network, then reload the page.'
-  );
-  throw new Error(`Unsupported Ethereum network, ID: ${ethereumNetworkID}`);
-}
-
 function validateMetaMask(provider: any): boolean {
   return (
     typeof provider === 'object' &&
@@ -122,10 +115,6 @@ async function getEthereumSigner(walletProvider: any, network: EthereumNetwork) 
     const signer = browserProvider.getSigner();
     const walletNetwork = await browserProvider.getNetwork();
     const walletNetworkID = walletNetwork.chainId.toString();
-
-    if (!Object.values(EthereumNetworkID).includes(walletNetworkID as EthereumNetworkID)) {
-      alertNetworkNotSupported(walletNetworkID);
-    }
 
     if (walletNetworkID !== network.id) {
       await switchEthereumNetwork(walletProvider, network.id);

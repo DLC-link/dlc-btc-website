@@ -1,14 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
 
-import { getEthereumContractWithDefaultNode } from '@functions/configuration.functions';
+import { getEthereumContractWithProvider } from '@functions/configuration.functions';
+import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { RootState } from '@store/index';
 import { getDLCBTCTotalSupply } from 'dlc-btc-lib/ethereum-functions';
 import { unshiftValue } from 'dlc-btc-lib/utilities';
 import { Contract } from 'ethers';
-
-import { useEthereumConfiguration } from './use-ethereum-configuration';
 
 interface UseTotalSupplyReturnType {
   totalSupply: number | undefined;
@@ -19,10 +18,10 @@ export function useTotalSupply(): UseTotalSupplyReturnType {
   const [shouldFetch, setShouldFetch] = useState(false);
   const [dlcBTCContract, setDLCBTCContract] = useState<Contract | undefined>(undefined);
 
-  const { ethereumContractDeploymentPlans } = useEthereumConfiguration();
+  const { ethereumContractDeploymentPlans } = useContext(EthereumNetworkConfigurationContext);
 
   useEffect(() => {
-    const dlcBTCContract = getEthereumContractWithDefaultNode(
+    const dlcBTCContract = getEthereumContractWithProvider(
       ethereumContractDeploymentPlans,
       ethereumNetwork,
       'DLCBTC'

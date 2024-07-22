@@ -1,12 +1,10 @@
 /* eslint-disable no-console */
-import { useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import {
-  getEthereumContractWithProvider,
-  getEthereumNetworkDeploymentPlans,
-} from '@functions/configuration.functions';
+import { getEthereumContractWithProvider } from '@functions/configuration.functions';
 import { getAndFormatVault } from '@functions/vault.functions';
+import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { RootState } from '@store/index';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { modalActions } from '@store/slices/modal/modal.actions';
@@ -20,12 +18,13 @@ export function useEthereumObserver(): void {
     (state: RootState) => state.account
   );
 
+  const { ethereumContractDeploymentPlans } = useContext(EthereumNetworkConfigurationContext);
+
   useEffect(() => {
     if (!ethereumUserAddress) return;
 
-    const deploymentPlans = getEthereumNetworkDeploymentPlans(ethereumNetwork);
     const dlcManagerContract = getEthereumContractWithProvider(
-      deploymentPlans,
+      ethereumContractDeploymentPlans,
       ethereumNetwork,
       'DLCManager',
       appConfiguration.ethereumInfuraWebsocketURL

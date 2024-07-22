@@ -5,11 +5,11 @@ import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { Divider, HStack, Icon, Image, Link, Text } from '@chakra-ui/react';
-import { getEthereumContractWithDefaultNode } from '@functions/configuration.functions';
+import { getEthereumContractWithProvider } from '@functions/configuration.functions';
 import { fetchMintBurnEvents } from '@functions/ethereum.functions';
-import { useEthereumConfiguration } from '@hooks/use-ethereum-configuration';
 import { Merchant } from '@models/merchant';
 import { bitcoin, dlcBTC } from '@models/token';
+import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
 import { RootState } from '@store/index';
 
@@ -36,7 +36,7 @@ export function MerchantDetails(): React.JSX.Element {
   ];
   const selectedMerchant = merchantProofOfReserves.find(item => item.merchant.name === name);
 
-  const { ethereumContractDeploymentPlans } = useEthereumConfiguration();
+  const { ethereumContractDeploymentPlans } = useContext(EthereumNetworkConfigurationContext);
 
   const { data: mintBurnEvents } = useQuery([`mintBurnEvents${name}`], fetchMintBurnEventsHandler);
   const { network: ethereumNetwork } = useSelector((state: RootState) => state.account);
@@ -44,7 +44,7 @@ export function MerchantDetails(): React.JSX.Element {
 
   async function fetchMintBurnEventsHandler(): Promise<MerchantDetailsTableItemProps[]> {
     if (!selectedMerchant?.merchant.address) return [];
-    const dlcBTCContract = getEthereumContractWithDefaultNode(
+    const dlcBTCContract = getEthereumContractWithProvider(
       ethereumContractDeploymentPlans,
       ethereumNetwork,
       'DLCBTC'

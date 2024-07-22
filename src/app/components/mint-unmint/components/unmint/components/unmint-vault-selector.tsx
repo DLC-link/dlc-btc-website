@@ -4,11 +4,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Text, VStack, useToast } from '@chakra-ui/react';
 import { VaultsListGroupContainer } from '@components/vaults-list/components/vaults-list-group-container';
 import { VaultsList } from '@components/vaults-list/vaults-list';
-import { getEthereumContractWithDefaultNode } from '@functions/configuration.functions';
+import { getEthereumContractWithProvider } from '@functions/configuration.functions';
 import { getAndFormatVault } from '@functions/vault.functions';
-import { useEthereumConfiguration } from '@hooks/use-ethereum-configuration';
 import { Vault } from '@models/vault';
 import { EthereumHandlerContext } from '@providers/ethereum-handler-context-provider';
+import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
 import { VaultContext } from '@providers/vault-context-provider';
 import { RootState } from '@store/index';
@@ -43,7 +43,7 @@ export function UnmintVaultSelector({
 
   const [selectedVault, setSelectedVault] = useState<Vault | undefined>();
 
-  const { ethereumContractDeploymentPlans } = useEthereumConfiguration();
+  const { ethereumContractDeploymentPlans } = useContext(EthereumNetworkConfigurationContext);
 
   const { network: ethereumNetwork } = useSelector((state: RootState) => state.account);
 
@@ -65,7 +65,7 @@ export function UnmintVaultSelector({
         const formattedWithdrawAmount = BigInt(shiftValue(withdrawAmount));
         await ethereumHandler?.withdraw(selectedVault.uuid, formattedWithdrawAmount);
 
-        const dlcManagerContract = getEthereumContractWithDefaultNode(
+        const dlcManagerContract = getEthereumContractWithProvider(
           ethereumContractDeploymentPlans,
           ethereumNetwork,
           'DLCManager'

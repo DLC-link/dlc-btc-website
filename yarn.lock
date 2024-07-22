@@ -3872,8 +3872,10 @@ dir-glob@^3.0.1:
   dependencies:
     path-type "^4.0.0"
 
-"dlc-btc-lib@file:../dlc-btc-lib":
-  version "2.0.0"
+dlc-btc-lib@2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/dlc-btc-lib/-/dlc-btc-lib-2.1.0.tgz#827bf112ca6f31d6b2bf72c6216fe6ccbc316b94"
+  integrity sha512-+g4+0qR2E2nFEwLt0TbKVK2fo+shKKCodvN5z+rbfvt4wK38YuwrOeRV6/VJMDwn0M4obUD7TT5Y3h8qUqvSBw==
   dependencies:
     "@ledgerhq/hw-app-btc" "^10.2.4"
     "@noble/hashes" "^1.4.0"

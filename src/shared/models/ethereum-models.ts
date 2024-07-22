@@ -1,4 +1,16 @@
-import { EthereumDeploymentPlan } from 'dlc-btc-lib/models';
+import { EthereumDeploymentPlan, EthereumNetwork } from 'dlc-btc-lib/models';
+
+export interface EthereumNetworkConfiguration {
+  ethereumExplorerAPIURL: string;
+  ethereumAttestorChainID: 'evm-arbitrum' | 'evm-arbsepolia' | 'evm-localhost';
+  enabledEthereumNetworks: EthereumNetwork[];
+  ethereumContractDeploymentPlans: EthereumDeploymentPlan[];
+}
+
+export interface StaticEthereumNetworkSettings {
+  ethereumExplorerAPIURL: string;
+  ethereumAttestorChainID: 'evm-arbitrum' | 'evm-arbsepolia' | 'evm-localhost';
+}
 
 export interface TimeStampedEvent {
   timestamp: number;

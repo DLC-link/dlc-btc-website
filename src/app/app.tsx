@@ -12,6 +12,7 @@ import { BalanceContextProvider } from '@providers/balance-context-provider';
 import { BlockchainHeightContextProvider } from '@providers/bitcoin-query-provider';
 import { BitcoinWalletContextProvider } from '@providers/bitcoin-wallet-context-provider';
 import { EthereumHandlerContextProvider } from '@providers/ethereum-handler-context-provider';
+import { EthereumNetworkConfigurationContextProvider } from '@providers/ethereum-network-configuration.provider';
 import { EthereumObserverProvider } from '@providers/ethereum-observer-provider';
 import { ProofOfReserveContextProvider } from '@providers/proof-of-reserve-context-provider';
 
@@ -24,33 +25,35 @@ const queryClient = new QueryClient();
 export function App(): React.JSX.Element {
   return (
     <QueryClientProvider client={queryClient}>
-      <EthereumHandlerContextProvider>
-        <EthereumObserverProvider>
-          <BitcoinWalletContextProvider>
-            <VaultContextProvider>
-              <BlockchainHeightContextProvider>
-                <BalanceContextProvider>
-                  <ProofOfReserveContextProvider>
-                    <AppLayout>
-                      <Route path="/" element={<PointsPage />} />
-                      <Route path="/my-vaults" element={<MyVaults />} />
-                      <Route path="/how-it-works" element={<About />} />
-                      <Route path="/proof-of-reserve" element={<ProofOfReservePage />} />
-                      <Route path="/attestor-details" element={<AttestorDetailsPage />} />
-                      <Route
-                        path="/attestor-details-select"
-                        element={<AttestorDetailsSelectPage />}
-                      />
-                      <Route path="/merchant-details/:name" element={<MerchantDetails />} />
-                      <Route path="/mint-withdraw" element={<Dashboard />} />
-                    </AppLayout>
-                  </ProofOfReserveContextProvider>
-                </BalanceContextProvider>
-              </BlockchainHeightContextProvider>
-            </VaultContextProvider>
-          </BitcoinWalletContextProvider>
-        </EthereumObserverProvider>
-      </EthereumHandlerContextProvider>
+      <EthereumNetworkConfigurationContextProvider>
+        <EthereumHandlerContextProvider>
+          <EthereumObserverProvider>
+            <BitcoinWalletContextProvider>
+              <VaultContextProvider>
+                <BlockchainHeightContextProvider>
+                  <BalanceContextProvider>
+                    <ProofOfReserveContextProvider>
+                      <AppLayout>
+                        <Route path="/" element={<PointsPage />} />
+                        <Route path="/my-vaults" element={<MyVaults />} />
+                        <Route path="/how-it-works" element={<About />} />
+                        <Route path="/proof-of-reserve" element={<ProofOfReservePage />} />
+                        <Route path="/attestor-details" element={<AttestorDetailsPage />} />
+                        <Route
+                          path="/attestor-details-select"
+                          element={<AttestorDetailsSelectPage />}
+                        />
+                        <Route path="/merchant-details/:name" element={<MerchantDetails />} />
+                        <Route path="/mint-withdraw" element={<Dashboard />} />
+                      </AppLayout>
+                    </ProofOfReserveContextProvider>
+                  </BalanceContextProvider>
+                </BlockchainHeightContextProvider>
+              </VaultContextProvider>
+            </BitcoinWalletContextProvider>
+          </EthereumObserverProvider>
+        </EthereumHandlerContextProvider>
+      </EthereumNetworkConfigurationContextProvider>
     </QueryClientProvider>
   );
 }

@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
 
-import { getEthereumContractWithDefaultNode } from '@functions/configuration.functions';
+import { getEthereumContractWithProvider } from '@functions/configuration.functions';
 import { Merchant, MerchantProofOfReserve } from '@models/merchant';
+import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { RootState } from '@store/index';
 import { ProofOfReserveHandler } from 'dlc-btc-lib';
 import { getAttestorGroupPublicKey, getContractVaults } from 'dlc-btc-lib/ethereum-functions';
@@ -13,8 +14,6 @@ import { Contract } from 'ethers';
 
 import { BITCOIN_NETWORK_MAP } from '@shared/constants/bitcoin.constants';
 
-import { useEthereumConfiguration } from './use-ethereum-configuration';
-
 interface UseProofOfReserveReturnType {
   proofOfReserve: [number | undefined, MerchantProofOfReserve[]] | undefined;
 }
@@ -22,7 +21,7 @@ interface UseProofOfReserveReturnType {
 export function useProofOfReserve(): UseProofOfReserveReturnType {
   const { network: ethereumNetwork } = useSelector((state: RootState) => state.account);
 
-  const { ethereumContractDeploymentPlans } = useEthereumConfiguration();
+  const { ethereumContractDeploymentPlans } = useContext(EthereumNetworkConfigurationContext);
 
   const [dlcManagerContract, setDLCManagerContract] = useState<Contract | undefined>(undefined);
   const [proofOfReserveHandler, setProofOfReserveHandler] = useState<
@@ -39,7 +38,7 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
   }, [ethereumNetwork]);
 
   async function getProofOfReserveHandlerAndDLCManagerContract(): Promise<void> {
-    const dlcManagerContract = getEthereumContractWithDefaultNode(
+    const dlcManagerContract = getEthereumContractWithProvider(
       ethereumContractDeploymentPlans,
       ethereumNetwork,
       'DLCManager'
