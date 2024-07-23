@@ -2,7 +2,6 @@
 import { useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { getEthereumContractWithProvider } from '@functions/configuration.functions';
 import { getAndFormatVault } from '@functions/vault.functions';
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { RootState } from '@store/index';
@@ -18,15 +17,12 @@ export function useEthereumObserver(): void {
     (state: RootState) => state.account
   );
 
-  const { ethereumContractDeploymentPlans } = useContext(EthereumNetworkConfigurationContext);
+  const { getReadOnlyDLCManagerContract } = useContext(EthereumNetworkConfigurationContext);
 
   useEffect(() => {
     if (!ethereumUserAddress) return;
 
-    const dlcManagerContract = getEthereumContractWithProvider(
-      ethereumContractDeploymentPlans,
-      ethereumNetwork,
-      'DLCManager',
+    const dlcManagerContract = getReadOnlyDLCManagerContract(
       appConfiguration.ethereumInfuraWebsocketURL
     );
 

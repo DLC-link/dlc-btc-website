@@ -1,38 +1,21 @@
 import { useContext, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
-import { useSelector } from 'react-redux';
 
-import { getEthereumContractWithProvider } from '@functions/configuration.functions';
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
-import { RootState } from '@store/index';
 import { getDLCBTCTotalSupply } from 'dlc-btc-lib/ethereum-functions';
 import { unshiftValue } from 'dlc-btc-lib/utilities';
-import { Contract } from 'ethers';
 
 interface UseTotalSupplyReturnType {
   totalSupply: number | undefined;
 }
 
 export function useTotalSupply(): UseTotalSupplyReturnType {
-  const { network: ethereumNetwork } = useSelector((state: RootState) => state.account);
   const [shouldFetch, setShouldFetch] = useState(false);
-  const [dlcBTCContract, setDLCBTCContract] = useState<Contract | undefined>(undefined);
 
-  const { ethereumContractDeploymentPlans } = useContext(EthereumNetworkConfigurationContext);
-
-  useEffect(() => {
-    const dlcBTCContract = getEthereumContractWithProvider(
-      ethereumContractDeploymentPlans,
-      ethereumNetwork,
-      'DLCBTC'
-    );
-    setDLCBTCContract(dlcBTCContract);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ethereumNetwork]);
+  const { getReadOnlyDLCBTCContract } = useContext(EthereumNetworkConfigurationContext);
 
   const fetchTotalSupply = async () => {
-    if (!dlcBTCContract) return;
-    const totalSupply = await getDLCBTCTotalSupply(dlcBTCContract);
+    const totalSupply = await getDLCBTCTotalSupply(getReadOnlyDLCBTCContract());
 
     return unshiftValue(totalSupply);
   };

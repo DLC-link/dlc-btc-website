@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
-import { getEthereumContractWithProvider } from '@functions/configuration.functions';
 import { HasChildren } from '@models/has-children';
 import { RootState } from '@store/index';
 import {
@@ -23,34 +22,28 @@ export const BalanceContext = createContext<VaultContextType>({
 });
 
 export function BalanceContextProvider({ children }: HasChildren): React.JSX.Element {
-  const { ethereumContractDeploymentPlans } = useContext(EthereumNetworkConfigurationContext);
-  const { address: ethereumUserAddress, network: ethereumNetwork } = useSelector(
-    (state: RootState) => state.account
+  const { getReadOnlyDLCBTCContract, getReadOnlyDLCManagerContract } = useContext(
+    EthereumNetworkConfigurationContext
   );
+  const { address: ethereumUserAddress } = useSelector((state: RootState) => state.account);
 
   const [dlcBTCBalance, setDLCBTCBalance] = useState<number | undefined>(undefined);
   const [lockedBTCBalance, setLockedBTCBalance] = useState<number | undefined>(undefined);
 
   const fetchBalancesIfReady = async (ethereumAddress: string) => {
-    const dlcManagerContract = getEthereumContractWithProvider(
-      ethereumContractDeploymentPlans,
-      ethereumNetwork,
-      'DLCManager'
+    const currentTokenBalance = await getAddressDLCBTCBalance(
+      getReadOnlyDLCBTCContract(),
+      ethereumAddress
     );
-
-    const dlcBTCContract = getEthereumContractWithProvider(
-      ethereumContractDeploymentPlans,
-      ethereumNetwork,
-      'DLCBTC'
-    );
-
-    const currentTokenBalance = await getAddressDLCBTCBalance(dlcBTCContract, ethereumAddress);
 
     if (currentTokenBalance !== dlcBTCBalance) {
       setDLCBTCBalance(currentTokenBalance);
     }
 
-    const userFundedVaults = await getAllAddressVaults(dlcManagerContract, ethereumAddress);
+    const userFundedVaults = await getAllAddressVaults(
+      getReadOnlyDLCManagerContract(),
+      ethereumAddress
+    );
     const currentLockedBTCBalance = await getLockedBTCBalance(userFundedVaults);
     if (currentLockedBTCBalance !== lockedBTCBalance) {
       setLockedBTCBalance(currentLockedBTCBalance);

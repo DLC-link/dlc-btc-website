@@ -4,10 +4,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Text, VStack, useToast } from '@chakra-ui/react';
 import { VaultsListGroupContainer } from '@components/vaults-list/components/vaults-list-group-container';
 import { VaultsList } from '@components/vaults-list/vaults-list';
-import {
-  getEthereumContractWithProvider,
-  getEthereumContractWithSigner,
-} from '@functions/configuration.functions';
 import { getAndFormatVault } from '@functions/vault.functions';
 import { Vault } from '@models/vault';
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
@@ -44,9 +40,11 @@ export function UnmintVaultSelector({
 
   const [selectedVault, setSelectedVault] = useState<Vault | undefined>();
 
-  const { ethereumContractDeploymentPlans } = useContext(EthereumNetworkConfigurationContext);
+  const { getDLCManagerContract, getReadOnlyDLCManagerContract } = useContext(
+    EthereumNetworkConfigurationContext
+  );
 
-  const { walletType, network: ethereumNetwork } = useSelector((state: RootState) => state.account);
+  const { network: ethereumNetwork } = useSelector((state: RootState) => state.account);
 
   function handleSelect(uuid: string): void {
     const vault = fundedVaults.find(vault => vault.uuid === uuid);
@@ -65,22 +63,12 @@ export function UnmintVaultSelector({
         if (currentRisk === 'High') throw new Error('Risk Level is too high');
         const formattedWithdrawAmount = BigInt(shiftValue(withdrawAmount));
 
-        const dlcManagerContract = await getEthereumContractWithSigner(
-          ethereumContractDeploymentPlans,
-          'DLCManager',
-          walletType,
-          ethereumNetwork
-        );
+        await withdraw(await getDLCManagerContract(), selectedVault.uuid, formattedWithdrawAmount);
 
-        await withdraw(dlcManagerContract, selectedVault.uuid, formattedWithdrawAmount);
-
-        const dlcManagerContractReadOnly = getEthereumContractWithProvider(
-          ethereumContractDeploymentPlans,
-          ethereumNetwork,
-          'DLCManager'
-        );
-
-        await getAndFormatVault(selectedVault.uuid, dlcManagerContractReadOnly)
+        await getAndFormatVault(
+          selectedVault.uuid,
+          getReadOnlyDLCManagerContract(appConfiguration.ethereumInfuraWebsocketURL)
+        )
           .then(vault => {
             dispatch(
               vaultActions.swapVault({

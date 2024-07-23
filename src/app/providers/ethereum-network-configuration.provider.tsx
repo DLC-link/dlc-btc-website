@@ -3,6 +3,8 @@ import { useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
 
 import {
+  getEthereumContractWithProvider,
+  getEthereumContractWithSigner,
   getEthereumNetworkByID,
   getEthereumNetworkDeploymentPlans,
 } from '@functions/configuration.functions';
@@ -13,6 +15,13 @@ import {
 import { HasChildren } from '@models/has-children';
 import { RootState } from '@store/index';
 import { EthereumNetworkID } from 'dlc-btc-lib/models';
+import { Contract } from 'ethers';
+
+interface EthereumNetworkConfigurationContext extends EthereumNetworkConfiguration {
+  getReadOnlyDLCManagerContract: (rpcEndpoint?: string) => Contract;
+  getReadOnlyDLCBTCContract: (rpcEndpoint?: string) => Contract;
+  getDLCManagerContract: (rpcEndpoint?: string) => Promise<Contract>;
+}
 
 const staticEthereumNetworkSettingsMap: Record<EthereumNetworkID, StaticEthereumNetworkSettings> = {
   [EthereumNetworkID.ArbitrumSepolia]: {
@@ -44,14 +53,24 @@ const defaultEthereumNetworkConfiguration = {
   ),
 };
 
-export const EthereumNetworkConfigurationContext = createContext<EthereumNetworkConfiguration>(
-  defaultEthereumNetworkConfiguration
-);
+export const EthereumNetworkConfigurationContext =
+  createContext<EthereumNetworkConfigurationContext>({
+    ...defaultEthereumNetworkConfiguration,
+    getDLCManagerContract: () => {
+      throw new Error('Not implemented');
+    },
+    getReadOnlyDLCManagerContract: () => {
+      throw new Error('Not implemented');
+    },
+    getReadOnlyDLCBTCContract: () => {
+      throw new Error('Not implemented');
+    },
+  });
 
 export function EthereumNetworkConfigurationContextProvider({
   children,
 }: HasChildren): React.JSX.Element {
-  const { network: ethereumNetwork } = useSelector((state: RootState) => state.account);
+  const { walletType, network: ethereumNetwork } = useSelector((state: RootState) => state.account);
 
   const [ethereumNetworkConfiguration, setEthereumNetworkConfiguration] =
     useState<EthereumNetworkConfiguration>(defaultEthereumNetworkConfiguration);
@@ -74,6 +93,33 @@ export function EthereumNetworkConfigurationContextProvider({
     });
   }
 
+  async function getDLCManagerContract(): Promise<Contract> {
+    return getEthereumContractWithSigner(
+      ethereumNetworkConfiguration.ethereumContractDeploymentPlans,
+      'DLCManager',
+      walletType,
+      ethereumNetwork
+    );
+  }
+
+  function getReadOnlyDLCManagerContract(rpcEndpoint?: string): Contract {
+    return getEthereumContractWithProvider(
+      ethereumNetworkConfiguration.ethereumContractDeploymentPlans,
+      ethereumNetwork,
+      'DLCManager',
+      rpcEndpoint ?? ethereumNetwork.defaultNodeURL
+    );
+  }
+
+  function getReadOnlyDLCBTCContract(rpcEndpoint?: string): Contract {
+    return getEthereumContractWithProvider(
+      ethereumNetworkConfiguration.ethereumContractDeploymentPlans,
+      ethereumNetwork,
+      'DLCBTC',
+      rpcEndpoint ?? ethereumNetwork.defaultNodeURL
+    );
+  }
+
   return (
     <EthereumNetworkConfigurationContext.Provider
       value={{
@@ -82,6 +128,9 @@ export function EthereumNetworkConfigurationContextProvider({
           ethereumNetworkConfiguration.ethereumContractDeploymentPlans,
         ethereumAttestorChainID: ethereumNetworkConfiguration.ethereumAttestorChainID,
         enabledEthereumNetworks: ethereumNetworkConfiguration.enabledEthereumNetworks,
+        getReadOnlyDLCManagerContract,
+        getReadOnlyDLCBTCContract,
+        getDLCManagerContract,
       }}
     >
       {children}

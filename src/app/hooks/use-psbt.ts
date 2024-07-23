@@ -1,7 +1,6 @@
 import { useContext, useState } from 'react';
 import { useSelector } from 'react-redux';
 
-import { getEthereumContractWithProvider } from '@functions/configuration.functions';
 import { BitcoinError } from '@models/error-types';
 import { BitcoinWalletType } from '@models/wallet';
 import { bytesToHex } from '@noble/hashes/utils';
@@ -27,9 +26,7 @@ interface UsePSBTReturnType {
 }
 
 export function usePSBT(): UsePSBTReturnType {
-  const { address: ethereumUserAddress, network: ethereumNetwork } = useSelector(
-    (state: RootState) => state.account
-  );
+  const { address: ethereumUserAddress } = useSelector((state: RootState) => state.account);
 
   const { bitcoinWalletType, dlcHandler, resetBitcoinWalletContext } =
     useContext(BitcoinWalletContext);
@@ -48,7 +45,7 @@ export function usePSBT(): UsePSBTReturnType {
     isLoading: isLeatherLoading,
   } = useLeather();
 
-  const { ethereumAttestorChainID, ethereumContractDeploymentPlans } = useContext(
+  const { ethereumAttestorChainID, getDLCManagerContract } = useContext(
     EthereumNetworkConfigurationContext
   );
 
@@ -64,17 +61,10 @@ export function usePSBT(): UsePSBTReturnType {
 
       const feeRateMultiplier = import.meta.env.VITE_FEE_RATE_MULTIPLIER;
 
-      const dlcManagerContract = getEthereumContractWithProvider(
-        ethereumContractDeploymentPlans,
-        ethereumNetwork,
-        'DLCManager',
-        appConfiguration.ethereumInfuraWebsocketURL
-      );
+      const dlcManagerContract = await getDLCManagerContract();
 
       const attestorGroupPublicKey = await getAttestorGroupPublicKey(dlcManagerContract);
-      console.log('attestorGroupPublicKey', attestorGroupPublicKey);
       const vault = await getRawVault(dlcManagerContract, vaultUUID);
-      console.log('vault', vault);
 
       let fundingTransaction: Transaction;
       switch (bitcoinWalletType) {
@@ -159,12 +149,7 @@ export function usePSBT(): UsePSBTReturnType {
 
       const feeRateMultiplier = import.meta.env.VITE_FEE_RATE_MULTIPLIER;
 
-      const dlcManagerContract = getEthereumContractWithProvider(
-        ethereumContractDeploymentPlans,
-        ethereumNetwork,
-        'DLCManager',
-        appConfiguration.ethereumInfuraWebsocketURL
-      );
+      const dlcManagerContract = await getDLCManagerContract();
 
       const attestorGroupPublicKey = await getAttestorGroupPublicKey(dlcManagerContract);
       const vault = await getRawVault(dlcManagerContract, vaultUUID);

@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux';
 
 import { HStack } from '@chakra-ui/react';
 import { TabButton } from '@components/tab-button/tab-button';
-import { getEthereumContractWithProvider } from '@functions/configuration.functions';
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { RootState } from '@store/index';
 import { isUserWhitelisted, isWhitelistingEnabled } from 'dlc-btc-lib/ethereum-functions';
@@ -17,20 +16,16 @@ export function NavigationTabs({
   activeTab,
   handleTabClick,
 }: NavigationTabsProps): React.JSX.Element {
-  const { address, network: ethereumNetwork } = useSelector((state: RootState) => state.account);
+  const { address } = useSelector((state: RootState) => state.account);
   const [showDisplayMintBurn, setShowDisplayMintBurn] = useState<boolean>(false);
-  const { ethereumContractDeploymentPlans } = useContext(EthereumNetworkConfigurationContext);
+  const { getReadOnlyDLCManagerContract } = useContext(EthereumNetworkConfigurationContext);
 
   useEffect(() => {
     async function checkWhitelisting(address?: string) {
       const result = async () => {
         if (!address) return false;
 
-        const dlcManagerContract = getEthereumContractWithProvider(
-          ethereumContractDeploymentPlans,
-          ethereumNetwork,
-          'DLCManager'
-        );
+        const dlcManagerContract = getReadOnlyDLCManagerContract();
 
         return (
           !(await isWhitelistingEnabled(dlcManagerContract)) ||

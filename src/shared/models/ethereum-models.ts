@@ -1,8 +1,6 @@
 import { EthereumDeploymentPlan, EthereumNetwork } from 'dlc-btc-lib/models';
 
-export interface EthereumNetworkConfiguration {
-  ethereumExplorerAPIURL: string;
-  ethereumAttestorChainID: 'evm-arbitrum' | 'evm-arbsepolia' | 'evm-localhost';
+export interface EthereumNetworkConfiguration extends StaticEthereumNetworkSettings {
   enabledEthereumNetworks: EthereumNetwork[];
   ethereumContractDeploymentPlans: EthereumDeploymentPlan[];
 }

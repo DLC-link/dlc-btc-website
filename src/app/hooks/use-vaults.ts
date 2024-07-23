@@ -1,7 +1,6 @@
 import { useContext, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { getEthereumContractWithProvider } from '@functions/configuration.functions';
 import { formatVault } from '@functions/vault.functions';
 import { Vault } from '@models/vault';
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
@@ -30,19 +29,12 @@ export function useVaults(): UseVaultsReturnType {
 
   const [isLoading, setIsLoading] = useState(true);
 
-  const { ethereumContractDeploymentPlans } = useContext(EthereumNetworkConfigurationContext);
+  const { getDLCManagerContract } = useContext(EthereumNetworkConfigurationContext);
 
   const fetchVaultsIfReady = async (ethereumAddress: string, ethereumNetwork: EthereumNetwork) => {
     setIsLoading(true);
 
-    const dlcManagerContract = getEthereumContractWithProvider(
-      ethereumContractDeploymentPlans,
-      ethereumNetwork,
-      'DLCManager',
-      appConfiguration.ethereumInfuraWebsocketURL
-    );
-
-    await getAllAddressVaults(dlcManagerContract, ethereumAddress)
+    await getAllAddressVaults(await getDLCManagerContract(), ethereumAddress)
       .then(vaults => {
         const formattedVaults = vaults.map(vault => {
           return formatVault(vault);

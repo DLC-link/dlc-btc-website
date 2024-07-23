@@ -5,7 +5,6 @@ import { useSelector } from 'react-redux';
 import { Divider, HStack, Text } from '@chakra-ui/react';
 import { ProtocolHistoryTableItemProps } from '@components/protocol-history-table/components/protocol-history-table-item';
 import { ProtocolHistoryTable } from '@components/protocol-history-table/protocol-history-table';
-import { getEthereumContractWithProvider } from '@functions/configuration.functions';
 import { fetchMintBurnEvents } from '@functions/ethereum.functions';
 import { Merchant } from '@models/merchant';
 import { bitcoin, dlcBTC } from '@models/token';
@@ -40,16 +39,11 @@ export function ProofOfReserve(): React.JSX.Element {
 
   const { data: allMintBurnEvents } = useQuery(['allMintBurnEvents'], fetchMintBurnEventsHandler);
 
-  const { ethereumContractDeploymentPlans } = useContext(EthereumNetworkConfigurationContext);
+  const { getReadOnlyDLCBTCContract } = useContext(EthereumNetworkConfigurationContext);
 
   async function fetchMintBurnEventsHandler(): Promise<ProtocolHistoryTableItemProps[]> {
-    const dlcBTCContract = getEthereumContractWithProvider(
-      ethereumContractDeploymentPlans,
-      ethereumNetwork,
-      'DLCBTC'
-    );
     const detailedEvents = await fetchMintBurnEvents(
-      dlcBTCContract,
+      getReadOnlyDLCBTCContract(),
       ethereumNetwork.defaultNodeURL,
       undefined,
       10
