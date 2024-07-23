@@ -167,6 +167,8 @@ export function useLeather(): UseLeatherReturnType {
         feeRateMultiplier
       );
 
+      console.log('Funding PSBT:', fundingPSBT);
+
       setIsLoading([true, 'Sign Funding Transaction in your Leather Wallet']);
       // ==> Sign Funding PSBT with Ledger
       const fundingTransactionHex = await signPSBT(fundingPSBT.toPSBT());

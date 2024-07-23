@@ -4,16 +4,19 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Text, VStack, useToast } from '@chakra-ui/react';
 import { VaultsListGroupContainer } from '@components/vaults-list/components/vaults-list-group-container';
 import { VaultsList } from '@components/vaults-list/vaults-list';
-import { getEthereumContractWithProvider } from '@functions/configuration.functions';
+import {
+  getEthereumContractWithProvider,
+  getEthereumContractWithSigner,
+} from '@functions/configuration.functions';
 import { getAndFormatVault } from '@functions/vault.functions';
 import { Vault } from '@models/vault';
-import { EthereumHandlerContext } from '@providers/ethereum-handler-context-provider';
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
 import { VaultContext } from '@providers/vault-context-provider';
 import { RootState } from '@store/index';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { vaultActions } from '@store/slices/vault/vault.actions';
+import { withdraw } from 'dlc-btc-lib/ethereum-functions';
 import { shiftValue } from 'dlc-btc-lib/utilities';
 
 import { BurnTokenTransactionForm } from '../../sign-transaction-screen/components/ethereum-transaction-form';
@@ -35,8 +38,6 @@ export function UnmintVaultSelector({
   const { bitcoinPrice } = useContext(ProofOfReserveContext);
   const { fundedVaults } = useContext(VaultContext);
 
-  const { ethereumHandler } = useContext(EthereumHandlerContext);
-
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { unmintStep } = useSelector((state: RootState) => state.mintunmint);
@@ -45,7 +46,7 @@ export function UnmintVaultSelector({
 
   const { ethereumContractDeploymentPlans } = useContext(EthereumNetworkConfigurationContext);
 
-  const { network: ethereumNetwork } = useSelector((state: RootState) => state.account);
+  const { walletType, network: ethereumNetwork } = useSelector((state: RootState) => state.account);
 
   function handleSelect(uuid: string): void {
     const vault = fundedVaults.find(vault => vault.uuid === uuid);
@@ -63,15 +64,23 @@ export function UnmintVaultSelector({
         const currentRisk = await fetchUserEthereumAddressRiskLevel();
         if (currentRisk === 'High') throw new Error('Risk Level is too high');
         const formattedWithdrawAmount = BigInt(shiftValue(withdrawAmount));
-        await ethereumHandler?.withdraw(selectedVault.uuid, formattedWithdrawAmount);
 
-        const dlcManagerContract = getEthereumContractWithProvider(
+        const dlcManagerContract = await getEthereumContractWithSigner(
+          ethereumContractDeploymentPlans,
+          'DLCManager',
+          walletType,
+          ethereumNetwork
+        );
+
+        await withdraw(dlcManagerContract, selectedVault.uuid, formattedWithdrawAmount);
+
+        const dlcManagerContractReadOnly = getEthereumContractWithProvider(
           ethereumContractDeploymentPlans,
           ethereumNetwork,
           'DLCManager'
         );
 
-        await getAndFormatVault(selectedVault.uuid, dlcManagerContract)
+        await getAndFormatVault(selectedVault.uuid, dlcManagerContractReadOnly)
           .then(vault => {
             dispatch(
               vaultActions.swapVault({

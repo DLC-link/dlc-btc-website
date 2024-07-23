@@ -1,11 +1,11 @@
 import { useContext, useState } from 'react';
 import { useSelector } from 'react-redux';
 
+import { getEthereumContractWithProvider } from '@functions/configuration.functions';
 import { BitcoinError } from '@models/error-types';
 import { BitcoinWalletType } from '@models/wallet';
 import { bytesToHex } from '@noble/hashes/utils';
 import { BitcoinWalletContext } from '@providers/bitcoin-wallet-context-provider';
-import { EthereumHandlerContext } from '@providers/ethereum-handler-context-provider';
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { RootState } from '@store/index';
 import { LedgerDLCHandler, SoftwareWalletDLCHandler } from 'dlc-btc-lib';
@@ -13,6 +13,7 @@ import {
   submitFundingPSBT,
   submitWithdrawDepositPSBT,
 } from 'dlc-btc-lib/attestor-request-functions';
+import { getAttestorGroupPublicKey, getRawVault } from 'dlc-btc-lib/ethereum-functions';
 import { Transaction, VaultState } from 'dlc-btc-lib/models';
 
 import { useLeather } from './use-leather';
@@ -26,7 +27,9 @@ interface UsePSBTReturnType {
 }
 
 export function usePSBT(): UsePSBTReturnType {
-  const { address: ethereumUserAddress } = useSelector((state: RootState) => state.account);
+  const { address: ethereumUserAddress, network: ethereumNetwork } = useSelector(
+    (state: RootState) => state.account
+  );
 
   const { bitcoinWalletType, dlcHandler, resetBitcoinWalletContext } =
     useContext(BitcoinWalletContext);
@@ -45,9 +48,9 @@ export function usePSBT(): UsePSBTReturnType {
     isLoading: isLeatherLoading,
   } = useLeather();
 
-  const { ethereumHandler } = useContext(EthereumHandlerContext);
-
-  const { ethereumAttestorChainID } = useContext(EthereumNetworkConfigurationContext);
+  const { ethereumAttestorChainID, ethereumContractDeploymentPlans } = useContext(
+    EthereumNetworkConfigurationContext
+  );
 
   const [bitcoinDepositAmount, setBitcoinDepositAmount] = useState(0);
 
@@ -56,16 +59,22 @@ export function usePSBT(): UsePSBTReturnType {
     depositAmount: number
   ): Promise<void> {
     try {
-      if (!ethereumHandler) throw new Error('Ethereum Handler is not setup');
       if (!dlcHandler) throw new Error('DLC Handler is not setup');
       if (!ethereumUserAddress) throw new Error('User Address is not setup');
 
       const feeRateMultiplier = import.meta.env.VITE_FEE_RATE_MULTIPLIER;
 
-      const attestorGroupPublicKey = await ethereumHandler.getAttestorGroupPublicKey();
-      const vault = await ethereumHandler.getRawVault(vaultUUID);
+      const dlcManagerContract = getEthereumContractWithProvider(
+        ethereumContractDeploymentPlans,
+        ethereumNetwork,
+        'DLCManager',
+        appConfiguration.ethereumInfuraWebsocketURL
+      );
 
-      if (!bitcoinWalletType) throw new Error('Bitcoin Wallet is not setup');
+      const attestorGroupPublicKey = await getAttestorGroupPublicKey(dlcManagerContract);
+      console.log('attestorGroupPublicKey', attestorGroupPublicKey);
+      const vault = await getRawVault(dlcManagerContract, vaultUUID);
+      console.log('vault', vault);
 
       let fundingTransaction: Transaction;
       switch (bitcoinWalletType) {
@@ -145,14 +154,20 @@ export function usePSBT(): UsePSBTReturnType {
     withdrawAmount: number
   ): Promise<void> {
     try {
-      if (!ethereumHandler) throw new Error('Ethereum Handler is not setup');
       if (!dlcHandler) throw new Error('DLC Handler is not setup');
       if (!ethereumUserAddress) throw new Error('User Address is not setup');
 
       const feeRateMultiplier = import.meta.env.VITE_FEE_RATE_MULTIPLIER;
 
-      const attestorGroupPublicKey = await ethereumHandler.getAttestorGroupPublicKey();
-      const vault = await ethereumHandler.getRawVault(vaultUUID);
+      const dlcManagerContract = getEthereumContractWithProvider(
+        ethereumContractDeploymentPlans,
+        ethereumNetwork,
+        'DLCManager',
+        appConfiguration.ethereumInfuraWebsocketURL
+      );
+
+      const attestorGroupPublicKey = await getAttestorGroupPublicKey(dlcManagerContract);
+      const vault = await getRawVault(dlcManagerContract, vaultUUID);
 
       if (!bitcoinWalletType) throw new Error('Bitcoin Wallet is not setup');
 

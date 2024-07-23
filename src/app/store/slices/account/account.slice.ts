@@ -5,7 +5,7 @@ import { EthereumNetwork } from 'dlc-btc-lib/models';
 
 interface AccountState {
   address: string | undefined;
-  walletType: WalletType | undefined;
+  walletType: WalletType;
   network: EthereumNetwork;
   dlcBTCBalance: number | undefined;
   lockedBTCBalance: number | undefined;
@@ -46,7 +46,7 @@ export const accountSlice = createSlice({
     },
     logout: state => {
       state.address = undefined;
-      state.walletType = undefined;
+      state.walletType = WalletType.Metamask;
       state.dlcBTCBalance = 0;
       state.lockedBTCBalance = 0;
       state.network = ethereumNetwork;

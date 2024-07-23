@@ -1,6 +1,6 @@
 import { WalletType } from '@models/wallet';
 import { addNetworkParams, hexChainIDs } from 'dlc-btc-lib/constants';
-import { EthereumNetwork, EthereumNetworkID } from 'dlc-btc-lib/models';
+import { EthereumDeploymentPlan, EthereumNetwork, EthereumNetworkID } from 'dlc-btc-lib/models';
 import { ethers } from 'ethers';
 
 function alertMissingWallet(walletType: WalletType): void {
@@ -32,8 +32,7 @@ function checkIfMultipleEthereumProviders(ethereum: any): boolean {
     ethereum.providerMap.size > 1
   );
 }
-
-export function getWalletProvider(walletType: WalletType): any {
+function getWalletProvider(walletType: WalletType): any {
   const { ethereum } = window;
 
   if (!ethereum) {
@@ -108,7 +107,7 @@ async function switchEthereumNetwork(
   }
 }
 
-async function getEthereumSigner(walletProvider: any, network: EthereumNetwork) {
+async function getEthereumSignerFromProvider(walletProvider: any, network: EthereumNetwork) {
   try {
     const browserProvider = new ethers.providers.Web3Provider(walletProvider, 'any');
 
@@ -118,9 +117,21 @@ async function getEthereumSigner(walletProvider: any, network: EthereumNetwork) 
 
     if (walletNetworkID !== network.id) {
       await switchEthereumNetwork(walletProvider, network.id);
-      window.location.reload();
     }
     return signer;
+  } catch (error) {
+    throw new Error(`Could not get Ethereum signer: ${error}`);
+  }
+}
+
+export async function getEthereumSigner(
+  walletType: WalletType,
+  ethereumNetwork: EthereumNetwork
+): Promise<ethers.providers.JsonRpcSigner> {
+  try {
+    const walletProvider = getWalletProvider(walletType);
+
+    return await getEthereumSignerFromProvider(walletProvider, ethereumNetwork);
   } catch (error) {
     throw new Error(`Could not get Ethereum signer: ${error}`);
   }
@@ -137,7 +148,7 @@ export async function connectEthereumAccount(
       method: 'eth_requestAccounts',
     });
 
-    const ethereumSigner = await getEthereumSigner(walletProvider, ethereumNetwork);
+    const ethereumSigner = await getEthereumSignerFromProvider(walletProvider, ethereumNetwork);
 
     return {
       ethereumUserAddress: ethereumAccounts[0],
@@ -145,5 +156,34 @@ export async function connectEthereumAccount(
     };
   } catch (error) {
     throw Error(`Could not connect to Ethereum: ${error}`);
+  }
+}
+
+export async function recommendTokenToMetamask(
+  ethereumContractDeploymentPlans: EthereumDeploymentPlan[],
+  walletType: WalletType
+): Promise<void> {
+  try {
+    const dlcBTCContractAddress = ethereumContractDeploymentPlans.find(
+      plan => plan.contract.name === 'DLCBTC'
+    )?.contract.address;
+
+    const walletProvider = getWalletProvider(walletType);
+
+    const response = await walletProvider.request({
+      method: 'wallet_watchAsset',
+      params: {
+        type: 'ERC20',
+        options: {
+          address: dlcBTCContractAddress,
+          symbol: 'dlcBTC',
+          decimals: 8,
+          image: 'https://dlc-public-assets.s3.amazonaws.com/dlcBTC_Token.png',
+        },
+      },
+    });
+    await response.wait();
+  } catch (error) {
+    throw new Error(`Could not recommend dlcBTC token to MetaMask: , ${error}`);
   }
 }

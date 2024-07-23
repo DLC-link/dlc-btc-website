@@ -1,11 +1,16 @@
 import { createContext, useContext, useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 
+import { getEthereumContractWithProvider } from '@functions/configuration.functions';
 import { HasChildren } from '@models/has-children';
-import { getLockedBTCBalance } from 'dlc-btc-lib/ethereum-functions';
-import { VaultState } from 'dlc-btc-lib/models';
+import { RootState } from '@store/index';
+import {
+  getAddressDLCBTCBalance,
+  getAllAddressVaults,
+  getLockedBTCBalance,
+} from 'dlc-btc-lib/ethereum-functions';
 
-import { EthereumHandlerContext } from './ethereum-handler-context-provider';
-import { VaultContext } from './vault-context-provider';
+import { EthereumNetworkConfigurationContext } from './ethereum-network-configuration.provider';
 
 interface VaultContextType {
   dlcBTCBalance: number | undefined;
@@ -18,33 +23,44 @@ export const BalanceContext = createContext<VaultContextType>({
 });
 
 export function BalanceContextProvider({ children }: HasChildren): React.JSX.Element {
-  const { ethereumHandler } = useContext(EthereumHandlerContext);
-  const { fundedVaults } = useContext(VaultContext);
+  const { ethereumContractDeploymentPlans } = useContext(EthereumNetworkConfigurationContext);
+  const { address: ethereumUserAddress, network: ethereumNetwork } = useSelector(
+    (state: RootState) => state.account
+  );
 
   const [dlcBTCBalance, setDLCBTCBalance] = useState<number | undefined>(undefined);
   const [lockedBTCBalance, setLockedBTCBalance] = useState<number | undefined>(undefined);
 
-  const fetchBalancesIfReady = async () => {
-    if (ethereumHandler) {
-      const currentTokenBalance = await ethereumHandler.getUserDLCBTCBalance();
-      if (currentTokenBalance !== dlcBTCBalance) {
-        setDLCBTCBalance(currentTokenBalance);
-      }
-      const fundedVaults = (await ethereumHandler.getAllUserVaults()).filter(
-        vault => vault.status === VaultState.FUNDED
-      );
-      const currentLockedBTCBalance = await getLockedBTCBalance(fundedVaults);
-      if (currentLockedBTCBalance !== lockedBTCBalance) {
-        setLockedBTCBalance(currentLockedBTCBalance);
-      }
+  const fetchBalancesIfReady = async (ethereumAddress: string) => {
+    const dlcManagerContract = getEthereumContractWithProvider(
+      ethereumContractDeploymentPlans,
+      ethereumNetwork,
+      'DLCManager'
+    );
+
+    const dlcBTCContract = getEthereumContractWithProvider(
+      ethereumContractDeploymentPlans,
+      ethereumNetwork,
+      'DLCBTC'
+    );
+
+    const currentTokenBalance = await getAddressDLCBTCBalance(dlcBTCContract, ethereumAddress);
+
+    if (currentTokenBalance !== dlcBTCBalance) {
+      setDLCBTCBalance(currentTokenBalance);
+    }
+
+    const userFundedVaults = await getAllAddressVaults(dlcManagerContract, ethereumAddress);
+    const currentLockedBTCBalance = await getLockedBTCBalance(userFundedVaults);
+    if (currentLockedBTCBalance !== lockedBTCBalance) {
+      setLockedBTCBalance(currentLockedBTCBalance);
     }
   };
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    fetchBalancesIfReady();
+    ethereumUserAddress && void fetchBalancesIfReady(ethereumUserAddress);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ethereumHandler, fundedVaults]);
+  }, [ethereumUserAddress]);
 
   return (
     <BalanceContext.Provider value={{ dlcBTCBalance, lockedBTCBalance }}>

@@ -35,7 +35,7 @@ const defaultEthereumNetworkConfiguration = {
   ethereumAttestorChainID:
     staticEthereumNetworkSettingsMap[defaultEthereumNetwork].ethereumAttestorChainID,
   enabledEthereumNetworks: appConfiguration.enabledEthereumNetworkIDs.map(id =>
-    getEthereumNetworkByID(id as EthereumNetworkID)
+    getEthereumNetworkByID(id)
   ),
   ethereumContractDeploymentPlans: getEthereumNetworkDeploymentPlans(
     getEthereumNetworkByID(defaultEthereumNetwork)
@@ -76,7 +76,7 @@ export function EthereumNetworkConfigurationContextProvider({
       ethereumAttestorChainID:
         staticEthereumNetworkSettingsMap[ethereumNetwork.id].ethereumAttestorChainID,
       enabledEthereumNetworks: appConfiguration.enabledEthereumNetworkIDs.map(id =>
-        getEthereumNetworkByID(id as EthereumNetworkID)
+        getEthereumNetworkByID(id)
       ),
       ethereumContractDeploymentPlans: getEthereumNetworkDeploymentPlans(ethereumNetwork),
     });

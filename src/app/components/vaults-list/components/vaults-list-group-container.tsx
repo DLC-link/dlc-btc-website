@@ -1,7 +1,12 @@
+import { useContext } from 'react';
+import { useSelector } from 'react-redux';
+
 import { Button, HStack, Image, Spinner, Text, VStack } from '@chakra-ui/react';
 import { VaultCard } from '@components/vault/vault-card';
-import { useEthereumHandler } from '@hooks/use-ethereum-handler';
+import { recommendTokenToMetamask } from '@functions/ethereum-account.functions';
 import { Vault } from '@models/vault';
+import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
+import { RootState } from '@store/index';
 
 interface VaultsListGroupContainerProps {
   label?: string;
@@ -18,7 +23,9 @@ export function VaultsListGroupContainer({
   isSelectable = false,
   handleSelect,
 }: VaultsListGroupContainerProps): React.JSX.Element | boolean {
-  const { recommendTokenToMetamask } = useEthereumHandler();
+  const { ethereumContractDeploymentPlans } = useContext(EthereumNetworkConfigurationContext);
+
+  const { walletType } = useSelector((state: RootState) => state.account);
 
   if (vaults.length === 0) return false;
 
@@ -35,7 +42,9 @@ export function VaultsListGroupContainer({
               variant={'ghost'}
               size={'xs'}
               _hover={{ backgroundColor: 'accent.lightBlue.01' }}
-              onClick={async () => await recommendTokenToMetamask()}
+              onClick={async () =>
+                await recommendTokenToMetamask(ethereumContractDeploymentPlans, walletType)
+              }
             >
               <HStack>
                 <Image src={'/images/logos/dlc-btc-logo.svg'} alt={'dlcBTC'} boxSize={'15px'} />
