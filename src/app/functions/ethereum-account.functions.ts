@@ -182,7 +182,7 @@ export async function recommendTokenToMetamask(
         },
       },
     });
-    await response.wait();
+    await response;
   } catch (error) {
     throw new Error(`Could not recommend dlcBTC token to MetaMask: , ${error}`);
   }

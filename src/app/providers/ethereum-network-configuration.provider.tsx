@@ -2,15 +2,17 @@ import React, { createContext, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
 
-import { getEthereumNetworkDeploymentPlans } from '@functions/configuration.functions';
+import {
+  getEthereumNetworkByID,
+  getEthereumNetworkDeploymentPlans,
+} from '@functions/configuration.functions';
 import {
   EthereumNetworkConfiguration,
   StaticEthereumNetworkSettings,
 } from '@models/ethereum-models';
 import { HasChildren } from '@models/has-children';
 import { RootState } from '@store/index';
-import { supportedEthereumNetworks } from 'dlc-btc-lib/constants';
-import { EthereumNetwork, EthereumNetworkID } from 'dlc-btc-lib/models';
+import { EthereumNetworkID } from 'dlc-btc-lib/models';
 
 const staticEthereumNetworkSettingsMap: Record<EthereumNetworkID, StaticEthereumNetworkSettings> = {
   [EthereumNetworkID.ArbitrumSepolia]: {
@@ -41,16 +43,6 @@ const defaultEthereumNetworkConfiguration = {
     getEthereumNetworkByID(defaultEthereumNetwork)
   ),
 };
-
-function getEthereumNetworkByID(ethereumNetworkID: EthereumNetworkID): EthereumNetwork {
-  const ethereumNetwork = supportedEthereumNetworks.find(
-    network => network.id === ethereumNetworkID
-  );
-  if (!ethereumNetwork) {
-    throw new Error(`Unsupported Ethereum network: ${ethereumNetworkID}`);
-  }
-  return ethereumNetwork;
-}
 
 export const EthereumNetworkConfigurationContext = createContext<EthereumNetworkConfiguration>(
   defaultEthereumNetworkConfiguration

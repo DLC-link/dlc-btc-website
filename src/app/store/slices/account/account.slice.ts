@@ -1,6 +1,6 @@
+import { getEthereumNetworkByID } from '@functions/configuration.functions';
 import { WalletType } from '@models/wallet';
 import { createSlice } from '@reduxjs/toolkit';
-import { ethereumArbitrum, ethereumArbitrumSepolia } from 'dlc-btc-lib/constants';
 import { EthereumNetwork } from 'dlc-btc-lib/models';
 
 interface AccountState {
@@ -12,23 +12,10 @@ interface AccountState {
   loadedAt: string | undefined;
 }
 
-const bitcoinNetworkName = appConfiguration.bitcoinNetwork;
-let ethereumNetwork: EthereumNetwork;
-switch (bitcoinNetworkName) {
-  case 'mainnet':
-    ethereumNetwork = ethereumArbitrum;
-    break;
-  case 'regtest':
-    ethereumNetwork = ethereumArbitrumSepolia;
-    break;
-  default:
-    ethereumNetwork = ethereumArbitrumSepolia;
-}
-
 export const initialAccountState: AccountState = {
   address: undefined,
   walletType: WalletType.Metamask,
-  network: ethereumNetwork,
+  network: getEthereumNetworkByID(appConfiguration.enabledEthereumNetworkIDs.at(0)!),
   dlcBTCBalance: 0,
   lockedBTCBalance: 0,
   loadedAt: undefined,
@@ -49,7 +36,7 @@ export const accountSlice = createSlice({
       state.walletType = WalletType.Metamask;
       state.dlcBTCBalance = 0;
       state.lockedBTCBalance = 0;
-      state.network = ethereumNetwork;
+      state.network = getEthereumNetworkByID(appConfiguration.enabledEthereumNetworkIDs.at(0)!);
     },
   },
 });

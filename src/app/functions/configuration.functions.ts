@@ -1,6 +1,7 @@
 import { WalletType } from '@models/wallet';
+import { supportedEthereumNetworks } from 'dlc-btc-lib/constants';
 import { getEthereumContract, getProvider } from 'dlc-btc-lib/ethereum-functions';
-import { EthereumDeploymentPlan, EthereumNetwork } from 'dlc-btc-lib/models';
+import { EthereumDeploymentPlan, EthereumNetwork, EthereumNetworkID } from 'dlc-btc-lib/models';
 import { Contract } from 'ethers';
 
 import { getEthereumSigner } from './ethereum-account.functions';
@@ -12,6 +13,16 @@ export function getEthereumNetworkDeploymentPlans(
     appConfiguration.ethereumContractInformations[ethereumNetwork.name.toLowerCase()];
 
   return ethereumNetworkDeploymentPlans;
+}
+
+export function getEthereumNetworkByID(ethereumNetworkID: EthereumNetworkID): EthereumNetwork {
+  const ethereumNetwork = supportedEthereumNetworks.find(
+    network => network.id === ethereumNetworkID
+  );
+  if (!ethereumNetwork) {
+    throw new Error(`Unsupported Ethereum network: ${ethereumNetworkID}`);
+  }
+  return ethereumNetwork;
 }
 
 export function getEthereumContractWithProvider(

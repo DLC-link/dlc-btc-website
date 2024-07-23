@@ -32,9 +32,10 @@ export function NavigationTabs({
           'DLCManager'
         );
 
-        return !(await isWhitelistingEnabled(dlcManagerContract))
-          ? true
-          : await isUserWhitelisted(dlcManagerContract, address);
+        return (
+          !(await isWhitelistingEnabled(dlcManagerContract)) ||
+          (await isUserWhitelisted(dlcManagerContract, address))
+        );
       };
       setShowDisplayMintBurn(await result());
     }
