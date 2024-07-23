@@ -27,18 +27,18 @@ const staticEthereumNetworkSettingsMap: Record<EthereumNetworkID, StaticEthereum
   },
 };
 
+const defaultEthereumNetwork = appConfiguration.enabledEthereumNetworkIDs.at(0)!;
+
 const defaultEthereumNetworkConfiguration = {
   ethereumExplorerAPIURL:
-    staticEthereumNetworkSettingsMap[appConfiguration.enabledEthereumNetworkIDs[0]]
-      .ethereumExplorerAPIURL,
+    staticEthereumNetworkSettingsMap[defaultEthereumNetwork].ethereumExplorerAPIURL,
   ethereumAttestorChainID:
-    staticEthereumNetworkSettingsMap[appConfiguration.enabledEthereumNetworkIDs[0]]
-      .ethereumAttestorChainID,
+    staticEthereumNetworkSettingsMap[defaultEthereumNetwork].ethereumAttestorChainID,
   enabledEthereumNetworks: appConfiguration.enabledEthereumNetworkIDs.map(id =>
     getEthereumNetworkByID(id as EthereumNetworkID)
   ),
   ethereumContractDeploymentPlans: getEthereumNetworkDeploymentPlans(
-    getEthereumNetworkByID(appConfiguration.enabledEthereumNetworkIDs[0])
+    getEthereumNetworkByID(defaultEthereumNetwork)
   ),
 };
 
