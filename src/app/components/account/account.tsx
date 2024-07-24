@@ -3,11 +3,14 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { Button, HStack } from '@chakra-ui/react';
 import { AccountMenu } from '@components/account/components/account-menu';
+import { EthereumNetwork } from '@models/ethereum-network';
 import { Wallet, WalletType, ethereumWallets } from '@models/wallet';
 import { RootState } from '@store/index';
 import { accountActions } from '@store/slices/account/account.actions';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { modalActions } from '@store/slices/modal/modal.actions';
+
+import { NetworkMenu } from './components/network-menu';
 
 function findWalletById(walletType: WalletType): Wallet | undefined {
   const wallet = ethereumWallets.find(wallet => wallet.id === walletType);
@@ -18,6 +21,7 @@ export function Account(): React.JSX.Element {
   const dispatch = useDispatch();
   const [wallet, setWallet] = useState<Wallet | undefined>(undefined);
   const { address, walletType } = useSelector((state: RootState) => state.account);
+  const [currentNetwork, setCurrentNetwork] = useState<EthereumNetwork | undefined>(undefined);
 
   useEffect(() => {
     const currentWallet = walletType !== undefined && findWalletById(walletType);
@@ -33,14 +37,21 @@ export function Account(): React.JSX.Element {
     dispatch(mintUnmintActions.resetMintUnmintState());
   }
 
+  const handleNetworkChange = (currentNetwork: EthereumNetwork) => {
+    setCurrentNetwork(currentNetwork);
+  };
+
   return (
     <HStack w={'275px'}>
       {address !== undefined && wallet !== undefined ? (
-        <AccountMenu
-          address={address}
-          wallet={wallet}
-          handleClick={() => onDisconnectWalletClick()}
-        />
+        <>
+          <NetworkMenu handleClick={handleNetworkChange} currentNetwork={currentNetwork} />
+          <AccountMenu
+            address={address}
+            wallet={wallet}
+            handleClick={() => onDisconnectWalletClick()}
+          />
+        </>
       ) : (
         <Button variant={'account'} onClick={() => onConnectWalletClick()}>
           Connect Wallet
