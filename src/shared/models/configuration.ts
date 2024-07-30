@@ -16,15 +16,12 @@ enum AppEnvironment {
   LOCALHOST = 'localhost',
 }
 
-interface EthereumDeploymentPlans {
-  [key: string]: EthereumDeploymentPlan[];
-}
 type BitcoinNetworkPrefix = 'bc1' | 'tb1' | 'bcrt1';
 export interface Configuration {
   appEnvironment: AppEnvironment;
   attestorURLs: string[];
   enabledEthereumNetworkIDs: EthereumNetworkID[];
-  ethereumContractInformations: EthereumDeploymentPlans;
+  ethereumContractInformations: { name: string; deploymentPlans: EthereumDeploymentPlan[] }[];
   ethereumInfuraWebsocketURL: string;
   bitcoinNetwork: BitcoinNetworkName;
   bitcoinNetworkIndex: number;

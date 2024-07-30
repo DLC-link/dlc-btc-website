@@ -20,7 +20,6 @@ import { Dashboard } from './pages/dashboard/dashboard';
 import { VaultContextProvider } from './providers/vault-context-provider';
 
 const queryClient = new QueryClient();
-
 export function App(): React.JSX.Element {
   return (
     <QueryClientProvider client={queryClient}>

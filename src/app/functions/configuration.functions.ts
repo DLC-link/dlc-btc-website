@@ -9,8 +9,15 @@ import { getEthereumSigner } from './ethereum-account.functions';
 export function getEthereumNetworkDeploymentPlans(
   ethereumNetwork: EthereumNetwork
 ): EthereumDeploymentPlan[] {
-  const ethereumNetworkDeploymentPlans: EthereumDeploymentPlan[] =
-    appConfiguration.ethereumContractInformations[ethereumNetwork.name.toLowerCase()];
+  const ethereumNetworkDeploymentPlans: EthereumDeploymentPlan[] | undefined =
+    appConfiguration.ethereumContractInformations.find(
+      (networkDeploymenPlans: { name: string; deploymentPlans: EthereumDeploymentPlan[] }) =>
+        networkDeploymenPlans.name === ethereumNetwork.name
+    )?.deploymentPlans;
+
+  if (!ethereumNetworkDeploymentPlans) {
+    throw new Error(`Ethereum Network not supported: ${ethereumNetwork.id}`);
+  }
 
   return ethereumNetworkDeploymentPlans;
 }
