@@ -18,20 +18,20 @@ export function RiskBox({ risk }: RiskBoxProps): React.JSX.Element {
           {risk}
         </Text>
       </HStack>
-      <VStack>
+      <VStack gap={'0px'}>
+        <Text color={'white.01'} fontWeight={200}>
+          Potential suspicious activity detected, redemptions are temporarily suspended.
+        </Text>
         <Text color={'white.01'}>
-          <Text color={'white.01'} fontWeight={800}>
-            Redemptions are temporarily suspended.
-          </Text>
           <Link
             color={'accent.lightBlue.01'}
             href="mailto:support@dlc.link"
             isExternal
             textDecoration={'underline'}
           >
-            Get in touch with our support
+            Get in touch
           </Link>{' '}
-          to resolve this issue.
+          with your DLC.Link representative to resolve this issue.
         </Text>
       </VStack>
     </RiskBoxLayout>

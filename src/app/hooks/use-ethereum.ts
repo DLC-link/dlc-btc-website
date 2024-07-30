@@ -5,7 +5,8 @@ import { useSelector } from 'react-redux';
 import { EthereumError } from '@models/error-types';
 import { DetailedEvent } from '@models/ethereum-models';
 import { EthereumNetwork } from '@models/ethereum-network';
-import { RawVault, Vault, VaultState } from '@models/vault';
+import { RawVault, VaultState } from '@models/vault';
+import { Vault } from '@models/vault';
 import { VaultContext } from '@providers/vault-context-provider';
 import { RootState, store } from '@store/index';
 import { vaultActions } from '@store/slices/vault/vault.actions';
@@ -36,6 +37,8 @@ interface UseEthereumReturnType {
     userAddress: string,
     contractAddress?: string
   ) => Promise<DetailedEvent[]>;
+  isWhitelistingEnabled: () => Promise<boolean>;
+  isUserWhitelisted: (userAddress: string) => Promise<boolean>;
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -65,8 +68,8 @@ export function useEthereum(): UseEthereumReturnType {
       fundingTX: vault.fundingTxId,
       closingTX: vault.closingTxId,
       btcFeeRecipient: vault.btcFeeRecipient,
-      btcMintFeeBasisPoints: customShiftValue(vault.btcMintFeeBasisPoints.toNumber(), 4, true),
-      btcRedeemFeeBasisPoints: customShiftValue(vault.btcRedeemFeeBasisPoints.toNumber(), 4, true),
+      btcMintFeeBasisPoints: vault.btcMintFeeBasisPoints.toNumber(),
+      btcRedeemFeeBasisPoints: vault.btcRedeemFeeBasisPoints.toNumber(),
       taprootPubKey: vault.taprootPubKey,
     };
   }
@@ -229,6 +232,18 @@ export function useEthereum(): UseEthereumReturnType {
       throwEthereumError(`Could not close Vault: `, error);
     }
   }
+
+  async function isWhitelistingEnabled(): Promise<boolean> {
+    const dlcManagerContract = await getDefaultProvider(network, 'TokenManager');
+    return await dlcManagerContract.whitelistingEnabled();
+  }
+
+  async function isUserWhitelisted(userAddress: string): Promise<boolean> {
+    return appConfiguration.merchants
+      .map(merchant => merchant.address.toLowerCase())
+      .includes(userAddress);
+  }
+
   async function fetchMintBurnEvents(
     userAddress?: string,
     lastN?: number
@@ -289,5 +304,7 @@ export function useEthereum(): UseEthereumReturnType {
     closeVault,
     fetchMintBurnEvents,
     fetchTransfersForUser,
+    isWhitelistingEnabled,
+    isUserWhitelisted,
   };
 }

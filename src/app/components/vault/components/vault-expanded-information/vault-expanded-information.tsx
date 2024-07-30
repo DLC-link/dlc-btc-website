@@ -48,7 +48,7 @@ export function VaultExpandedInformation({
             {state === VaultState.READY && !isSelected && (
               <Button
                 onClick={() => {
-                  navigate('/');
+                  navigate('/mint-withdraw');
                   dispatch(mintUnmintActions.setMintStep([1, uuid]));
                   close();
                 }}
@@ -60,7 +60,7 @@ export function VaultExpandedInformation({
             {state === VaultState.FUNDED && !isSelected && (
               <Button
                 onClick={() => {
-                  navigate('/');
+                  navigate('/mint-withdraw');
                   dispatch(mintUnmintActions.setUnmintStep([0, uuid]));
                   close();
                 }}

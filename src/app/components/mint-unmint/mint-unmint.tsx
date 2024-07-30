@@ -37,7 +37,7 @@ export function MintUnmint({ address }: MintUnmintContainerProps): React.JSX.Ele
       <Tabs variant="unstyled" index={activeTab} onChange={handleTabsChange}>
         <TabList>
           <Tab>Mint</Tab>
-          <Tab isDisabled={!address}>Redeem</Tab>
+          <Tab isDisabled={!address}>Withdraw</Tab>
         </TabList>
         <TabIndicator mt="5px" h="3.5px" bg={'accent.lightBlue.01'} />
         <Spacer />

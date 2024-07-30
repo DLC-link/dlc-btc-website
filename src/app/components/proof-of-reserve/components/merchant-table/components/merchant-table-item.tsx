@@ -44,7 +44,7 @@ export function MerchantTableItem({
         onClick={() => navigate(`/merchant-details/${merchant.name}`)}
       >
         <Text color={'white.01'} fontSize={'xs'}>
-          Mint/Redeem History
+          Mint/Withdraw History
         </Text>
       </Button>
     </HStack>
