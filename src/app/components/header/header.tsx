@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
+import { HStack } from '@chakra-ui/react';
 import { Account } from '@components/account/account';
 import { CompanyWebsiteButton } from '@components/company-website-button/company-website-button';
 import { HeaderLayout } from '@components/header/components/header.layout';
@@ -17,8 +18,10 @@ export function Header(): React.JSX.Element {
 
   return (
     <HeaderLayout>
-      <CompanyWebsiteButton />
-      <NavigationTabs activeTab={location.pathname} handleTabClick={handleTabClick} />
+      <HStack gap={'50px'}>
+        <CompanyWebsiteButton />
+        <NavigationTabs activeTab={location.pathname} handleTabClick={handleTabClick} />
+      </HStack>
       <Account />
     </HeaderLayout>
   );
