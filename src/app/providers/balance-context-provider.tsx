@@ -10,6 +10,7 @@ import {
 } from 'dlc-btc-lib/ethereum-functions';
 
 import { EthereumNetworkConfigurationContext } from './ethereum-network-configuration.provider';
+import { VaultContext } from './vault-context-provider';
 
 interface VaultContextType {
   dlcBTCBalance: number | undefined;
@@ -26,6 +27,7 @@ export function BalanceContextProvider({ children }: HasChildren): React.JSX.Ele
     EthereumNetworkConfigurationContext
   );
   const { address: ethereumUserAddress } = useSelector((state: RootState) => state.account);
+  const { fundedVaults } = useContext(VaultContext);
 
   const [dlcBTCBalance, setDLCBTCBalance] = useState<number | undefined>(undefined);
   const [lockedBTCBalance, setLockedBTCBalance] = useState<number | undefined>(undefined);
@@ -53,7 +55,7 @@ export function BalanceContextProvider({ children }: HasChildren): React.JSX.Ele
   useEffect(() => {
     ethereumUserAddress && void fetchBalancesIfReady(ethereumUserAddress);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ethereumUserAddress]);
+  }, [ethereumUserAddress, fundedVaults]);
 
   return (
     <BalanceContext.Provider value={{ dlcBTCBalance, lockedBTCBalance }}>
