@@ -61,7 +61,9 @@
     "redux": "^4.2.1",
     "redux-persist": "^6.0.0",
     "redux-persist-expire": "^1.1.1",
-    "vite-plugin-toml": "^0.7.0"
+    "viem": "2.x",
+    "vite-plugin-toml": "^0.7.0",
+    "wagmi": "^2.12.2"
   },
   "devDependencies": {
     "@ls-lint/ls-lint": "^2.2.2",
