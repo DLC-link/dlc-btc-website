@@ -14,7 +14,9 @@ export function JasperModal({ isOpen, handleClose }: ModalComponentProps): React
           Your Jasper Vault points are safe and will appear soon. We’ll ensure everything is updated
           retroactively. Thank you for your patience!
         </Text>
-        <Button variant={'account'}>Continue to Points</Button>
+        <Button variant={'account'} onClick={() => handleClose()}>
+          Continue to Points
+        </Button>
       </VStack>
     </ModalLayout>
   );
