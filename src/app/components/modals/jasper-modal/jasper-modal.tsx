@@ -7,12 +7,12 @@ export function JasperModal({ isOpen, handleClose }: ModalComponentProps): React
     <ModalLayout title="" isOpen={isOpen} onClose={() => handleClose()}>
       <VStack alignItems={'start'} spacing={'25px'}>
         <Image src={'/images/logos/jasper-vault-logo.svg'} alt={'Jasper Vault Logo'} />
-        <Text color={'accent.lightBlue.01'} fontSize={'xl'} fontWeight={800}>
-          Jasper Vault Points Update
+        <Text color={'accent.lightBlue.01'} fontSize={'md'} fontWeight={800}>
+          Coming Soon: Jasper Vault Points!
         </Text>
         <Text color={'white.02'}>
-          Your Jasper Vault points are safe and will appear soon. We’ll ensure everything is updated
-          retroactively. Thank you for your patience!
+          We are happy to be partnering with Jasper Vault! All Jasper Vault points will appear here
+          soon and will be calculated retroactively.
         </Text>
         <Button variant={'account'} onClick={() => handleClose()}>
           Continue to Points
