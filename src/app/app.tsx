@@ -1,4 +1,3 @@
-import { QueryClient, QueryClientProvider } from 'react-query';
 import { Route } from 'react-router-dom';
 
 import { AppLayout } from '@components/app.layout';
@@ -14,6 +13,7 @@ import { BitcoinWalletContextProvider } from '@providers/bitcoin-wallet-context-
 import { EthereumNetworkConfigurationContextProvider } from '@providers/ethereum-network-configuration.provider';
 import { EthereumObserverProvider } from '@providers/ethereum-observer-provider';
 import { ProofOfReserveContextProvider } from '@providers/proof-of-reserve-context-provider';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import { About } from './pages/about/about';
 import { Dashboard } from './pages/dashboard/dashboard';

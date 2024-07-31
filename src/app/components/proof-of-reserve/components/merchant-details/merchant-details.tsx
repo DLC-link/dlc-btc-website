@@ -1,6 +1,5 @@
 import { useContext } from 'react';
 import { MdArrowBack } from 'react-icons/md';
-import { useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -11,6 +10,7 @@ import { bitcoin, dlcBTC } from '@models/token';
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
 import { RootState } from '@store/index';
+import { useQuery } from '@tanstack/react-query';
 
 import { MerchantDetailsTableItemProps } from '../merchant-table/components/merchant-details-table-item';
 import { MerchantDetailsTable } from '../merchant-table/merchant-details-table';
@@ -37,7 +37,10 @@ export function MerchantDetails(): React.JSX.Element {
 
   const { getReadOnlyDLCBTCContract } = useContext(EthereumNetworkConfigurationContext);
 
-  const { data: mintBurnEvents } = useQuery([`mintBurnEvents${name}`], fetchMintBurnEventsHandler);
+  const { data: mintBurnEvents } = useQuery({
+    queryKey: [`mintBurnEvents${name}`],
+    queryFn: fetchMintBurnEventsHandler,
+  });
   const { network: ethereumNetwork } = useSelector((state: RootState) => state.account);
   if (!name) return <Text>Error: No merchant name provided</Text>;
 

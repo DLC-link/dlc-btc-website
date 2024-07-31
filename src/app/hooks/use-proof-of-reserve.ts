@@ -1,8 +1,8 @@
 import { useContext } from 'react';
-import { useQuery } from 'react-query';
 
 import { Merchant, MerchantProofOfReserve } from '@models/merchant';
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
+import { useQuery } from '@tanstack/react-query';
 import { ProofOfReserveHandler } from 'dlc-btc-lib';
 import { getAttestorGroupPublicKey, getContractVaults } from 'dlc-btc-lib/ethereum-functions';
 import { RawVault } from 'dlc-btc-lib/models';
@@ -17,7 +17,9 @@ interface UseProofOfReserveReturnType {
 export function useProofOfReserve(): UseProofOfReserveReturnType {
   const { getReadOnlyDLCManagerContract } = useContext(EthereumNetworkConfigurationContext);
 
-  const { data: proofOfReserve } = useQuery(['proofOfReserve'], calculateProofOfReserve, {
+  const { data: proofOfReserve } = useQuery({
+    queryKey: ['proofOfReserve'],
+    queryFn: calculateProofOfReserve,
     refetchInterval: 60000,
   });
 

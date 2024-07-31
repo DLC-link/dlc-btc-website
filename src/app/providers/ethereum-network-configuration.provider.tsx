@@ -1,5 +1,4 @@
-import React, { createContext, useState } from 'react';
-import { useQuery } from 'react-query';
+import React, { createContext } from 'react';
 import { useSelector } from 'react-redux';
 
 import {
@@ -12,6 +11,7 @@ import { EthereumNetworkConfiguration } from '@models/ethereum-models';
 import { HasChildren } from '@models/has-children';
 import { WalletType } from '@models/wallet';
 import { RootState } from '@store/index';
+import { useQuery } from '@tanstack/react-query';
 import { EthereumNetworkID } from 'dlc-btc-lib/models';
 import { Contract } from 'ethers';
 
@@ -91,16 +91,13 @@ export function EthereumNetworkConfigurationContextProvider({
 }: HasChildren): React.JSX.Element {
   const { walletType, network: ethereumNetwork } = useSelector((state: RootState) => state.account);
 
-  const [ethereumNetworkConfiguration, setEthereumNetworkConfiguration] =
-    useState<EthereumNetworkConfiguration>(defaultEthereumNetworkConfiguration);
+  const { data: ethereumNetworkConfiguration = defaultEthereumNetworkConfiguration } = useQuery({
+    queryKey: [`ethereumNetworkConfiguration-${ethereumNetwork.id}`],
+    queryFn: getEthereumNetworkConfiguration,
+  });
 
-  useQuery(
-    `ethereumNetworkConfiguration-${ethereumNetwork}`,
-    getAndSetEthereumNetworkConfiguration
-  );
-
-  function getAndSetEthereumNetworkConfiguration(): void {
-    setEthereumNetworkConfiguration({
+  function getEthereumNetworkConfiguration(): EthereumNetworkConfiguration {
+    return {
       ethereumExplorerAPIURL:
         ethereumNetworkConfigurationMap[ethereumNetwork.id].ethereumExplorerAPIURL,
       ethereumAttestorChainID:
@@ -109,7 +106,7 @@ export function EthereumNetworkConfigurationContextProvider({
         ethereumNetworkConfigurationMap[ethereumNetwork.id].enabledEthereumNetworks,
       ethereumContractDeploymentPlans:
         ethereumNetworkConfigurationMap[ethereumNetwork.id].ethereumContractDeploymentPlans,
-    });
+    };
   }
 
   return (
