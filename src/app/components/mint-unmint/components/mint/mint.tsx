@@ -1,12 +1,13 @@
 import { useSelector } from 'react-redux';
 
 import { HStack } from '@chakra-ui/react';
+import { TransactionBox } from '@components/vault/components/transaction-box';
 import { usePSBT } from '@hooks/use-psbt';
 import { useRisk } from '@hooks/use-risk';
 import { RootState } from '@store/index';
+import { VaultState } from 'dlc-btc-lib/models';
 
 import { ProgressTimeline } from '../progress-timeline/progress-timeline';
-import { SetupVaultScreen } from '../setup-vault-screen/setup-vault-screen';
 import { SignFundingTransactionScreen } from '../sign-transaction-screen/sign-funding-transaction-screen';
 import { TransactionSummary } from '../transaction-summary/transaction-summary';
 import { Walkthrough } from '../walkthrough/walkthrough';
@@ -27,7 +28,7 @@ export function Mint(): React.JSX.Element {
       <ProgressTimeline variant={'mint'} currentStep={mintStep[0]} />
       <HStack w={'100%'} alignItems={'start'} justifyContent={'space-between'}>
         <Walkthrough flow={'mint'} currentStep={mintStep[0]} />
-        {[0].includes(mintStep[0]) && <SetupVaultScreen />}
+        {[0].includes(mintStep[0]) && <TransactionBox collateral={5} state={VaultState.READY} />}
         {[1].includes(mintStep[0]) && (
           <SignFundingTransactionScreen
             handleSignFundingTransaction={handleSignFundingTransaction}
