@@ -5,6 +5,7 @@ interface ModalState {
   isSuccesfulFlowModalOpen: [boolean, 'mint' | 'unmint', string?];
   isSelectBitcoinWalletModalOpen: boolean;
   isLedgerModalOpen: boolean;
+  isJasperModalOpen: boolean;
 }
 
 const initialModalState: ModalState = {
@@ -12,6 +13,7 @@ const initialModalState: ModalState = {
   isSuccesfulFlowModalOpen: [false, 'mint'],
   isSelectBitcoinWalletModalOpen: false,
   isLedgerModalOpen: false,
+  isJasperModalOpen: false,
 };
 
 export const modalSlice = createSlice({
@@ -30,6 +32,9 @@ export const modalSlice = createSlice({
     },
     toggleLedgerModalVisibility: state => {
       state.isLedgerModalOpen = !state.isLedgerModalOpen;
+    },
+    toggleJasperModalVisibility: state => {
+      state.isJasperModalOpen = !state.isJasperModalOpen;
     },
   },
 });

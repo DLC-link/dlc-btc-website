@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Button, Divider, HStack, Image, Text, VStack } from '@chakra-ui/react';
@@ -16,6 +17,12 @@ export function Points(): React.JSX.Element {
   const dispatch = useDispatch();
   const { userPoints } = usePoints();
   const { address } = useSelector((state: RootState) => state.account);
+
+  useEffect(() => {
+    if (!address) return;
+    dispatch(modalActions.toggleJasperModalVisibility());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [address]);
 
   function onConnectWalletClick(): void {
     dispatch(modalActions.toggleSelectWalletModalVisibility());

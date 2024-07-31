@@ -5,6 +5,7 @@ import { AnyAction } from '@reduxjs/toolkit';
 import { RootState } from '@store/index';
 import { modalActions } from '@store/slices/modal/modal.actions';
 
+import { JasperModal } from '../jasper-modal/jasper-modal';
 import { LedgerModal } from '../ledger-modal/ledger-modal';
 import { SelectBitcoinWalletModal } from '../select-bitcoin-wallet-modal/select-bitcoin-wallet-modal';
 import { SuccessfulFlowModal } from '../successful-flow-modal/successful-flow-modal';
@@ -21,6 +22,7 @@ export function ModalContainer(): React.JSX.Element {
     isSuccesfulFlowModalOpen,
     isSelectBitcoinWalletModalOpen,
     isLedgerModalOpen,
+    isJasperModalOpen,
   } = useSelector((state: RootState) => state.modal);
 
   const handleClosingModal = (actionCreator: () => AnyAction) => {
@@ -50,6 +52,10 @@ export function ModalContainer(): React.JSX.Element {
       <LedgerModal
         isOpen={isLedgerModalOpen}
         handleClose={() => handleClosingModal(modalActions.toggleLedgerModalVisibility)}
+      />
+      <JasperModal
+        isOpen={isJasperModalOpen}
+        handleClose={() => handleClosingModal(modalActions.toggleJasperModalVisibility)}
       />
     </>
   );
