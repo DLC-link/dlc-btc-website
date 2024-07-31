@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from 'react';
-import { useQuery } from 'react-query';
 
 import { Vault } from '@models/vault';
 import { BlockchainHeightContext } from '@providers/bitcoin-query-provider';
+import { useQuery } from '@tanstack/react-query';
 import { VaultState } from 'dlc-btc-lib/models';
 
 export function useConfirmationChecker(vault?: Vault): number {
@@ -22,17 +22,13 @@ export function useConfirmationChecker(vault?: Vault): number {
     return transactionDetails.status.block_height;
   }
 
-  const { data: txBlockHeightAtBroadcast } = useQuery(
-    ['transactionDetails', vault?.withdrawDepositTX],
-    () => fetchTransactionDetails(),
-    {
-      enabled:
-        !!vault?.withdrawDepositTX &&
-        vault?.state === VaultState.PENDING &&
-        !blockHeightAtBroadcast,
-      refetchInterval: 10000,
-    }
-  );
+  const { data: txBlockHeightAtBroadcast } = useQuery({
+    queryKey: ['transactionDetails', vault?.withdrawDepositTX],
+    queryFn: () => fetchTransactionDetails(),
+    enabled:
+      !!vault?.withdrawDepositTX && vault?.state === VaultState.PENDING && !blockHeightAtBroadcast,
+    refetchInterval: 10000,
+  });
 
   useEffect(() => {
     if (txBlockHeightAtBroadcast && typeof txBlockHeightAtBroadcast === 'number') {
