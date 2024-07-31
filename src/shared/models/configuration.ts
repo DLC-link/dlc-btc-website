@@ -1,4 +1,5 @@
 import { EthereumDeploymentPlan, EthereumNetworkID } from 'dlc-btc-lib/models';
+import { Config } from 'wagmi';
 
 import { Merchant } from './merchant';
 import { Protocol } from './protocol';
@@ -23,6 +24,7 @@ export interface Configuration {
   enabledEthereumNetworkIDs: EthereumNetworkID[];
   ethereumContractInformations: { name: string; deploymentPlans: EthereumDeploymentPlan[] }[];
   ethereumInfuraWebsocketURL: string;
+  wagmiConfiguration: Config;
   bitcoinNetwork: BitcoinNetworkName;
   bitcoinNetworkIndex: number;
   bitcoinNetworkPreFix: BitcoinNetworkPrefix;

@@ -7,7 +7,30 @@ import wasm from 'vite-plugin-wasm';
 import { EthereumNetworkID } from 'dlc-btc-lib/models';
 import { supportedEthereumNetworks } from 'dlc-btc-lib/constants';
 
+import { http, createConfig, Config } from 'wagmi'
+import { arbitrum, arbitrumSepolia, hardhat, Chain  } from 'wagmi/chains'
+import { filter, fromPairs, includes, map, pipe } from 'ramda';
+import { HttpTransport } from 'viem';
+
 const SOLIDITY_CONTRACT_URL = 'https://raw.githubusercontent.com/DLC-link/dlc-solidity';
+const SUPPORTED_VIEM_CHAINS: Chain[] = [arbitrum, arbitrumSepolia, hardhat];
+
+function getWagmiConfiguration(ethereumNetworkIDs: EthereumNetworkID[]): Config {
+  const wagmiChains = filter(
+    (chain: Chain) => includes(chain.id, map(Number, ethereumNetworkIDs)),
+    SUPPORTED_VIEM_CHAINS
+  ) as [Chain, ...Chain[]];
+
+  const wagmiTransports = pipe(
+    map((chain: Chain): [number, HttpTransport] => [chain.id, http()]),
+    fromPairs
+  )(wagmiChains);
+
+  return createConfig({
+    chains: wagmiChains, 
+    transports: wagmiTransports
+  });
+}
 
 async function fetchEthereumDeploymentPlans(
   appEnvironment: string,
@@ -60,9 +83,13 @@ export default defineConfig(async ({ mode }) =>  {
 
   const appConfigurationJSON = readFileSync(resolve(__dirname, `./config.${environmentName}.json`), 'utf-8');
   const appConfiguration = JSON.parse(appConfigurationJSON);
+  const enabledEthereumNetworkIDs = appConfiguration.enabledEthereumNetworkIDs;
 
-  appConfiguration.ethereumContractInformations = await fetchEthereumDeploymentPlans(environmentName, branchName, appConfiguration.enabledEthereumNetworkIDs);
+
+  appConfiguration.ethereumContractInformations = await fetchEthereumDeploymentPlans(environmentName, branchName, enabledEthereumNetworkIDs);
   appConfiguration.ethereumInfuraWebsocketURL = env.VITE_ARBITRUM_OBSERVER_NODE;
+  appConfiguration.wagmiConfiguration = getWagmiConfiguration(enabledEthereumNetworkIDs);
+  console.log(appConfiguration);
 
   return {
   plugins: [react(), wasm(), ViteToml()],
