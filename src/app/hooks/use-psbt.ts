@@ -5,16 +5,16 @@ import { BitcoinError } from '@models/error-types';
 import { BitcoinWalletType } from '@models/wallet';
 import { bytesToHex } from '@noble/hashes/utils';
 import { BitcoinWalletContext } from '@providers/bitcoin-wallet-context-provider';
+import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { RootState } from '@store/index';
 import { LedgerDLCHandler, SoftwareWalletDLCHandler } from 'dlc-btc-lib';
 import {
   submitFundingPSBT,
   submitWithdrawDepositPSBT,
 } from 'dlc-btc-lib/attestor-request-functions';
+import { getAttestorGroupPublicKey, getRawVault } from 'dlc-btc-lib/ethereum-functions';
 import { Transaction, VaultState } from 'dlc-btc-lib/models';
 
-import { useEthereum } from './use-ethereum';
-import { useEthereumConfiguration } from './use-ethereum-configuration';
 import { useLeather } from './use-leather';
 import { useLedger } from './use-ledger';
 
@@ -45,9 +45,9 @@ export function usePSBT(): UsePSBTReturnType {
     isLoading: isLeatherLoading,
   } = useLeather();
 
-  const { getAttestorGroupPublicKey, getRawVault } = useEthereum();
-
-  const { ethereumAttestorChainID } = useEthereumConfiguration();
+  const { ethereumAttestorChainID, getDLCManagerContract } = useContext(
+    EthereumNetworkConfigurationContext
+  );
 
   const [bitcoinDepositAmount, setBitcoinDepositAmount] = useState(0);
 
@@ -61,10 +61,10 @@ export function usePSBT(): UsePSBTReturnType {
 
       const feeRateMultiplier = import.meta.env.VITE_FEE_RATE_MULTIPLIER;
 
-      const attestorGroupPublicKey = await getAttestorGroupPublicKey();
-      const vault = await getRawVault(vaultUUID);
+      const dlcManagerContract = await getDLCManagerContract();
 
-      if (!bitcoinWalletType) throw new Error('Bitcoin Wallet is not setup');
+      const attestorGroupPublicKey = await getAttestorGroupPublicKey(dlcManagerContract);
+      const vault = await getRawVault(dlcManagerContract, vaultUUID);
 
       let fundingTransaction: Transaction;
       switch (bitcoinWalletType) {
@@ -149,8 +149,10 @@ export function usePSBT(): UsePSBTReturnType {
 
       const feeRateMultiplier = import.meta.env.VITE_FEE_RATE_MULTIPLIER;
 
-      const attestorGroupPublicKey = await getAttestorGroupPublicKey();
-      const vault = await getRawVault(vaultUUID);
+      const dlcManagerContract = await getDLCManagerContract();
+
+      const attestorGroupPublicKey = await getAttestorGroupPublicKey(dlcManagerContract);
+      const vault = await getRawVault(dlcManagerContract, vaultUUID);
 
       if (!bitcoinWalletType) throw new Error('Bitcoin Wallet is not setup');
 

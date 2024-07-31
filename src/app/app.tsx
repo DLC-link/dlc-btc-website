@@ -11,20 +11,19 @@ import { ProofOfReservePage } from '@pages/proof-of-reserve/proof-of-reserve-pag
 import { BalanceContextProvider } from '@providers/balance-context-provider';
 import { BlockchainHeightContextProvider } from '@providers/bitcoin-query-provider';
 import { BitcoinWalletContextProvider } from '@providers/bitcoin-wallet-context-provider';
+import { EthereumNetworkConfigurationContextProvider } from '@providers/ethereum-network-configuration.provider';
 import { EthereumObserverProvider } from '@providers/ethereum-observer-provider';
 import { ProofOfReserveContextProvider } from '@providers/proof-of-reserve-context-provider';
 
 import { About } from './pages/about/about';
 import { Dashboard } from './pages/dashboard/dashboard';
-import { EthereumContextProvider } from './providers/ethereum-context-provider';
 import { VaultContextProvider } from './providers/vault-context-provider';
 
 const queryClient = new QueryClient();
-
 export function App(): React.JSX.Element {
   return (
     <QueryClientProvider client={queryClient}>
-      <EthereumContextProvider>
+      <EthereumNetworkConfigurationContextProvider>
         <EthereumObserverProvider>
           <BitcoinWalletContextProvider>
             <VaultContextProvider>
@@ -50,7 +49,7 @@ export function App(): React.JSX.Element {
             </VaultContextProvider>
           </BitcoinWalletContextProvider>
         </EthereumObserverProvider>
-      </EthereumContextProvider>
+      </EthereumNetworkConfigurationContextProvider>
     </QueryClientProvider>
   );
 }

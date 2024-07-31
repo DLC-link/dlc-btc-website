@@ -4,17 +4,65 @@ import { resolve } from 'path'
 import { ViteToml } from 'vite-plugin-toml'
 import { readFileSync } from 'fs';
 import wasm from 'vite-plugin-wasm';
+import { EthereumNetworkID } from 'dlc-btc-lib/models';
+import { supportedEthereumNetworks } from 'dlc-btc-lib/constants';
+
+const SOLIDITY_CONTRACT_URL = 'https://raw.githubusercontent.com/DLC-link/dlc-solidity';
+
+async function fetchEthereumDeploymentPlans(
+  appEnvironment: string,
+  branchName: string,
+  ethereumNetworkIDs: EthereumNetworkID[],
+  localDeploymentFilesURL?: string
+): Promise<any[]> {
+  const deploymentPlans = await Promise.all(ethereumNetworkIDs.map(async (ethereumNetworkID) => {
+    const ethereumNetwork = supportedEthereumNetworks.find(
+      network => network.id === ethereumNetworkID
+    );
+
+    const networkDeploymentPlans = await Promise.all(['DLCManager', 'DLCBTC'].map(async (contractName) => {
+      let deploymentPlanURL: string;
+    switch (appEnvironment) {
+      case 'mainnet':
+      case 'testnet':
+      case 'devnet':
+        deploymentPlanURL = `${SOLIDITY_CONTRACT_URL}/${branchName}/deploymentFiles/${ethereumNetwork.name.toLowerCase()}/${contractName}.json`;
+        break;
+      case 'localhost':
+        deploymentPlanURL = `${localDeploymentFilesURL}/contracts/localhost/${contractName}.json`;
+        break;
+      default:
+        throw new Error('Invalid App Environment');
+    }
+      try {
+        const response = await fetch(deploymentPlanURL);
+        const contractData = await response.json();
+        return contractData;
+      } catch (error) {
+        throw new Error(
+          `Could not fetch deployment info for ${contractName} on ${ethereumNetwork.name}`
+        );
+      }
+    }));
+    return { name: ethereumNetwork.name, deploymentPlans: networkDeploymentPlans};
+  }));
+
+  return deploymentPlans;
+}
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) =>  {
+export default defineConfig(async ({ mode }) =>  {
 
   const env = loadEnv(mode, process.cwd(), '')
 
   const environmentName = env.VITE_APP_ENVIRONMENT;
+  const branchName = env.VITE_ETHEREUM_DEPLOYMENT_BRANCH
 
   const appConfigurationJSON = readFileSync(resolve(__dirname, `./config.${environmentName}.json`), 'utf-8');
   const appConfiguration = JSON.parse(appConfigurationJSON);
-  
+
+  appConfiguration.ethereumContractInformations = await fetchEthereumDeploymentPlans(environmentName, branchName, appConfiguration.enabledEthereumNetworkIDs);
+  appConfiguration.ethereumInfuraWebsocketURL = env.VITE_ARBITRUM_OBSERVER_NODE;
 
   return {
   plugins: [react(), wasm(), ViteToml()],

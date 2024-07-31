@@ -2,6 +2,7 @@
   "name": "dlc-btc-website",
   "private": true,
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
     "localhost": "vite --mode localhost",
     "devnet": "vite --mode devnet",
@@ -16,7 +17,7 @@
     "lint:prettier:fix": "prettier --write \"{src,tests}/**/*.{ts,tsx}\" *.js",
     "lint:unused-exports": "ts-unused-exports tsconfig.json",
     "typecheck": "tsc --noEmit",
-    "test:unit": "VITE_APP_ENVIRONMENT=devnet vitest --reporter=verbose unit",
+    "test:unit": "VITE_APP_ENVIRONMENT=devnet VITE_ETHEREUM_DEPLOYMENT_BRANCH=dev vitest --reporter=verbose unit",
     "test:integration": "npx playwright test",
     "preview": "vite preview"
   },
@@ -41,7 +42,7 @@
     "concurrently": "^8.2.2",
     "d3": "^7.9.0",
     "decimal.js": "^10.4.3",
-    "dlc-btc-lib": "2.0.0",
+    "dlc-btc-lib": "2.1.0",
     "dotenv": "^16.3.1",
     "ethers": "5.7.2",
     "formik": "^2.4.5",

@@ -1,7 +1,9 @@
 /* eslint-disable */
+import { useContext } from 'react';
+
 import { HStack, Image, Text } from '@chakra-ui/react';
 import { CustomSkeleton } from '@components/custom-skeleton/custom-skeleton';
-import { useEthereumConfiguration } from '@hooks/use-ethereum-configuration';
+import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { truncateAddress, unshiftValue } from 'dlc-btc-lib/utilities';
 
 export interface MerchantDetailsTableItemProps {
@@ -20,7 +22,7 @@ export function MerchantDetailsTableItem(
 
   const { orderBook, amount, txHash, date } = merchantFocusTableItem;
 
-  const { ethereumExplorerAPIURL } = useEthereumConfiguration();
+  const { ethereumExplorerAPIURL } = useContext(EthereumNetworkConfigurationContext);
 
   const renderAmount = () => {
     const unshiftedValue = unshiftValue(amount);
