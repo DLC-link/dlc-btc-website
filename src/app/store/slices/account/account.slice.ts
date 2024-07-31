@@ -32,11 +32,7 @@ export const accountSlice = createSlice({
       state.loadedAt = new Date().toJSON();
     },
     logout: state => {
-      state.address = undefined;
-      state.walletType = WalletType.Metamask;
-      state.dlcBTCBalance = 0;
-      state.lockedBTCBalance = 0;
-      state.network = getEthereumNetworkByID(appConfiguration.enabledEthereumNetworkIDs.at(0)!);
+      Object.assign(state, initialAccountState);
     },
   },
 });
