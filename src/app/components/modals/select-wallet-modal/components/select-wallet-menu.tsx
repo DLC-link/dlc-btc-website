@@ -1,21 +1,21 @@
 import { Button, HStack, Image, Text } from '@chakra-ui/react';
-import { Wallet, WalletType } from '@models/wallet';
+import { Connector } from 'wagmi';
 
 interface SelectWalletMenuProps {
-  wallet: Wallet;
-  handleClick: (address: string, walletType: WalletType) => void;
+  wagmiConnector: Connector;
+  handleConnectWallet: (wagmiConnector: Connector) => void;
 }
 
 export function SelectWalletMenu({
-  wallet,
-  handleClick,
+  wagmiConnector,
+  handleConnectWallet,
 }: SelectWalletMenuProps): React.JSX.Element {
-  const { logo, name } = wallet;
+  const { icon, name } = wagmiConnector;
 
   return (
-    <Button variant={'wallet'} onClick={() => handleClick('123456789123456789', wallet.id)}>
+    <Button variant={'wallet'} onClick={() => handleConnectWallet(wagmiConnector)}>
       <HStack justifyContent={'space-evenly'} w={'250px'}>
-        <Image src={logo} alt={name} boxSize={'25px'} />
+        <Image src={icon} alt={name} boxSize={'25px'} />
         <Text w={'150px'}>{name}</Text>
       </HStack>
     </Button>
