@@ -3,6 +3,11 @@ import { supportedEthereumNetworks } from 'dlc-btc-lib/constants';
 import { getEthereumContract, getProvider } from 'dlc-btc-lib/ethereum-functions';
 import { EthereumDeploymentPlan, EthereumNetwork, EthereumNetworkID } from 'dlc-btc-lib/models';
 import { Contract } from 'ethers';
+import { filter, fromPairs, includes, map, pipe } from 'ramda';
+import { Chain, HttpTransport, http } from 'viem';
+import { Config, createConfig } from 'wagmi';
+
+import { SUPPORTED_VIEM_CHAINS } from '@shared/constants/ethereum.constants';
 
 import { getEthereumSigner } from './ethereum-account.functions';
 
@@ -56,4 +61,21 @@ export async function getEthereumContractWithSigner(
     contractName,
     await getEthereumSigner(walletType, ethereumNetwork)
   );
+}
+
+export function getWagmiConfiguration(ethereumNetworkIDs: EthereumNetworkID[]): Config {
+  const wagmiChains = filter(
+    (chain: Chain) => includes(chain.id, map(Number, ethereumNetworkIDs)),
+    SUPPORTED_VIEM_CHAINS
+  ) as [Chain, ...Chain[]];
+
+  const wagmiTransports = pipe(
+    map((chain: Chain): [number, HttpTransport] => [chain.id, http()]),
+    fromPairs
+  )(wagmiChains);
+
+  return createConfig({
+    chains: wagmiChains,
+    transports: wagmiTransports,
+  });
 }
