@@ -12,7 +12,7 @@ import { HasChildren } from '@models/has-children';
 import { useQuery } from '@tanstack/react-query';
 import { EthereumNetworkID } from 'dlc-btc-lib/models';
 import { Contract } from 'ethers';
-import { defaultTo, find, propEq } from 'ramda';
+import { defaultTo, equals, find } from 'ramda';
 import { useAccount } from 'wagmi';
 
 import { SUPPORTED_VIEM_CHAINS } from '@shared/constants/ethereum.constants';
@@ -23,7 +23,7 @@ interface EthereumNetworkConfigurationContext extends EthereumNetworkConfigurati
   getDLCManagerContract: (rpcEndpoint?: string) => Promise<Contract>;
 }
 const defaultEthereumNetwork = find(
-  propEq('id', Number(appConfiguration.enabledEthereumNetworkIDs.at(0))),
+  chain => equals(chain.id, Number(appConfiguration.enabledEthereumNetworkIDs.at(0))),
   SUPPORTED_VIEM_CHAINS
 );
 
@@ -92,7 +92,7 @@ export function EthereumNetworkConfigurationContextProvider({
   const ethersSigner = useEthersSigner();
 
   const { data: ethereumNetworkConfiguration = defaultEthereumNetworkConfiguration } = useQuery({
-    queryKey: [`ethereumNetworkConfiguration-${chain!.id}`],
+    queryKey: [`ethereumNetworkConfiguration-${chain?.id ?? defaultEthereumNetwork?.id!}`],
     queryFn: getEthereumNetworkConfiguration,
   });
 
