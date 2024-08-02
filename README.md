@@ -1,17 +1,13 @@
 # DLC.Link - dlcBTC Bridge
 
+**dlcBTC Website** is an interface for interacting with DLC.Link smart contracts and the Bitcoin blockchain. This platform provides a secure and efficient self-custodial way to lock Bitcoin as collateral and mint dlcBTC tokens based on the amount of Bitcoin locked.
+
 ## Installation
 
 To install all the dependencies, run the following command:
 
 ```bash
 yarn install
-```
-
-or
-
-```bash
-npm install
 ```
 
 ## Setup Environment Variables
