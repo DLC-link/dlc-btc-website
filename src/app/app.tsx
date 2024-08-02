@@ -22,7 +22,7 @@ import { Dashboard } from './pages/dashboard/dashboard';
 import { VaultContextProvider } from './providers/vault-context-provider';
 
 const queryClient = new QueryClient();
-const wagmiConfiguration = getWagmiConfiguration(appConfiguration.enabledEthereumNetworkIDs);
+export const wagmiConfiguration = getWagmiConfiguration(appConfiguration.enabledEthereumNetworkIDs);
 
 export function App(): React.JSX.Element {
   return (
