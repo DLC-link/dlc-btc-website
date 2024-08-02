@@ -1,12 +1,10 @@
 import { useContext, useState } from 'react';
-import { useSelector } from 'react-redux';
 
 import { BitcoinError } from '@models/error-types';
 import { BitcoinWalletType } from '@models/wallet';
 import { bytesToHex } from '@noble/hashes/utils';
 import { BitcoinWalletContext } from '@providers/bitcoin-wallet-context-provider';
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
-import { RootState } from '@store/index';
 import { LedgerDLCHandler, SoftwareWalletDLCHandler } from 'dlc-btc-lib';
 import {
   submitFundingPSBT,
@@ -14,6 +12,7 @@ import {
 } from 'dlc-btc-lib/attestor-request-functions';
 import { getAttestorGroupPublicKey, getRawVault } from 'dlc-btc-lib/ethereum-functions';
 import { Transaction, VaultState } from 'dlc-btc-lib/models';
+import { useAccount } from 'wagmi';
 
 import { useLeather } from './use-leather';
 import { useLedger } from './use-ledger';
@@ -26,7 +25,7 @@ interface UsePSBTReturnType {
 }
 
 export function usePSBT(): UsePSBTReturnType {
-  const { address: ethereumUserAddress } = useSelector((state: RootState) => state.account);
+  const { address: ethereumUserAddress } = useAccount();
 
   const { bitcoinWalletType, dlcHandler, resetBitcoinWalletContext } =
     useContext(BitcoinWalletContext);

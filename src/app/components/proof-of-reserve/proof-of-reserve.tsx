@@ -1,5 +1,4 @@
 import { useContext } from 'react';
-import { useSelector } from 'react-redux';
 
 import { Divider, HStack, Text } from '@chakra-ui/react';
 import { ProtocolHistoryTableItemProps } from '@components/protocol-history-table/components/protocol-history-table-item';
@@ -9,8 +8,8 @@ import { Merchant } from '@models/merchant';
 import { bitcoin, dlcBTC } from '@models/token';
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
-import { RootState } from '@store/index';
 import { useQuery } from '@tanstack/react-query';
+import { useAccount } from 'wagmi';
 
 import { BURN_ADDRESS } from '@shared/constants/ethereum.constants';
 
@@ -35,7 +34,7 @@ export function ProofOfReserve(): React.JSX.Element {
     }),
   ];
 
-  const { network: ethereumNetwork } = useSelector((state: RootState) => state.account);
+  const { chain } = useAccount();
 
   const { data: allMintBurnEvents } = useQuery({
     queryKey: ['allMintBurnEvents'],
@@ -47,7 +46,7 @@ export function ProofOfReserve(): React.JSX.Element {
   async function fetchMintBurnEventsHandler(): Promise<ProtocolHistoryTableItemProps[]> {
     const detailedEvents = await fetchMintBurnEvents(
       getReadOnlyDLCBTCContract(),
-      ethereumNetwork.defaultNodeURL,
+      chain?.rpcUrls.default.http[0]!,
       undefined,
       10
     );

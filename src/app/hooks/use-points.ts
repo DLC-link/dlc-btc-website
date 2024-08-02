@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
 
 import { getEthereumNetworkDeploymentPlans } from '@functions/configuration.functions';
 import {
@@ -9,9 +8,8 @@ import {
   TimeStampedEvent,
 } from '@models/ethereum-models';
 import Decimal from 'decimal.js';
-import { EthereumNetwork } from 'dlc-btc-lib/models';
-
-import { RootState } from '../store';
+import { Chain } from 'viem';
+import { useAccount } from 'wagmi';
 
 interface UsePointsReturnType {
   userPoints: PointsData | undefined;
@@ -95,11 +93,11 @@ export function calculatePoints(
 }
 
 async function fetchTransfersForUser(
-  ethereumNetwork: EthereumNetwork,
+  ethereumNetwork: Chain,
   userAddress: string,
   contractAddress?: string
 ): Promise<DetailedEvent[]> {
-  const providerURL = ethereumNetwork.defaultNodeURL;
+  const providerURL = ethereumNetwork.rpcUrls.default.http[0];
 
   if (!contractAddress) {
     const dlcBTCContract = getEthereumNetworkDeploymentPlans(ethereumNetwork).find(
@@ -128,9 +126,7 @@ async function fetchTransfersForUser(
 }
 
 export function usePoints(): UsePointsReturnType {
-  const { address: userAddress, network: ethereumNetwork } = useSelector(
-    (state: RootState) => state.account
-  );
+  const { address, chain } = useAccount();
 
   const [userPoints, setUserPoints] = useState<PointsData | undefined>(undefined);
 
@@ -140,7 +136,7 @@ export function usePoints(): UsePointsReturnType {
       name: 'dlcBTC',
       multiplier: 1,
       getRollingTVL: async (userAddress: string): Promise<TimeStampedEvent[]> => {
-        const events = await fetchTransfersForUser(ethereumNetwork, userAddress);
+        const events = await fetchTransfersForUser(chain!, address!);
         events.sort((a, b) => a.timestamp - b.timestamp);
         const rollingTVL = calculateRollingTVL(events, userAddress);
         return rollingTVL;
@@ -155,7 +151,7 @@ export function usePoints(): UsePointsReturnType {
         if (!gaugeAddress) {
           return [];
         }
-        const events = await fetchTransfersForUser(ethereumNetwork, userAddress, gaugeAddress);
+        const events = await fetchTransfersForUser(chain!, address!, gaugeAddress);
         events.sort((a, b) => a.timestamp - b.timestamp);
         const rollingTVL = calculateRollingTVL(events, userAddress);
         return rollingTVL;
@@ -167,11 +163,11 @@ export function usePoints(): UsePointsReturnType {
     const fetchUserPoints = async (currentUserAddress: string) => {
       void fetchPoints(currentUserAddress);
     };
-    if (userAddress) {
-      void fetchUserPoints(userAddress);
+    if (address) {
+      void fetchUserPoints(address);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userAddress]);
+  }, [address]);
 
   async function fetchPoints(currentUserAddress: string): Promise<void> {
     // This is the default 1x reward rate of 10000 points/day/BTC

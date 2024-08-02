@@ -1,21 +1,21 @@
 /* eslint-disable no-console */
 import { useContext, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { getAndFormatVault } from '@functions/vault.functions';
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
-import { RootState } from '@store/index';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { modalActions } from '@store/slices/modal/modal.actions';
 import { vaultActions } from '@store/slices/vault/vault.actions';
+import { EthereumNetworkID } from 'dlc-btc-lib/models';
 import { delay } from 'dlc-btc-lib/utilities';
+import { equals } from 'ramda';
+import { useAccount } from 'wagmi';
 
 export function useEthereumObserver(): void {
   const dispatch = useDispatch();
 
-  const { address: ethereumUserAddress, network: ethereumNetwork } = useSelector(
-    (state: RootState) => state.account
-  );
+  const { address: ethereumUserAddress, chainId, chain } = useAccount();
 
   const { getReadOnlyDLCManagerContract } = useContext(EthereumNetworkConfigurationContext);
 
@@ -26,13 +26,13 @@ export function useEthereumObserver(): void {
       appConfiguration.ethereumInfuraWebsocketURL
     );
 
-    console.log(`Listening to [${ethereumNetwork.name}]`);
+    console.log(`Listening to [${chain?.name}]`);
     console.log(`Listening to [${dlcManagerContract.address}]`);
 
     dlcManagerContract.on('CreateDLC', async (...args: any[]) => {
       const vaultOwner: string = args[1];
 
-      if (vaultOwner.toLowerCase() !== ethereumUserAddress) return;
+      if (!equals(vaultOwner, ethereumUserAddress)) return;
 
       const vaultUUID = args[0];
 
@@ -44,7 +44,7 @@ export function useEthereumObserver(): void {
             vaultActions.swapVault({
               vaultUUID,
               updatedVault: vault,
-              networkID: ethereumNetwork.id,
+              networkID: chain?.id.toString() as EthereumNetworkID,
             })
           );
         })
@@ -56,11 +56,9 @@ export function useEthereumObserver(): void {
     dlcManagerContract.on('SetStatusFunded', async (...args: any[]) => {
       const vaultOwner = args[2];
 
-      if (vaultOwner.toLowerCase() !== ethereumUserAddress) return;
+      if (!equals(vaultOwner, ethereumUserAddress)) return;
 
       const vaultUUID = args[0];
-
-      console.log('vaultUUID', vaultUUID);
 
       console.log(`Vault ${vaultUUID} is funded`);
 
@@ -70,7 +68,7 @@ export function useEthereumObserver(): void {
             vaultActions.swapVault({
               vaultUUID,
               updatedVault: vault,
-              networkID: ethereumNetwork.id,
+              networkID: chain?.id.toString() as EthereumNetworkID,
             })
           );
         })
@@ -89,7 +87,7 @@ export function useEthereumObserver(): void {
     dlcManagerContract.on('SetStatusPending', async (...args: any[]) => {
       const vaultOwner = args[2];
 
-      if (vaultOwner.toLowerCase() !== ethereumUserAddress) return;
+      if (!equals(vaultOwner, ethereumUserAddress)) return;
 
       const vaultUUID = args[0];
 
@@ -101,7 +99,7 @@ export function useEthereumObserver(): void {
             vaultActions.swapVault({
               vaultUUID,
               updatedVault: vault,
-              networkID: ethereumNetwork.id,
+              networkID: chain?.id.toString() as EthereumNetworkID,
             })
           );
           return vault;
@@ -115,5 +113,5 @@ export function useEthereumObserver(): void {
         });
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ethereumNetwork]);
+  }, [chainId]);
 }

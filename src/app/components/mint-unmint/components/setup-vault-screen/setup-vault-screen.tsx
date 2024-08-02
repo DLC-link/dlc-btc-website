@@ -1,32 +1,21 @@
 import { useContext, useState } from 'react';
-import { useSelector } from 'react-redux';
 
 import { Button, VStack, useToast } from '@chakra-ui/react';
-import { getEthereumContractWithSigner } from '@functions/configuration.functions';
 import { EthereumError } from '@models/error-types';
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
-import { RootState } from '@store/index';
 import { setupVault } from 'dlc-btc-lib/ethereum-functions';
 
 export function SetupVaultScreen(): React.JSX.Element {
   const toast = useToast();
 
-  const { ethereumContractDeploymentPlans } = useContext(EthereumNetworkConfigurationContext);
-  const { walletType, network: ethereumNetwork } = useSelector((state: RootState) => state.account);
+  const { getDLCManagerContract } = useContext(EthereumNetworkConfigurationContext);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSetup() {
     try {
       setIsSubmitting(true);
-      const dlcManagerContract = await getEthereumContractWithSigner(
-        ethereumContractDeploymentPlans,
-        'DLCManager',
-        walletType,
-        ethereumNetwork
-      );
-
-      await setupVault(dlcManagerContract);
+      await setupVault(await getDLCManagerContract());
     } catch (error) {
       setIsSubmitting(false);
       toast({

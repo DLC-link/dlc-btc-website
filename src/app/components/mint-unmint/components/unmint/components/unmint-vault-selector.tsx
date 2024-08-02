@@ -13,7 +13,9 @@ import { RootState } from '@store/index';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { vaultActions } from '@store/slices/vault/vault.actions';
 import { withdraw } from 'dlc-btc-lib/ethereum-functions';
+import { EthereumNetworkID } from 'dlc-btc-lib/models';
 import { shiftValue } from 'dlc-btc-lib/utilities';
+import { useAccount } from 'wagmi';
 
 import { BurnTokenTransactionForm } from '../../sign-transaction-screen/components/ethereum-transaction-form';
 
@@ -38,13 +40,13 @@ export function UnmintVaultSelector({
 
   const { unmintStep } = useSelector((state: RootState) => state.mintunmint);
 
+  const { chainId } = useAccount();
+
   const [selectedVault, setSelectedVault] = useState<Vault | undefined>();
 
   const { getDLCManagerContract, getReadOnlyDLCManagerContract } = useContext(
     EthereumNetworkConfigurationContext
   );
-
-  const { network: ethereumNetwork } = useSelector((state: RootState) => state.account);
 
   function handleSelect(uuid: string): void {
     const vault = fundedVaults.find(vault => vault.uuid === uuid);
@@ -74,7 +76,7 @@ export function UnmintVaultSelector({
               vaultActions.swapVault({
                 vaultUUID: selectedVault.uuid,
                 updatedVault: vault,
-                networkID: ethereumNetwork.id,
+                networkID: chainId?.toString() as EthereumNetworkID,
               })
             );
           })
