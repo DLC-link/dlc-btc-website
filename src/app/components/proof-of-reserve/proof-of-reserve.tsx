@@ -41,12 +41,14 @@ export function ProofOfReserve(): React.JSX.Element {
     queryFn: fetchMintBurnEventsHandler,
   });
 
-  const { getReadOnlyDLCBTCContract } = useContext(EthereumNetworkConfigurationContext);
+  const { getReadOnlyDLCBTCContract, defaultEthereumNetwork } = useContext(
+    EthereumNetworkConfigurationContext
+  );
 
   async function fetchMintBurnEventsHandler(): Promise<ProtocolHistoryTableItemProps[]> {
     const detailedEvents = await fetchMintBurnEvents(
       getReadOnlyDLCBTCContract(),
-      chain?.rpcUrls.default.http[0]!,
+      chain?.rpcUrls.default.http[0] ?? defaultEthereumNetwork.rpcUrls.default.http[0],
       undefined,
       10
     );

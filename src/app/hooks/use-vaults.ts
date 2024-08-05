@@ -1,6 +1,7 @@
 import { useContext, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { isEnabledEthereumNetwork } from '@functions/configuration.functions';
 import { formatVault } from '@functions/vault.functions';
 import { Vault } from '@models/vault';
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
@@ -23,7 +24,7 @@ interface UseVaultsReturnType {
 export function useVaults(): UseVaultsReturnType {
   const dispatch = useDispatch();
 
-  const { isConnected, address, chainId } = useAccount();
+  const { isConnected, address, chainId, chain } = useAccount();
 
   const { vaults } = useSelector((state: RootState) => state.vault);
 
@@ -55,11 +56,7 @@ export function useVaults(): UseVaultsReturnType {
   };
 
   useEffect(() => {
-    isConnected &&
-      appConfiguration.enabledEthereumNetworkIDs.includes(
-        chainId?.toString() as EthereumNetworkID
-      ) &&
-      void fetchVaultsIfReady(address!);
+    isConnected && chain && isEnabledEthereumNetwork(chain) && void fetchVaultsIfReady(address!);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, address, chainId]);
 
@@ -67,86 +64,68 @@ export function useVaults(): UseVaultsReturnType {
     () =>
       [
         ...vaults[
-          chainId &&
-          appConfiguration.enabledEthereumNetworkIDs.includes(
-            chainId?.toString() as EthereumNetworkID
-          )
-            ? (chainId.toString() as EthereumNetworkID)
-            : '42161'
+          chain && isEnabledEthereumNetwork(chain)
+            ? (chain.id.toString() as EthereumNetworkID)
+            : appConfiguration.enabledEthereumNetworkIDs[0]
         ],
       ].sort((a, b) => b.timestamp - a.timestamp),
-    [vaults, chainId]
+    [vaults, chain]
   );
 
   const readyVaults = useMemo(
     () =>
       vaults[
-        chainId &&
-        appConfiguration.enabledEthereumNetworkIDs.includes(
-          chainId?.toString() as EthereumNetworkID
-        )
-          ? (chainId.toString() as EthereumNetworkID)
-          : '42161'
+        chain && isEnabledEthereumNetwork(chain)
+          ? (chain.id.toString() as EthereumNetworkID)
+          : appConfiguration.enabledEthereumNetworkIDs[0]
       ]
         .filter(vault => vault.state === VaultState.READY)
         .sort((a, b) => b.timestamp - a.timestamp),
-    [vaults, chainId]
+    [vaults, chain]
   );
   const fundedVaults = useMemo(
     () =>
       vaults[
-        chainId &&
-        appConfiguration.enabledEthereumNetworkIDs.includes(
-          chainId?.toString() as EthereumNetworkID
-        )
-          ? (chainId.toString() as EthereumNetworkID)
-          : '42161'
+        chain && isEnabledEthereumNetwork(chain)
+          ? (chain.id.toString() as EthereumNetworkID)
+          : appConfiguration.enabledEthereumNetworkIDs[0]
       ]
         .filter(vault => vault.state === VaultState.FUNDED)
         .sort((a, b) => b.timestamp - a.timestamp),
-    [vaults, chainId]
+    [vaults, chain]
   );
   const pendingVaults = useMemo(
     () =>
       vaults[
-        chainId &&
-        appConfiguration.enabledEthereumNetworkIDs.includes(
-          chainId?.toString() as EthereumNetworkID
-        )
-          ? (chainId.toString() as EthereumNetworkID)
-          : '42161'
+        chain && isEnabledEthereumNetwork(chain)
+          ? (chain.id.toString() as EthereumNetworkID)
+          : appConfiguration.enabledEthereumNetworkIDs[0]
       ]
         .filter(vault => vault.state === VaultState.PENDING)
         .sort((a, b) => b.timestamp - a.timestamp),
-    [vaults, chainId]
+    [vaults, chain]
   );
   const closingVaults = useMemo(
     () =>
       vaults[
-        chainId &&
-        appConfiguration.enabledEthereumNetworkIDs.includes(
-          chainId?.toString() as EthereumNetworkID
-        )
-          ? (chainId.toString() as EthereumNetworkID)
-          : '42161'
+        chain && isEnabledEthereumNetwork(chain)
+          ? (chain.id.toString() as EthereumNetworkID)
+          : appConfiguration.enabledEthereumNetworkIDs[0]
       ]
         .filter(vault => vault.state === VaultState.CLOSING)
         .sort((a, b) => b.timestamp - a.timestamp),
-    [vaults, chainId]
+    [vaults, chain]
   );
   const closedVaults = useMemo(
     () =>
       vaults[
-        chainId &&
-        appConfiguration.enabledEthereumNetworkIDs.includes(
-          chainId?.toString() as EthereumNetworkID
-        )
-          ? (chainId.toString() as EthereumNetworkID)
-          : '42161'
+        chain && isEnabledEthereumNetwork(chain)
+          ? (chain.id.toString() as EthereumNetworkID)
+          : appConfiguration.enabledEthereumNetworkIDs[0]
       ]
         .filter(vault => vault.state === VaultState.CLOSED)
         .sort((a, b) => b.timestamp - a.timestamp),
-    [vaults, chainId]
+    [vaults, chain]
   );
 
   return {

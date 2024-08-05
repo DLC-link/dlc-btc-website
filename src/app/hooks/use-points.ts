@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 
-import { getEthereumNetworkDeploymentPlans } from '@functions/configuration.functions';
+import {
+  getEthereumNetworkDeploymentPlans,
+  isEnabledEthereumNetwork,
+} from '@functions/configuration.functions';
 import {
   DetailedEvent,
   PointsData,
@@ -135,8 +138,11 @@ export function usePoints(): UsePointsReturnType {
       description: 'Holding dlcBTC in user wallet',
       name: 'dlcBTC',
       multiplier: 1,
-      getRollingTVL: async (userAddress: string): Promise<TimeStampedEvent[]> => {
-        const events = await fetchTransfersForUser(chain!, address!);
+      getRollingTVL: async (
+        userAddress: string,
+        ethereumNetwork: Chain
+      ): Promise<TimeStampedEvent[]> => {
+        const events = await fetchTransfersForUser(ethereumNetwork, userAddress);
         events.sort((a, b) => a.timestamp - b.timestamp);
         const rollingTVL = calculateRollingTVL(events, userAddress);
         return rollingTVL;
@@ -146,12 +152,15 @@ export function usePoints(): UsePointsReturnType {
       description: 'Staking LP tokens in DLCBTC/WBTC gauge',
       name: 'Curve',
       multiplier: 5,
-      getRollingTVL: async (userAddress: string): Promise<TimeStampedEvent[]> => {
+      getRollingTVL: async (
+        userAddress: string,
+        ethereumNetwork: Chain
+      ): Promise<TimeStampedEvent[]> => {
         const gaugeAddress = appConfiguration.protocols.find(p => p.name === 'Curve')?.gaugeAddress;
         if (!gaugeAddress) {
           return [];
         }
-        const events = await fetchTransfersForUser(chain!, address!, gaugeAddress);
+        const events = await fetchTransfersForUser(ethereumNetwork, userAddress, gaugeAddress);
         events.sort((a, b) => a.timestamp - b.timestamp);
         const rollingTVL = calculateRollingTVL(events, userAddress);
         return rollingTVL;
@@ -160,16 +169,19 @@ export function usePoints(): UsePointsReturnType {
   ];
 
   useEffect(() => {
-    const fetchUserPoints = async (currentUserAddress: string) => {
-      void fetchPoints(currentUserAddress);
+    const fetchUserPoints = async (currentUserAddress: string, currentEthereumNetwork: Chain) => {
+      void fetchPoints(currentUserAddress, currentEthereumNetwork);
     };
-    if (address) {
-      void fetchUserPoints(address);
+    if (address && chain && isEnabledEthereumNetwork(chain)) {
+      void fetchUserPoints(address, chain);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [address]);
+  }, [address, chain]);
 
-  async function fetchPoints(currentUserAddress: string): Promise<void> {
+  async function fetchPoints(
+    currentUserAddress: string,
+    currentEthereumNetwork: Chain
+  ): Promise<void> {
     // This is the default 1x reward rate of 10000 points/day/BTC
     const rewardsRate = import.meta.env.VITE_REWARDS_RATE;
     if (!rewardsRate) {
@@ -179,7 +191,7 @@ export function usePoints(): UsePointsReturnType {
     let totalPoints = 0;
     const protocolRewards: ProtocolRewards[] = [];
     for (const protocol of protocolRewardDefinitions) {
-      const rollingTVL = await protocol.getRollingTVL(currentUserAddress);
+      const rollingTVL = await protocol.getRollingTVL(currentUserAddress, currentEthereumNetwork);
       const points = calculatePoints(rollingTVL, rewardsRate * protocol.multiplier);
       totalPoints += points;
       protocolRewards.push({

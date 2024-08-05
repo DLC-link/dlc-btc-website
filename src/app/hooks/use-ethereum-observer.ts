@@ -2,6 +2,7 @@
 import { useContext, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
+import { isEnabledEthereumNetwork } from '@functions/configuration.functions';
 import { getAndFormatVault } from '@functions/vault.functions';
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
@@ -20,7 +21,8 @@ export function useEthereumObserver(): void {
   const { getReadOnlyDLCManagerContract } = useContext(EthereumNetworkConfigurationContext);
 
   useEffect(() => {
-    if (!ethereumUserAddress) return;
+    if (!ethereumUserAddress || !chain) return;
+    if (!isEnabledEthereumNetwork(chain)) return;
 
     const dlcManagerContract = getReadOnlyDLCManagerContract(
       appConfiguration.ethereumInfuraWebsocketURL
