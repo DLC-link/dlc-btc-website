@@ -56,7 +56,7 @@ export function useVaults(): UseVaultsReturnType {
   };
 
   useEffect(() => {
-    isConnected && chain && isEnabledEthereumNetwork(chain) && void fetchVaultsIfReady(address!);
+    if (isConnected && chain && isEnabledEthereumNetwork(chain)) void fetchVaultsIfReady(address!);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, address, chainId]);
 

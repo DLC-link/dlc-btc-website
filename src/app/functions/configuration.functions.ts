@@ -94,8 +94,11 @@ export function getWagmiConfiguration(ethereumNetworkIDs: EthereumNetworkID[]): 
   });
 }
 
-export const isEnabledEthereumNetwork = (chain: Chain): boolean =>
-  appConfiguration.enabledEthereumNetworkIDs.includes(chain.id.toString() as EthereumNetworkID);
+export const isEnabledEthereumNetwork = (chain: Chain): boolean => {
+  return appConfiguration.enabledEthereumNetworkIDs.includes(
+    chain.id.toString() as EthereumNetworkID
+  );
+};
 
 function clientToSigner(client: Client<Transport, Chain, Account>): providers.JsonRpcSigner {
   const { account, chain, transport } = client;
