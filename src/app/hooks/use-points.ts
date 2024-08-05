@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
 
-import { getEthereumNetworkDeploymentPlans } from '@functions/configuration.functions';
+import {
+  getEthereumNetworkDeploymentPlans,
+  isEnabledEthereumNetwork,
+} from '@functions/configuration.functions';
 import {
   DetailedEvent,
   PointsData,
@@ -9,9 +11,8 @@ import {
   TimeStampedEvent,
 } from '@models/ethereum-models';
 import Decimal from 'decimal.js';
-import { EthereumNetwork } from 'dlc-btc-lib/models';
-
-import { RootState } from '../store';
+import { Chain } from 'viem';
+import { useAccount } from 'wagmi';
 
 interface UsePointsReturnType {
   userPoints: PointsData | undefined;
@@ -95,11 +96,11 @@ export function calculatePoints(
 }
 
 async function fetchTransfersForUser(
-  ethereumNetwork: EthereumNetwork,
+  ethereumNetwork: Chain,
   userAddress: string,
   contractAddress?: string
 ): Promise<DetailedEvent[]> {
-  const providerURL = ethereumNetwork.defaultNodeURL;
+  const providerURL = ethereumNetwork.rpcUrls.default.http[0];
 
   if (!contractAddress) {
     const dlcBTCContract = getEthereumNetworkDeploymentPlans(ethereumNetwork).find(
@@ -128,9 +129,7 @@ async function fetchTransfersForUser(
 }
 
 export function usePoints(): UsePointsReturnType {
-  const { address: userAddress, network: ethereumNetwork } = useSelector(
-    (state: RootState) => state.account
-  );
+  const { address, chain } = useAccount();
 
   const [userPoints, setUserPoints] = useState<PointsData | undefined>(undefined);
 
@@ -139,7 +138,10 @@ export function usePoints(): UsePointsReturnType {
       description: 'Holding dlcBTC in user wallet',
       name: 'dlcBTC',
       multiplier: 1,
-      getRollingTVL: async (userAddress: string): Promise<TimeStampedEvent[]> => {
+      getRollingTVL: async (
+        userAddress: string,
+        ethereumNetwork: Chain
+      ): Promise<TimeStampedEvent[]> => {
         const events = await fetchTransfersForUser(ethereumNetwork, userAddress);
         events.sort((a, b) => a.timestamp - b.timestamp);
         const rollingTVL = calculateRollingTVL(events, userAddress);
@@ -150,7 +152,10 @@ export function usePoints(): UsePointsReturnType {
       description: 'Staking LP tokens in DLCBTC/WBTC gauge',
       name: 'Curve',
       multiplier: 5,
-      getRollingTVL: async (userAddress: string): Promise<TimeStampedEvent[]> => {
+      getRollingTVL: async (
+        userAddress: string,
+        ethereumNetwork: Chain
+      ): Promise<TimeStampedEvent[]> => {
         const gaugeAddress = appConfiguration.protocols.find(p => p.name === 'Curve')?.gaugeAddress;
         if (!gaugeAddress) {
           return [];
@@ -164,16 +169,19 @@ export function usePoints(): UsePointsReturnType {
   ];
 
   useEffect(() => {
-    const fetchUserPoints = async (currentUserAddress: string) => {
-      void fetchPoints(currentUserAddress);
+    const fetchUserPoints = async (currentUserAddress: string, currentEthereumNetwork: Chain) => {
+      void fetchPoints(currentUserAddress, currentEthereumNetwork);
     };
-    if (userAddress) {
-      void fetchUserPoints(userAddress);
+    if (address && chain && isEnabledEthereumNetwork(chain)) {
+      void fetchUserPoints(address, chain);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userAddress]);
+  }, [address, chain]);
 
-  async function fetchPoints(currentUserAddress: string): Promise<void> {
+  async function fetchPoints(
+    currentUserAddress: string,
+    currentEthereumNetwork: Chain
+  ): Promise<void> {
     // This is the default 1x reward rate of 10000 points/day/BTC
     const rewardsRate = import.meta.env.VITE_REWARDS_RATE;
     if (!rewardsRate) {
@@ -183,7 +191,7 @@ export function usePoints(): UsePointsReturnType {
     let totalPoints = 0;
     const protocolRewards: ProtocolRewards[] = [];
     for (const protocol of protocolRewardDefinitions) {
-      const rollingTVL = await protocol.getRollingTVL(currentUserAddress);
+      const rollingTVL = await protocol.getRollingTVL(currentUserAddress, currentEthereumNetwork);
       const points = calculatePoints(rollingTVL, rewardsRate * protocol.multiplier);
       totalPoints += points;
       protocolRewards.push({

@@ -1,13 +1,12 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
 
 import { HasChildren } from '@models/has-children';
-import { RootState } from '@store/index';
 import {
   getAddressDLCBTCBalance,
   getAllAddressVaults,
   getLockedBTCBalance,
 } from 'dlc-btc-lib/ethereum-functions';
+import { useAccount } from 'wagmi';
 
 import { EthereumNetworkConfigurationContext } from './ethereum-network-configuration.provider';
 import { VaultContext } from './vault-context-provider';
@@ -26,7 +25,7 @@ export function BalanceContextProvider({ children }: HasChildren): React.JSX.Ele
   const { getReadOnlyDLCBTCContract, getReadOnlyDLCManagerContract } = useContext(
     EthereumNetworkConfigurationContext
   );
-  const { address: ethereumUserAddress } = useSelector((state: RootState) => state.account);
+  const { address: ethereumUserAddress } = useAccount();
   const { fundedVaults } = useContext(VaultContext);
 
   const [dlcBTCBalance, setDLCBTCBalance] = useState<number | undefined>(undefined);

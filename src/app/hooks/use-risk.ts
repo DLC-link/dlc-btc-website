@@ -1,7 +1,5 @@
-import { useSelector } from 'react-redux';
-
-import { RootState } from '@store/index';
 import { useQuery } from '@tanstack/react-query';
+import { useAccount } from 'wagmi';
 
 interface UserAddressRegistrationResponse {
   address: string;
@@ -54,7 +52,7 @@ interface UseRiskReturnType {
 }
 
 export function useRisk(): UseRiskReturnType {
-  const { address } = useSelector((state: RootState) => state.account);
+  const { address } = useAccount();
 
   const { data: risk, isLoading } = useQuery({
     queryKey: ['userAddressRisk'],

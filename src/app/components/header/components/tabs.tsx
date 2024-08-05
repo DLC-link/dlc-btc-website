@@ -1,11 +1,10 @@
 import { useContext, useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
 
 import { HStack } from '@chakra-ui/react';
 import { TabButton } from '@components/tab-button/tab-button';
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
-import { RootState } from '@store/index';
 import { isUserWhitelisted, isWhitelistingEnabled } from 'dlc-btc-lib/ethereum-functions';
+import { useAccount } from 'wagmi';
 
 interface NavigationTabsProps {
   activeTab: string;
@@ -16,7 +15,7 @@ export function NavigationTabs({
   activeTab,
   handleTabClick,
 }: NavigationTabsProps): React.JSX.Element {
-  const { address } = useSelector((state: RootState) => state.account);
+  const { address } = useAccount();
   const [showDisplayMintBurn, setShowDisplayMintBurn] = useState<boolean>(false);
   const { getReadOnlyDLCManagerContract } = useContext(EthereumNetworkConfigurationContext);
 

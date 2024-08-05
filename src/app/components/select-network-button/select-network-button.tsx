@@ -1,35 +1,39 @@
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import { HStack, Menu, MenuButton, MenuItem, MenuList, Text } from '@chakra-ui/react';
-import { supportedEthereumNetworks } from 'dlc-btc-lib/constants';
-import { EthereumNetwork } from 'dlc-btc-lib/models';
+import { Chain } from 'viem';
 
 interface SelectNetworkButtonProps {
-  handleClick: (network: EthereumNetwork) => void;
-  currentNetwork?: EthereumNetwork;
+  handleChangeNetwork: (ethereumNetwork: Chain) => void;
+  ethereumNetworks: readonly [Chain, ...Chain[]];
+  selectedEthereumNetwork?: Chain;
 }
 
 export function SelectNetworkButton({
-  handleClick,
-  currentNetwork,
+  handleChangeNetwork,
+  ethereumNetworks,
+  selectedEthereumNetwork,
 }: SelectNetworkButtonProps): React.JSX.Element {
-  const enabledEthereumNetworkIDs = appConfiguration.enabledEthereumNetworkIDs;
-  const enabledEthereumNetworks = supportedEthereumNetworks.filter(network =>
-    enabledEthereumNetworkIDs.includes(network.id)
-  );
-
   return (
     <Menu variant={'network'}>
       <MenuButton>
         <HStack justifyContent={'space-between'}>
-          <Text>{currentNetwork ? currentNetwork.name : 'SELECT NETWORK'}</Text>
+          {selectedEthereumNetwork ? (
+            <Text>{selectedEthereumNetwork.name}</Text>
+          ) : (
+            <Text>{'SELECT NETWORK'}</Text>
+          )}
           <ChevronDownIcon color={'white'} />
         </HStack>
       </MenuButton>
       <MenuList>
-        {enabledEthereumNetworks.map((network, id) => {
+        {ethereumNetworks.map(ethereumNetwork => {
           return (
-            <MenuItem key={id} value={network.id} onClick={() => handleClick(network)}>
-              {network.displayName}
+            <MenuItem
+              key={ethereumNetwork.id}
+              value={ethereumNetwork.id}
+              onClick={() => handleChangeNetwork(ethereumNetwork)}
+            >
+              {ethereumNetwork.name}
             </MenuItem>
           );
         })}
