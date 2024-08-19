@@ -21,6 +21,11 @@
       "name": "DLC.Link",
       "address": "0x0DD4f29E21F10cb2E485cf9bDAb9F2dD1f240Bfa",
       "logo": "/images/logos/dlc-link-logo-horizontal.svg"
+    },
+    {
+      "name": "SmartBitcoinLabs",
+      "address": "0x65B681E2127f31720A598A3DE3A0423482F792c9",
+      "logo": ""
     }
   ],
   "protocols": [
