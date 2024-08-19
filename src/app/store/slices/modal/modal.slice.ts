@@ -12,7 +12,7 @@ const initialModalState: ModalState = {
   isSelectWalletModalOpen: false,
   isSuccesfulFlowModalOpen: [false, 'mint'],
   isSelectBitcoinWalletModalOpen: false,
-  isLedgerModalOpen: false,
+  isLedgerModalOpen: true,
   isJasperModalOpen: false,
 };
 
