@@ -11,7 +11,7 @@ import {
   submitWithdrawDepositPSBT,
 } from 'dlc-btc-lib/attestor-request-functions';
 import { getAttestorGroupPublicKey, getRawVault } from 'dlc-btc-lib/ethereum-functions';
-import { Transaction, VaultState } from 'dlc-btc-lib/models';
+import { AttestorChainID, Transaction, VaultState } from 'dlc-btc-lib/models';
 import { useAccount } from 'wagmi';
 
 import { useLeather } from './use-leather';
@@ -121,13 +121,14 @@ export function usePSBT(): UsePSBTReturnType {
             fundingPSBT: bytesToHex(fundingTransaction.toPSBT()),
             userEthereumAddress: ethereumUserAddress,
             userBitcoinTaprootPublicKey: dlcHandler.getTaprootDerivedPublicKey(),
-            attestorChainID: ethereumAttestorChainID,
+            attestorChainID: ethereumAttestorChainID as AttestorChainID,
           });
           break;
         default:
           await submitWithdrawDepositPSBT(appConfiguration.attestorURLs, {
             vaultUUID,
             withdrawDepositPSBT: bytesToHex(fundingTransaction.toPSBT()),
+            attestorChainID: ethereumAttestorChainID as AttestorChainID,
           });
       }
 
@@ -182,6 +183,7 @@ export function usePSBT(): UsePSBTReturnType {
       await submitWithdrawDepositPSBT(appConfiguration.attestorURLs, {
         vaultUUID,
         withdrawDepositPSBT: withdrawalTransactionHex,
+        attestorChainID: ethereumAttestorChainID as AttestorChainID,
       });
 
       resetBitcoinWalletContext();

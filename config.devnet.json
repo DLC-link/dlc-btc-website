@@ -5,7 +5,7 @@
     "https://devnet.dlc.link/attestor-2",
     "https://devnet.dlc.link/attestor-3"
   ],
-  "enabledEthereumNetworkIDs": ["421614"],
+  "enabledEthereumNetworkIDs": ["421614", "11155111", "84532"],
   "bitcoinNetwork": "regtest",
   "bitcoinNetworkIndex": 1,
   "bitcoinNetworkPreFix": "bcrt1",

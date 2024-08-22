@@ -63,6 +63,7 @@ export default defineConfig(async ({ mode }) =>  {
 
   appConfiguration.ethereumContractInformations = await fetchEthereumDeploymentPlans(environmentName, branchName, appConfiguration.enabledEthereumNetworkIDs);
   appConfiguration.ethereumInfuraWebsocketURL = env.VITE_ARBITRUM_OBSERVER_NODE;
+  appConfiguration.ethereumAlchemyWebsocketURL = env.VITE_BASE_OBSERVER_NODE;
 
   return {
   plugins: [react(), wasm(), ViteToml()],

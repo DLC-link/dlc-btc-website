@@ -57,7 +57,7 @@ const ethereumNetworkConfigurationMap: Record<number, EthereumNetworkConfigurati
   },
   [EthereumNetworkID.Hardhat]: {
     ethereumExplorerAPIURL: 'https://arbiscan.io',
-    ethereumAttestorChainID: 'evm-localhost',
+    ethereumAttestorChainID: 'evm-hardhat-arb',
     ...commonEthereumNetworkConfigurationFields,
   },
 };

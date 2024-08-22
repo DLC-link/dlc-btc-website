@@ -23,6 +23,7 @@ export interface Configuration {
   enabledEthereumNetworkIDs: EthereumNetworkID[];
   ethereumContractInformations: { name: string; deploymentPlans: EthereumDeploymentPlan[] }[];
   ethereumInfuraWebsocketURL: string;
+  ethereumAlchemyWebsocketURL: string;
   bitcoinNetwork: BitcoinNetworkName;
   bitcoinNetworkIndex: number;
   bitcoinNetworkPreFix: BitcoinNetworkPrefix;

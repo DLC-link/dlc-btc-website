@@ -67,10 +67,13 @@ export function UnmintVaultSelector({
 
         await withdraw(await getDLCManagerContract(), selectedVault.uuid, formattedWithdrawAmount);
 
-        await getAndFormatVault(
-          selectedVault.uuid,
-          getReadOnlyDLCManagerContract(appConfiguration.ethereumInfuraWebsocketURL)
-        )
+        let websocketURL;
+        if ([421614, 11155111].includes(chainId!)) {
+          websocketURL = appConfiguration.ethereumInfuraWebsocketURL;
+        } else {
+          websocketURL = appConfiguration.ethereumAlchemyWebsocketURL;
+        }
+        await getAndFormatVault(selectedVault.uuid, getReadOnlyDLCManagerContract(websocketURL))
           .then(vault => {
             dispatch(
               vaultActions.swapVault({

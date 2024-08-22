@@ -2,7 +2,13 @@ import { EthereumDeploymentPlan, EthereumNetwork } from 'dlc-btc-lib/models';
 
 export interface EthereumNetworkConfiguration {
   ethereumExplorerAPIURL: string;
-  ethereumAttestorChainID: 'evm-arbitrum' | 'evm-arbsepolia' | 'evm-localhost';
+  ethereumAttestorChainID:
+    | 'evm-sepolia'
+    | 'evm-arbitrum'
+    | 'evm-arbsepolia'
+    | 'evm-base'
+    | 'evm-basesepolia'
+    | 'evm-hardhat-arb';
   enabledEthereumNetworks: EthereumNetwork[];
   ethereumContractDeploymentPlans: EthereumDeploymentPlan[];
 }

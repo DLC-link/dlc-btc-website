@@ -24,9 +24,14 @@ export function useEthereumObserver(): void {
     if (!ethereumUserAddress || !chain) return;
     if (!isEnabledEthereumNetwork(chain)) return;
 
-    const dlcManagerContract = getReadOnlyDLCManagerContract(
-      appConfiguration.ethereumInfuraWebsocketURL
-    );
+    let websocketURL;
+    if ([421614, 11155111].includes(chain.id)) {
+      websocketURL = appConfiguration.ethereumInfuraWebsocketURL;
+    } else {
+      websocketURL = appConfiguration.ethereumAlchemyWebsocketURL;
+    }
+
+    const dlcManagerContract = getReadOnlyDLCManagerContract(websocketURL);
 
     console.log(`Listening to [${chain?.name}]`);
     console.log(`Listening to [${dlcManagerContract.address}]`);
