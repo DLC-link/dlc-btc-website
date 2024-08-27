@@ -116,7 +116,7 @@ export function usePSBT(): UsePSBTReturnType {
 
       switch (vault.status) {
         case VaultState.READY:
-          await submitFundingPSBT(appConfiguration.attestorURLs, {
+          await submitFundingPSBT([appConfiguration.coordinatorURL], {
             vaultUUID,
             fundingPSBT: bytesToHex(fundingTransaction.toPSBT()),
             userEthereumAddress: ethereumUserAddress,
@@ -125,7 +125,7 @@ export function usePSBT(): UsePSBTReturnType {
           });
           break;
         default:
-          await submitWithdrawDepositPSBT(appConfiguration.attestorURLs, {
+          await submitWithdrawDepositPSBT([appConfiguration.coordinatorURL], {
             vaultUUID,
             withdrawDepositPSBT: bytesToHex(fundingTransaction.toPSBT()),
           });
@@ -179,7 +179,7 @@ export function usePSBT(): UsePSBTReturnType {
           throw new BitcoinError('Invalid Bitcoin Wallet Type');
       }
 
-      await submitWithdrawDepositPSBT(appConfiguration.attestorURLs, {
+      await submitWithdrawDepositPSBT([appConfiguration.coordinatorURL], {
         vaultUUID,
         withdrawDepositPSBT: withdrawalTransactionHex,
       });

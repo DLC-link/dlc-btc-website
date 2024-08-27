@@ -20,6 +20,7 @@ type BitcoinNetworkPrefix = 'bc1' | 'tb1' | 'bcrt1';
 export interface Configuration {
   appEnvironment: AppEnvironment;
   attestorURLs: string[];
+  coordinatorURL: string;
   enabledEthereumNetworkIDs: EthereumNetworkID[];
   ethereumContractInformations: { name: string; deploymentPlans: EthereumDeploymentPlan[] }[];
   ethereumInfuraWebsocketURL: string;
