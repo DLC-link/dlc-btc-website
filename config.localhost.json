@@ -1,10 +1,6 @@
 {
   "appEnvironment": "localhost",
-  "attestorURLs": [
-    "http://192.168.86.31:8811",
-    "http://192.168.86.31:8812",
-    "http://192.168.86.31:8813"
-  ],
+  "coordinatorURL": "http://192.168.86.31:8811",
   "enabledEthereumNetworkIDs": ["421614", "31337"],
   "bitcoinNetwork": "regtest",
   "bitcoinNetworkIndex": 1,
