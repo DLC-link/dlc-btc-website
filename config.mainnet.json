@@ -1,14 +1,5 @@
 {
   "appEnvironment": "mainnet",
-  "attestorURLs": [
-    "https://mainnet.dlc.link/attestor-1",
-    "https://mainnet.dlc.link/attestor-2",
-    "https://mainnet.dlc.link/attestor-3",
-    "https://arb-mainnet-dlc-attestor-0.public.linkpool.io/Xm021miSBasVXI57j1CTNn7I70F8xRYH",
-    "https://dlc.hashkey.cloud",
-    "http://34.116.75.154:8811",
-    "http://dlc-mainnet.stakin-nodes.com:8812"
-  ],
   "coordinatorURL": "https://mainnet.dlc.link/attestor-1",
   "enabledEthereumNetworkIDs": ["42161"],
   "bitcoinNetwork": "mainnet",
