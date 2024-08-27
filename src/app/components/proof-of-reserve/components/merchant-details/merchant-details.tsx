@@ -9,6 +9,8 @@ import { bitcoin, dlcBTC } from '@models/token';
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
 import { useQuery } from '@tanstack/react-query';
+import { DetailedEvent } from 'dlc-btc-lib/models';
+import { isEmpty } from 'ramda';
 import { useAccount } from 'wagmi';
 
 import { MerchantDetailsTableItemProps } from '../merchant-table/components/merchant-details-table-item';
@@ -45,19 +47,27 @@ export function MerchantDetails(): React.JSX.Element {
   if (!name) return <Text>Error: No merchant name provided</Text>;
 
   async function fetchMintBurnEventsHandler(): Promise<MerchantDetailsTableItemProps[]> {
-    if (!selectedMerchant?.merchant.address) return [];
-    const detailedEvents = await fetchMintBurnEvents(
-      getReadOnlyDLCBTCContract(),
-      chain?.rpcUrls.default.http[0]!,
-      selectedMerchant.merchant.address
-    );
+    if (!selectedMerchant || isEmpty(selectedMerchant?.merchant.addresses)) return [];
+    const detailedEvents: DetailedEvent[] = (
+      await Promise.all(
+        selectedMerchant.merchant.addresses.map(async address => {
+          return await fetchMintBurnEvents(
+            getReadOnlyDLCBTCContract(),
+            chain?.rpcUrls.default.http[0]!,
+            address
+          );
+        })
+      )
+    ).flat();
+
     return detailedEvents.map((event, index) => {
       return {
         id: index,
-        orderBook:
-          event.from.toLowerCase() === selectedMerchant.merchant.address.toLowerCase()
-            ? 'REDEEM'
-            : 'MINT',
+        orderBook: selectedMerchant.merchant.addresses
+          .map(address => address.toLowerCase())
+          .includes(event.from.toLowerCase())
+          ? 'REDEEM'
+          : 'MINT',
         amount: event.value,
         inUSD: 'TODO', //TODO: calculate usd value at the time of mint
         txHash: event.txHash,

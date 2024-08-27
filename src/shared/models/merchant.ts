@@ -1,6 +1,6 @@
 export interface Merchant {
   name: string;
-  address: string;
+  addresses: string[];
   logo: string;
 }
 
