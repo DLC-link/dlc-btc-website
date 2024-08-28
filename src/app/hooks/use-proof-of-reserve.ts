@@ -39,10 +39,19 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
     1;
 
     const promises = appConfiguration.merchants.map(async (merchant: Merchant) => {
-      const proofOfReserve = await calculateProofOfReserveOfAddress(
-        proofOfReserveHandler,
-        allVaults,
-        merchant.address
+      const proofOfReserve = (
+        await Promise.all(
+          merchant.addresses.map(async address => {
+            return await calculateProofOfReserveOfAddress(
+              proofOfReserveHandler,
+              allVaults,
+              address
+            );
+          })
+        )
+      ).reduce(
+        (totalProofOfReserve, addressProofOfReserve) => totalProofOfReserve + addressProofOfReserve,
+        0
       );
       return {
         merchant,
