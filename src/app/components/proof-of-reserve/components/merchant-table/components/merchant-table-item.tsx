@@ -19,7 +19,7 @@ export function MerchantTableItem({
 
   return (
     <HStack w={'100%'} justifyContent={'space-between'}>
-      <HStack w={'150px'}>
+      <HStack w={'250px'}>
         <Text
           fontSize={'2xl'}
           fontWeight={600}

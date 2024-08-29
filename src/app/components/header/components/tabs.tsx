@@ -50,11 +50,11 @@ export function NavigationTabs({
         isActive={activeTab === '/proof-of-reserve'}
         handleClick={() => handleTabClick('/proof-of-reserve')}
       />
-      <TabButton
+      {/* <TabButton
         title={'How It Works'}
         isActive={activeTab === '/how-it-works'}
         handleClick={() => handleTabClick('/how-it-works')}
-      />
+      /> */}
 
       {showDisplayMintBurn && (
         <TabButton
