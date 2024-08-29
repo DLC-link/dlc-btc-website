@@ -30,12 +30,14 @@ export function useVaults(): UseVaultsReturnType {
 
   const [isLoading, setIsLoading] = useState(true);
 
-  const { getReadOnlyDLCManagerContract } = useContext(EthereumNetworkConfigurationContext);
+  const { ethereumNetworkConfiguration, isEthereumNetworkConfigurationLoading } = useContext(
+    EthereumNetworkConfigurationContext
+  );
 
   const fetchVaultsIfReady = async (ethereumAddress: string) => {
     setIsLoading(true);
 
-    await getAllAddressVaults(getReadOnlyDLCManagerContract(), ethereumAddress)
+    await getAllAddressVaults(ethereumNetworkConfiguration.dlcManagerContract, ethereumAddress)
       .then(vaults => {
         const formattedVaults = vaults.map(vault => {
           return formatVault(vault);
@@ -56,9 +58,16 @@ export function useVaults(): UseVaultsReturnType {
   };
 
   useEffect(() => {
-    if (isConnected && chain && isEnabledEthereumNetwork(chain)) void fetchVaultsIfReady(address!);
+    if (
+      isConnected &&
+      chain &&
+      !isEthereumNetworkConfigurationLoading &&
+      isEnabledEthereumNetwork(chain)
+    ) {
+      void fetchVaultsIfReady(address!);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, address, chainId]);
+  }, [isConnected, address, chainId, ethereumNetworkConfiguration]);
 
   const allVaults = useMemo(
     () =>

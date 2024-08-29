@@ -17,14 +17,16 @@ export function NavigationTabs({
 }: NavigationTabsProps): React.JSX.Element {
   const { address } = useAccount();
   const [showDisplayMintBurn, setShowDisplayMintBurn] = useState<boolean>(false);
-  const { getReadOnlyDLCManagerContract } = useContext(EthereumNetworkConfigurationContext);
+  const { ethereumNetworkConfiguration, isEthereumNetworkConfigurationLoading } = useContext(
+    EthereumNetworkConfigurationContext
+  );
 
   useEffect(() => {
     async function checkWhitelisting(address?: string) {
       const result = async () => {
-        if (!address) return false;
+        if (!address || isEthereumNetworkConfigurationLoading) return false;
 
-        const dlcManagerContract = getReadOnlyDLCManagerContract();
+        const dlcManagerContract = ethereumNetworkConfiguration.dlcManagerContract;
 
         return (
           !(await isWhitelistingEnabled(dlcManagerContract)) ||
@@ -36,7 +38,7 @@ export function NavigationTabs({
 
     void checkWhitelisting(address);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [address]);
+  }, [address, isEthereumNetworkConfigurationLoading]);
 
   return (
     <HStack spacing={'25px'} marginRight={'150px'}>

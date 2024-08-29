@@ -15,7 +15,7 @@ interface UseProofOfReserveReturnType {
 }
 
 export function useProofOfReserve(): UseProofOfReserveReturnType {
-  const { getReadOnlyDLCManagerContract } = useContext(EthereumNetworkConfigurationContext);
+  const { ethereumNetworkConfiguration } = useContext(EthereumNetworkConfigurationContext);
 
   const { data: proofOfReserve } = useQuery({
     queryKey: ['proofOfReserve'],
@@ -26,17 +26,19 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
   async function calculateProofOfReserve(): Promise<
     [number | undefined, MerchantProofOfReserve[]]
   > {
-    const attestorGroupPublicKey = await getAttestorGroupPublicKey(getReadOnlyDLCManagerContract());
+    const attestorGroupPublicKey = await getAttestorGroupPublicKey(
+      ethereumNetworkConfiguration.dlcManagerContract
+    );
+
     const proofOfReserveHandler = new ProofOfReserveHandler(
       appConfiguration.bitcoinBlockchainURL,
       BITCOIN_NETWORK_MAP[appConfiguration.bitcoinNetwork],
       attestorGroupPublicKey
     );
 
-    const allVaults = await getContractVaults(getReadOnlyDLCManagerContract());
+    const allVaults = await getContractVaults(ethereumNetworkConfiguration.dlcManagerContract);
 
     const proofOfReserve = await proofOfReserveHandler.calculateProofOfReserve(allVaults);
-    1;
 
     const promises = appConfiguration.merchants.map(async (merchant: Merchant) => {
       const proofOfReserve = (

@@ -1,10 +1,20 @@
 import { EthereumDeploymentPlan, EthereumNetwork } from 'dlc-btc-lib/models';
+import { Contract } from 'ethers';
 
 export interface EthereumNetworkConfiguration {
   ethereumExplorerAPIURL: string;
-  ethereumAttestorChainID: 'evm-arbitrum' | 'evm-arbsepolia' | 'evm-localhost';
+  ethereumAttestorChainID:
+    | 'evm-mainnet'
+    | 'evm-sepolia'
+    | 'evm-arbitrum'
+    | 'evm-arbsepolia'
+    | 'evm-base'
+    | 'evm-basesepolia'
+    | 'evm-hardhat-arb'
+    | 'evm-hardhat-eth';
   enabledEthereumNetworks: EthereumNetwork[];
-  ethereumContractDeploymentPlans: EthereumDeploymentPlan[];
+  dlcManagerContract: Contract;
+  dlcBTCContract: Contract;
 }
 
 export interface TimeStampedEvent {

@@ -36,7 +36,7 @@ export function MerchantDetails(): React.JSX.Element {
   ];
   const selectedMerchant = merchantProofOfReserves.find(item => item.merchant.name === name);
 
-  const { getReadOnlyDLCBTCContract } = useContext(EthereumNetworkConfigurationContext);
+  const { ethereumNetworkConfiguration } = useContext(EthereumNetworkConfigurationContext);
 
   const { data: mintBurnEvents } = useQuery({
     queryKey: [`mintBurnEvents${name}`],
@@ -52,7 +52,7 @@ export function MerchantDetails(): React.JSX.Element {
       await Promise.all(
         selectedMerchant.merchant.addresses.map(async address => {
           return await fetchMintBurnEvents(
-            getReadOnlyDLCBTCContract(),
+            ethereumNetworkConfiguration.dlcBTCContract,
             chain?.rpcUrls.default.http[0]!,
             address
           );

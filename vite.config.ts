@@ -62,7 +62,9 @@ export default defineConfig(async ({ mode }) =>  {
   const appConfiguration = JSON.parse(appConfigurationJSON);
 
   appConfiguration.ethereumContractInformations = await fetchEthereumDeploymentPlans(environmentName, branchName, appConfiguration.enabledEthereumNetworkIDs);
-  appConfiguration.ethereumInfuraWebsocketURL = env.VITE_ARBITRUM_OBSERVER_NODE;
+  appConfiguration.arbitrumWebsocket = env.VITE_ARBITRUM_OBSERVER_NODE;
+  appConfiguration.l1Websocket = env.VITE_L1_OBSERVER_NODE;
+  appConfiguration.baseWebsocket = env.VITE_BASE_OBSERVER_NODE;
 
   return {
   plugins: [react(), wasm(), ViteToml()],

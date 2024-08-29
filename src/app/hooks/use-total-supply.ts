@@ -12,10 +12,10 @@ interface UseTotalSupplyReturnType {
 export function useTotalSupply(): UseTotalSupplyReturnType {
   const [shouldFetch, setShouldFetch] = useState(false);
 
-  const { getReadOnlyDLCBTCContract } = useContext(EthereumNetworkConfigurationContext);
+  const { ethereumNetworkConfiguration } = useContext(EthereumNetworkConfigurationContext);
 
   const fetchTotalSupply = async () => {
-    const totalSupply = await getDLCBTCTotalSupply(getReadOnlyDLCBTCContract());
+    const totalSupply = await getDLCBTCTotalSupply(ethereumNetworkConfiguration.dlcBTCContract);
 
     return unshiftValue(totalSupply);
   };

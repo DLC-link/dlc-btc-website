@@ -102,6 +102,7 @@ export const isEnabledEthereumNetwork = (chain: Chain): boolean => {
 
 function clientToSigner(client: Client<Transport, Chain, Account>): providers.JsonRpcSigner {
   const { account, chain, transport } = client;
+
   const network = {
     chainId: chain.id,
     name: chain.name,

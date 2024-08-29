@@ -6,7 +6,10 @@ import { ProtocolHistoryTable } from '@components/protocol-history-table/protoco
 import { fetchMintBurnEvents } from '@functions/ethereum.functions';
 import { Merchant } from '@models/merchant';
 import { bitcoin, dlcBTC } from '@models/token';
-import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
+import {
+  EthereumNetworkConfigurationContext,
+  defaultEthereumNetwork,
+} from '@providers/ethereum-network-configuration.provider';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
 import { useQuery } from '@tanstack/react-query';
 import { useAccount } from 'wagmi';
@@ -41,13 +44,11 @@ export function ProofOfReserve(): React.JSX.Element {
     queryFn: fetchMintBurnEventsHandler,
   });
 
-  const { getReadOnlyDLCBTCContract, defaultEthereumNetwork } = useContext(
-    EthereumNetworkConfigurationContext
-  );
+  const { ethereumNetworkConfiguration } = useContext(EthereumNetworkConfigurationContext);
 
   async function fetchMintBurnEventsHandler(): Promise<ProtocolHistoryTableItemProps[]> {
     const detailedEvents = await fetchMintBurnEvents(
-      getReadOnlyDLCBTCContract(),
+      ethereumNetworkConfiguration.dlcBTCContract,
       chain?.rpcUrls.default.http[0] ?? defaultEthereumNetwork.rpcUrls.default.http[0],
       undefined,
       10

@@ -18,15 +18,13 @@ export function useEthereumObserver(): void {
 
   const { address: ethereumUserAddress, chainId, chain } = useAccount();
 
-  const { getReadOnlyDLCManagerContract } = useContext(EthereumNetworkConfigurationContext);
+  const { ethereumNetworkConfiguration } = useContext(EthereumNetworkConfigurationContext);
 
   useEffect(() => {
     if (!ethereumUserAddress || !chain) return;
     if (!isEnabledEthereumNetwork(chain)) return;
 
-    const dlcManagerContract = getReadOnlyDLCManagerContract(
-      appConfiguration.ethereumInfuraWebsocketURL
-    );
+    const dlcManagerContract = ethereumNetworkConfiguration.dlcManagerContract;
 
     console.log(`Listening to [${chain?.name}]`);
     console.log(`Listening to [${dlcManagerContract.address}]`);

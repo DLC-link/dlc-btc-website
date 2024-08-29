@@ -22,7 +22,9 @@ export interface Configuration {
   coordinatorURL: string;
   enabledEthereumNetworkIDs: EthereumNetworkID[];
   ethereumContractInformations: { name: string; deploymentPlans: EthereumDeploymentPlan[] }[];
-  ethereumInfuraWebsocketURL: string;
+  l1Websocket: string;
+  arbitrumWebsocket: string;
+  baseWebsocket: string;
   bitcoinNetwork: BitcoinNetworkName;
   bitcoinNetworkIndex: number;
   bitcoinNetworkPreFix: BitcoinNetworkPrefix;
