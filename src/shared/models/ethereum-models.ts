@@ -1,4 +1,4 @@
-import { EthereumDeploymentPlan, EthereumNetwork } from 'dlc-btc-lib/models';
+import { EthereumNetwork } from 'dlc-btc-lib/models';
 import { Contract } from 'ethers';
 
 export interface EthereumNetworkConfiguration {

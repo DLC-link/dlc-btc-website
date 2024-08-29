@@ -47,9 +47,7 @@ export function UnmintVaultSelector({
 
   const signer = useEthersSigner();
 
-  const { ethereumNetworkConfiguration } = useContext(
-    EthereumNetworkConfigurationContext
-  );
+  const { ethereumNetworkConfiguration } = useContext(EthereumNetworkConfigurationContext);
 
   function handleSelect(uuid: string): void {
     const vault = fundedVaults.find(vault => vault.uuid === uuid);

@@ -4,6 +4,7 @@ import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network
 import { useQuery } from '@tanstack/react-query';
 import { getDLCBTCTotalSupply } from 'dlc-btc-lib/ethereum-functions';
 import { unshiftValue } from 'dlc-btc-lib/utilities';
+import { useAccount } from 'wagmi';
 
 interface UseTotalSupplyReturnType {
   totalSupply: number | undefined;
@@ -11,6 +12,7 @@ interface UseTotalSupplyReturnType {
 
 export function useTotalSupply(): UseTotalSupplyReturnType {
   const [shouldFetch, setShouldFetch] = useState(false);
+  const { chainId } = useAccount();
 
   const { ethereumNetworkConfiguration } = useContext(EthereumNetworkConfigurationContext);
 
@@ -21,7 +23,7 @@ export function useTotalSupply(): UseTotalSupplyReturnType {
   };
 
   const { data: totalSupply } = useQuery({
-    queryKey: ['totalSupply'],
+    queryKey: ['totalSupply', chainId, ethereumNetworkConfiguration.dlcBTCContract.address],
     queryFn: fetchTotalSupply,
     enabled: shouldFetch,
     refetchInterval: 60000,

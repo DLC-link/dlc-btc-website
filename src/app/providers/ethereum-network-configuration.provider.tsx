@@ -1,4 +1,5 @@
 import React, { createContext, useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 import {
   getEthereumContractWithProvider,
@@ -8,6 +9,7 @@ import {
 } from '@functions/configuration.functions';
 import { EthereumNetworkConfiguration } from '@models/ethereum-models';
 import { HasChildren } from '@models/has-children';
+import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { EthereumNetworkID } from 'dlc-btc-lib/models';
 import { equals, find } from 'ramda';
 import {
@@ -19,7 +21,7 @@ import {
   mainnet,
   sepolia,
 } from 'viem/chains';
-import { useAccount } from 'wagmi';
+import { useAccount, useDisconnect } from 'wagmi';
 
 import { SUPPORTED_VIEM_CHAINS } from '@shared/constants/ethereum.constants';
 
@@ -38,7 +40,7 @@ const enabledEthereumNetworks = appConfiguration.enabledEthereumNetworkIDs.map(i
   getEthereumNetworkByID(id)
 );
 
-export function getEthereumNetworkConfiguration(
+function getEthereumNetworkConfiguration(
   ethereumNetworkID: EthereumNetworkID
 ): EthereumNetworkConfiguration {
   switch (ethereumNetworkID) {
@@ -188,10 +190,12 @@ export const EthereumNetworkConfigurationContext =
 export function EthereumNetworkConfigurationContextProvider({
   children,
 }: HasChildren): React.JSX.Element {
-  const { isConnected, chain } = useAccount();
+  const dispatch = useDispatch();
+  const { chain, isConnected } = useAccount();
+  const { disconnect } = useDisconnect();
   const [ethereumNetworkConfiguration, setEthereumNetworkConfiguration] =
     useState<EthereumNetworkConfiguration>(
-      isConnected && isEnabledEthereumNetwork(chain!)
+      chain && isEnabledEthereumNetwork(chain)
         ? getEthereumNetworkConfiguration(chain?.id.toString() as EthereumNetworkID)
         : defaultEthereumNetworkConfiguration
     );
@@ -199,13 +203,23 @@ export function EthereumNetworkConfigurationContextProvider({
     useState(false);
 
   useEffect(() => {
-    if (!chain || !isEnabledEthereumNetwork(chain)) {
-      return;
+    if (isConnected && !chain) {
+      disconnect();
+      dispatch(mintUnmintActions.resetMintUnmintState());
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chain]);
+
+  useEffect(() => {
     setIsEthereumNetworkConfigurationLoading(true);
 
+    if (!chain) {
+      setEthereumNetworkConfiguration(defaultEthereumNetworkConfiguration);
+      return;
+    }
+
     const currentEthereumNetworkConfiguration = getEthereumNetworkConfiguration(
-      chain.id.toString() as EthereumNetworkID
+      chain?.id.toString() as EthereumNetworkID
     );
 
     setEthereumNetworkConfiguration(currentEthereumNetworkConfiguration);

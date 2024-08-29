@@ -46,7 +46,7 @@ export function useVaults(): UseVaultsReturnType {
         dispatch(
           vaultActions.setVaults({
             newVaults: formattedVaults,
-            networkID: chainId as unknown as EthereumNetworkID,
+            networkID: chainId?.toString() as EthereumNetworkID,
           })
         );
       })
@@ -58,16 +58,17 @@ export function useVaults(): UseVaultsReturnType {
   };
 
   useEffect(() => {
-    if (
-      isConnected &&
-      chain &&
-      !isEthereumNetworkConfigurationLoading &&
-      isEnabledEthereumNetwork(chain)
-    ) {
+    if (isConnected && chain && !isEthereumNetworkConfigurationLoading) {
       void fetchVaultsIfReady(address!);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, address, chainId, ethereumNetworkConfiguration]);
+  }, [
+    isConnected,
+    address,
+    chain,
+    isEthereumNetworkConfigurationLoading,
+    ethereumNetworkConfiguration,
+  ]);
 
   const allVaults = useMemo(
     () =>

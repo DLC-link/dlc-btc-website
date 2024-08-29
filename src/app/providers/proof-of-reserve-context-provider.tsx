@@ -1,4 +1,4 @@
-import { createContext, useEffect } from 'react';
+import { createContext } from 'react';
 
 import { useBitcoinPrice } from '@hooks/use-bitcoin-price';
 import { useProofOfReserve } from '@hooks/use-proof-of-reserve';
