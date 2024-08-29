@@ -17,7 +17,7 @@ import { ProofOfReserveContextProvider } from '@providers/proof-of-reserve-conte
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WagmiProvider } from 'wagmi';
 
-import { About } from './pages/about/about';
+// import { About } from './pages/about/about';
 import { Dashboard } from './pages/dashboard/dashboard';
 import { VaultContextProvider } from './providers/vault-context-provider';
 
@@ -38,7 +38,7 @@ export function App(): React.JSX.Element {
                       <AppLayout>
                         <Route path="/" element={<PointsPage />} />
                         <Route path="/my-vaults" element={<MyVaults />} />
-                        <Route path="/how-it-works" element={<About />} />
+                        {/* <Route path="/how-it-works" element={<About />} /> */}
                         <Route path="/proof-of-reserve" element={<ProofOfReservePage />} />
                         <Route path="/attestor-details" element={<AttestorDetailsPage />} />
                         <Route

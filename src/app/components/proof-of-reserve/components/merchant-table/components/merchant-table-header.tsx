@@ -3,7 +3,7 @@ import { HStack, Text } from '@chakra-ui/react';
 export function MerchantTableHeader(): React.JSX.Element {
   return (
     <HStack pt={'15px'} w={'100%'} justifyContent={'space-between'}>
-      <HStack w={'150px'}>
+      <HStack w={'250px'}>
         <Text color={'white'} fontSize={'lg'} fontWeight={800}>
           Merchant
         </Text>
