@@ -1,7 +1,6 @@
 import { useContext, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { isEnabledEthereumNetwork } from '@functions/configuration.functions';
 import { formatVault } from '@functions/vault.functions';
 import { Vault } from '@models/vault';
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
@@ -24,18 +23,20 @@ interface UseVaultsReturnType {
 export function useVaults(): UseVaultsReturnType {
   const dispatch = useDispatch();
 
-  const { isConnected, address, chainId, chain } = useAccount();
+  const { isConnected, address: ethereumUserAddress } = useAccount();
 
   const { vaults } = useSelector((state: RootState) => state.vault);
 
   const [isLoading, setIsLoading] = useState(true);
 
-  const { getReadOnlyDLCManagerContract } = useContext(EthereumNetworkConfigurationContext);
+  const { ethereumNetworkConfiguration, isEthereumNetworkConfigurationLoading } = useContext(
+    EthereumNetworkConfigurationContext
+  );
 
   const fetchVaultsIfReady = async (ethereumAddress: string) => {
     setIsLoading(true);
 
-    await getAllAddressVaults(getReadOnlyDLCManagerContract(), ethereumAddress)
+    await getAllAddressVaults(ethereumNetworkConfiguration.dlcManagerContract, ethereumAddress)
       .then(vaults => {
         const formattedVaults = vaults.map(vault => {
           return formatVault(vault);
@@ -44,7 +45,7 @@ export function useVaults(): UseVaultsReturnType {
         dispatch(
           vaultActions.setVaults({
             newVaults: formattedVaults,
-            networkID: chainId as unknown as EthereumNetworkID,
+            networkID: ethereumNetworkConfiguration.chain.id.toString() as EthereumNetworkID,
           })
         );
       })
@@ -56,76 +57,59 @@ export function useVaults(): UseVaultsReturnType {
   };
 
   useEffect(() => {
-    if (isConnected && chain && isEnabledEthereumNetwork(chain)) void fetchVaultsIfReady(address!);
+    if (isConnected && ethereumUserAddress && !isEthereumNetworkConfigurationLoading) {
+      void fetchVaultsIfReady(ethereumUserAddress);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, address, chainId]);
+  }, [
+    isConnected,
+    ethereumUserAddress,
+    isEthereumNetworkConfigurationLoading,
+    ethereumNetworkConfiguration,
+  ]);
 
   const allVaults = useMemo(
     () =>
-      [
-        ...vaults[
-          chain && isEnabledEthereumNetwork(chain)
-            ? (chain.id.toString() as EthereumNetworkID)
-            : appConfiguration.enabledEthereumNetworkIDs[0]
-        ],
-      ].sort((a, b) => b.timestamp - a.timestamp),
-    [vaults, chain]
+      [...vaults[ethereumNetworkConfiguration.chain.id.toString() as EthereumNetworkID]].sort(
+        (a, b) => b.timestamp - a.timestamp
+      ),
+    [vaults, ethereumNetworkConfiguration]
   );
 
   const readyVaults = useMemo(
     () =>
-      vaults[
-        chain && isEnabledEthereumNetwork(chain)
-          ? (chain.id.toString() as EthereumNetworkID)
-          : appConfiguration.enabledEthereumNetworkIDs[0]
-      ]
+      vaults[ethereumNetworkConfiguration.chain.id.toString() as EthereumNetworkID]
         .filter(vault => vault.state === VaultState.READY)
         .sort((a, b) => b.timestamp - a.timestamp),
-    [vaults, chain]
+    [vaults, ethereumNetworkConfiguration]
   );
   const fundedVaults = useMemo(
     () =>
-      vaults[
-        chain && isEnabledEthereumNetwork(chain)
-          ? (chain.id.toString() as EthereumNetworkID)
-          : appConfiguration.enabledEthereumNetworkIDs[0]
-      ]
+      vaults[ethereumNetworkConfiguration.chain.id.toString() as EthereumNetworkID]
         .filter(vault => vault.state === VaultState.FUNDED)
         .sort((a, b) => b.timestamp - a.timestamp),
-    [vaults, chain]
+    [vaults, ethereumNetworkConfiguration]
   );
   const pendingVaults = useMemo(
     () =>
-      vaults[
-        chain && isEnabledEthereumNetwork(chain)
-          ? (chain.id.toString() as EthereumNetworkID)
-          : appConfiguration.enabledEthereumNetworkIDs[0]
-      ]
+      vaults[ethereumNetworkConfiguration.chain.id.toString() as EthereumNetworkID]
         .filter(vault => vault.state === VaultState.PENDING)
         .sort((a, b) => b.timestamp - a.timestamp),
-    [vaults, chain]
+    [vaults, ethereumNetworkConfiguration]
   );
   const closingVaults = useMemo(
     () =>
-      vaults[
-        chain && isEnabledEthereumNetwork(chain)
-          ? (chain.id.toString() as EthereumNetworkID)
-          : appConfiguration.enabledEthereumNetworkIDs[0]
-      ]
+      vaults[ethereumNetworkConfiguration.chain.id.toString() as EthereumNetworkID]
         .filter(vault => vault.state === VaultState.CLOSING)
         .sort((a, b) => b.timestamp - a.timestamp),
-    [vaults, chain]
+    [vaults, ethereumNetworkConfiguration]
   );
   const closedVaults = useMemo(
     () =>
-      vaults[
-        chain && isEnabledEthereumNetwork(chain)
-          ? (chain.id.toString() as EthereumNetworkID)
-          : appConfiguration.enabledEthereumNetworkIDs[0]
-      ]
+      vaults[ethereumNetworkConfiguration.chain.id.toString() as EthereumNetworkID]
         .filter(vault => vault.state === VaultState.CLOSED)
         .sort((a, b) => b.timestamp - a.timestamp),
-    [vaults, chain]
+    [vaults, ethereumNetworkConfiguration]
   );
 
   return {

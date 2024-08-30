@@ -1,30 +1,28 @@
-import React, { createContext } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 import {
   getEthereumContractWithProvider,
-  getEthereumContractWithSigner,
   getEthereumNetworkByID,
   getEthereumNetworkDeploymentPlans,
-  isEnabledEthereumNetwork,
-  useEthersSigner,
 } from '@functions/configuration.functions';
 import { EthereumNetworkConfiguration } from '@models/ethereum-models';
 import { HasChildren } from '@models/has-children';
-import { useQuery } from '@tanstack/react-query';
+import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { EthereumNetworkID } from 'dlc-btc-lib/models';
-import { Contract } from 'ethers';
-import { defaultTo, equals, find } from 'ramda';
-import { Chain } from 'viem';
-import { useAccount } from 'wagmi';
+import { equals, find } from 'ramda';
+import {
+  arbitrum,
+  arbitrumSepolia,
+  base,
+  baseSepolia,
+  hardhat,
+  mainnet,
+  sepolia,
+} from 'viem/chains';
+import { useAccount, useDisconnect } from 'wagmi';
 
 import { SUPPORTED_VIEM_CHAINS } from '@shared/constants/ethereum.constants';
-
-interface EthereumNetworkConfigurationContext extends EthereumNetworkConfiguration {
-  getReadOnlyDLCManagerContract: (rpcEndpoint?: string) => Contract;
-  getReadOnlyDLCBTCContract: (rpcEndpoint?: string) => Contract;
-  getDLCManagerContract: (rpcEndpoint?: string) => Promise<Contract>;
-  defaultEthereumNetwork: Chain;
-}
 
 const defaultEthereumNetwork = (() => {
   const defaultNetwork = find(
@@ -37,131 +35,221 @@ const defaultEthereumNetwork = (() => {
   return defaultNetwork;
 })();
 
-const commonEthereumNetworkConfigurationFields = {
-  enabledEthereumNetworks: appConfiguration.enabledEthereumNetworkIDs.map(id =>
-    getEthereumNetworkByID(id)
-  ),
-  ethereumContractDeploymentPlans: getEthereumNetworkDeploymentPlans(defaultEthereumNetwork),
-};
+const enabledEthereumNetworks = appConfiguration.enabledEthereumNetworkIDs.map(id =>
+  getEthereumNetworkByID(id)
+);
 
-const ethereumNetworkConfigurationMap: Record<number, EthereumNetworkConfiguration> = {
-  [EthereumNetworkID.ArbitrumSepolia]: {
-    ethereumExplorerAPIURL: 'https://sepolia.arbiscan.io',
-    ethereumAttestorChainID: 'evm-arbsepolia',
-    ...commonEthereumNetworkConfigurationFields,
-  },
-  [EthereumNetworkID.Arbitrum]: {
-    ethereumExplorerAPIURL: 'https://arbiscan.io',
-    ethereumAttestorChainID: 'evm-arbitrum',
-    ...commonEthereumNetworkConfigurationFields,
-  },
-  [EthereumNetworkID.Hardhat]: {
-    ethereumExplorerAPIURL: 'https://arbiscan.io',
-    ethereumAttestorChainID: 'evm-localhost',
-    ...commonEthereumNetworkConfigurationFields,
-  },
-};
+function getEthereumNetworkConfiguration(
+  ethereumNetworkID: EthereumNetworkID
+): EthereumNetworkConfiguration {
+  switch (ethereumNetworkID) {
+    case EthereumNetworkID.Mainnet:
+      return {
+        ethereumExplorerAPIURL: mainnet.blockExplorers.default.apiUrl,
+        websocketURL: appConfiguration.l1Websocket,
+        httpURL: appConfiguration.l1HTTP,
+        ethereumAttestorChainID: 'evm-mainnet',
+        enabledEthereumNetworks,
+        dlcManagerContract: getEthereumContractWithProvider(
+          getEthereumNetworkDeploymentPlans(mainnet),
+          mainnet,
+          'DLCManager',
+          appConfiguration.l1Websocket
+        ),
+        dlcBTCContract: getEthereumContractWithProvider(
+          getEthereumNetworkDeploymentPlans(mainnet),
+          mainnet,
+          'DLCBTC',
+          appConfiguration.l1Websocket
+        ),
+        chain: mainnet,
+      };
+    case EthereumNetworkID.Sepolia:
+      return {
+        ethereumExplorerAPIURL: sepolia.blockExplorers.default.apiUrl,
+        websocketURL: appConfiguration.l1Websocket,
+        httpURL: appConfiguration.l1HTTP,
+        ethereumAttestorChainID: 'evm-sepolia',
+        enabledEthereumNetworks,
+        dlcManagerContract: getEthereumContractWithProvider(
+          getEthereumNetworkDeploymentPlans(sepolia),
+          sepolia,
+          'DLCManager',
+          appConfiguration.l1Websocket
+        ),
+        dlcBTCContract: getEthereumContractWithProvider(
+          getEthereumNetworkDeploymentPlans(sepolia),
+          sepolia,
+          'DLCBTC',
+          appConfiguration.l1Websocket
+        ),
+        chain: sepolia,
+      };
+    case EthereumNetworkID.Base:
+      return {
+        ethereumExplorerAPIURL: base.blockExplorers.default.apiUrl,
+        websocketURL: appConfiguration.baseWebsocket,
+        httpURL: appConfiguration.baseHTTP,
+        ethereumAttestorChainID: 'evm-base',
+        enabledEthereumNetworks,
+        dlcManagerContract: getEthereumContractWithProvider(
+          getEthereumNetworkDeploymentPlans(base),
+          base,
+          'DLCManager',
+          appConfiguration.baseWebsocket
+        ),
+        dlcBTCContract: getEthereumContractWithProvider(
+          getEthereumNetworkDeploymentPlans(base),
+          base,
+          'DLCBTC',
+          appConfiguration.baseWebsocket
+        ),
+        chain: base,
+      };
+    case EthereumNetworkID.BaseSepolia:
+      return {
+        ethereumExplorerAPIURL: baseSepolia.blockExplorers.default.apiUrl,
+        websocketURL: appConfiguration.baseWebsocket,
+        httpURL: appConfiguration.baseHTTP,
+        ethereumAttestorChainID: 'evm-basesepolia',
+        enabledEthereumNetworks,
+        dlcManagerContract: getEthereumContractWithProvider(
+          getEthereumNetworkDeploymentPlans(baseSepolia),
+          baseSepolia,
+          'DLCManager',
+          baseSepolia.rpcUrls.default.http[0]
+        ),
+        dlcBTCContract: getEthereumContractWithProvider(
+          getEthereumNetworkDeploymentPlans(baseSepolia),
+          baseSepolia,
+          'DLCBTC',
+          baseSepolia.rpcUrls.default.http[0]
+        ),
+        chain: baseSepolia,
+      };
+    case EthereumNetworkID.Arbitrum:
+      return {
+        ethereumExplorerAPIURL: arbitrum.blockExplorers.default.apiUrl,
+        websocketURL: appConfiguration.arbitrumWebsocket,
+        httpURL: appConfiguration.arbitrumHTTP,
+        ethereumAttestorChainID: 'evm-arbitrum',
+        enabledEthereumNetworks,
+        dlcManagerContract: getEthereumContractWithProvider(
+          getEthereumNetworkDeploymentPlans(arbitrum),
+          arbitrum,
+          'DLCManager',
+          appConfiguration.arbitrumWebsocket
+        ),
+        dlcBTCContract: getEthereumContractWithProvider(
+          getEthereumNetworkDeploymentPlans(arbitrum),
+          arbitrum,
+          'DLCBTC',
+          appConfiguration.arbitrumWebsocket
+        ),
+        chain: arbitrum,
+      };
+    case EthereumNetworkID.ArbitrumSepolia:
+      return {
+        ethereumExplorerAPIURL: arbitrumSepolia.blockExplorers.default.apiUrl,
+        websocketURL: appConfiguration.arbitrumWebsocket,
+        httpURL: appConfiguration.arbitrumHTTP,
+        ethereumAttestorChainID: 'evm-arbsepolia',
+        enabledEthereumNetworks,
+        dlcManagerContract: getEthereumContractWithProvider(
+          getEthereumNetworkDeploymentPlans(arbitrumSepolia),
+          arbitrumSepolia,
+          'DLCManager',
+          appConfiguration.arbitrumWebsocket
+        ),
+        dlcBTCContract: getEthereumContractWithProvider(
+          getEthereumNetworkDeploymentPlans(arbitrumSepolia),
+          arbitrumSepolia,
+          'DLCBTC',
+          appConfiguration.arbitrumWebsocket
+        ),
+        chain: arbitrumSepolia,
+      };
+    case EthereumNetworkID.Hardhat:
+      return {
+        ethereumExplorerAPIURL: '',
+        websocketURL: hardhat.rpcUrls.default.http[0],
+        httpURL: hardhat.rpcUrls.default.http[0],
+        ethereumAttestorChainID: 'evm-hardhat-arb',
+        enabledEthereumNetworks,
+        dlcManagerContract: getEthereumContractWithProvider(
+          getEthereumNetworkDeploymentPlans(hardhat),
+          hardhat,
+          'DLCManager'
+        ),
+        dlcBTCContract: getEthereumContractWithProvider(
+          getEthereumNetworkDeploymentPlans(hardhat),
+          hardhat,
+          'DLCBTC'
+        ),
+        chain: hardhat,
+      };
+    default:
+      throw new Error(`Unsupported Ethereum network ID: ${ethereumNetworkID}`);
+  }
+}
 
-const defaultEthereumNetworkConfiguration = {
-  ethereumExplorerAPIURL:
-    ethereumNetworkConfigurationMap[defaultEthereumNetwork.id].ethereumExplorerAPIURL,
-  ethereumAttestorChainID:
-    ethereumNetworkConfigurationMap[defaultEthereumNetwork.id].ethereumAttestorChainID,
-  enabledEthereumNetworks:
-    ethereumNetworkConfigurationMap[defaultEthereumNetwork.id].enabledEthereumNetworks,
-  ethereumContractDeploymentPlans:
-    ethereumNetworkConfigurationMap[defaultEthereumNetwork.id].ethereumContractDeploymentPlans,
-};
+const defaultEthereumNetworkConfiguration = getEthereumNetworkConfiguration(
+  defaultEthereumNetwork.id.toString() as EthereumNetworkID
+);
 
+interface EthereumNetworkConfigurationContext {
+  ethereumNetworkConfiguration: EthereumNetworkConfiguration;
+  isEthereumNetworkConfigurationLoading: boolean;
+}
 export const EthereumNetworkConfigurationContext =
   createContext<EthereumNetworkConfigurationContext>({
-    ...defaultEthereumNetworkConfiguration,
-    getDLCManagerContract: () => {
-      throw new Error('Signer is not yet available to get the Contract with Signer');
-    },
-    getReadOnlyDLCManagerContract: (rpcEndpoint?: string) =>
-      getEthereumContractWithProvider(
-        defaultEthereumNetworkConfiguration.ethereumContractDeploymentPlans,
-        defaultEthereumNetwork,
-        'DLCManager',
-        defaultTo(defaultEthereumNetwork?.rpcUrls.default.http[0], rpcEndpoint)
-      ),
-    getReadOnlyDLCBTCContract: (rpcEndpoint?: string) =>
-      getEthereumContractWithProvider(
-        defaultEthereumNetworkConfiguration.ethereumContractDeploymentPlans,
-        defaultEthereumNetwork,
-        'DLCBTC',
-        defaultTo(defaultEthereumNetwork?.rpcUrls.default.http[0], rpcEndpoint)
-      ),
-    defaultEthereumNetwork,
+    ethereumNetworkConfiguration: defaultEthereumNetworkConfiguration,
+    isEthereumNetworkConfigurationLoading: false,
   });
 
 export function EthereumNetworkConfigurationContextProvider({
   children,
 }: HasChildren): React.JSX.Element {
-  const { chain } = useAccount();
+  const dispatch = useDispatch();
+  const { chain, isConnected } = useAccount();
+  const { disconnect } = useDisconnect();
+  const [ethereumNetworkConfiguration, setEthereumNetworkConfiguration] =
+    useState<EthereumNetworkConfiguration>(
+      chain
+        ? getEthereumNetworkConfiguration(chain?.id.toString() as EthereumNetworkID)
+        : defaultEthereumNetworkConfiguration
+    );
+  const [isEthereumNetworkConfigurationLoading, setIsEthereumNetworkConfigurationLoading] =
+    useState(false);
 
-  const ethersSigner = useEthersSigner();
-
-  const { data: ethereumNetworkConfiguration = defaultEthereumNetworkConfiguration } = useQuery({
-    enabled: !!chain && isEnabledEthereumNetwork(chain),
-    queryKey: [`ethereumNetworkConfiguration-${chain?.id}`],
-    queryFn: () => getEthereumNetworkConfiguration(chain?.id),
-  });
-
-  function getEthereumNetworkConfiguration(
-    ethereumNetworkID?: number
-  ): EthereumNetworkConfiguration {
-    if (!ethereumNetworkID) {
-      throw new Error(
-        'Ethereum Network ID is not available to get the Ethereum Network Configuration'
-      );
+  useEffect(() => {
+    if (isConnected && !chain) {
+      disconnect();
+      dispatch(mintUnmintActions.resetMintUnmintState());
     }
-    return {
-      ethereumExplorerAPIURL:
-        ethereumNetworkConfigurationMap[ethereumNetworkID].ethereumExplorerAPIURL,
-      ethereumAttestorChainID:
-        ethereumNetworkConfigurationMap[ethereumNetworkID].ethereumAttestorChainID,
-      enabledEthereumNetworks:
-        ethereumNetworkConfigurationMap[ethereumNetworkID].enabledEthereumNetworks,
-      ethereumContractDeploymentPlans:
-        ethereumNetworkConfigurationMap[ethereumNetworkID].ethereumContractDeploymentPlans,
-    };
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chain]);
+
+  useEffect(() => {
+    setIsEthereumNetworkConfigurationLoading(true);
+
+    if (!chain) {
+      setEthereumNetworkConfiguration(defaultEthereumNetworkConfiguration);
+      return;
+    }
+
+    const currentEthereumNetworkConfiguration = getEthereumNetworkConfiguration(
+      chain?.id.toString() as EthereumNetworkID
+    );
+
+    setEthereumNetworkConfiguration(currentEthereumNetworkConfiguration);
+    setIsEthereumNetworkConfigurationLoading(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chain]);
 
   return (
     <EthereumNetworkConfigurationContext.Provider
-      value={{
-        ethereumExplorerAPIURL: ethereumNetworkConfiguration.ethereumExplorerAPIURL,
-        ethereumContractDeploymentPlans:
-          ethereumNetworkConfiguration.ethereumContractDeploymentPlans,
-        ethereumAttestorChainID: ethereumNetworkConfiguration.ethereumAttestorChainID,
-        enabledEthereumNetworks: ethereumNetworkConfiguration.enabledEthereumNetworks,
-        getReadOnlyDLCManagerContract: (rpcEndpoint?: string) => {
-          return getEthereumContractWithProvider(
-            ethereumNetworkConfiguration.ethereumContractDeploymentPlans,
-            chain ?? defaultEthereumNetwork,
-            'DLCManager',
-            defaultTo(chain?.rpcUrls.default.http[0], rpcEndpoint)
-          );
-        },
-        getReadOnlyDLCBTCContract: (rpcEndpoint?: string) => {
-          return getEthereumContractWithProvider(
-            ethereumNetworkConfiguration.ethereumContractDeploymentPlans,
-            chain ?? defaultEthereumNetwork,
-            'DLCBTC',
-            defaultTo(chain?.rpcUrls.default.http[0], rpcEndpoint)
-          );
-        },
-        getDLCManagerContract: async () => {
-          return getEthereumContractWithSigner(
-            ethereumNetworkConfiguration.ethereumContractDeploymentPlans,
-            'DLCManager',
-            ethersSigner!
-          );
-        },
-        defaultEthereumNetwork,
-      }}
+      value={{ ethereumNetworkConfiguration, isEthereumNetworkConfigurationLoading }}
     >
       {children}
     </EthereumNetworkConfigurationContext.Provider>

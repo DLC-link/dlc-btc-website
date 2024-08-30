@@ -58,7 +58,6 @@ const handler: Handler = async event => {
   let decimals: number;
   try {
     decimals = await contract.decimals();
-    console.log('decimals', decimals);
   } catch (error) {
     console.error('Error fetching decimals', error);
     return {

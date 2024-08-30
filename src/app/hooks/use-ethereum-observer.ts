@@ -2,7 +2,6 @@
 import { useContext, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { isEnabledEthereumNetwork } from '@functions/configuration.functions';
 import { getAndFormatVault } from '@functions/vault.functions';
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
@@ -16,17 +15,14 @@ import { useAccount } from 'wagmi';
 export function useEthereumObserver(): void {
   const dispatch = useDispatch();
 
-  const { address: ethereumUserAddress, chainId, chain } = useAccount();
+  const { address: ethereumUserAddress, chain } = useAccount();
 
-  const { getReadOnlyDLCManagerContract } = useContext(EthereumNetworkConfigurationContext);
+  const { ethereumNetworkConfiguration } = useContext(EthereumNetworkConfigurationContext);
 
   useEffect(() => {
-    if (!ethereumUserAddress || !chain) return;
-    if (!isEnabledEthereumNetwork(chain)) return;
+    if (!ethereumUserAddress) return;
 
-    const dlcManagerContract = getReadOnlyDLCManagerContract(
-      appConfiguration.ethereumInfuraWebsocketURL
-    );
+    const dlcManagerContract = ethereumNetworkConfiguration.dlcManagerContract;
 
     console.log(`Listening to [${chain?.name}]`);
     console.log(`Listening to [${dlcManagerContract.address}]`);
@@ -115,5 +111,5 @@ export function useEthereumObserver(): void {
         });
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chainId]);
+  }, [ethereumNetworkConfiguration, ethereumUserAddress]);
 }

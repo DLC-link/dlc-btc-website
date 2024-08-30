@@ -22,7 +22,7 @@ export function MerchantDetailsTableItem(
 
   const { orderBook, amount, txHash, date } = merchantFocusTableItem;
 
-  const { ethereumExplorerAPIURL } = useContext(EthereumNetworkConfigurationContext);
+  const { ethereumNetworkConfiguration } = useContext(EthereumNetworkConfigurationContext);
 
   const renderAmount = () => {
     const unshiftedValue = unshiftValue(amount);
@@ -63,7 +63,12 @@ export function MerchantDetailsTableItem(
         w={'15%'}
         color={'accent.lightBlue.01'}
         fontSize={'sm'}
-        onClick={() => window.open(`${ethereumExplorerAPIURL}/tx/${txHash}`, '_blank')}
+        onClick={() =>
+          window.open(
+            `${ethereumNetworkConfiguration.ethereumExplorerAPIURL}/tx/${txHash}`,
+            '_blank'
+          )
+        }
         cursor={'pointer'}
         textDecoration={'underline'}
       >

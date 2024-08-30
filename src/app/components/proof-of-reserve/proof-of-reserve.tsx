@@ -9,7 +9,6 @@ import { bitcoin, dlcBTC } from '@models/token';
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
 import { useQuery } from '@tanstack/react-query';
-import { useAccount } from 'wagmi';
 
 import { BURN_ADDRESS } from '@shared/constants/ethereum.constants';
 
@@ -33,22 +32,17 @@ export function ProofOfReserve(): React.JSX.Element {
       };
     }),
   ];
-
-  const { chain } = useAccount();
+  const { ethereumNetworkConfiguration } = useContext(EthereumNetworkConfigurationContext);
 
   const { data: allMintBurnEvents } = useQuery({
-    queryKey: ['allMintBurnEvents'],
+    queryKey: ['allMintBurnEvents', ethereumNetworkConfiguration.dlcBTCContract.address],
     queryFn: fetchMintBurnEventsHandler,
   });
 
-  const { getReadOnlyDLCBTCContract, defaultEthereumNetwork } = useContext(
-    EthereumNetworkConfigurationContext
-  );
-
   async function fetchMintBurnEventsHandler(): Promise<ProtocolHistoryTableItemProps[]> {
     const detailedEvents = await fetchMintBurnEvents(
-      getReadOnlyDLCBTCContract(),
-      chain?.rpcUrls.default.http[0] ?? defaultEthereumNetwork.rpcUrls.default.http[0],
+      ethereumNetworkConfiguration.dlcBTCContract,
+      ethereumNetworkConfiguration.httpURL,
       undefined,
       10
     );

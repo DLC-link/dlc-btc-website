@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Text, VStack, useToast } from '@chakra-ui/react';
 import { VaultsListGroupContainer } from '@components/vaults-list/components/vaults-list-group-container';
 import { VaultsList } from '@components/vaults-list/vaults-list';
+import { useEthersSigner } from '@functions/configuration.functions';
 import { getAndFormatVault } from '@functions/vault.functions';
 import { Vault } from '@models/vault';
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
@@ -44,9 +45,9 @@ export function UnmintVaultSelector({
 
   const [selectedVault, setSelectedVault] = useState<Vault | undefined>();
 
-  const { getDLCManagerContract, getReadOnlyDLCManagerContract } = useContext(
-    EthereumNetworkConfigurationContext
-  );
+  const signer = useEthersSigner();
+
+  const { ethereumNetworkConfiguration } = useContext(EthereumNetworkConfigurationContext);
 
   function handleSelect(uuid: string): void {
     const vault = fundedVaults.find(vault => vault.uuid === uuid);
@@ -65,12 +66,13 @@ export function UnmintVaultSelector({
         if (currentRisk === 'High') throw new Error('Risk Level is too high');
         const formattedWithdrawAmount = BigInt(shiftValue(withdrawAmount));
 
-        await withdraw(await getDLCManagerContract(), selectedVault.uuid, formattedWithdrawAmount);
-
-        await getAndFormatVault(
+        await withdraw(
+          ethereumNetworkConfiguration.dlcManagerContract.connect(signer!),
           selectedVault.uuid,
-          getReadOnlyDLCManagerContract(appConfiguration.ethereumInfuraWebsocketURL)
-        )
+          formattedWithdrawAmount
+        );
+
+        await getAndFormatVault(selectedVault.uuid, ethereumNetworkConfiguration.dlcManagerContract)
           .then(vault => {
             dispatch(
               vaultActions.swapVault({

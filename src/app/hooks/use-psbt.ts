@@ -11,7 +11,7 @@ import {
   submitWithdrawDepositPSBT,
 } from 'dlc-btc-lib/attestor-request-functions';
 import { getAttestorGroupPublicKey, getRawVault } from 'dlc-btc-lib/ethereum-functions';
-import { Transaction, VaultState } from 'dlc-btc-lib/models';
+import { AttestorChainID, Transaction, VaultState } from 'dlc-btc-lib/models';
 import { useAccount } from 'wagmi';
 
 import { useLeather } from './use-leather';
@@ -44,9 +44,7 @@ export function usePSBT(): UsePSBTReturnType {
     isLoading: isLeatherLoading,
   } = useLeather();
 
-  const { ethereumAttestorChainID, getDLCManagerContract } = useContext(
-    EthereumNetworkConfigurationContext
-  );
+  const { ethereumNetworkConfiguration } = useContext(EthereumNetworkConfigurationContext);
 
   const [bitcoinDepositAmount, setBitcoinDepositAmount] = useState(0);
 
@@ -60,7 +58,7 @@ export function usePSBT(): UsePSBTReturnType {
 
       const feeRateMultiplier = import.meta.env.VITE_FEE_RATE_MULTIPLIER;
 
-      const dlcManagerContract = await getDLCManagerContract();
+      const dlcManagerContract = ethereumNetworkConfiguration.dlcManagerContract;
 
       const attestorGroupPublicKey = await getAttestorGroupPublicKey(dlcManagerContract);
       const vault = await getRawVault(dlcManagerContract, vaultUUID);
@@ -121,7 +119,8 @@ export function usePSBT(): UsePSBTReturnType {
             fundingPSBT: bytesToHex(fundingTransaction.toPSBT()),
             userEthereumAddress: ethereumUserAddress,
             userBitcoinTaprootPublicKey: dlcHandler.getTaprootDerivedPublicKey(),
-            attestorChainID: ethereumAttestorChainID,
+            attestorChainID:
+              ethereumNetworkConfiguration.ethereumAttestorChainID as AttestorChainID,
           });
           break;
         default:
@@ -148,7 +147,7 @@ export function usePSBT(): UsePSBTReturnType {
 
       const feeRateMultiplier = import.meta.env.VITE_FEE_RATE_MULTIPLIER;
 
-      const dlcManagerContract = await getDLCManagerContract();
+      const dlcManagerContract = ethereumNetworkConfiguration.dlcManagerContract;
 
       const attestorGroupPublicKey = await getAttestorGroupPublicKey(dlcManagerContract);
       const vault = await getRawVault(dlcManagerContract, vaultUUID);
