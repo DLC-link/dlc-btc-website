@@ -51,7 +51,7 @@ export function MerchantDetails(): React.JSX.Element {
         selectedMerchant.merchant.addresses.map(async address => {
           return await fetchMintBurnEvents(
             ethereumNetworkConfiguration.dlcBTCContract,
-            ethereumNetworkConfiguration.chain.rpcUrls.default.http[0],
+            ethereumNetworkConfiguration.httpURL,
             address
           );
         })

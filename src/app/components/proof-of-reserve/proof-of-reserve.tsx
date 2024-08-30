@@ -42,7 +42,7 @@ export function ProofOfReserve(): React.JSX.Element {
   async function fetchMintBurnEventsHandler(): Promise<ProtocolHistoryTableItemProps[]> {
     const detailedEvents = await fetchMintBurnEvents(
       ethereumNetworkConfiguration.dlcBTCContract,
-      ethereumNetworkConfiguration.chain.rpcUrls.default.http[0],
+      ethereumNetworkConfiguration.httpURL,
       undefined,
       10
     );

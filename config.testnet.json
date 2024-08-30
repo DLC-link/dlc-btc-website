@@ -1,7 +1,7 @@
 {
   "appEnvironment": "testnet",
   "coordinatorURL": "https://testnet.dlc.link/attestor-1",
-  "enabledEthereumNetworkIDs": ["421614", "84532", "11155111"],
+  "enabledEthereumNetworkIDs": ["421614", "84532"],
   "bitcoinNetwork": "testnet",
   "bitcoinNetworkIndex": 1,
   "bitcoinNetworkPreFix": "tb1",

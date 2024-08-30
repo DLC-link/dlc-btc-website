@@ -46,6 +46,8 @@ function getEthereumNetworkConfiguration(
     case EthereumNetworkID.Mainnet:
       return {
         ethereumExplorerAPIURL: mainnet.blockExplorers.default.apiUrl,
+        websocketURL: appConfiguration.l1Websocket,
+        httpURL: appConfiguration.l1HTTP,
         ethereumAttestorChainID: 'evm-mainnet',
         enabledEthereumNetworks,
         dlcManagerContract: getEthereumContractWithProvider(
@@ -65,6 +67,8 @@ function getEthereumNetworkConfiguration(
     case EthereumNetworkID.Sepolia:
       return {
         ethereumExplorerAPIURL: sepolia.blockExplorers.default.apiUrl,
+        websocketURL: appConfiguration.l1Websocket,
+        httpURL: appConfiguration.l1HTTP,
         ethereumAttestorChainID: 'evm-sepolia',
         enabledEthereumNetworks,
         dlcManagerContract: getEthereumContractWithProvider(
@@ -84,6 +88,8 @@ function getEthereumNetworkConfiguration(
     case EthereumNetworkID.Base:
       return {
         ethereumExplorerAPIURL: base.blockExplorers.default.apiUrl,
+        websocketURL: appConfiguration.baseWebsocket,
+        httpURL: appConfiguration.baseHTTP,
         ethereumAttestorChainID: 'evm-base',
         enabledEthereumNetworks,
         dlcManagerContract: getEthereumContractWithProvider(
@@ -103,6 +109,8 @@ function getEthereumNetworkConfiguration(
     case EthereumNetworkID.BaseSepolia:
       return {
         ethereumExplorerAPIURL: baseSepolia.blockExplorers.default.apiUrl,
+        websocketURL: appConfiguration.baseWebsocket,
+        httpURL: appConfiguration.baseHTTP,
         ethereumAttestorChainID: 'evm-basesepolia',
         enabledEthereumNetworks,
         dlcManagerContract: getEthereumContractWithProvider(
@@ -122,6 +130,8 @@ function getEthereumNetworkConfiguration(
     case EthereumNetworkID.Arbitrum:
       return {
         ethereumExplorerAPIURL: arbitrum.blockExplorers.default.apiUrl,
+        websocketURL: appConfiguration.arbitrumWebsocket,
+        httpURL: appConfiguration.arbitrumHTTP,
         ethereumAttestorChainID: 'evm-arbitrum',
         enabledEthereumNetworks,
         dlcManagerContract: getEthereumContractWithProvider(
@@ -141,6 +151,8 @@ function getEthereumNetworkConfiguration(
     case EthereumNetworkID.ArbitrumSepolia:
       return {
         ethereumExplorerAPIURL: arbitrumSepolia.blockExplorers.default.apiUrl,
+        websocketURL: appConfiguration.arbitrumWebsocket,
+        httpURL: appConfiguration.arbitrumHTTP,
         ethereumAttestorChainID: 'evm-arbsepolia',
         enabledEthereumNetworks,
         dlcManagerContract: getEthereumContractWithProvider(
@@ -160,6 +172,8 @@ function getEthereumNetworkConfiguration(
     case EthereumNetworkID.Hardhat:
       return {
         ethereumExplorerAPIURL: '',
+        websocketURL: hardhat.rpcUrls.default.http[0],
+        httpURL: hardhat.rpcUrls.default.http[0],
         ethereumAttestorChainID: 'evm-hardhat-arb',
         enabledEthereumNetworks,
         dlcManagerContract: getEthereumContractWithProvider(

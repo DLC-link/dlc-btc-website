@@ -4,6 +4,8 @@ import { Chain } from 'viem';
 
 export interface EthereumNetworkConfiguration {
   ethereumExplorerAPIURL: string;
+  websocketURL: string;
+  httpURL: string;
   ethereumAttestorChainID:
     | 'evm-mainnet'
     | 'evm-sepolia'

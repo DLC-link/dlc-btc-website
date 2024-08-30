@@ -1,7 +1,7 @@
 {
   "appEnvironment": "mainnet",
   "coordinatorURL": "https://mainnet.dlc.link/attestor-1",
-  "enabledEthereumNetworkIDs": ["42161"],
+  "enabledEthereumNetworkIDs": ["42161", "8453"],
   "bitcoinNetwork": "mainnet",
   "bitcoinNetworkIndex": 0,
   "bitcoinNetworkPreFix": "bc1",

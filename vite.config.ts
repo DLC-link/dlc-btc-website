@@ -62,9 +62,15 @@ export default defineConfig(async ({ mode }) =>  {
   const appConfiguration = JSON.parse(appConfigurationJSON);
 
   appConfiguration.ethereumContractInformations = await fetchEthereumDeploymentPlans(environmentName, branchName, appConfiguration.enabledEthereumNetworkIDs);
-  appConfiguration.arbitrumWebsocket = env.VITE_ARBITRUM_OBSERVER_NODE;
-  appConfiguration.l1Websocket = env.VITE_L1_OBSERVER_NODE;
-  appConfiguration.baseWebsocket = env.VITE_BASE_OBSERVER_NODE;
+  const arbitrumURLs: string[] = env.VITE_ARBITRUM_OBSERVER_NODE.split(',');
+  const l1URLs: string[] = env.VITE_L1_OBSERVER_NODE.split(',');
+  const baseURLs: string[] = env.VITE_BASE_OBSERVER_NODE.split(',');
+  appConfiguration.arbitrumWebsocket = arbitrumURLs[0];
+  appConfiguration.arbitrumHTTP = arbitrumURLs[1];
+  appConfiguration.l1Websocket = l1URLs[0];
+  appConfiguration.l1HTTP = l1URLs[1];
+  appConfiguration.baseWebsocket = baseURLs[0];
+  appConfiguration.baseHTTP = baseURLs[1];
 
   return {
   plugins: [react(), wasm(), ViteToml()],
