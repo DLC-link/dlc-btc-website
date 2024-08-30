@@ -1,5 +1,6 @@
 import { EthereumNetwork } from 'dlc-btc-lib/models';
 import { Contract } from 'ethers';
+import { Chain } from 'viem';
 
 export interface EthereumNetworkConfiguration {
   ethereumExplorerAPIURL: string;
@@ -15,6 +16,7 @@ export interface EthereumNetworkConfiguration {
   enabledEthereumNetworks: EthereumNetwork[];
   dlcManagerContract: Contract;
   dlcBTCContract: Contract;
+  chain: Chain;
 }
 
 export interface TimeStampedEvent {

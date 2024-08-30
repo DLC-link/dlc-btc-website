@@ -5,7 +5,6 @@ import {
   getEthereumContractWithProvider,
   getEthereumNetworkByID,
   getEthereumNetworkDeploymentPlans,
-  isEnabledEthereumNetwork,
 } from '@functions/configuration.functions';
 import { EthereumNetworkConfiguration } from '@models/ethereum-models';
 import { HasChildren } from '@models/has-children';
@@ -25,7 +24,7 @@ import { useAccount, useDisconnect } from 'wagmi';
 
 import { SUPPORTED_VIEM_CHAINS } from '@shared/constants/ethereum.constants';
 
-export const defaultEthereumNetwork = (() => {
+const defaultEthereumNetwork = (() => {
   const defaultNetwork = find(
     chain => equals(chain.id, Number(appConfiguration.enabledEthereumNetworkIDs.at(0))),
     SUPPORTED_VIEM_CHAINS
@@ -61,6 +60,7 @@ function getEthereumNetworkConfiguration(
           'DLCBTC',
           appConfiguration.l1Websocket
         ),
+        chain: mainnet,
       };
     case EthereumNetworkID.Sepolia:
       return {
@@ -79,6 +79,7 @@ function getEthereumNetworkConfiguration(
           'DLCBTC',
           appConfiguration.l1Websocket
         ),
+        chain: sepolia,
       };
     case EthereumNetworkID.Base:
       return {
@@ -97,6 +98,7 @@ function getEthereumNetworkConfiguration(
           'DLCBTC',
           appConfiguration.baseWebsocket
         ),
+        chain: base,
       };
     case EthereumNetworkID.BaseSepolia:
       return {
@@ -107,7 +109,7 @@ function getEthereumNetworkConfiguration(
           getEthereumNetworkDeploymentPlans(baseSepolia),
           baseSepolia,
           'DLCManager',
-          appConfiguration.baseWebsocket
+          baseSepolia.rpcUrls.default.http[0]
         ),
         dlcBTCContract: getEthereumContractWithProvider(
           getEthereumNetworkDeploymentPlans(baseSepolia),
@@ -115,6 +117,7 @@ function getEthereumNetworkConfiguration(
           'DLCBTC',
           baseSepolia.rpcUrls.default.http[0]
         ),
+        chain: baseSepolia,
       };
     case EthereumNetworkID.Arbitrum:
       return {
@@ -133,6 +136,7 @@ function getEthereumNetworkConfiguration(
           'DLCBTC',
           appConfiguration.arbitrumWebsocket
         ),
+        chain: arbitrum,
       };
     case EthereumNetworkID.ArbitrumSepolia:
       return {
@@ -151,6 +155,7 @@ function getEthereumNetworkConfiguration(
           'DLCBTC',
           appConfiguration.arbitrumWebsocket
         ),
+        chain: arbitrumSepolia,
       };
     case EthereumNetworkID.Hardhat:
       return {
@@ -167,6 +172,7 @@ function getEthereumNetworkConfiguration(
           hardhat,
           'DLCBTC'
         ),
+        chain: hardhat,
       };
     default:
       throw new Error(`Unsupported Ethereum network ID: ${ethereumNetworkID}`);
@@ -195,7 +201,7 @@ export function EthereumNetworkConfigurationContextProvider({
   const { disconnect } = useDisconnect();
   const [ethereumNetworkConfiguration, setEthereumNetworkConfiguration] =
     useState<EthereumNetworkConfiguration>(
-      chain && isEnabledEthereumNetwork(chain)
+      chain
         ? getEthereumNetworkConfiguration(chain?.id.toString() as EthereumNetworkID)
         : defaultEthereumNetworkConfiguration
     );
