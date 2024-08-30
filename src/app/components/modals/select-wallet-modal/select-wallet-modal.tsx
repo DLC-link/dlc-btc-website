@@ -8,7 +8,7 @@ import { SelectWalletMenu } from '@components/modals/select-wallet-modal/compone
 import { SelectNetworkButton } from '@components/select-network-button/select-network-button';
 import { delay } from 'dlc-btc-lib/utilities';
 import { Chain } from 'viem';
-import { Connector, useConfig, useConnect, useConnectors } from 'wagmi';
+import { Connector, useConfig, useConnect } from 'wagmi';
 
 export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps): React.JSX.Element {
   const { connect, isPending, isSuccess, connectors } = useConnect();

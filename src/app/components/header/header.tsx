@@ -23,7 +23,7 @@ export function Header(): React.JSX.Element {
         <CompanyWebsiteButton />
         <NavigationTabs activeTab={location.pathname} handleTabClick={handleTabClick} />
       </HStack>
-      <HStack gap={'50px'}>
+      <HStack w={'450px'}>
         <NetworkBox />
         <Account />
       </HStack>

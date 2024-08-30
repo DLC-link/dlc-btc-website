@@ -70,7 +70,7 @@ export function getWagmiConfiguration(ethereumNetworkIDs: EthereumNetworkID[]): 
   return createConfig({
     chains: wagmiChains,
     transports: wagmiTransports,
-    connectors: [walletConnect({ projectId: '15e1912940165aa0fc41fb062d117593' })],
+    connectors: [walletConnect({ projectId: appConfiguration.walletConnectProjectID })],
   });
 }
 

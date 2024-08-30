@@ -7,8 +7,8 @@ export function NetworksMenu(): React.JSX.Element {
   const { switchChain } = useSwitchChain();
 
   return (
-    <Menu variant={'account'}>
-      <MenuButton disabled={!chain} fontSize={'small'}>
+    <Menu variant={'networkChange'}>
+      <MenuButton disabled={!chain}>
         <HStack justifyContent={'space-evenly'}>
           <Text>{chain ? chain?.name : 'Not Connected'}</Text>
         </HStack>
