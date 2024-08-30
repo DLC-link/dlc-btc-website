@@ -32,15 +32,13 @@ export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps):
     await delay(1000);
     setSelectedEthereumNetwork(undefined);
     setSelectedWagmiConnectorID(undefined);
-    handleClose();
+    if (selectedWagmiConnectorID && selectedWagmiConnectorID !== 'walletConnect') handleClose();
   }
 
   async function handleConnectWallet(wagmiConnector: Connector) {
     setSelectedWagmiConnectorID(wagmiConnector.id);
     connect({ chainId: selectedEthereumNetwork?.id, connector: wagmiConnector });
-    if (wagmiConnector.name === 'WalletConnect') {
-      setSelectedEthereumNetwork(undefined);
-      setSelectedWagmiConnectorID(undefined);
+    if (wagmiConnector.id === 'walletConnect') {
       handleClose();
     }
   }
