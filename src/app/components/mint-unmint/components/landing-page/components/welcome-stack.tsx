@@ -1,11 +1,11 @@
 import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 
+// import { useNavigate } from 'react-router-dom';
 import { Button, HStack, Image, Text, VStack } from '@chakra-ui/react';
 import { modalActions } from '@store/slices/modal/modal.actions';
 
 export function WelcomeStack(): React.JSX.Element {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const setupText = 'Ready to\n mint dlcBTC?';
@@ -20,9 +20,9 @@ export function WelcomeStack(): React.JSX.Element {
         <Text variant={'welcome'} alignContent={'start'}>
           {setupText}
         </Text>
-        <Text variant={'navigate'} onClick={() => navigate('/how-it-works')}>
+        {/* <Text variant={'navigate'} onClick={() => navigate('/how-it-works')}>
           How it works?
-        </Text>
+        </Text> */}
         <Button variant={'account'} onClick={onConnectWalletClick}>
           Connect Wallet
         </Button>
