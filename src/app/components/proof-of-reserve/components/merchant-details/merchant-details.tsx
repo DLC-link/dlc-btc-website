@@ -35,10 +35,10 @@ export function MerchantDetails(): React.JSX.Element {
   ];
   const selectedMerchant = merchantProofOfReserves.find(item => item.merchant.name === name);
 
-  const { ethereumNetworkConfiguration } = useContext(EthereumNetworkConfigurationContext);
+  const { enabledEthereumNetworkConfigurations } = useContext(EthereumNetworkConfigurationContext);
 
   const { data: mintBurnEvents } = useQuery({
-    queryKey: [`mintBurnEvents${name}`, ethereumNetworkConfiguration.dlcBTCContract.address],
+    queryKey: [`mintBurnEvents${name}`],
     queryFn: fetchMintBurnEventsHandler,
   });
 
@@ -49,11 +49,16 @@ export function MerchantDetails(): React.JSX.Element {
     const detailedEvents: DetailedEvent[] = (
       await Promise.all(
         selectedMerchant.merchant.addresses.map(async address => {
-          return await fetchMintBurnEvents(
-            ethereumNetworkConfiguration.dlcBTCContract,
-            ethereumNetworkConfiguration.httpURL,
-            address
+          const events = await Promise.all(
+            enabledEthereumNetworkConfigurations.map(async ethereumNetworkConfiguration => {
+              return await fetchMintBurnEvents(
+                ethereumNetworkConfiguration.dlcBTCContract,
+                ethereumNetworkConfiguration.httpURL,
+                address
+              );
+            })
           );
+          return events.flat();
         })
       )
     ).flat();

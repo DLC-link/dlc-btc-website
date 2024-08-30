@@ -3,12 +3,20 @@ import { useMemo } from 'react';
 import { supportedEthereumNetworks } from 'dlc-btc-lib/constants';
 import { getEthereumContract, getProvider } from 'dlc-btc-lib/ethereum-functions';
 import { EthereumDeploymentPlan, EthereumNetwork, EthereumNetworkID } from 'dlc-btc-lib/models';
-import { Contract, providers } from 'ethers';
+import { Contract, ethers, providers } from 'ethers';
 import { filter, fromPairs, includes, map, pipe } from 'ramda';
 import { Account, Chain, Client, HttpTransport, Transport, http } from 'viem';
 import { Config, createConfig, useConnectorClient } from 'wagmi';
 
 import { SUPPORTED_VIEM_CHAINS } from '@shared/constants/ethereum.constants';
+
+const abi = ['function totalSupply() view returns (uint256)'];
+const provider = new ethers.providers.StaticJsonRpcProvider(appConfiguration.l1HTTP);
+export const mainnetContract = new ethers.Contract(
+  '0x20157DBAbb84e3BBFE68C349d0d44E48AE7B5AD2',
+  abi,
+  provider
+);
 
 export function getEthereumNetworkDeploymentPlans(ethereumChain: Chain): EthereumDeploymentPlan[] {
   const ethereumNetwork: EthereumNetwork | undefined = supportedEthereumNetworks.find(

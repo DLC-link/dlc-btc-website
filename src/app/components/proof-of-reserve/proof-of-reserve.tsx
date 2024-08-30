@@ -32,20 +32,26 @@ export function ProofOfReserve(): React.JSX.Element {
       };
     }),
   ];
-  const { ethereumNetworkConfiguration } = useContext(EthereumNetworkConfigurationContext);
+  const { enabledEthereumNetworkConfigurations } = useContext(EthereumNetworkConfigurationContext);
 
   const { data: allMintBurnEvents } = useQuery({
-    queryKey: ['allMintBurnEvents', ethereumNetworkConfiguration.dlcBTCContract.address],
+    queryKey: ['allMintBurnEvents'],
     queryFn: fetchMintBurnEventsHandler,
   });
 
   async function fetchMintBurnEventsHandler(): Promise<ProtocolHistoryTableItemProps[]> {
-    const detailedEvents = await fetchMintBurnEvents(
-      ethereumNetworkConfiguration.dlcBTCContract,
-      ethereumNetworkConfiguration.httpURL,
-      undefined,
-      10
-    );
+    const detailedEvents = (
+      await Promise.all(
+        enabledEthereumNetworkConfigurations.map(async ethereumNetworkConfiguration => {
+          return await fetchMintBurnEvents(
+            ethereumNetworkConfiguration.dlcBTCContract,
+            ethereumNetworkConfiguration.httpURL,
+            undefined,
+            10
+          );
+        })
+      )
+    ).flat();
     return detailedEvents.map((event, index) => {
       const isMint = event.from.toLowerCase() === BURN_ADDRESS.toLowerCase();
       return {

@@ -132,7 +132,7 @@ export function usePoints(): UsePointsReturnType {
   const { address, chain } = useAccount();
 
   const [userPoints, setUserPoints] = useState<PointsData | undefined>(undefined);
-  const { ethereumNetworkConfiguration } = useContext(EthereumNetworkConfigurationContext);
+  const { enabledEthereumNetworkConfigurations } = useContext(EthereumNetworkConfigurationContext);
 
   const protocolRewardDefinitions = [
     {
@@ -143,11 +143,17 @@ export function usePoints(): UsePointsReturnType {
         userAddress: string,
         ethereumNetwork: Chain
       ): Promise<TimeStampedEvent[]> => {
-        const events = await fetchTransfersForUser(
-          ethereumNetwork,
-          ethereumNetworkConfiguration.httpURL,
-          userAddress
-        );
+        const events = (
+          await Promise.all(
+            enabledEthereumNetworkConfigurations.map(async ethereumNetworkConfiguration => {
+              return await fetchTransfersForUser(
+                ethereumNetwork,
+                ethereumNetworkConfiguration.httpURL,
+                userAddress
+              );
+            })
+          )
+        ).flat();
         events.sort((a, b) => a.timestamp - b.timestamp);
         const rollingTVL = calculateRollingTVL(events, userAddress);
         return rollingTVL;
@@ -165,12 +171,18 @@ export function usePoints(): UsePointsReturnType {
         if (!gaugeAddress) {
           return [];
         }
-        const events = await fetchTransfersForUser(
-          ethereumNetwork,
-          ethereumNetworkConfiguration.httpURL,
-          userAddress,
-          gaugeAddress
-        );
+        const events = (
+          await Promise.all(
+            enabledEthereumNetworkConfigurations.map(async ethereumNetworkConfiguration => {
+              return await fetchTransfersForUser(
+                ethereumNetwork,
+                ethereumNetworkConfiguration.httpURL,
+                userAddress,
+                gaugeAddress
+              );
+            })
+          )
+        ).flat();
         events.sort((a, b) => a.timestamp - b.timestamp);
         const rollingTVL = calculateRollingTVL(events, userAddress);
         return rollingTVL;
