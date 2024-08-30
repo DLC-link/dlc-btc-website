@@ -7,6 +7,7 @@ import { Contract, providers } from 'ethers';
 import { filter, fromPairs, includes, map, pipe } from 'ramda';
 import { Account, Chain, Client, HttpTransport, Transport, http } from 'viem';
 import { Config, createConfig, useConnectorClient } from 'wagmi';
+import { walletConnect } from 'wagmi/connectors';
 
 import { SUPPORTED_VIEM_CHAINS } from '@shared/constants/ethereum.constants';
 
@@ -90,7 +91,7 @@ export function getWagmiConfiguration(ethereumNetworkIDs: EthereumNetworkID[]): 
   return createConfig({
     chains: wagmiChains,
     transports: wagmiTransports,
-    connectors: [],
+    connectors: [walletConnect({ projectId: '15e1912940165aa0fc41fb062d117593' })],
   });
 }
 

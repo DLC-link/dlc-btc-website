@@ -8,10 +8,10 @@ import { SelectWalletMenu } from '@components/modals/select-wallet-modal/compone
 import { SelectNetworkButton } from '@components/select-network-button/select-network-button';
 import { delay } from 'dlc-btc-lib/utilities';
 import { Chain } from 'viem';
-import { Connector, useConfig, useConnect } from 'wagmi';
+import { Connector, useConfig, useConnect, useConnectors } from 'wagmi';
 
 export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps): React.JSX.Element {
-  const { connectors, connect, isPending, isSuccess } = useConnect();
+  const { connect, isPending, isSuccess, connectors } = useConnect();
   const { chains } = useConfig();
 
   const [selectedEthereumNetwork, setSelectedEthereumNetwork] = useState<Chain | undefined>(
@@ -29,7 +29,7 @@ export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps):
   }, [isSuccess]);
 
   async function handleCloseAfterSuccess() {
-    await delay(2500);
+    await delay(1000);
     setSelectedEthereumNetwork(undefined);
     setSelectedWagmiConnectorID(undefined);
     handleClose();
@@ -38,6 +38,11 @@ export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps):
   async function handleConnectWallet(wagmiConnector: Connector) {
     setSelectedWagmiConnectorID(wagmiConnector.id);
     connect({ chainId: selectedEthereumNetwork?.id, connector: wagmiConnector });
+    if (wagmiConnector.name === 'WalletConnect') {
+      setSelectedEthereumNetwork(undefined);
+      setSelectedWagmiConnectorID(undefined);
+      handleClose();
+    }
   }
 
   const handleChangeNetwork = (ethereumNetwork: Chain) => {
