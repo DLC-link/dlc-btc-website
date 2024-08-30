@@ -7,6 +7,7 @@ import { ProofOfReserveHandler } from 'dlc-btc-lib';
 import { getAttestorGroupPublicKey, getContractVaults } from 'dlc-btc-lib/ethereum-functions';
 import { RawVault } from 'dlc-btc-lib/models';
 import { unshiftValue } from 'dlc-btc-lib/utilities';
+import { useAccount } from 'wagmi';
 
 import { BITCOIN_NETWORK_MAP } from '@shared/constants/bitcoin.constants';
 
@@ -15,10 +16,11 @@ interface UseProofOfReserveReturnType {
 }
 
 export function useProofOfReserve(): UseProofOfReserveReturnType {
-  const { getReadOnlyDLCManagerContract } = useContext(EthereumNetworkConfigurationContext);
+  const { ethereumNetworkConfiguration } = useContext(EthereumNetworkConfigurationContext);
+  const { chainId } = useAccount();
 
   const { data: proofOfReserve } = useQuery({
-    queryKey: ['proofOfReserve'],
+    queryKey: ['proofOfReserve', chainId, ethereumNetworkConfiguration.dlcManagerContract.address],
     queryFn: calculateProofOfReserve,
     refetchInterval: 60000,
   });
@@ -26,17 +28,19 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
   async function calculateProofOfReserve(): Promise<
     [number | undefined, MerchantProofOfReserve[]]
   > {
-    const attestorGroupPublicKey = await getAttestorGroupPublicKey(getReadOnlyDLCManagerContract());
+    const attestorGroupPublicKey = await getAttestorGroupPublicKey(
+      ethereumNetworkConfiguration.dlcManagerContract
+    );
+
     const proofOfReserveHandler = new ProofOfReserveHandler(
       appConfiguration.bitcoinBlockchainURL,
       BITCOIN_NETWORK_MAP[appConfiguration.bitcoinNetwork],
       attestorGroupPublicKey
     );
 
-    const allVaults = await getContractVaults(getReadOnlyDLCManagerContract());
+    const allVaults = await getContractVaults(ethereumNetworkConfiguration.dlcManagerContract);
 
     const proofOfReserve = await proofOfReserveHandler.calculateProofOfReserve(allVaults);
-    1;
 
     const promises = appConfiguration.merchants.map(async (merchant: Merchant) => {
       const proofOfReserve = (

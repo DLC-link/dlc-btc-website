@@ -10,8 +10,12 @@ interface VaultSliceState {
 
 const initialVaultState: VaultSliceState = {
   vaults: {
-    [EthereumNetworkID.ArbitrumSepolia]: [],
+    [EthereumNetworkID.Mainnet]: [],
+    [EthereumNetworkID.Sepolia]: [],
     [EthereumNetworkID.Arbitrum]: [],
+    [EthereumNetworkID.ArbitrumSepolia]: [],
+    [EthereumNetworkID.Base]: [],
+    [EthereumNetworkID.BaseSepolia]: [],
     [EthereumNetworkID.Hardhat]: [],
   },
   status: 'idle',

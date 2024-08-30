@@ -22,7 +22,7 @@ export const BalanceContext = createContext<VaultContextType>({
 });
 
 export function BalanceContextProvider({ children }: HasChildren): React.JSX.Element {
-  const { getReadOnlyDLCBTCContract, getReadOnlyDLCManagerContract } = useContext(
+  const { ethereumNetworkConfiguration, isEthereumNetworkConfigurationLoading } = useContext(
     EthereumNetworkConfigurationContext
   );
   const { address: ethereumUserAddress } = useAccount();
@@ -33,7 +33,7 @@ export function BalanceContextProvider({ children }: HasChildren): React.JSX.Ele
 
   const fetchBalancesIfReady = async (ethereumAddress: string) => {
     const currentTokenBalance = await getAddressDLCBTCBalance(
-      getReadOnlyDLCBTCContract(),
+      ethereumNetworkConfiguration.dlcBTCContract,
       ethereumAddress
     );
 
@@ -42,7 +42,7 @@ export function BalanceContextProvider({ children }: HasChildren): React.JSX.Ele
     }
 
     const userFundedVaults = await getAllAddressVaults(
-      getReadOnlyDLCManagerContract(),
+      ethereumNetworkConfiguration.dlcManagerContract,
       ethereumAddress
     );
     const currentLockedBTCBalance = await getLockedBTCBalance(userFundedVaults);
@@ -52,7 +52,9 @@ export function BalanceContextProvider({ children }: HasChildren): React.JSX.Ele
   };
 
   useEffect(() => {
-    ethereumUserAddress && void fetchBalancesIfReady(ethereumUserAddress);
+    ethereumUserAddress &&
+      !isEthereumNetworkConfigurationLoading &&
+      void fetchBalancesIfReady(ethereumUserAddress);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ethereumUserAddress, fundedVaults]);
 

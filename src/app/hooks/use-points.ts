@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 import {
   getEthereumNetworkDeploymentPlans,
@@ -10,6 +10,7 @@ import {
   ProtocolRewards,
   TimeStampedEvent,
 } from '@models/ethereum-models';
+import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import Decimal from 'decimal.js';
 import { Chain } from 'viem';
 import { useAccount } from 'wagmi';
@@ -97,11 +98,10 @@ export function calculatePoints(
 
 async function fetchTransfersForUser(
   ethereumNetwork: Chain,
+  providerURL: string,
   userAddress: string,
   contractAddress?: string
 ): Promise<DetailedEvent[]> {
-  const providerURL = ethereumNetwork.rpcUrls.default.http[0];
-
   if (!contractAddress) {
     const dlcBTCContract = getEthereumNetworkDeploymentPlans(ethereumNetwork).find(
       plan => plan.contract.name === 'DLCBTC'
@@ -132,6 +132,7 @@ export function usePoints(): UsePointsReturnType {
   const { address, chain } = useAccount();
 
   const [userPoints, setUserPoints] = useState<PointsData | undefined>(undefined);
+  const { ethereumNetworkConfiguration } = useContext(EthereumNetworkConfigurationContext);
 
   const protocolRewardDefinitions = [
     {
@@ -142,7 +143,11 @@ export function usePoints(): UsePointsReturnType {
         userAddress: string,
         ethereumNetwork: Chain
       ): Promise<TimeStampedEvent[]> => {
-        const events = await fetchTransfersForUser(ethereumNetwork, userAddress);
+        const events = await fetchTransfersForUser(
+          ethereumNetwork,
+          ethereumNetworkConfiguration.httpURL,
+          userAddress
+        );
         events.sort((a, b) => a.timestamp - b.timestamp);
         const rollingTVL = calculateRollingTVL(events, userAddress);
         return rollingTVL;
@@ -160,7 +165,12 @@ export function usePoints(): UsePointsReturnType {
         if (!gaugeAddress) {
           return [];
         }
-        const events = await fetchTransfersForUser(ethereumNetwork, userAddress, gaugeAddress);
+        const events = await fetchTransfersForUser(
+          ethereumNetwork,
+          ethereumNetworkConfiguration.httpURL,
+          userAddress,
+          gaugeAddress
+        );
         events.sort((a, b) => a.timestamp - b.timestamp);
         const rollingTVL = calculateRollingTVL(events, userAddress);
         return rollingTVL;

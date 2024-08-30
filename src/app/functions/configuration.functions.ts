@@ -11,19 +11,6 @@ import { walletConnect } from 'wagmi/connectors';
 
 import { SUPPORTED_VIEM_CHAINS } from '@shared/constants/ethereum.constants';
 
-export function getEthereumNetworkDeploymentPlanByName(
-  ethereumNetworkDeploymentPlans: EthereumDeploymentPlan[],
-  contractName: string
-): EthereumDeploymentPlan {
-  const ethereumNetworkDeploymentPlan = ethereumNetworkDeploymentPlans.find(
-    deploymentPlan => deploymentPlan.contract.name === contractName
-  );
-  if (!ethereumNetworkDeploymentPlan) {
-    throw new Error(`Contract not found in Deploymen plans: ${contractName}`);
-  }
-  return ethereumNetworkDeploymentPlan;
-}
-
 export function getEthereumNetworkDeploymentPlans(ethereumChain: Chain): EthereumDeploymentPlan[] {
   const ethereumNetwork: EthereumNetwork | undefined = supportedEthereumNetworks.find(
     network => network.id === (ethereumChain.id.toString() as EthereumNetworkID)
@@ -69,14 +56,6 @@ export function getEthereumContractWithProvider(
   );
 }
 
-export async function getEthereumContractWithSigner(
-  contractDeploymentPlans: EthereumDeploymentPlan[],
-  contractName: string,
-  ethersSigner: providers.JsonRpcSigner
-): Promise<Contract> {
-  return getEthereumContract(contractDeploymentPlans, contractName, ethersSigner);
-}
-
 export function getWagmiConfiguration(ethereumNetworkIDs: EthereumNetworkID[]): Config {
   const wagmiChains = filter(
     (chain: Chain) => includes(chain.id, map(Number, ethereumNetworkIDs)),
@@ -103,6 +82,7 @@ export const isEnabledEthereumNetwork = (chain: Chain): boolean => {
 
 function clientToSigner(client: Client<Transport, Chain, Account>): providers.JsonRpcSigner {
   const { account, chain, transport } = client;
+
   const network = {
     chainId: chain.id,
     name: chain.name,

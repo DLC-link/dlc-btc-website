@@ -11,7 +11,6 @@ import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provi
 import { useQuery } from '@tanstack/react-query';
 import { DetailedEvent } from 'dlc-btc-lib/models';
 import { isEmpty } from 'ramda';
-import { useAccount } from 'wagmi';
 
 import { MerchantDetailsTableItemProps } from '../merchant-table/components/merchant-details-table-item';
 import { MerchantDetailsTable } from '../merchant-table/merchant-details-table';
@@ -36,14 +35,13 @@ export function MerchantDetails(): React.JSX.Element {
   ];
   const selectedMerchant = merchantProofOfReserves.find(item => item.merchant.name === name);
 
-  const { getReadOnlyDLCBTCContract } = useContext(EthereumNetworkConfigurationContext);
+  const { ethereumNetworkConfiguration } = useContext(EthereumNetworkConfigurationContext);
 
   const { data: mintBurnEvents } = useQuery({
-    queryKey: [`mintBurnEvents${name}`],
+    queryKey: [`mintBurnEvents${name}`, ethereumNetworkConfiguration.dlcBTCContract.address],
     queryFn: fetchMintBurnEventsHandler,
   });
 
-  const { chain } = useAccount();
   if (!name) return <Text>Error: No merchant name provided</Text>;
 
   async function fetchMintBurnEventsHandler(): Promise<MerchantDetailsTableItemProps[]> {
@@ -52,8 +50,8 @@ export function MerchantDetails(): React.JSX.Element {
       await Promise.all(
         selectedMerchant.merchant.addresses.map(async address => {
           return await fetchMintBurnEvents(
-            getReadOnlyDLCBTCContract(),
-            chain?.rpcUrls.default.http[0]!,
+            ethereumNetworkConfiguration.dlcBTCContract,
+            ethereumNetworkConfiguration.httpURL,
             address
           );
         })
