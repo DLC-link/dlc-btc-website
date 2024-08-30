@@ -5,6 +5,7 @@ import { HStack } from '@chakra-ui/react';
 import { Account } from '@components/account/account';
 import { CompanyWebsiteButton } from '@components/company-website-button/company-website-button';
 import { HeaderLayout } from '@components/header/components/header.layout';
+import { NetworkBox } from '@components/network/network';
 
 import { NavigationTabs } from './components/tabs';
 
@@ -22,7 +23,10 @@ export function Header(): React.JSX.Element {
         <CompanyWebsiteButton />
         <NavigationTabs activeTab={location.pathname} handleTabClick={handleTabClick} />
       </HStack>
-      <Account />
+      <HStack w={'450px'}>
+        <NetworkBox />
+        <Account />
+      </HStack>
     </HeaderLayout>
   );
 }
