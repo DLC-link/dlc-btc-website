@@ -11,7 +11,7 @@ import { Chain } from 'viem';
 import { Connector, useConfig, useConnect } from 'wagmi';
 
 export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps): React.JSX.Element {
-  const { connectors, connect, isPending, isSuccess } = useConnect();
+  const { connect, isPending, isSuccess, connectors } = useConnect();
   const { chains } = useConfig();
 
   const [selectedEthereumNetwork, setSelectedEthereumNetwork] = useState<Chain | undefined>(
@@ -29,15 +29,18 @@ export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps):
   }, [isSuccess]);
 
   async function handleCloseAfterSuccess() {
-    await delay(2500);
+    await delay(1000);
     setSelectedEthereumNetwork(undefined);
     setSelectedWagmiConnectorID(undefined);
-    handleClose();
+    if (selectedWagmiConnectorID && selectedWagmiConnectorID !== 'walletConnect') handleClose();
   }
 
   async function handleConnectWallet(wagmiConnector: Connector) {
     setSelectedWagmiConnectorID(wagmiConnector.id);
     connect({ chainId: selectedEthereumNetwork?.id, connector: wagmiConnector });
+    if (wagmiConnector.id === 'walletConnect') {
+      handleClose();
+    }
   }
 
   const handleChangeNetwork = (ethereumNetwork: Chain) => {

@@ -34,7 +34,11 @@ export function SelectWalletMenu({
           w={'250px'}
           filter={isConnectWalletPending && isThisWalletSelected ? 'opacity(25%)' : 'none'}
         >
-          <Image src={icon} alt={name} boxSize={'25px'} />
+          <Image
+            src={name === 'WalletConnect' ? './images/logos/walletconnect.svg' : icon}
+            alt={name}
+            boxSize={'25px'}
+          />
           <Text w={'150px'}>{name}</Text>
         </HStack>
         {isConnectWalletPending && isThisWalletSelected && (

@@ -71,6 +71,8 @@ export default defineConfig(async ({ mode }) =>  {
   appConfiguration.l1HTTP = l1URLs[1];
   appConfiguration.baseWebsocket = baseURLs[0];
   appConfiguration.baseHTTP = baseURLs[1];
+  appConfiguration.walletConnectProjectID = env.VITE_WALLET_CONNECT_PROJECT_ID;
+
 
   return {
   plugins: [react(), wasm(), ViteToml()],
