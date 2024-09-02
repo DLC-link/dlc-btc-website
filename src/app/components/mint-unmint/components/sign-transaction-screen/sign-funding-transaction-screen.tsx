@@ -51,7 +51,7 @@ export function SignFundingTransactionScreen({
     } catch (error: any) {
       setIsSubmitting(false);
       toast({
-        title: 'Failed to sign Depost Transaction',
+        title: 'Failed to sign Deposit Transaction',
         description: error.message,
         status: 'error',
         duration: 9000,
