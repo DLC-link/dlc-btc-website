@@ -1,10 +1,14 @@
 import { HStack, Menu, MenuButton, MenuItem, MenuList, Text } from '@chakra-ui/react';
 import { useAccount, useConfig, useSwitchChain } from 'wagmi';
 
-export function NetworksMenu(): React.JSX.Element {
+export function NetworksMenu(): React.JSX.Element | null {
   const { chains } = useConfig();
   const { chain } = useAccount();
   const { switchChain } = useSwitchChain();
+
+  if (!chain) {
+    return null;
+  }
 
   return (
     <Menu variant={'networkChange'}>
