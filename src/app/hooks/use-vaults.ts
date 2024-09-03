@@ -68,49 +68,51 @@ export function useVaults(): UseVaultsReturnType {
     ethereumNetworkConfiguration,
   ]);
 
-  const allVaults = useMemo(
-    () =>
-      [...vaults[ethereumNetworkConfiguration.chain.id.toString() as EthereumNetworkID]].sort(
-        (a, b) => b.timestamp - a.timestamp
-      ),
-    [vaults, ethereumNetworkConfiguration]
-  );
+  const allVaults = useMemo(() => {
+    const networkVaults =
+      vaults[ethereumNetworkConfiguration.chain.id.toString() as EthereumNetworkID] || [];
+    return [...networkVaults].sort((a, b) => b.timestamp - a.timestamp);
+  }, [vaults, ethereumNetworkConfiguration]);
 
-  const readyVaults = useMemo(
-    () =>
-      vaults[ethereumNetworkConfiguration.chain.id.toString() as EthereumNetworkID]
-        .filter(vault => vault.state === VaultState.READY)
-        .sort((a, b) => b.timestamp - a.timestamp),
-    [vaults, ethereumNetworkConfiguration]
-  );
-  const fundedVaults = useMemo(
-    () =>
-      vaults[ethereumNetworkConfiguration.chain.id.toString() as EthereumNetworkID]
-        .filter(vault => vault.state === VaultState.FUNDED)
-        .sort((a, b) => b.timestamp - a.timestamp),
-    [vaults, ethereumNetworkConfiguration]
-  );
-  const pendingVaults = useMemo(
-    () =>
-      vaults[ethereumNetworkConfiguration.chain.id.toString() as EthereumNetworkID]
-        .filter(vault => vault.state === VaultState.PENDING)
-        .sort((a, b) => b.timestamp - a.timestamp),
-    [vaults, ethereumNetworkConfiguration]
-  );
-  const closingVaults = useMemo(
-    () =>
-      vaults[ethereumNetworkConfiguration.chain.id.toString() as EthereumNetworkID]
-        .filter(vault => vault.state === VaultState.CLOSING)
-        .sort((a, b) => b.timestamp - a.timestamp),
-    [vaults, ethereumNetworkConfiguration]
-  );
-  const closedVaults = useMemo(
-    () =>
-      vaults[ethereumNetworkConfiguration.chain.id.toString() as EthereumNetworkID]
-        .filter(vault => vault.state === VaultState.CLOSED)
-        .sort((a, b) => b.timestamp - a.timestamp),
-    [vaults, ethereumNetworkConfiguration]
-  );
+  const readyVaults = useMemo(() => {
+    const networkVaults =
+      vaults[ethereumNetworkConfiguration.chain.id.toString() as EthereumNetworkID] || [];
+    return networkVaults
+      .filter(vault => vault.state === VaultState.READY)
+      .sort((a, b) => b.timestamp - a.timestamp);
+  }, [vaults, ethereumNetworkConfiguration]);
+
+  const fundedVaults = useMemo(() => {
+    const networkVaults =
+      vaults[ethereumNetworkConfiguration.chain.id.toString() as EthereumNetworkID] || [];
+    return networkVaults
+      .filter(vault => vault.state === VaultState.FUNDED)
+      .sort((a, b) => b.timestamp - a.timestamp);
+  }, [vaults, ethereumNetworkConfiguration]);
+
+  const pendingVaults = useMemo(() => {
+    const networkVaults =
+      vaults[ethereumNetworkConfiguration.chain.id.toString() as EthereumNetworkID] || [];
+    return networkVaults
+      .filter(vault => vault.state === VaultState.PENDING)
+      .sort((a, b) => b.timestamp - a.timestamp);
+  }, [vaults, ethereumNetworkConfiguration]);
+
+  const closingVaults = useMemo(() => {
+    const networkVaults =
+      vaults[ethereumNetworkConfiguration.chain.id.toString() as EthereumNetworkID] || [];
+    return networkVaults
+      .filter(vault => vault.state === VaultState.CLOSING)
+      .sort((a, b) => b.timestamp - a.timestamp);
+  }, [vaults, ethereumNetworkConfiguration]);
+
+  const closedVaults = useMemo(() => {
+    const networkVaults =
+      vaults[ethereumNetworkConfiguration.chain.id.toString() as EthereumNetworkID] || [];
+    return networkVaults
+      .filter(vault => vault.state === VaultState.CLOSED)
+      .sort((a, b) => b.timestamp - a.timestamp);
+  }, [vaults, ethereumNetworkConfiguration]);
 
   return {
     allVaults,
