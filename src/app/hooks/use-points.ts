@@ -1,9 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 
-import {
-  getEthereumNetworkDeploymentPlans,
-  isEnabledEthereumNetwork,
-} from '@functions/configuration.functions';
+import { getEthereumNetworkDeploymentPlans } from '@functions/configuration.functions';
 import {
   DetailedEvent,
   PointsData,
@@ -182,7 +179,7 @@ export function usePoints(): UsePointsReturnType {
     const fetchUserPoints = async (currentUserAddress: string, currentEthereumNetwork: Chain) => {
       void fetchPoints(currentUserAddress, currentEthereumNetwork);
     };
-    if (address && chain && isEnabledEthereumNetwork(chain)) {
+    if (address && chain) {
       void fetchUserPoints(address, chain);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

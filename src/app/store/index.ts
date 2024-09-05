@@ -1,19 +1,7 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { modalSlice } from '@store/slices/modal/modal.slice';
 import { vaultSlice } from '@store/slices/vault/vault.slice';
-import {
-  FLUSH,
-  PAUSE,
-  PERSIST,
-  PURGE,
-  PersistConfig,
-  REGISTER,
-  REHYDRATE,
-  persistReducer,
-  persistStore,
-} from 'redux-persist';
-import autoMergeLevel2 from 'redux-persist/es/stateReconciler/autoMergeLevel2';
-import storage from 'redux-persist/lib/storage';
+import { FLUSH, PAUSE, PERSIST, PURGE, REGISTER, REHYDRATE } from 'redux-persist';
 
 import { mintUnmintSlice } from './slices/mintunmint/mintunmint.slice';
 
@@ -29,18 +17,8 @@ const rootReducer = combineReducers({
   mintunmint: mintUnmintSlice.reducer,
 });
 
-const persistConfig: PersistConfig<RootState> = {
-  key: 'root',
-  version: 1,
-  storage: storage,
-  stateReconciler: autoMergeLevel2,
-  whitelist: ['account', 'vault'],
-};
-
-const persistedReducer = persistReducer(persistConfig, rootReducer);
-
 export const store = configureStore({
-  reducer: persistedReducer,
+  reducer: rootReducer,
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
       serializableCheck: {
@@ -48,5 +26,3 @@ export const store = configureStore({
       },
     }),
 });
-
-export const persistor = persistStore(store);
