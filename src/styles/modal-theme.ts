@@ -25,7 +25,6 @@ const ledgerModalStyle = definePartsStyle({
   },
   dialog: {
     padding: '15px',
-    fontFamily: 'Inter',
     height: 'auto',
     width: '500px',
     border: '1.5px solid',
@@ -37,8 +36,27 @@ const ledgerModalStyle = definePartsStyle({
   },
 });
 
+const geofencingModalStyle = definePartsStyle({
+  dialogContainer: {
+    top: '13.5%',
+  },
+  dialog: {
+    px: '25px',
+    py: '20px',
+    height: 'auto',
+    width: 'auto',
+    border: '1.5px solid',
+    borderColor: 'border.white.01',
+    borderRadius: 'md',
+    backgroundColor: 'black',
+    color: 'white',
+    alignItems: 'center',
+  },
+});
+
 const variants = {
   ledger: ledgerModalStyle,
+  geofencing: geofencingModalStyle,
 };
 
 export const modalTheme = defineMultiStyleConfig({

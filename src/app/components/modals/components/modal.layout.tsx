@@ -14,6 +14,8 @@ interface SelectWalletModalLayoutProps {
   isOpen: boolean;
   onClose: () => void;
   children: ReactNode;
+  variant?: string;
+  padding?: string;
 }
 
 export function ModalLayout({
@@ -21,14 +23,16 @@ export function ModalLayout({
   isOpen,
   onClose,
   children,
+  variant = 'baseStyle',
+  padding = '15px',
 }: SelectWalletModalLayoutProps): React.JSX.Element {
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={onClose} variant={variant}>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>{title}</ModalHeader>
         <ModalCloseButton />
-        <ModalBody>{children}</ModalBody>
+        <ModalBody padding={padding}>{children}</ModalBody>
       </ModalContent>
     </Modal>
   );

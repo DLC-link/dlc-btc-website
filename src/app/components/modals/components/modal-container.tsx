@@ -5,6 +5,7 @@ import { AnyAction } from '@reduxjs/toolkit';
 import { RootState } from '@store/index';
 import { modalActions } from '@store/slices/modal/modal.actions';
 
+import { GeofencingModal } from '../geofencing-modal/geofencing-modal';
 import { JasperModal } from '../jasper-modal/jasper-modal';
 import { LedgerModal } from '../ledger-modal/ledger-modal';
 import { SelectBitcoinWalletModal } from '../select-bitcoin-wallet-modal/select-bitcoin-wallet-modal';
@@ -23,6 +24,7 @@ export function ModalContainer(): React.JSX.Element {
     isSelectBitcoinWalletModalOpen,
     isLedgerModalOpen,
     isJasperModalOpen,
+    isGeofencingModalOpen,
   } = useSelector((state: RootState) => state.modal);
 
   const handleClosingModal = (actionCreator: () => AnyAction) => {
@@ -57,6 +59,10 @@ export function ModalContainer(): React.JSX.Element {
       <JasperModal
         isOpen={isJasperModalOpen}
         handleClose={() => handleClosingModal(modalActions.toggleJasperModalVisibility)}
+      />
+      <GeofencingModal
+        isOpen={isGeofencingModalOpen}
+        handleClose={() => handleClosingModal(modalActions.toggleGeofencingModalVisibility)}
       />
     </>
   );

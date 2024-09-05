@@ -1,4 +1,5 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 
 import { Divider, HStack, Text } from '@chakra-ui/react';
 import { ProtocolHistoryTableItemProps } from '@components/protocol-history-table/components/protocol-history-table-item';
@@ -8,7 +9,9 @@ import { Merchant } from '@models/merchant';
 import { bitcoin, dlcBTC } from '@models/token';
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
+import { modalActions } from '@store/slices/modal/modal.actions';
 import { useQuery } from '@tanstack/react-query';
+import { useAccount } from 'wagmi';
 
 import { BURN_ADDRESS } from '@shared/constants/ethereum.constants';
 
@@ -22,6 +25,8 @@ import { TokenStatsBoardLayout } from './components/token-stats-board/token-stat
 
 export function ProofOfReserve(): React.JSX.Element {
   const { proofOfReserve, totalSupply, bitcoinPrice } = useContext(ProofOfReserveContext);
+  const dispatch = useDispatch();
+  const { address } = useAccount();
 
   const [proofOfReserveSum, merchantProofOfReserves] = proofOfReserve || [
     undefined,
@@ -38,6 +43,11 @@ export function ProofOfReserve(): React.JSX.Element {
     queryKey: ['allMintBurnEvents', ethereumNetworkConfiguration.dlcBTCContract.address],
     queryFn: fetchMintBurnEventsHandler,
   });
+
+  useEffect(() => {
+    dispatch(modalActions.toggleGeofencingModalVisibility());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [address]);
 
   async function fetchMintBurnEventsHandler(): Promise<ProtocolHistoryTableItemProps[]> {
     const detailedEvents = await fetchMintBurnEvents(

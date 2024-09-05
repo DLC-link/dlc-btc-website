@@ -6,6 +6,7 @@ interface ModalState {
   isSelectBitcoinWalletModalOpen: boolean;
   isLedgerModalOpen: boolean;
   isJasperModalOpen: boolean;
+  isGeofencingModalOpen: boolean;
 }
 
 const initialModalState: ModalState = {
@@ -14,6 +15,7 @@ const initialModalState: ModalState = {
   isSelectBitcoinWalletModalOpen: false,
   isLedgerModalOpen: false,
   isJasperModalOpen: false,
+  isGeofencingModalOpen: false,
 };
 
 export const modalSlice = createSlice({
@@ -35,6 +37,9 @@ export const modalSlice = createSlice({
     },
     toggleJasperModalVisibility: state => {
       state.isJasperModalOpen = !state.isJasperModalOpen;
+    },
+    toggleGeofencingModalVisibility: state => {
+      state.isGeofencingModalOpen = !state.isGeofencingModalOpen;
     },
   },
 });
