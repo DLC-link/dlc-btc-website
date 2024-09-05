@@ -1,10 +1,10 @@
 import { useContext, useEffect, useState } from 'react';
 
+import { mainnetContract } from '@functions/configuration.functions';
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { useQuery } from '@tanstack/react-query';
 import { getDLCBTCTotalSupply } from 'dlc-btc-lib/ethereum-functions';
 import { unshiftValue } from 'dlc-btc-lib/utilities';
-import { useAccount } from 'wagmi';
 
 interface UseTotalSupplyReturnType {
   totalSupply: number | undefined;
@@ -12,18 +12,25 @@ interface UseTotalSupplyReturnType {
 
 export function useTotalSupply(): UseTotalSupplyReturnType {
   const [shouldFetch, setShouldFetch] = useState(false);
-  const { chainId } = useAccount();
 
-  const { ethereumNetworkConfiguration } = useContext(EthereumNetworkConfigurationContext);
+  const { enabledEthereumNetworkConfigurations } = useContext(EthereumNetworkConfigurationContext);
 
   const fetchTotalSupply = async () => {
-    const totalSupply = await getDLCBTCTotalSupply(ethereumNetworkConfiguration.dlcBTCContract);
-
+    let totalSupply = (
+      await Promise.all(
+        enabledEthereumNetworkConfigurations.map(async ethereumNetworkConfiguration => {
+          return await getDLCBTCTotalSupply(ethereumNetworkConfiguration.dlcBTCContract);
+        })
+      )
+    ).reduce((acc, supply) => acc + supply, 0);
+    if (appConfiguration.appEnvironment === 'mainnet') {
+      totalSupply += await getDLCBTCTotalSupply(mainnetContract);
+    }
     return unshiftValue(totalSupply);
   };
 
   const { data: totalSupply } = useQuery({
-    queryKey: ['totalSupply', chainId, ethereumNetworkConfiguration.dlcBTCContract.address],
+    queryKey: ['totalSupply'],
     queryFn: fetchTotalSupply,
     enabled: shouldFetch,
     refetchInterval: 60000,

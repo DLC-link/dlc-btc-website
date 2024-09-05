@@ -193,6 +193,14 @@ function getEthereumNetworkConfiguration(
   }
 }
 
+function getAllEnabledEthereumNetworkConfigurations(): EthereumNetworkConfiguration[] {
+  return appConfiguration.enabledEthereumNetworkIDs.map(id =>
+    getEthereumNetworkConfiguration(id as EthereumNetworkID)
+  );
+}
+
+const enabledEthereumNetworkConfigurations = getAllEnabledEthereumNetworkConfigurations();
+
 const defaultEthereumNetworkConfiguration = getEthereumNetworkConfiguration(
   defaultEthereumNetwork.id.toString() as EthereumNetworkID
 );
@@ -200,11 +208,14 @@ const defaultEthereumNetworkConfiguration = getEthereumNetworkConfiguration(
 interface EthereumNetworkConfigurationContext {
   ethereumNetworkConfiguration: EthereumNetworkConfiguration;
   isEthereumNetworkConfigurationLoading: boolean;
+  enabledEthereumNetworkConfigurations: EthereumNetworkConfiguration[];
 }
+
 export const EthereumNetworkConfigurationContext =
   createContext<EthereumNetworkConfigurationContext>({
     ethereumNetworkConfiguration: defaultEthereumNetworkConfiguration,
     isEthereumNetworkConfigurationLoading: false,
+    enabledEthereumNetworkConfigurations,
   });
 
 export function EthereumNetworkConfigurationContextProvider({
@@ -249,7 +260,11 @@ export function EthereumNetworkConfigurationContextProvider({
 
   return (
     <EthereumNetworkConfigurationContext.Provider
-      value={{ ethereumNetworkConfiguration, isEthereumNetworkConfigurationLoading }}
+      value={{
+        ethereumNetworkConfiguration,
+        isEthereumNetworkConfigurationLoading,
+        enabledEthereumNetworkConfigurations,
+      }}
     >
       {children}
     </EthereumNetworkConfigurationContext.Provider>
