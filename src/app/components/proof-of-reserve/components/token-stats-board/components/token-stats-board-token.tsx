@@ -29,7 +29,7 @@ export function TokenStatsBoardToken({
         <HStack>
           <Image src={token.logo} alt={token.logoAlt} boxSize={'25px'} />
           <Text color={'white.01'} fontWeight={200} fontSize={'2xl'}>
-            {totalSupply}
+            {Number(totalSupply).toFixed(4)}
           </Text>
         </HStack>
       </Skeleton>
