@@ -16,6 +16,7 @@ import { useAccount } from 'wagmi';
 
 import { useLeather } from './use-leather';
 import { useLedger } from './use-ledger';
+import { useUnisat } from './use-unisat';
 
 interface UsePSBTReturnType {
   handleSignFundingTransaction: (vaultUUID: string, depositAmount: number) => Promise<void>;
@@ -43,6 +44,13 @@ export function usePSBT(): UsePSBTReturnType {
     handleDepositTransaction: handleDepositTransactionWithLeather,
     isLoading: isLeatherLoading,
   } = useLeather();
+
+  const {
+    handleFundingTransaction: handleFundingTransactionWithUnisat,
+    handleWithdrawalTransaction: handleWithdrawalTransactionWithUnisat,
+    handleDepositTransaction: handleDepositTransactionWithUnisat,
+    isLoading: isUnisatLoading,
+  } = useUnisat();
 
   const { ethereumNetworkConfiguration } = useContext(EthereumNetworkConfigurationContext);
 
@@ -84,6 +92,28 @@ export function usePSBT(): UsePSBTReturnType {
                 attestorGroupPublicKey,
                 feeRateMultiplier
               );
+          }
+          break;
+        case 'Unisat':
+          switch (vault.valueLocked.toNumber()) {
+            case 0:
+              fundingTransaction = await handleFundingTransactionWithUnisat(
+                dlcHandler as SoftwareWalletDLCHandler,
+                vault,
+                depositAmount,
+                attestorGroupPublicKey,
+                feeRateMultiplier
+              );
+              break;
+            default:
+              fundingTransaction = await handleDepositTransactionWithUnisat(
+                dlcHandler as SoftwareWalletDLCHandler,
+                vault,
+                depositAmount,
+                attestorGroupPublicKey,
+                feeRateMultiplier
+              );
+              break;
           }
           break;
         case 'Leather':
@@ -165,6 +195,15 @@ export function usePSBT(): UsePSBTReturnType {
             feeRateMultiplier
           );
           break;
+        case 'Unisat':
+          withdrawalTransactionHex = await handleWithdrawalTransactionWithUnisat(
+            dlcHandler as SoftwareWalletDLCHandler,
+            withdrawAmount,
+            attestorGroupPublicKey,
+            vault,
+            feeRateMultiplier
+          );
+          break;
         case 'Leather':
           withdrawalTransactionHex = await handleWithdrawalTransactionWithLeather(
             dlcHandler as SoftwareWalletDLCHandler,
@@ -193,6 +232,11 @@ export function usePSBT(): UsePSBTReturnType {
     handleSignFundingTransaction,
     handleSignWithdrawTransaction,
     bitcoinDepositAmount,
-    isLoading: bitcoinWalletType === BitcoinWalletType.Ledger ? isLedgerLoading : isLeatherLoading,
+    isLoading:
+      bitcoinWalletType === BitcoinWalletType.Ledger
+        ? isLedgerLoading
+        : bitcoinWalletType === BitcoinWalletType.Leather
+          ? isLeatherLoading
+          : isUnisatLoading,
   };
 }

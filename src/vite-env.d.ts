@@ -3,4 +3,5 @@
 interface Window {
   ethereum: any;
   btc: any;
+  unisat: any;
 }

@@ -1,6 +1,7 @@
 export enum BitcoinWalletType {
   Leather = 'Leather',
   Ledger = 'Ledger',
+  Unisat = 'Unisat',
 }
 
 export interface BitcoinWallet {
@@ -21,4 +22,10 @@ const ledger: BitcoinWallet = {
   logo: '/images/logos/ledger-square-logo.svg',
 };
 
-export const bitcoinWallets: BitcoinWallet[] = [leather, ledger];
+const unisat: BitcoinWallet = {
+  id: BitcoinWalletType.Unisat,
+  name: 'Unisat',
+  logo: '/images/logos/unisat-logo.svg',
+};
+
+export const bitcoinWallets: BitcoinWallet[] = [leather, ledger, unisat];
