@@ -11,7 +11,6 @@ import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
 import { modalActions } from '@store/slices/modal/modal.actions';
 import { useQuery } from '@tanstack/react-query';
-import { useAccount } from 'wagmi';
 
 import { BURN_ADDRESS } from '@shared/constants/ethereum.constants';
 
@@ -26,7 +25,6 @@ import { TokenStatsBoardLayout } from './components/token-stats-board/token-stat
 export function ProofOfReserve(): React.JSX.Element {
   const { proofOfReserve, totalSupply, bitcoinPrice } = useContext(ProofOfReserveContext);
   const dispatch = useDispatch();
-  const { address } = useAccount();
 
   const [proofOfReserveSum, merchantProofOfReserves] = proofOfReserve || [
     undefined,
@@ -45,9 +43,17 @@ export function ProofOfReserve(): React.JSX.Element {
   });
 
   useEffect(() => {
-    dispatch(modalActions.toggleGeofencingModalVisibility());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [address]);
+    fetch('https://ipapi.co/json/')
+      .then(res => res.json())
+      .then(response => {
+        if (response.country_code === 'US') {
+          dispatch(modalActions.toggleGeofencingModalVisibility());
+        }
+      })
+      .catch(data => {
+        console.log('Request failed:', data);
+      });
+  }, [dispatch]);
 
   async function fetchMintBurnEventsHandler(): Promise<ProtocolHistoryTableItemProps[]> {
     const detailedEvents = await fetchMintBurnEvents(
