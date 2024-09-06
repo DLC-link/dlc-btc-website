@@ -228,15 +228,16 @@ export function usePSBT(): UsePSBTReturnType {
     }
   }
 
+  const loadingStates = {
+    [BitcoinWalletType.Ledger]: isLedgerLoading,
+    [BitcoinWalletType.Leather]: isLeatherLoading,
+    [BitcoinWalletType.Unisat]: isUnisatLoading,
+  };
+
   return {
     handleSignFundingTransaction,
     handleSignWithdrawTransaction,
     bitcoinDepositAmount,
-    isLoading:
-      bitcoinWalletType === BitcoinWalletType.Ledger
-        ? isLedgerLoading
-        : bitcoinWalletType === BitcoinWalletType.Leather
-          ? isLeatherLoading
-          : isUnisatLoading,
+    isLoading: bitcoinWalletType ? loadingStates[bitcoinWalletType] : [false, ''],
   };
 }
