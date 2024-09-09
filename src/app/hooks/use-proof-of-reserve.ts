@@ -50,7 +50,7 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
       );
       return {
         merchant,
-        dlcBTCAmount: proofOfReserve,
+        dlcBTCAmount: unshiftValue(proofOfReserve),
       };
     });
 

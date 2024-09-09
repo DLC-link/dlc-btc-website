@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 
 import { Button, HStack, Image, Skeleton, Text } from '@chakra-ui/react';
 import { Merchant } from '@models/merchant';
-import { unshiftValue } from 'dlc-btc-lib/utilities';
 
 interface MerchantTableItemProps {
   merchant: Merchant;
@@ -34,7 +33,7 @@ export function MerchantTableItem({
         <Image src={'/images/logos/dlc-btc-logo.svg'} alt={'dlcBTC Logo'} boxSize={'25px'} />
         <Skeleton isLoaded={dlcBTCAmount !== undefined} h={'auto'} w={'150px'}>
           <Text color={'white'} fontSize={'2xl'} fontWeight={800} h={'35px'}>
-            {dlcBTCAmount && unshiftValue(dlcBTCAmount)}
+            {Number(dlcBTCAmount?.toFixed(4))}
           </Text>
         </Skeleton>
       </HStack>
