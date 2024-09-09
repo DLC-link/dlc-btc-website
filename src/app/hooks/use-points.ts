@@ -2,7 +2,8 @@ import { PointsData } from '@models/points.models';
 import { useQuery } from '@tanstack/react-query';
 import { useAccount } from 'wagmi';
 
-const POINTS_API_URL = 'https://dlc-link-api-30248018978b.herokuapp.com/points';
+import { POINTS_API_URL } from '@shared/constants/api.constants';
+
 interface UsePointsReturnType {
   userPoints: PointsData | undefined;
 }

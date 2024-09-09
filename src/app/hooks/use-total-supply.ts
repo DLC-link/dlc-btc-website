@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-const TOTAL_SUPPLY_API_URL = 'https://dlc-link-api-30248018978b.herokuapp.com/dlcbtc/total-supply';
+import { TOTAL_SUPPLY_API_URL } from '@shared/constants/api.constants';
 
 interface UseTotalSupplyReturnType {
   totalSupply: number | undefined;
