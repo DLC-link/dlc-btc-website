@@ -4,12 +4,12 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import { Divider, HStack, Icon, Image, Link, Text } from '@chakra-ui/react';
 import { fetchMintBurnEvents } from '@functions/ethereum.functions';
+import { DetailedEvent } from '@models/ethereum-models';
 import { Merchant } from '@models/merchant';
 import { bitcoin, dlcBTC } from '@models/token';
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
 import { useQuery } from '@tanstack/react-query';
-import { DetailedEvent } from 'dlc-btc-lib/models';
 import { isEmpty } from 'ramda';
 
 import { MerchantDetailsTableItemProps } from '../merchant-table/components/merchant-details-table-item';

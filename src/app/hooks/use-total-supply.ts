@@ -1,40 +1,34 @@
-import { useContext, useEffect, useState } from 'react';
-
-import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { useQuery } from '@tanstack/react-query';
-import { getDLCBTCTotalSupply } from 'dlc-btc-lib/ethereum-functions';
-import { unshiftValue } from 'dlc-btc-lib/utilities';
-import { useAccount } from 'wagmi';
+
+import { TOTAL_SUPPLY_API_URL } from '@shared/constants/api.constants';
 
 interface UseTotalSupplyReturnType {
   totalSupply: number | undefined;
 }
 
 export function useTotalSupply(): UseTotalSupplyReturnType {
-  const [shouldFetch, setShouldFetch] = useState(false);
-  const { chainId } = useAccount();
-
-  const { ethereumNetworkConfiguration } = useContext(EthereumNetworkConfigurationContext);
-
   const fetchTotalSupply = async () => {
-    const totalSupply = await getDLCBTCTotalSupply(ethereumNetworkConfiguration.dlcBTCContract);
+    try {
+      const response = await fetch(`${TOTAL_SUPPLY_API_URL}/${appConfiguration.appEnvironment}`);
 
-    return unshiftValue(totalSupply);
+      if (!response.ok) {
+        throw new Error(`Response was not OK: ${response.status}`);
+      }
+
+      const responseData = await response.json();
+
+      return responseData;
+    } catch (error) {
+      console.error('Error fetching Total Supply', error);
+      return undefined;
+    }
   };
 
   const { data: totalSupply } = useQuery({
-    queryKey: ['totalSupply', chainId, ethereumNetworkConfiguration.dlcBTCContract.address],
+    queryKey: ['totalSupply'],
     queryFn: fetchTotalSupply,
-    enabled: shouldFetch,
     refetchInterval: 60000,
   });
-
-  useEffect(() => {
-    const delayFetching = setTimeout(() => {
-      setShouldFetch(true);
-    }, 3500);
-    return () => clearTimeout(delayFetching);
-  }, []);
 
   return {
     totalSupply,

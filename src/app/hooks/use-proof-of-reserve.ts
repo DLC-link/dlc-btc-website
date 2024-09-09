@@ -1,56 +1,47 @@
-import { useContext } from 'react';
-
 import { Merchant, MerchantProofOfReserve } from '@models/merchant';
-import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { useQuery } from '@tanstack/react-query';
-import { ProofOfReserveHandler } from 'dlc-btc-lib';
-import { getAttestorGroupPublicKey, getContractVaults } from 'dlc-btc-lib/ethereum-functions';
-import { RawVault } from 'dlc-btc-lib/models';
 import { unshiftValue } from 'dlc-btc-lib/utilities';
-import { useAccount } from 'wagmi';
 
-import { BITCOIN_NETWORK_MAP } from '@shared/constants/bitcoin.constants';
+import { PROOF_OF_RESERVE_API_URL } from '@shared/constants/api.constants';
 
 interface UseProofOfReserveReturnType {
   proofOfReserve: [number | undefined, MerchantProofOfReserve[]] | undefined;
 }
 
 export function useProofOfReserve(): UseProofOfReserveReturnType {
-  const { ethereumNetworkConfiguration } = useContext(EthereumNetworkConfigurationContext);
-  const { chainId } = useAccount();
-
   const { data: proofOfReserve } = useQuery({
-    queryKey: ['proofOfReserve', chainId, ethereumNetworkConfiguration.dlcManagerContract.address],
-    queryFn: calculateProofOfReserve,
+    queryKey: ['proofOfReserve'],
+    queryFn: fetchAllProofOfReserve,
     refetchInterval: 60000,
   });
 
-  async function calculateProofOfReserve(): Promise<
-    [number | undefined, MerchantProofOfReserve[]]
-  > {
-    const attestorGroupPublicKey = await getAttestorGroupPublicKey(
-      ethereumNetworkConfiguration.dlcManagerContract
-    );
+  async function fetchProofOfReserve(merchantAddress?: string): Promise<number> {
+    try {
+      const apiURL = merchantAddress
+        ? `${PROOF_OF_RESERVE_API_URL}/${appConfiguration.appEnvironment}?address=${merchantAddress}`
+        : `${PROOF_OF_RESERVE_API_URL}/${appConfiguration.appEnvironment}`;
 
-    const proofOfReserveHandler = new ProofOfReserveHandler(
-      appConfiguration.bitcoinBlockchainURL,
-      BITCOIN_NETWORK_MAP[appConfiguration.bitcoinNetwork],
-      attestorGroupPublicKey
-    );
+      const response = await fetch(apiURL);
 
-    const allVaults = await getContractVaults(ethereumNetworkConfiguration.dlcManagerContract);
+      if (!response.ok) {
+        throw new Error('Error fetching Proof of Reserve');
+      }
 
-    const proofOfReserve = await proofOfReserveHandler.calculateProofOfReserve(allVaults);
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching Proof of Reserve', error);
+      return 0;
+    }
+  }
+
+  async function fetchAllProofOfReserve(): Promise<[number | undefined, MerchantProofOfReserve[]]> {
+    const proofOfReserve = await fetchProofOfReserve();
 
     const promises = appConfiguration.merchants.map(async (merchant: Merchant) => {
       const proofOfReserve = (
         await Promise.all(
           merchant.addresses.map(async address => {
-            return await calculateProofOfReserveOfAddress(
-              proofOfReserveHandler,
-              allVaults,
-              address
-            );
+            return await fetchProofOfReserve(address);
           })
         )
       ).reduce(
@@ -59,27 +50,13 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
       );
       return {
         merchant,
-        dlcBTCAmount: proofOfReserve,
+        dlcBTCAmount: unshiftValue(proofOfReserve),
       };
     });
 
     const merchantProofOfReserves = await Promise.all(promises);
 
     return [unshiftValue(proofOfReserve), merchantProofOfReserves];
-  }
-
-  async function calculateProofOfReserveOfAddress(
-    proofOfReserveHandler: ProofOfReserveHandler,
-    allVaults: RawVault[],
-    ethereumAddress: string
-  ): Promise<number> {
-    const filteredVaults = allVaults.filter(
-      vault => vault.creator.toLowerCase() === ethereumAddress.toLowerCase()
-    );
-
-    const proofOfReserve = await proofOfReserveHandler.calculateProofOfReserve(filteredVaults);
-
-    return unshiftValue(proofOfReserve);
   }
 
   return {

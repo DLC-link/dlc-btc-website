@@ -1,4 +1,4 @@
-import { DetailedEvent } from 'dlc-btc-lib/models';
+import { DetailedEvent } from '@models/ethereum-models';
 import { Contract } from 'ethers';
 
 export async function fetchMintBurnEvents(
