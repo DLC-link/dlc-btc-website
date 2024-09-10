@@ -4,6 +4,7 @@ import { VStack, useToast } from '@chakra-ui/react';
 import { ModalComponentProps } from '@components/modals/components/modal-container';
 import { ModalLayout } from '@components/modals/components/modal.layout';
 import { useLeather } from '@hooks/use-leather';
+import { useUnisat } from '@hooks/use-unisat';
 import { BitcoinWalletType, bitcoinWallets } from '@models/wallet';
 import { modalActions } from '@store/slices/modal/modal.actions';
 
@@ -16,6 +17,7 @@ export function SelectBitcoinWalletModal({
   const dispatch = useDispatch();
   const toast = useToast();
   const { connectLeatherWallet } = useLeather();
+  const { connectUnisatWallet } = useUnisat();
 
   async function handleLogin(walletType: BitcoinWalletType) {
     switch (walletType) {
@@ -24,7 +26,20 @@ export function SelectBitcoinWalletModal({
           await connectLeatherWallet();
         } catch (error: any) {
           toast({
-            title: 'Failed to sign transaction',
+            title: 'Failed to connect to Leather Wallet',
+            description: error.message,
+            status: 'error',
+            duration: 9000,
+            isClosable: true,
+          });
+        }
+        break;
+      case BitcoinWalletType.Unisat:
+        try {
+          await connectUnisatWallet();
+        } catch (error: any) {
+          toast({
+            title: 'Failed to connect to Unisat Wallet',
             description: error.message,
             status: 'error',
             duration: 9000,

@@ -9,7 +9,7 @@ import {
   BitcoinTaprootAccount,
   RpcResponse,
   SignPsbtRequestParams,
-} from '@models/leather';
+} from '@models/software-wallet.models';
 import { BitcoinWalletType } from '@models/wallet';
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
 import {
@@ -129,6 +129,7 @@ export function useLeather(): UseLeatherReturnType {
       const leatherDLCHandler = new SoftwareWalletDLCHandler(
         nativeSegwitAccount.publicKey,
         taprootAccount.publicKey,
+        'wpkh',
         BITCOIN_NETWORK_MAP[appConfiguration.bitcoinNetwork],
         appConfiguration.bitcoinBlockchainURL,
         appConfiguration.bitcoinBlockchainFeeEstimateURL
