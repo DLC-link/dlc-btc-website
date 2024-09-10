@@ -41,9 +41,11 @@ export function PointsTableItem(pointsTableItem: ProtocolRewards): React.JSX.Ele
           {`(${multiplier}x)`}
         </Text>
       </HStack>
-      <Text w={'20%'} color={'white'} fontSize={'sm'}>
-        {name}
-      </Text>
+      <HStack w={'25%'}>
+        <Text color={'white'} fontSize={'sm'}>
+          {name}
+        </Text>
+      </HStack>
     </HStack>
   );
 }

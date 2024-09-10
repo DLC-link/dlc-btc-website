@@ -1,82 +1,74 @@
 /* eslint-disable */
-import { useContext } from 'react';
-
 import { HStack, Image, Text } from '@chakra-ui/react';
 import { CustomSkeleton } from '@components/custom-skeleton/custom-skeleton';
-import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
+import { DetailedEvent } from '@models/ethereum-models';
 import { truncateAddress, unshiftValue } from 'dlc-btc-lib/utilities';
 
-export interface MerchantDetailsTableItemProps {
-  id: number;
-  orderBook: string;
-  amount: number;
-  inUSD: string;
-  txHash: string;
-  date: string;
-}
+import { findEthereumNetworkByName, formatEvent } from '@shared/utils';
 
-export function MerchantDetailsTableItem(
-  merchantFocusTableItem: MerchantDetailsTableItemProps
-): React.JSX.Element {
+export function MerchantDetailsTableItem(merchantFocusTableItem: DetailedEvent): React.JSX.Element {
   if (!merchantFocusTableItem) return <CustomSkeleton height={'35px'} />;
 
-  const { orderBook, amount, txHash, date } = merchantFocusTableItem;
+  const {
+    dlcBTCAmount,
+    txHash,
+    date,
+    isMint,
+    chain: eventChain,
+  } = formatEvent(merchantFocusTableItem);
 
-  const { ethereumNetworkConfiguration } = useContext(EthereumNetworkConfigurationContext);
-
-  const renderAmount = () => {
-    const unshiftedValue = unshiftValue(amount);
-    return orderBook === 'REDEEM' ? -unshiftedValue : unshiftedValue;
-  };
+  const ethereumNetwork = findEthereumNetworkByName(eventChain);
 
   return (
     <HStack
       p={'10px'}
       w={'100%'}
       h={'50px'}
-      bg={orderBook === 'MINT' ? 'table.background.green' : 'table.background.red'}
+      bg={isMint ? 'table.background.green' : 'table.background.red'}
       blendMode={'screen'}
       border={'1px solid'}
       borderRadius={'md'}
       borderColor={'border.white.01'}
       justifyContent={'space-between'}
     >
-      <Text
-        w={'18%'}
-        color={orderBook === 'MINT' ? 'green.mint' : 'red.redeem'}
-        fontSize={'sm'}
-        fontWeight={700}
-      >
-        {orderBook}
-      </Text>
-      <HStack w={'18%'}>
+      <HStack w={'15%'}>
+        <Text color={isMint ? 'green.mint' : 'red.redeem'} fontSize={'sm'} fontWeight={700}>
+          {isMint ? 'MINT' : 'REDEEM'}
+        </Text>
+      </HStack>
+      <HStack w={'15%'}>
         <Image src={'/images/logos/dlc-btc-logo.svg'} alt={'dlc BTC logo'} boxSize={'25px'} />
         <Text color={'white'} fontSize={'sm'} fontWeight={800}>
-          {renderAmount()}
+          {unshiftValue(dlcBTCAmount)}
         </Text>
       </HStack>
       {/* add back the USD calculation later and adjus the width accordingly */}
       {/* <Text w={'20%'} color={'white'} fontSize={'sm'}>
         {inUSD}
       </Text> */}
-      <Text
-        w={'15%'}
-        color={'accent.lightBlue.01'}
-        fontSize={'sm'}
-        onClick={() =>
-          window.open(
-            `${ethereumNetworkConfiguration.ethereumExplorerAPIURL}/tx/${txHash}`,
-            '_blank'
-          )
-        }
-        cursor={'pointer'}
-        textDecoration={'underline'}
-      >
-        {truncateAddress(txHash)}
-      </Text>
-      <Text w={'25%'} color={'white'} fontSize={'sm'}>
-        {date}
-      </Text>
+      <HStack w={'15%'}>
+        <Text
+          color={'accent.lightBlue.01'}
+          fontSize={'sm'}
+          onClick={() =>
+            window.open(`${ethereumNetwork.blockExplorers?.default.url}/tx/${txHash}`, '_blank')
+          }
+          cursor={'pointer'}
+          textDecoration={'underline'}
+        >
+          {truncateAddress(txHash)}
+        </Text>
+      </HStack>
+      <HStack w={'15%'}>
+        <Text color={'white'} fontSize={'sm'}>
+          {ethereumNetwork.name}
+        </Text>
+      </HStack>
+      <HStack w={'15%'}>
+        <Text color={'white'} fontSize={'sm'}>
+          {date}
+        </Text>
+      </HStack>
     </HStack>
   );
 }

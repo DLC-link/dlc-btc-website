@@ -3,16 +3,9 @@ import { MdArrowBack } from 'react-icons/md';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { Divider, HStack, Icon, Image, Link, Text } from '@chakra-ui/react';
-import { fetchMintBurnEvents } from '@functions/ethereum.functions';
-import { DetailedEvent } from '@models/ethereum-models';
-import { Merchant } from '@models/merchant';
 import { bitcoin, dlcBTC } from '@models/token';
-import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
-import { useQuery } from '@tanstack/react-query';
-import { isEmpty } from 'ramda';
 
-import { MerchantDetailsTableItemProps } from '../merchant-table/components/merchant-details-table-item';
 import { MerchantDetailsTable } from '../merchant-table/merchant-details-table';
 import { TokenStatsBoardToken } from '../token-stats-board/components/token-stats-board-token';
 import { TokenStatsBoardTVL } from '../token-stats-board/components/token-stats-board-tvl';
@@ -21,58 +14,14 @@ import { MerchantDetailsLayout } from './components/merchant-details-layout';
 
 export function MerchantDetails(): React.JSX.Element {
   const { name } = useParams();
-  const { proofOfReserve, bitcoinPrice } = useContext(ProofOfReserveContext);
+  const { proofOfReserve, bitcoinPrice, merchantMintBurnEvents } =
+    useContext(ProofOfReserveContext);
   const navigate = useNavigate();
 
-  const [, merchantProofOfReserves] = proofOfReserve || [
-    undefined,
-    appConfiguration.merchants.map((merchant: Merchant) => {
-      return {
-        merchant,
-        dlcBTCAmount: undefined,
-      };
-    }),
-  ];
-  const selectedMerchant = merchantProofOfReserves.find(item => item.merchant.name === name);
-
-  const { ethereumNetworkConfiguration } = useContext(EthereumNetworkConfigurationContext);
-
-  const { data: mintBurnEvents } = useQuery({
-    queryKey: [`mintBurnEvents${name}`, ethereumNetworkConfiguration.dlcBTCContract.address],
-    queryFn: fetchMintBurnEventsHandler,
-  });
+  const selectedMerchant = proofOfReserve?.[1].find(item => item.merchant.name === name);
+  const mintBurnEvents = merchantMintBurnEvents?.find(item => item.name === name)?.mintBurnEvents;
 
   if (!name) return <Text>Error: No merchant name provided</Text>;
-
-  async function fetchMintBurnEventsHandler(): Promise<MerchantDetailsTableItemProps[]> {
-    if (!selectedMerchant || isEmpty(selectedMerchant?.merchant.addresses)) return [];
-    const detailedEvents: DetailedEvent[] = (
-      await Promise.all(
-        selectedMerchant.merchant.addresses.map(async address => {
-          return await fetchMintBurnEvents(
-            ethereumNetworkConfiguration.dlcBTCContract,
-            ethereumNetworkConfiguration.httpURL,
-            address
-          );
-        })
-      )
-    ).flat();
-
-    return detailedEvents.map((event, index) => {
-      return {
-        id: index,
-        orderBook: selectedMerchant.merchant.addresses
-          .map(address => address.toLowerCase())
-          .includes(event.from.toLowerCase())
-          ? 'REDEEM'
-          : 'MINT',
-        amount: event.value,
-        inUSD: 'TODO', //TODO: calculate usd value at the time of mint
-        txHash: event.txHash,
-        date: new Date(event.timestamp * 1000).toDateString(),
-      };
-    });
-  }
 
   return (
     <MerchantDetailsLayout>
