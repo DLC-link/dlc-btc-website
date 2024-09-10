@@ -8,7 +8,6 @@ interface GenericTableHeaderTextProps {
   fontSize?: string;
   fontWeight?: string;
   children: React.ReactNode;
-  pl?: string;
 }
 
 export function GenericTableHeaderText({
@@ -17,10 +16,9 @@ export function GenericTableHeaderText({
   fontSize = 'small',
   children,
   fontWeight = '600',
-  pl = '10px',
 }: GenericTableHeaderTextProps): React.JSX.Element {
   return (
-    <Text w={w} color={color} fontSize={fontSize} fontWeight={fontWeight} pl={pl}>
+    <Text w={w} color={color} fontSize={fontSize} fontWeight={fontWeight}>
       {children}
     </Text>
   );

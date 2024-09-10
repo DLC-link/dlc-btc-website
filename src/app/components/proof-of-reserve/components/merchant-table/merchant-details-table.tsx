@@ -16,11 +16,12 @@ export function MerchantDetailsTable({ items }: MerchantDetailsTableProps): Reac
   return (
     <GenericTableLayout height={`${dynamicHeight}px`}>
       <GenericTableHeader>
-        <GenericTableHeaderText w={'25%'}>Order Book</GenericTableHeaderText>
-        <GenericTableHeaderText w={'25%'}>Amount</GenericTableHeaderText>
+        <GenericTableHeaderText w={'15%'}>Order Book</GenericTableHeaderText>
+        <GenericTableHeaderText w={'15%'}>Amount</GenericTableHeaderText>
         {/* <GenericTableHeaderText>in USD</GenericTableHeaderText> */}
-        <GenericTableHeaderText w={'25%'}>Transaction</GenericTableHeaderText>
-        <GenericTableHeaderText>Date</GenericTableHeaderText>
+        <GenericTableHeaderText w={'15%'}>Transaction</GenericTableHeaderText>
+        <GenericTableHeaderText w={'15%'}>Chain</GenericTableHeaderText>
+        <GenericTableHeaderText w={'15%'}>Date</GenericTableHeaderText>
       </GenericTableHeader>
       <Skeleton isLoaded={items !== undefined} height={'50px'} w={'100%'}>
         {items?.length === 0 && (

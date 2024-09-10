@@ -1,16 +1,10 @@
 import { useContext } from 'react';
 
 import { Divider, HStack, Text } from '@chakra-ui/react';
-import { ProtocolHistoryTableItemProps } from '@components/protocol-history-table/components/protocol-history-table-item';
 import { ProtocolHistoryTable } from '@components/protocol-history-table/protocol-history-table';
-import { fetchMintBurnEvents } from '@functions/ethereum.functions';
 import { Merchant } from '@models/merchant';
 import { bitcoin, dlcBTC } from '@models/token';
-import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
-import { useQuery } from '@tanstack/react-query';
-
-import { BURN_ADDRESS } from '@shared/constants/ethereum.constants';
 
 import { MerchantTableHeader } from './components/merchant-table/components/merchant-table-header';
 import { MerchantTableItem } from './components/merchant-table/components/merchant-table-item';
@@ -21,7 +15,8 @@ import { TokenStatsBoardTVL } from './components/token-stats-board/components/to
 import { TokenStatsBoardLayout } from './components/token-stats-board/token-stats-board.layout';
 
 export function ProofOfReserve(): React.JSX.Element {
-  const { proofOfReserve, totalSupply, bitcoinPrice } = useContext(ProofOfReserveContext);
+  const { proofOfReserve, totalSupply, bitcoinPrice, allMintBurnEvents } =
+    useContext(ProofOfReserveContext);
 
   const [proofOfReserveSum, merchantProofOfReserves] = proofOfReserve || [
     undefined,
@@ -32,31 +27,6 @@ export function ProofOfReserve(): React.JSX.Element {
       };
     }),
   ];
-  const { ethereumNetworkConfiguration } = useContext(EthereumNetworkConfigurationContext);
-
-  const { data: allMintBurnEvents } = useQuery({
-    queryKey: ['allMintBurnEvents', ethereumNetworkConfiguration.dlcBTCContract.address],
-    queryFn: fetchMintBurnEventsHandler,
-  });
-
-  async function fetchMintBurnEventsHandler(): Promise<ProtocolHistoryTableItemProps[]> {
-    const detailedEvents = await fetchMintBurnEvents(
-      ethereumNetworkConfiguration.dlcBTCContract,
-      ethereumNetworkConfiguration.httpURL,
-      undefined,
-      10
-    );
-    return detailedEvents.map((event, index) => {
-      const isMint = event.from.toLowerCase() === BURN_ADDRESS.toLowerCase();
-      return {
-        id: index,
-        dlcBTCAmount: isMint ? event.value : event.value * -1,
-        merchant: isMint ? event.to : event.from,
-        txHash: event.txHash,
-        date: new Date(event.timestamp * 1000).toDateString(),
-      };
-    });
-  }
 
   return (
     <ProofOfReserveLayout>
