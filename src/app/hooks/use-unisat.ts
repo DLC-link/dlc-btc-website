@@ -22,21 +22,18 @@ import { BITCOIN_NETWORK_MAP } from '@shared/constants/bitcoin.constants';
 interface UseUnisatReturnType {
   connectUnisatWallet: () => Promise<void>;
   handleFundingTransaction: (
-    dlcHandler: SoftwareWalletDLCHandler,
     vault: RawVault,
     bitcoinAmount: number,
     attestorGroupPublicKey: string,
     feeRateMultiplier: number
   ) => Promise<Transaction>;
   handleDepositTransaction: (
-    dlcHandler: SoftwareWalletDLCHandler,
     vault: RawVault,
     bitcoinAmount: number,
     attestorGroupPublicKey: string,
     feeRateMultiplier: number
   ) => Promise<Transaction>;
   handleWithdrawalTransaction: (
-    dlcHandler: SoftwareWalletDLCHandler,
     withdrawAmount: number,
     attestorGroupPublicKey: string,
     vault: RawVault,
@@ -46,7 +43,7 @@ interface UseUnisatReturnType {
 }
 
 export function useUnisat(): UseUnisatReturnType {
-  const { setDLCHandler, setBitcoinWalletContextState, setBitcoinWalletType } =
+  const { setDLCHandler, setBitcoinWalletContextState, setBitcoinWalletType, dlcHandler } =
     useContext(BitcoinWalletContext);
 
   const [isLoading, setIsLoading] = useState<[boolean, string]>([false, '']);
@@ -191,12 +188,19 @@ export function useUnisat(): UseUnisatReturnType {
    * @returns The Signed Funding Transaction.
    */
   async function handleFundingTransaction(
-    dlcHandler: SoftwareWalletDLCHandler,
     vault: RawVault,
     bitcoinAmount: number,
     attestorGroupPublicKey: string,
     feeRateMultiplier: number
   ): Promise<Transaction> {
+    if (!dlcHandler) {
+      throw new UnisatError('DLC Handler not initialized');
+    }
+
+    if (!(dlcHandler instanceof SoftwareWalletDLCHandler)) {
+      throw new UnisatError('DLC Handler is not Software Wallet');
+    }
+
     try {
       setIsLoading([true, 'Creating Funding Transaction']);
 
@@ -238,13 +242,20 @@ export function useUnisat(): UseUnisatReturnType {
    * @returns The Signed Deposit Transaction.
    */
   async function handleDepositTransaction(
-    dlcHandler: SoftwareWalletDLCHandler,
     vault: RawVault,
     bitcoinAmount: number,
     attestorGroupPublicKey: string,
     feeRateMultiplier: number
   ): Promise<Transaction> {
     try {
+      if (!dlcHandler) {
+        throw new UnisatError('DLC Handler not initialized');
+      }
+
+      if (!(dlcHandler instanceof SoftwareWalletDLCHandler)) {
+        throw new UnisatError('DLC Handler is not Software Wallet');
+      }
+
       setIsLoading([true, 'Creating Deposit Transaction']);
 
       // ==> Create Deposit Transaction
@@ -292,13 +303,20 @@ export function useUnisat(): UseUnisatReturnType {
    * @returns The Signed Withdrawal Transaction.
    */
   async function handleWithdrawalTransaction(
-    dlcHandler: SoftwareWalletDLCHandler,
     withdrawAmount: number,
     attestorGroupPublicKey: string,
     vault: RawVault,
     feeRateMultiplier: number
   ): Promise<string> {
     try {
+      if (!dlcHandler) {
+        throw new UnisatError('DLC Handler not initialized');
+      }
+
+      if (!(dlcHandler instanceof SoftwareWalletDLCHandler)) {
+        throw new UnisatError('DLC Handler is not Software Wallet');
+      }
+
       setIsLoading([true, 'Creating Withdrawal Transaction']);
 
       const withdrawalTransaction = await dlcHandler.createWithdrawPSBT(
