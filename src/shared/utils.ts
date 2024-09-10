@@ -1,4 +1,9 @@
+import { DetailedEvent, FormattedEvent } from '@models/ethereum-models';
 import Decimal from 'decimal.js';
+import { supportedEthereumNetworks } from 'dlc-btc-lib/constants';
+import { Chain } from 'viem';
+
+import { SUPPORTED_VIEM_CHAINS } from './constants/ethereum.constants';
 
 export function formatNumber(value: number): string {
   if (value < 10000) {
@@ -12,4 +17,33 @@ export function formatNumber(value: number): string {
   } else {
     return new Decimal(value).dividedBy(1000000000000).toFixed(1).replace(/\.0$/, '') + 'T';
   }
+}
+
+export function findEthereumNetworkByName(ethereumNetworkName: string): Chain {
+  const ethereumNetworkID = supportedEthereumNetworks.find(
+    network => network.name.toLowerCase() === ethereumNetworkName
+  )?.id;
+  if (!ethereumNetworkID) {
+    throw new Error(`Could not find Ethereum network with name ${ethereumNetworkName}`);
+  }
+  const chain = SUPPORTED_VIEM_CHAINS.find(chain => chain.id === parseInt(ethereumNetworkID));
+
+  if (!chain) {
+    throw new Error(`Could not find chain with id ${ethereumNetworkID}`);
+  }
+
+  return chain;
+}
+
+export function formatEvent(event: DetailedEvent): FormattedEvent {
+  const isMint = event.eventType === 'mint';
+  return {
+    dlcBTCAmount: isMint ? event.value : -event.value,
+    merchant: isMint ? event.to : event.from,
+    txHash: event.txHash,
+    date: new Date(event.timestamp * 1000).toDateString(),
+    isMint,
+    chain: event.chain,
+    isCCIP: event.isCCIP,
+  };
 }

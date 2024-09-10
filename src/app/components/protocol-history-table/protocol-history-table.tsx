@@ -16,9 +16,9 @@ export function ProtocolHistoryTable({ items }: ProtocolHistoryTableProps): Reac
     <GenericTableLayout height={`${dynamicHeight}px`} width={'50%'}>
       <GenericTableHeader>
         <GenericTableHeaderText w={'25%'}>Order Book</GenericTableHeaderText>
-        <GenericTableHeaderText w={'21%'}>Merchant</GenericTableHeaderText>
+        <GenericTableHeaderText w={'25%'}>Merchant</GenericTableHeaderText>
         <GenericTableHeaderText w={'25%'}>Transaction</GenericTableHeaderText>
-        <GenericTableHeaderText>Date</GenericTableHeaderText>
+        <GenericTableHeaderText w={'25%'}>Date</GenericTableHeaderText>
       </GenericTableHeader>
       <Skeleton isLoaded={items !== undefined} height={'50px'} w={'100%'}>
         <GenericTableBody>
