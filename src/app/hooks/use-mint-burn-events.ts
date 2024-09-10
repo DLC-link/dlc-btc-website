@@ -55,8 +55,6 @@ export function useMintBurnEvents(): UseMintBurnEventsReturnType {
         .flat()
         .sort((a, b) => b.timestamp - a.timestamp);
 
-      console.log(allMintBurnEvents);
-
       return {
         allMintBurnEvents,
         merchantMintBurnEvents: mintBurnEvents,
