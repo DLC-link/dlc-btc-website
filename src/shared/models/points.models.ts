@@ -7,5 +7,6 @@ export interface ProtocolRewards {
 
 export interface PointsData {
   total: number;
+  useTotal: number;
   protocols: ProtocolRewards[];
 }

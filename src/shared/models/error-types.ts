@@ -18,3 +18,10 @@ export class LeatherError extends Error {
     this.name = 'LeatherError';
   }
 }
+
+export class UnisatError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'UnisatError';
+  }
+}

@@ -55,7 +55,7 @@ export function Points(): React.JSX.Element {
                 <HStack w={'100%'} pl={'25px'}>
                   <PointsStatsBoardAction
                     token={dlcBTC}
-                    totalSupply={userPoints?.protocols.find(p => p.name == 'Curve')?.points}
+                    totalSupply={userPoints?.useTotal}
                     tokenSuffix={'Use'}
                   />
                   <Divider
