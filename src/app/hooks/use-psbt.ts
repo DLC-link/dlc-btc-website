@@ -1,22 +1,22 @@
 import { useContext, useState } from 'react';
-import { useSelector } from 'react-redux';
 
 import { BitcoinError } from '@models/error-types';
 import { BitcoinWalletType } from '@models/wallet';
 import { bytesToHex } from '@noble/hashes/utils';
 import { BitcoinWalletContext } from '@providers/bitcoin-wallet-context-provider';
-import { RootState } from '@store/index';
+import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { LedgerDLCHandler, SoftwareWalletDLCHandler } from 'dlc-btc-lib';
 import {
   submitFundingPSBT,
   submitWithdrawDepositPSBT,
 } from 'dlc-btc-lib/attestor-request-functions';
-import { Transaction, VaultState } from 'dlc-btc-lib/models';
+import { getAttestorGroupPublicKey, getRawVault } from 'dlc-btc-lib/ethereum-functions';
+import { AttestorChainID, Transaction, VaultState } from 'dlc-btc-lib/models';
+import { useAccount } from 'wagmi';
 
-import { useEthereum } from './use-ethereum';
-import { useEthereumConfiguration } from './use-ethereum-configuration';
 import { useLeather } from './use-leather';
 import { useLedger } from './use-ledger';
+import { useUnisat } from './use-unisat';
 
 interface UsePSBTReturnType {
   handleSignFundingTransaction: (vaultUUID: string, depositAmount: number) => Promise<void>;
@@ -26,7 +26,7 @@ interface UsePSBTReturnType {
 }
 
 export function usePSBT(): UsePSBTReturnType {
-  const { address: ethereumUserAddress } = useSelector((state: RootState) => state.account);
+  const { address: ethereumUserAddress } = useAccount();
 
   const { bitcoinWalletType, dlcHandler, resetBitcoinWalletContext } =
     useContext(BitcoinWalletContext);
@@ -45,9 +45,14 @@ export function usePSBT(): UsePSBTReturnType {
     isLoading: isLeatherLoading,
   } = useLeather();
 
-  const { getAttestorGroupPublicKey, getRawVault } = useEthereum();
+  const {
+    handleFundingTransaction: handleFundingTransactionWithUnisat,
+    handleWithdrawalTransaction: handleWithdrawalTransactionWithUnisat,
+    handleDepositTransaction: handleDepositTransactionWithUnisat,
+    isLoading: isUnisatLoading,
+  } = useUnisat();
 
-  const { ethereumAttestorChainID } = useEthereumConfiguration();
+  const { ethereumNetworkConfiguration } = useContext(EthereumNetworkConfigurationContext);
 
   const [bitcoinDepositAmount, setBitcoinDepositAmount] = useState(0);
 
@@ -61,10 +66,10 @@ export function usePSBT(): UsePSBTReturnType {
 
       const feeRateMultiplier = import.meta.env.VITE_FEE_RATE_MULTIPLIER;
 
-      const attestorGroupPublicKey = await getAttestorGroupPublicKey();
-      const vault = await getRawVault(vaultUUID);
+      const dlcManagerContract = ethereumNetworkConfiguration.dlcManagerContract;
 
-      if (!bitcoinWalletType) throw new Error('Bitcoin Wallet is not setup');
+      const attestorGroupPublicKey = await getAttestorGroupPublicKey(dlcManagerContract);
+      const vault = await getRawVault(dlcManagerContract, vaultUUID);
 
       let fundingTransaction: Transaction;
       switch (bitcoinWalletType) {
@@ -87,6 +92,28 @@ export function usePSBT(): UsePSBTReturnType {
                 attestorGroupPublicKey,
                 feeRateMultiplier
               );
+          }
+          break;
+        case 'Unisat':
+          switch (vault.valueLocked.toNumber()) {
+            case 0:
+              fundingTransaction = await handleFundingTransactionWithUnisat(
+                dlcHandler as SoftwareWalletDLCHandler,
+                vault,
+                depositAmount,
+                attestorGroupPublicKey,
+                feeRateMultiplier
+              );
+              break;
+            default:
+              fundingTransaction = await handleDepositTransactionWithUnisat(
+                dlcHandler as SoftwareWalletDLCHandler,
+                vault,
+                depositAmount,
+                attestorGroupPublicKey,
+                feeRateMultiplier
+              );
+              break;
           }
           break;
         case 'Leather':
@@ -117,16 +144,17 @@ export function usePSBT(): UsePSBTReturnType {
 
       switch (vault.status) {
         case VaultState.READY:
-          await submitFundingPSBT(appConfiguration.attestorURLs, {
+          await submitFundingPSBT([appConfiguration.coordinatorURL], {
             vaultUUID,
             fundingPSBT: bytesToHex(fundingTransaction.toPSBT()),
             userEthereumAddress: ethereumUserAddress,
             userBitcoinTaprootPublicKey: dlcHandler.getTaprootDerivedPublicKey(),
-            attestorChainID: ethereumAttestorChainID,
+            attestorChainID:
+              ethereumNetworkConfiguration.ethereumAttestorChainID as AttestorChainID,
           });
           break;
         default:
-          await submitWithdrawDepositPSBT(appConfiguration.attestorURLs, {
+          await submitWithdrawDepositPSBT([appConfiguration.coordinatorURL], {
             vaultUUID,
             withdrawDepositPSBT: bytesToHex(fundingTransaction.toPSBT()),
           });
@@ -149,8 +177,10 @@ export function usePSBT(): UsePSBTReturnType {
 
       const feeRateMultiplier = import.meta.env.VITE_FEE_RATE_MULTIPLIER;
 
-      const attestorGroupPublicKey = await getAttestorGroupPublicKey();
-      const vault = await getRawVault(vaultUUID);
+      const dlcManagerContract = ethereumNetworkConfiguration.dlcManagerContract;
+
+      const attestorGroupPublicKey = await getAttestorGroupPublicKey(dlcManagerContract);
+      const vault = await getRawVault(dlcManagerContract, vaultUUID);
 
       if (!bitcoinWalletType) throw new Error('Bitcoin Wallet is not setup');
 
@@ -159,6 +189,15 @@ export function usePSBT(): UsePSBTReturnType {
         case 'Ledger':
           withdrawalTransactionHex = await handleWithdrawalTransactionWithLedger(
             dlcHandler as LedgerDLCHandler,
+            withdrawAmount,
+            attestorGroupPublicKey,
+            vault,
+            feeRateMultiplier
+          );
+          break;
+        case 'Unisat':
+          withdrawalTransactionHex = await handleWithdrawalTransactionWithUnisat(
+            dlcHandler as SoftwareWalletDLCHandler,
             withdrawAmount,
             attestorGroupPublicKey,
             vault,
@@ -178,7 +217,7 @@ export function usePSBT(): UsePSBTReturnType {
           throw new BitcoinError('Invalid Bitcoin Wallet Type');
       }
 
-      await submitWithdrawDepositPSBT(appConfiguration.attestorURLs, {
+      await submitWithdrawDepositPSBT([appConfiguration.coordinatorURL], {
         vaultUUID,
         withdrawDepositPSBT: withdrawalTransactionHex,
       });
@@ -189,10 +228,16 @@ export function usePSBT(): UsePSBTReturnType {
     }
   }
 
+  const loadingStates = {
+    [BitcoinWalletType.Ledger]: isLedgerLoading,
+    [BitcoinWalletType.Leather]: isLeatherLoading,
+    [BitcoinWalletType.Unisat]: isUnisatLoading,
+  };
+
   return {
     handleSignFundingTransaction,
     handleSignWithdrawTransaction,
     bitcoinDepositAmount,
-    isLoading: bitcoinWalletType === BitcoinWalletType.Ledger ? isLedgerLoading : isLeatherLoading,
+    isLoading: bitcoinWalletType ? loadingStates[bitcoinWalletType] : [false, ''],
   };
 }

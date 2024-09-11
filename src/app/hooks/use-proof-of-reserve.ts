@@ -1,99 +1,62 @@
-import { useEffect, useState } from 'react';
-import { useQuery } from 'react-query';
-import { useSelector } from 'react-redux';
-
 import { Merchant, MerchantProofOfReserve } from '@models/merchant';
-import { RootState } from '@store/index';
-import { ProofOfReserveHandler } from 'dlc-btc-lib';
-import { RawVault } from 'dlc-btc-lib/models';
+import { useQuery } from '@tanstack/react-query';
 import { unshiftValue } from 'dlc-btc-lib/utilities';
 
-import { BITCOIN_NETWORK_MAP } from '@shared/constants/bitcoin.constants';
-
-import { useEthereum } from './use-ethereum';
+import { PROOF_OF_RESERVE_API_URL } from '@shared/constants/api.constants';
 
 interface UseProofOfReserveReturnType {
   proofOfReserve: [number | undefined, MerchantProofOfReserve[]] | undefined;
 }
 
 export function useProofOfReserve(): UseProofOfReserveReturnType {
-  const { retrieveAllVaults, getAttestorGroupPublicKey } = useEthereum();
-  const { network } = useSelector((state: RootState) => state.account);
-
-  const [proofOfReserveHandler, setProofOfReserveHandler] = useState<
-    ProofOfReserveHandler | undefined
-  >(undefined);
-
-  useEffect(() => {
-    const fetchProofOfReserveHandler = async () => {
-      await getProofOfReserveHandler();
-    };
-    void fetchProofOfReserveHandler();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [network]);
-
-  async function getProofOfReserveHandler(): Promise<void> {
-    const attestorPublicKey = await getAttestorGroupPublicKey();
-
-    const proofOfReserveHandler = new ProofOfReserveHandler(
-      appConfiguration.bitcoinBlockchainURL,
-      BITCOIN_NETWORK_MAP[appConfiguration.bitcoinNetwork],
-      attestorPublicKey
-    );
-
-    setProofOfReserveHandler(proofOfReserveHandler);
-  }
-
-  const { data: proofOfReserve } = useQuery(['proofOfReserve'], calculateProofOfReserve, {
-    enabled: !!proofOfReserveHandler,
+  const { data: proofOfReserve } = useQuery({
+    queryKey: ['proofOfReserve'],
+    queryFn: fetchAllProofOfReserve,
     refetchInterval: 60000,
   });
 
-  async function calculateProofOfReserve(): Promise<
-    [number | undefined, MerchantProofOfReserve[]]
-  > {
-    const allVaults = await retrieveAllVaults(network);
+  async function fetchProofOfReserve(merchantAddress?: string): Promise<number> {
+    try {
+      const apiURL = merchantAddress
+        ? `${PROOF_OF_RESERVE_API_URL}/${appConfiguration.appEnvironment}?address=${merchantAddress}`
+        : `${PROOF_OF_RESERVE_API_URL}/${appConfiguration.appEnvironment}`;
 
-    if (!proofOfReserveHandler) {
-      return [
-        undefined,
-        appConfiguration.merchants.map((merchant: Merchant) => {
-          return {
-            merchant,
-            dlcBTCAmount: undefined,
-          };
-        }),
-      ];
+      const response = await fetch(apiURL);
+
+      if (!response.ok) {
+        throw new Error('Error fetching Proof of Reserve');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching Proof of Reserve', error);
+      return 0;
     }
+  }
 
-    const proofOfReserve = await proofOfReserveHandler.calculateProofOfReserve(allVaults);
+  async function fetchAllProofOfReserve(): Promise<[number | undefined, MerchantProofOfReserve[]]> {
+    const proofOfReserve = await fetchProofOfReserve();
 
     const promises = appConfiguration.merchants.map(async (merchant: Merchant) => {
-      const proofOfReserve = await calculateProofOfReserveOfAddress(allVaults, merchant.address);
+      const proofOfReserve = (
+        await Promise.all(
+          merchant.addresses.map(async address => {
+            return await fetchProofOfReserve(address);
+          })
+        )
+      ).reduce(
+        (totalProofOfReserve, addressProofOfReserve) => totalProofOfReserve + addressProofOfReserve,
+        0
+      );
       return {
         merchant,
-        dlcBTCAmount: proofOfReserve,
+        dlcBTCAmount: unshiftValue(proofOfReserve),
       };
     });
 
     const merchantProofOfReserves = await Promise.all(promises);
 
     return [unshiftValue(proofOfReserve), merchantProofOfReserves];
-  }
-
-  async function calculateProofOfReserveOfAddress(
-    allVaults: RawVault[],
-    ethereumAddress: string
-  ): Promise<number> {
-    if (!proofOfReserveHandler) return 0;
-    const filteredVaults = allVaults.filter(
-      vault => vault.creator.toLowerCase() === ethereumAddress.toLowerCase()
-    );
-
-    const proofOfReserve = await proofOfReserveHandler.calculateProofOfReserve(filteredVaults);
-
-    return unshiftValue(proofOfReserve);
   }
 
   return {

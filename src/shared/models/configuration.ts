@@ -1,3 +1,5 @@
+import { EthereumDeploymentPlan, EthereumNetworkID } from 'dlc-btc-lib/models';
+
 import { Merchant } from './merchant';
 import { Protocol } from './protocol';
 
@@ -17,8 +19,16 @@ enum AppEnvironment {
 type BitcoinNetworkPrefix = 'bc1' | 'tb1' | 'bcrt1';
 export interface Configuration {
   appEnvironment: AppEnvironment;
-  attestorURLs: string[];
-  enabledEthereumNetworkIDs: string[];
+  coordinatorURL: string;
+  enabledEthereumNetworkIDs: EthereumNetworkID[];
+  ethereumContractInformations: { name: string; deploymentPlans: EthereumDeploymentPlan[] }[];
+  l1Websocket: string;
+  l1HTTP: string;
+  arbitrumWebsocket: string;
+  arbitrumHTTP: string;
+  baseWebsocket: string;
+  baseHTTP: string;
+  walletConnectProjectID: string;
   bitcoinNetwork: BitcoinNetworkName;
   bitcoinNetworkIndex: number;
   bitcoinNetworkPreFix: BitcoinNetworkPrefix;

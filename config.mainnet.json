@@ -1,11 +1,7 @@
 {
   "appEnvironment": "mainnet",
-  "attestorURLs": [
-    "https://mainnet.dlc.link/attestor-1",
-    "https://mainnet.dlc.link/attestor-2",
-    "https://mainnet.dlc.link/attestor-3"
-  ],
-  "enabledEthereumNetworkIDs": ["42161"],
+  "coordinatorURL": "https://mainnet.dlc.link/attestor-1",
+  "enabledEthereumNetworkIDs": ["42161", "8453"],
   "bitcoinNetwork": "mainnet",
   "bitcoinNetworkIndex": 0,
   "bitcoinNetworkPreFix": "bc1",
@@ -15,13 +11,22 @@
   "merchants": [
     {
       "name": "Amber",
-      "address": "0xff200709bf9bbc5209ba4b5dd767913a8a06b73f",
+      "addresses": [
+        "0xff200709bf9bbc5209ba4b5dd767913a8a06b73f",
+        "0x5dd42c5fbf7f784d040c59f1720cdd8c47bbff95",
+        "0xf92893654e38b80dfd9b4a2fb99100dd31ba5e2d"
+      ],
       "logo": "/images/logos/amber-logo.svg"
     },
     {
       "name": "DLC.Link",
-      "address": "0x0DD4f29E21F10cb2E485cf9bDAb9F2dD1f240Bfa",
+      "addresses": ["0x0DD4f29E21F10cb2E485cf9bDAb9F2dD1f240Bfa"],
       "logo": "/images/logos/dlc-link-logo-horizontal.svg"
+    },
+    {
+      "name": "Smart Bitcoin Labs",
+      "addresses": ["0x46166fA874AAEDEA8d98b15F9A72C84e22Abe2A1"],
+      "logo": "/images/logos/smart-bitcoin-labs-logo.svg"
     }
   ],
   "protocols": [

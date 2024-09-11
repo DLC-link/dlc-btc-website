@@ -17,10 +17,9 @@ export function MerchantTableItem({
   const { name } = merchant;
   const navigate = useNavigate();
 
-  //const { ethereumExplorerAPIURL } = useEthereumConfiguration();
   return (
     <HStack w={'100%'} justifyContent={'space-between'}>
-      <HStack w={'150px'}>
+      <HStack w={'250px'}>
         <Text
           fontSize={'2xl'}
           fontWeight={600}
@@ -34,7 +33,7 @@ export function MerchantTableItem({
         <Image src={'/images/logos/dlc-btc-logo.svg'} alt={'dlcBTC Logo'} boxSize={'25px'} />
         <Skeleton isLoaded={dlcBTCAmount !== undefined} h={'auto'} w={'150px'}>
           <Text color={'white'} fontSize={'2xl'} fontWeight={800} h={'35px'}>
-            {dlcBTCAmount}
+            {Number(dlcBTCAmount?.toFixed(4))}
           </Text>
         </Skeleton>
       </HStack>

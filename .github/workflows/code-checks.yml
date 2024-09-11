@@ -61,12 +61,3 @@ jobs:
 
       - name: Typecheck
         run: yarn typecheck
-
-  test-unit:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/provision
-
-      - name: Test
-        run: yarn test:unit

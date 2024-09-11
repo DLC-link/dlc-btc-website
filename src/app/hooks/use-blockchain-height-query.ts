@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 export function useBlockchainHeightQuery(): number | undefined {
   const bitcoinExplorerHeightURL = `${appConfiguration.bitcoinBlockchainURL}/blocks/tip/height`;
@@ -9,7 +9,9 @@ export function useBlockchainHeightQuery(): number | undefined {
     return response.json();
   }
 
-  const { data: blockHeight } = useQuery('blockHeight', () => getBlockchainHeight(), {
+  const { data: blockHeight } = useQuery({
+    queryKey: ['blockHeight'],
+    queryFn: () => getBlockchainHeight(),
     refetchInterval: 10000,
   });
 

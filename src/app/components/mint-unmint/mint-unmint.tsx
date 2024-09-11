@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Spacer, Tab, TabIndicator, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react';
@@ -9,35 +8,21 @@ import { MintUnmintLayout } from './components/mint-unmint.layout';
 import { Mint } from './components/mint/mint';
 import { Unmint } from './components/unmint/unmint';
 
-interface MintUnmintContainerProps {
-  address?: string;
-}
-
-export function MintUnmint({ address }: MintUnmintContainerProps): React.JSX.Element {
+export function MintUnmint(): React.JSX.Element {
   const dispatch = useDispatch();
-  const [animate, setAnimate] = useState(false);
 
-  const { activeTab, mintStep, unmintStep } = useSelector((state: RootState) => state.mintunmint);
-
-  useEffect(() => {
-    if (!address) return;
-    setAnimate(true);
-    setTimeout(() => {
-      setAnimate(false);
-    }, 1000);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mintStep, unmintStep]);
+  const { activeTab } = useSelector((state: RootState) => state.mintunmint);
 
   function handleTabsChange(index: number) {
     dispatch(mintUnmintActions.setActiveTab(index));
   }
 
   return (
-    <MintUnmintLayout animate={animate}>
+    <MintUnmintLayout>
       <Tabs variant="unstyled" index={activeTab} onChange={handleTabsChange}>
         <TabList>
           <Tab>Mint</Tab>
-          <Tab isDisabled={!address}>Withdraw</Tab>
+          <Tab>Withdraw</Tab>
         </TabList>
         <TabIndicator mt="5px" h="3.5px" bg={'accent.lightBlue.01'} />
         <Spacer />

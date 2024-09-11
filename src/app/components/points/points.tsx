@@ -1,11 +1,11 @@
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { Button, Divider, HStack, Image, Text, VStack } from '@chakra-ui/react';
 import { TokenStatsBoardLayout } from '@components/proof-of-reserve/components/token-stats-board/token-stats-board.layout';
 import { usePoints } from '@hooks/use-points';
 import { dlcBTC } from '@models/token';
-import { RootState } from '@store/index';
 import { modalActions } from '@store/slices/modal/modal.actions';
+import { useAccount } from 'wagmi';
 
 import { TokenStatsBoardTotalPoints } from './components/point-stats-board-total-points';
 import { PointsLayout } from './components/points-layout';
@@ -15,7 +15,7 @@ import { PointsTable } from './components/points-table/points-table';
 export function Points(): React.JSX.Element {
   const dispatch = useDispatch();
   const { userPoints } = usePoints();
-  const { address } = useSelector((state: RootState) => state.account);
+  const { address } = useAccount();
 
   function onConnectWalletClick(): void {
     dispatch(modalActions.toggleSelectWalletModalVisibility());
@@ -55,7 +55,7 @@ export function Points(): React.JSX.Element {
                 <HStack w={'100%'} pl={'25px'}>
                   <PointsStatsBoardAction
                     token={dlcBTC}
-                    totalSupply={userPoints?.protocols.find(p => p.name == 'Curve')?.points}
+                    totalSupply={userPoints?.useTotal}
                     tokenSuffix={'Use'}
                   />
                   <Divider

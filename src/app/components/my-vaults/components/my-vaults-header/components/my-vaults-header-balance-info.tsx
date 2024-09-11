@@ -1,4 +1,5 @@
 import { HStack, Image, Skeleton, Text, VStack } from '@chakra-ui/react';
+import { unshiftValue } from 'dlc-btc-lib/utilities';
 
 interface MyVaultsHeaderBalanceInfoProps {
   title: string;
@@ -24,7 +25,7 @@ export function MyVaultsHeaderBalanceInfo({
         <HStack>
           <Image src={imageSrc} alt={altText} boxSize={'25px'} />
           <Text color={'white'} fontWeight={800} fontSize={'xl'}>
-            {showNone ? '-' : assetAmount}
+            {showNone ? '-' : unshiftValue(assetAmount!)}
           </Text>
         </HStack>
       </Skeleton>
