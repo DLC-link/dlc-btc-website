@@ -1,23 +1,50 @@
-import { Button, HStack, Image, Text } from '@chakra-ui/react';
-import { Wallet, WalletType } from '@models/wallet';
+import { Box, Button, HStack, Image, Spinner, Text } from '@chakra-ui/react';
+import { Connector } from 'wagmi';
 
 interface SelectWalletMenuProps {
-  wallet: Wallet;
-  handleClick: (address: string, walletType: WalletType) => void;
+  wagmiConnector: Connector;
+  selectedWagmiConnectorID?: string;
+  isConnectWalletPending: boolean;
+  isConnectWalletSuccess: boolean;
+  handleConnectWallet: (wagmiConnector: Connector) => void;
 }
 
 export function SelectWalletMenu({
-  wallet,
-  handleClick,
+  wagmiConnector,
+  selectedWagmiConnectorID,
+  isConnectWalletPending,
+  isConnectWalletSuccess,
+  handleConnectWallet,
 }: SelectWalletMenuProps): React.JSX.Element {
-  const { logo, name } = wallet;
+  const { id, icon, name } = wagmiConnector;
+
+  const isThisWalletSelected = selectedWagmiConnectorID === id;
 
   return (
-    <Button variant={'wallet'} onClick={() => handleClick('123456789123456789', wallet.id)}>
-      <HStack justifyContent={'space-evenly'} w={'250px'}>
-        <Image src={logo} alt={name} boxSize={'25px'} />
-        <Text w={'150px'}>{name}</Text>
-      </HStack>
+    <Button
+      borderColor={
+        isConnectWalletSuccess && isThisWalletSelected ? 'accent.lightBlue.01' : 'border.white.01'
+      }
+      variant={'wallet'}
+      onClick={() => handleConnectWallet(wagmiConnector)}
+    >
+      <Box position="relative" w={'100%'} display={'flex'} justifyContent={'center'}>
+        <HStack
+          justifyContent={'space-evenly'}
+          w={'250px'}
+          filter={isConnectWalletPending && isThisWalletSelected ? 'opacity(25%)' : 'none'}
+        >
+          <Image
+            src={name === 'WalletConnect' ? './images/logos/walletconnect.svg' : icon}
+            alt={name}
+            boxSize={'25px'}
+          />
+          <Text w={'150px'}>{name}</Text>
+        </HStack>
+        {isConnectWalletPending && isThisWalletSelected && (
+          <Spinner size={'md'} color={'accent.lightBlue.01'} position={'absolute'} />
+        )}
+      </Box>
     </Button>
   );
 }

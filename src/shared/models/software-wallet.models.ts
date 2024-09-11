@@ -1,6 +1,6 @@
 export interface BitcoinNativeSegwitAccount {
   address: string;
-  derivationPath: string;
+  derivationPath?: string;
   publicKey: string;
   symbol: string;
   type: string;
@@ -8,7 +8,7 @@ export interface BitcoinNativeSegwitAccount {
 
 export interface BitcoinTaprootAccount extends BitcoinNativeSegwitAccount {
   type: 'p2tr';
-  tweakedPublicKey: string;
+  tweakedPublicKey?: string;
 }
 
 export type BitcoinAccount = BitcoinNativeSegwitAccount | BitcoinTaprootAccount;
@@ -54,4 +54,17 @@ export interface SignPsbtRequestParams {
   network?: NetworkModes; // default is user's current network
   account?: number; // default is user's current account
   broadcast?: boolean; // default is false - finalize/broadcast tx
+}
+
+export interface UnisatToSignInput {
+  index: number;
+  address?: string;
+  publicKey?: string;
+  sighashTypes?: number[];
+  disableTweakSigner?: boolean;
+}
+
+export interface UnisatSignPsbtRequestOptions {
+  autoFinalized?: boolean;
+  toSignInputs?: UnisatToSignInput[];
 }

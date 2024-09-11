@@ -1,15 +1,10 @@
 import { useContext } from 'react';
-import { useQuery } from 'react-query';
 
 import { Divider, HStack, Text } from '@chakra-ui/react';
-import { ProtocolHistoryTableItemProps } from '@components/protocol-history-table/components/protocol-history-table-item';
 import { ProtocolHistoryTable } from '@components/protocol-history-table/protocol-history-table';
-import { useEthereum } from '@hooks/use-ethereum';
 import { Merchant } from '@models/merchant';
 import { bitcoin, dlcBTC } from '@models/token';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
-
-import { BURN_ADDRESS } from '@shared/constants/ethereum.constants';
 
 import { MerchantTableHeader } from './components/merchant-table/components/merchant-table-header';
 import { MerchantTableItem } from './components/merchant-table/components/merchant-table-item';
@@ -20,8 +15,8 @@ import { TokenStatsBoardTVL } from './components/token-stats-board/components/to
 import { TokenStatsBoardLayout } from './components/token-stats-board/token-stats-board.layout';
 
 export function ProofOfReserve(): React.JSX.Element {
-  const { proofOfReserve, totalSupply, bitcoinPrice } = useContext(ProofOfReserveContext);
-  const { fetchMintBurnEvents } = useEthereum();
+  const { proofOfReserve, totalSupply, bitcoinPrice, allMintBurnEvents } =
+    useContext(ProofOfReserveContext);
 
   const [proofOfReserveSum, merchantProofOfReserves] = proofOfReserve || [
     undefined,
@@ -32,22 +27,6 @@ export function ProofOfReserve(): React.JSX.Element {
       };
     }),
   ];
-
-  const { data: allMintBurnEvents } = useQuery(['allMintBurnEvents'], fetchMintBurnEventsHandler);
-
-  async function fetchMintBurnEventsHandler(): Promise<ProtocolHistoryTableItemProps[]> {
-    const detailedEvents = await fetchMintBurnEvents(undefined, 10);
-    return detailedEvents.map((event, index) => {
-      const isMint = event.from.toLowerCase() === BURN_ADDRESS.toLowerCase();
-      return {
-        id: index,
-        dlcBTCAmount: isMint ? event.value : event.value * -1,
-        merchant: isMint ? event.to : event.from,
-        txHash: event.txHash,
-        date: new Date(event.timestamp * 1000).toDateString(),
-      };
-    });
-  }
 
   return (
     <ProofOfReserveLayout>

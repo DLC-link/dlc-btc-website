@@ -3,10 +3,9 @@ import { boxShadowAnimation } from '@styles/css-styles';
 
 interface MintUnmintLayoutProps {
   children: React.ReactNode;
-  animate?: boolean;
 }
 
-export function MintUnmintLayout({ children, animate }: MintUnmintLayoutProps): React.JSX.Element {
+export function MintUnmintLayout({ children }: MintUnmintLayoutProps): React.JSX.Element {
   return (
     <VStack
       px={'15px'}
@@ -17,7 +16,7 @@ export function MintUnmintLayout({ children, animate }: MintUnmintLayoutProps): 
       borderRadius={'md'}
       borderColor={'border.lightBlue.01'}
       css={{
-        animation: animate ? `${boxShadowAnimation} 0.5s 2 ease-in-out` : 'none',
+        animation: `${boxShadowAnimation} 0.5s 2 ease-in-out`,
       }}
     >
       {children}

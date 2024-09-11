@@ -2,6 +2,7 @@
   "name": "dlc-btc-website",
   "private": true,
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
     "localhost": "vite --mode localhost",
     "devnet": "vite --mode devnet",
@@ -16,7 +17,7 @@
     "lint:prettier:fix": "prettier --write \"{src,tests}/**/*.{ts,tsx}\" *.js",
     "lint:unused-exports": "ts-unused-exports tsconfig.json",
     "typecheck": "tsc --noEmit",
-    "test:unit": "VITE_APP_ENVIRONMENT=devnet vitest --reporter=verbose unit",
+    "test:unit": "VITE_APP_ENVIRONMENT=devnet VITE_ETHEREUM_DEPLOYMENT_BRANCH=dev VITE_ARBITRUM_OBSERVER_NODE=wss://sepolia-rollup.arbitrum.io/rpc,https://sepolia-rollup.arbitrum.io/rpc VITE_L1_OBSERVER_NODE=wss://rpc.sepolia.org,https://rpc.sepolia.org VITE_BASE_OBSERVER_NODE=wss://sepolia.base.org,https://sepolia.base.org vitest --reporter=verbose unit",
     "test:integration": "npx playwright test",
     "preview": "vite preview"
   },
@@ -32,6 +33,7 @@
     "@ledgerhq/hw-transport-webusb": "^6.28.6",
     "@netlify/functions": "^2.8.1",
     "@reduxjs/toolkit": "^1.9.7",
+    "@tanstack/react-query": "^5.51.16",
     "@trivago/prettier-plugin-sort-imports": "^4.2.1",
     "@types/chrome": "^0.0.248",
     "@types/d3": "^7.4.3",
@@ -41,7 +43,7 @@
     "concurrently": "^8.2.2",
     "d3": "^7.9.0",
     "decimal.js": "^10.4.3",
-    "dlc-btc-lib": "2.0.0",
+    "dlc-btc-lib": "^2.2.6",
     "dotenv": "^16.3.1",
     "ethers": "5.7.2",
     "formik": "^2.4.5",
@@ -54,13 +56,14 @@
     "react-charts": "^3.0.0-beta.57",
     "react-dom": "^18.2.0",
     "react-icons": "^5.2.1",
-    "react-query": "^3.39.3",
     "react-redux": "^8.1.3",
     "react-youtube": "^10.1.0",
     "redux": "^4.2.1",
     "redux-persist": "^6.0.0",
     "redux-persist-expire": "^1.1.1",
-    "vite-plugin-toml": "^0.7.0"
+    "viem": "2.x",
+    "vite-plugin-toml": "^0.7.0",
+    "wagmi": "^2.12.2"
   },
   "devDependencies": {
     "@ls-lint/ls-lint": "^2.2.2",

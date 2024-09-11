@@ -5,13 +5,6 @@ export class BitcoinError extends Error {
   }
 }
 
-export class EthereumError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'EthereumError';
-  }
-}
-
 export class LedgerError extends Error {
   constructor(message: string) {
     super(message);
@@ -23,5 +16,12 @@ export class LeatherError extends Error {
   constructor(message: string) {
     super(message);
     this.name = 'LeatherError';
+  }
+}
+
+export class UnisatError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'UnisatError';
   }
 }

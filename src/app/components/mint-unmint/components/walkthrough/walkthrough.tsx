@@ -1,6 +1,6 @@
 import { Button, HStack, Image, Link, Text } from '@chakra-ui/react';
 import { TutorialVideo } from '@components/tutorial-video/tutorial-video';
-import { useEthereumAccount } from '@hooks/use-ethereum-account';
+import { useAddToken } from '@hooks/use-add-token';
 
 import { WalkthroughHeader } from './components/walkthrough-header';
 import { WalkthroughLayout } from './components/walkthrough.layout';
@@ -11,7 +11,7 @@ interface WalkthroughProps {
 }
 
 export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.Element {
-  const { recommendTokenToMetamask } = useEthereumAccount();
+  const addToken = useAddToken();
 
   switch (flow) {
     case 'mint':
@@ -88,7 +88,7 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
                 simply <span style={{ fontWeight: 800 }}>add them </span>
                 to your Ethereum Wallet.
               </Text>
-              <Button variant={'vault'} onClick={async () => await recommendTokenToMetamask()}>
+              <Button variant={'vault'} onClick={async () => await addToken()}>
                 <HStack>
                   <Image src={'/images/logos/dlc-btc-logo.svg'} alt={'dlcBTC'} boxSize={'25px'} />
                   <Text> Add Token to Wallet</Text>

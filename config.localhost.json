@@ -1,10 +1,6 @@
 {
   "appEnvironment": "localhost",
-  "attestorURLs": [
-    "http://192.168.86.31:8811",
-    "http://192.168.86.31:8812",
-    "http://192.168.86.31:8813"
-  ],
+  "coordinatorURL": "http://192.168.86.31:8811",
   "enabledEthereumNetworkIDs": ["421614", "31337"],
   "bitcoinNetwork": "regtest",
   "bitcoinNetworkIndex": 1,
@@ -15,12 +11,12 @@
   "merchants": [
     {
       "name": "Amber",
-      "address": "0xff200709bf9bbc5209ba4b5dd767913a8a06b73f",
+      "addresses": ["0xDdBE45eb79fa9920340a72020F50fB5b13dd3b6d"],
       "logo": "/images/logos/amber-logo.svg"
     },
     {
       "name": "DLC.Link",
-      "address": "0x0DD4f29E21F10cb2E485cf9bDAb9F2dD1f240Bfa",
+      "addresses": ["0x0DD4f29E21F10cb2E485cf9bDAb9F2dD1f240Bfa"],
       "logo": "/images/logos/dlc-link-logo-horizontal.svg"
     }
   ],
