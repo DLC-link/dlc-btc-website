@@ -1,5 +1,6 @@
 import { useContext, useState } from 'react';
 
+import { ALL_SUPPORTED_BITCOIN_NETWORK_PREFIX } from '@models/configuration';
 import { UnisatError } from '@models/error-types';
 import {
   BitcoinTaprootAccount,
@@ -115,11 +116,13 @@ export function useUnisat(): UseUnisatReturnType {
    * @throws UnisatError - If the user's wallet is not on the same network as the app or if the address is not a taproot address.
    */
   function checkUserWalletNetworkAndAddressType(userAddress: string): void {
+    if (
+      !ALL_SUPPORTED_BITCOIN_NETWORK_PREFIX.some(prefix => userAddress.startsWith(`${prefix}p`))
+    ) {
+      throw new UnisatError('User wallet is not a Taproot address');
+    }
     if (!userAddress.startsWith(appConfiguration.bitcoinNetworkPreFix)) {
       throw new UnisatError(`User wallet is not on [${appConfiguration.bitcoinNetwork}] Network`);
-    }
-    if (userAddress[appConfiguration.bitcoinNetworkPreFix.length] !== 'p') {
-      throw new UnisatError('Address is not a Taproot address, please switch to a Taproot address');
     }
   }
 
