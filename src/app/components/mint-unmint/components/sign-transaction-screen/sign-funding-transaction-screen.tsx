@@ -31,7 +31,7 @@ export function SignFundingTransactionScreen({
 
   const { bitcoinWalletContextState, resetBitcoinWalletContext } = useContext(BitcoinWalletContext);
 
-  const { bitcoinPrice } = useContext(ProofOfReserveContext);
+  const { bitcoinPrice, depositLimit } = useContext(ProofOfReserveContext);
   const { allVaults } = useContext(VaultContext);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -83,6 +83,7 @@ export function SignFundingTransactionScreen({
       isAttestorApprovePending={isAttestorApprovePending}
       userEthereumAddressRiskLevel={userEthereumAddressRiskLevel}
       isUserEthereumAddressRiskLevelLoading={isUserEthereumAddressRiskLevelLoading}
+      depositLimit={depositLimit}
       handleConnect={handleConnect}
       handleDeposit={handleDeposit}
       handleCancel={handleCancel}

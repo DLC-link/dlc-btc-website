@@ -47,8 +47,10 @@ export function BurnTokenTransactionForm({
                 {vault && <VaultMiniCard vault={vault} />}
                 <TransactionFormInput
                   header={'Amount of dlcBTC to burn:'}
+                  type={'burn'}
                   values={values}
                   bitcoinPrice={bitcoinPrice}
+                  lockedAmount={vault?.valueMinted}
                 />
                 <FormErrorMessage m={'0px'} fontSize={'xs'}>
                   {errors.amount}

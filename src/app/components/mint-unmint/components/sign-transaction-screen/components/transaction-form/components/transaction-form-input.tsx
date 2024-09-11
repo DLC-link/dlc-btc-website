@@ -1,27 +1,47 @@
 import { HStack, Image, Input, Text, VStack } from '@chakra-ui/react';
 import { Field } from 'formik';
 
-function validateTokenAmount(value: number): string | undefined {
-  let error;
-  if (!value) {
-    error = 'Please enter a valid amount of dlcBTC';
-  } else if (value < 0.01) {
-    error = "You can't mint less than 0.01 dlcBTC";
-  }
-  return error;
-}
-
 interface TransactionFormInputProps {
   header: string;
+  type: 'mint' | 'burn';
   values: { amount: number };
+  depositLimit?: { minimumDeposit: number; maximumDeposit: number } | undefined;
   bitcoinPrice?: number;
+  lockedAmount?: number;
 }
 
 export function TransactionFormInput({
   header,
   values,
+  type,
+  depositLimit,
   bitcoinPrice,
+  lockedAmount,
 }: TransactionFormInputProps): React.JSX.Element {
+  function validateDepositAmount(value: number): string | undefined {
+    let error;
+
+    if (!value) {
+      error = 'Please enter a valid amount of dlcBTC';
+    } else if (depositLimit && value < depositLimit.minimumDeposit) {
+      error = `You can't mint less than ${depositLimit.minimumDeposit} dlcBTC`;
+    } else if (depositLimit && value > depositLimit.maximumDeposit) {
+      error = `You can't mint more than ${depositLimit.maximumDeposit} dlcBTC`;
+    }
+    return error;
+  }
+
+  function validateWithdrawAmount(value: number): string | undefined {
+    let error;
+
+    if (!value) {
+      error = 'Please enter a valid amount of dlcBTC';
+    } else if (lockedAmount && value > lockedAmount) {
+      error = `You can't burn more than ${lockedAmount} dlcBTC`;
+    }
+    return error;
+  }
+
   return (
     <VStack
       alignItems={'start'}
@@ -52,7 +72,7 @@ export function TransactionFormInput({
             borderColor={'accent.lightBlue.01'}
             fontSize={'lg'}
             fontWeight={800}
-            validate={validateTokenAmount}
+            validate={type === 'mint' ? validateDepositAmount : validateWithdrawAmount}
             onWheel={(e: React.WheelEvent<HTMLInputElement>) =>
               (e.target as HTMLInputElement).blur()
             }
