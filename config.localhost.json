@@ -12,12 +12,12 @@
     {
       "name": "Amber",
       "addresses": ["0xDdBE45eb79fa9920340a72020F50fB5b13dd3b6d"],
-      "logo": "/images/logos/amber-logo.svg"
+      "logo": "/images/logos/amber-logotype.svg"
     },
     {
       "name": "DLC.Link",
       "addresses": ["0x0DD4f29E21F10cb2E485cf9bDAb9F2dD1f240Bfa"],
-      "logo": "/images/logos/dlc-link-logo-horizontal.svg"
+      "logo": "/images/logos/dlcBTC-logotype.svg"
     }
   ],
   "protocols": [
