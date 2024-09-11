@@ -20,7 +20,7 @@ import {
   mainnet,
   sepolia,
 } from 'viem/chains';
-import { useAccount, useDisconnect } from 'wagmi';
+import { useAccount } from 'wagmi';
 
 import { SUPPORTED_VIEM_CHAINS } from '@shared/constants/ethereum.constants';
 
@@ -212,7 +212,6 @@ export function EthereumNetworkConfigurationContextProvider({
 }: HasChildren): React.JSX.Element {
   const dispatch = useDispatch();
   const { chain, isConnected } = useAccount();
-  const { disconnect } = useDisconnect();
   const [ethereumNetworkConfiguration, setEthereumNetworkConfiguration] =
     useState<EthereumNetworkConfiguration>(
       chain
@@ -223,9 +222,12 @@ export function EthereumNetworkConfigurationContextProvider({
     useState(false);
 
   useEffect(() => {
+    if (!isConnected) {
+      return;
+    }
     if (isConnected && !chain) {
-      disconnect();
       dispatch(mintUnmintActions.resetMintUnmintState());
+      //ilyenkor kell megmutatni a bannert
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chain]);

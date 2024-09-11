@@ -3,16 +3,16 @@ import { useAccount, useConfig, useSwitchChain } from 'wagmi';
 
 export function NetworksMenu(): React.JSX.Element | null {
   const { chains } = useConfig();
-  const { chain } = useAccount();
+  const { chain, isConnected } = useAccount();
   const { switchChain } = useSwitchChain();
 
-  if (!chain) {
+  if (!isConnected) {
     return null;
   }
 
   return (
     <Menu variant={'networkChange'}>
-      <MenuButton disabled={!chain}>
+      <MenuButton>
         <HStack justifyContent={'space-evenly'}>
           <Text>{chain ? chain?.name : 'Not Connected'}</Text>
         </HStack>
