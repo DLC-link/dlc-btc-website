@@ -16,9 +16,9 @@ export function MerchantTableItem({
   const navigate = useNavigate();
 
   return (
-    <HStack w={'100%'} justifyContent={'space-between'}>
+    <HStack w={'100%'} justifyContent={'space-between'} py={'5px'}>
       <HStack w={'250px'}>
-        <Image src={merchant.logo} alt={merchant.name} />
+        <Image src={merchant.logo} alt={merchant.name} width={'150px'} />
       </HStack>
       <HStack w={'150px'} h={'35px'}>
         <Image src={'/images/logos/dlc-btc-logo.svg'} alt={'dlcBTC Logo'} boxSize={'25px'} />
