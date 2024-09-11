@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 
-import { Divider, HStack, Text, VStack } from '@chakra-ui/react';
+import { Divider, HStack, Text } from '@chakra-ui/react';
 import { ProtocolHistoryTable } from '@components/protocol-history-table/protocol-history-table';
 import { Merchant } from '@models/merchant';
 import { bitcoin, dlcBTC } from '@models/token';
