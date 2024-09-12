@@ -49,15 +49,16 @@ export function ProofOfReserve(): React.JSX.Element {
         <HStack
           w={'100%'}
           justifyContent={'center'}
-          bg={'yellow.300'}
+          bg={'error.01'}
           p={4}
+          border={'1px solid'}
           borderRadius={'md'}
           mb={4}
         >
-          <Text fontSize={'lg'} fontWeight={600} color={'black'}>
-            Please select a network to continue.
+          <Text fontSize={'lg'} fontWeight={600} color={'white'}>
+            You are on an unsupported network. Please switch to a supported network to continue.
           </Text>
-          <Button onClick={() => setShowBanner(false)} colorScheme="red" size="sm">
+          <Button onClick={() => setShowBanner(false)} size="sm">
             Exit
           </Button>
         </HStack>
