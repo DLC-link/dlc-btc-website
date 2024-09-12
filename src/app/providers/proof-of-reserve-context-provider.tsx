@@ -1,6 +1,7 @@
 import { createContext } from 'react';
 
 import { useBitcoinPrice } from '@hooks/use-bitcoin-price';
+import { useDepositLimits } from '@hooks/use-deposit-limits';
 import { useMintBurnEvents } from '@hooks/use-mint-burn-events';
 import { useProofOfReserve } from '@hooks/use-proof-of-reserve';
 import { useTotalSupply } from '@hooks/use-total-supply';
@@ -14,6 +15,7 @@ interface ProofOfReserveContextProviderType {
   bitcoinPrice: number | undefined;
   allMintBurnEvents: DetailedEvent[] | undefined;
   merchantMintBurnEvents: { name: string; mintBurnEvents: DetailedEvent[] }[] | undefined;
+  depositLimit: { minimumDeposit: number; maximumDeposit: number } | undefined;
 }
 
 export const ProofOfReserveContext = createContext<ProofOfReserveContextProviderType>({
@@ -22,6 +24,7 @@ export const ProofOfReserveContext = createContext<ProofOfReserveContextProvider
   bitcoinPrice: undefined,
   allMintBurnEvents: undefined,
   merchantMintBurnEvents: undefined,
+  depositLimit: undefined,
 });
 
 export function ProofOfReserveContextProvider({ children }: HasChildren): React.JSX.Element {
@@ -29,6 +32,7 @@ export function ProofOfReserveContextProvider({ children }: HasChildren): React.
   const { totalSupply } = useTotalSupply();
   const { bitcoinPrice } = useBitcoinPrice();
   const { allMintBurnEvents, merchantMintBurnEvents } = useMintBurnEvents();
+  const { depositLimit } = useDepositLimits();
 
   return (
     <ProofOfReserveContext.Provider
@@ -38,6 +42,7 @@ export function ProofOfReserveContextProvider({ children }: HasChildren): React.
         bitcoinPrice,
         allMintBurnEvents,
         merchantMintBurnEvents,
+        depositLimit,
       }}
     >
       {children}
