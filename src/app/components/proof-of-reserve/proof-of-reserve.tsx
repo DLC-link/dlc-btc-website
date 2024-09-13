@@ -1,11 +1,10 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
 
-import { Button, Divider, HStack, Text } from '@chakra-ui/react';
+import { Divider, HStack, Text } from '@chakra-ui/react';
 import { ProtocolHistoryTable } from '@components/protocol-history-table/protocol-history-table';
 import { Merchant } from '@models/merchant';
 import { bitcoin, dlcBTC } from '@models/token';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
-import { useAccount } from 'wagmi';
 
 import { MerchantTableHeader } from './components/merchant-table/components/merchant-table-header';
 import { MerchantTableItem } from './components/merchant-table/components/merchant-table-item';
@@ -19,8 +18,6 @@ export function ProofOfReserve(): React.JSX.Element {
   const { proofOfReserve, totalSupply, bitcoinPrice, allMintBurnEvents } =
     useContext(ProofOfReserveContext);
 
-  const { chain, isConnected } = useAccount();
-
   const [proofOfReserveSum, merchantProofOfReserves] = proofOfReserve || [
     undefined,
     appConfiguration.merchants.map((merchant: Merchant) => {
@@ -31,38 +28,8 @@ export function ProofOfReserve(): React.JSX.Element {
     }),
   ];
 
-  const [showBanner, setShowBanner] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (isConnected && !chain) {
-      setShowBanner(true);
-    } else {
-      setShowBanner(false);
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chain]);
-
   return (
     <ProofOfReserveLayout>
-      {showBanner && (
-        <HStack
-          w={'100%'}
-          justifyContent={'center'}
-          bg={'error.01'}
-          p={4}
-          border={'1px solid'}
-          borderRadius={'md'}
-          mb={4}
-        >
-          <Text fontSize={'lg'} fontWeight={600} color={'white'}>
-            You are on an unsupported network. Please switch to a supported network to continue.
-          </Text>
-          <Button onClick={() => setShowBanner(false)} size="sm">
-            Exit
-          </Button>
-        </HStack>
-      )}
       <Text w={'100%'} color={'white'} fontSize={'6xl'} fontWeight={500}>
         Proof of Reserve
       </Text>

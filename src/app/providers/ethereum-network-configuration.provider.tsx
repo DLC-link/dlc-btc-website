@@ -1,5 +1,4 @@
 import React, { createContext, useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
 
 import {
   getEthereumContractWithProvider,
@@ -8,7 +7,6 @@ import {
 } from '@functions/configuration.functions';
 import { EthereumNetworkConfiguration } from '@models/ethereum-models';
 import { HasChildren } from '@models/has-children';
-import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { EthereumNetworkID } from 'dlc-btc-lib/models';
 import { equals, find } from 'ramda';
 import {
@@ -210,8 +208,7 @@ export const EthereumNetworkConfigurationContext =
 export function EthereumNetworkConfigurationContextProvider({
   children,
 }: HasChildren): React.JSX.Element {
-  const dispatch = useDispatch();
-  const { chain, isConnected } = useAccount();
+  const { chain } = useAccount();
   const [ethereumNetworkConfiguration, setEthereumNetworkConfiguration] =
     useState<EthereumNetworkConfiguration>(
       chain
@@ -220,17 +217,6 @@ export function EthereumNetworkConfigurationContextProvider({
     );
   const [isEthereumNetworkConfigurationLoading, setIsEthereumNetworkConfigurationLoading] =
     useState(false);
-
-  useEffect(() => {
-    if (!isConnected) {
-      return;
-    }
-    if (isConnected && !chain) {
-      dispatch(mintUnmintActions.resetMintUnmintState());
-      //ilyenkor kell megmutatni a bannert
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chain]);
 
   useEffect(() => {
     setIsEthereumNetworkConfigurationLoading(true);
