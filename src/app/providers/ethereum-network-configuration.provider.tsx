@@ -1,5 +1,4 @@
 import React, { createContext, useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
 
 import {
   getEthereumContractWithProvider,
@@ -8,7 +7,6 @@ import {
 } from '@functions/configuration.functions';
 import { EthereumNetworkConfiguration } from '@models/ethereum-models';
 import { HasChildren } from '@models/has-children';
-import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { EthereumNetworkID } from 'dlc-btc-lib/models';
 import { equals, find } from 'ramda';
 import {
@@ -20,7 +18,7 @@ import {
   mainnet,
   sepolia,
 } from 'viem/chains';
-import { useAccount, useDisconnect } from 'wagmi';
+import { useAccount } from 'wagmi';
 
 import { SUPPORTED_VIEM_CHAINS } from '@shared/constants/ethereum.constants';
 
@@ -210,9 +208,7 @@ export const EthereumNetworkConfigurationContext =
 export function EthereumNetworkConfigurationContextProvider({
   children,
 }: HasChildren): React.JSX.Element {
-  const dispatch = useDispatch();
-  const { chain, isConnected } = useAccount();
-  const { disconnect } = useDisconnect();
+  const { chain } = useAccount();
   const [ethereumNetworkConfiguration, setEthereumNetworkConfiguration] =
     useState<EthereumNetworkConfiguration>(
       chain
@@ -221,14 +217,6 @@ export function EthereumNetworkConfigurationContextProvider({
     );
   const [isEthereumNetworkConfigurationLoading, setIsEthereumNetworkConfigurationLoading] =
     useState(false);
-
-  useEffect(() => {
-    if (isConnected && !chain) {
-      disconnect();
-      dispatch(mintUnmintActions.resetMintUnmintState());
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chain]);
 
   useEffect(() => {
     setIsEthereumNetworkConfigurationLoading(true);
