@@ -6,7 +6,7 @@ interface GenericTableHeaderProps {
 
 export function GenericTableHeader({ children }: GenericTableHeaderProps): React.JSX.Element {
   return (
-    <HStack w={'100%'} px={'10px'}>
+    <HStack w={'100%'} px={'10px'} justifyContent={'space-between'}>
       {children}
     </HStack>
   );
