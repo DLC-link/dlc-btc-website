@@ -11,11 +11,11 @@ import {
   BitcoinWalletContextState,
 } from '@providers/bitcoin-wallet-context-provider';
 import { LedgerDLCHandler } from 'dlc-btc-lib';
-import { getBalance } from 'dlc-btc-lib/bitcoin-functions';
+import { getBalance, getBitcoinAddressFromExtendedPublicKey } from 'dlc-btc-lib/bitcoin-functions';
 import { bitcoin } from 'dlc-btc-lib/constants';
-import { RawVault, Transaction } from 'dlc-btc-lib/models';
+import { Network, RawVault, Transaction } from 'dlc-btc-lib/models';
 import { delay, shiftValue, unshiftValue } from 'dlc-btc-lib/utilities';
-import { AppClient, DefaultWalletPolicy } from 'ledger-bitcoin';
+import { AppClient } from 'ledger-bitcoin';
 import { range } from 'ramda';
 
 import { BITCOIN_NETWORK_MAP } from '@shared/constants/bitcoin.constants';
@@ -29,11 +29,13 @@ export interface BitcoinAddressInformation {
 }
 
 interface UseLedgerReturnType {
-  getLedgerAddressesWithBalances: (
-    paymentType: SupportedPaymentType,
+  getAllLedgerAddressesWithBalances: (
     accountIndex: number,
     startIndex: number
-  ) => Promise<BitcoinAddressInformation[]>;
+  ) => Promise<{
+    nativeSegwitAddresses: BitcoinAddressInformation[];
+    taprootAddresses: BitcoinAddressInformation[];
+  }>;
   connectLedgerWallet: (
     walletAccountIndex: number,
     walletAddressIndex: number,
@@ -127,41 +129,70 @@ export function useLedger(): UseLedgerReturnType {
     await transport.send(0xe0, 0xd8, 0x00, 0x00, Buffer.from(name, 'ascii'));
   }
 
+  async function getAllLedgerAddressesWithBalances(
+    walletAccountIndex: number,
+    displayedAddressesStartIndex: number
+  ): Promise<{
+    nativeSegwitAddresses: BitcoinAddressInformation[];
+    taprootAddresses: BitcoinAddressInformation[];
+  }> {
+    try {
+      setIsLoading([true, 'Loading Ledger App and Information']);
+      const bitcoinNetwork = BITCOIN_NETWORK_MAP[appConfiguration.bitcoinNetwork];
+      const ledgerApp = await getLedgerApp(
+        bitcoinNetwork === bitcoin
+          ? LEDGER_APPS_MAP.BITCOIN_MAINNET
+          : LEDGER_APPS_MAP.BITCOIN_TESTNET
+      );
+      setLedgerApp(ledgerApp);
+
+      setIsLoading([true, `Loading Bitcoin Addresses`]);
+      const nativeSegwitAddresses = await getLedgerAddressesWithBalances(
+        ledgerApp,
+        bitcoinNetwork,
+        SupportedPaymentType.NATIVE_SEGWIT,
+        walletAccountIndex,
+        displayedAddressesStartIndex
+      );
+      const taprootAddresses = await getLedgerAddressesWithBalances(
+        ledgerApp,
+        bitcoinNetwork,
+        SupportedPaymentType.TAPROOT,
+        walletAccountIndex,
+        displayedAddressesStartIndex
+      );
+      setIsLoading([false, '']);
+      return { nativeSegwitAddresses, taprootAddresses };
+    } catch (error: any) {
+      setIsLoading([false, '']);
+      throw new LedgerError(`Error getting all Ledger Addresses with Balances: ${error}`);
+    }
+  }
+
   /**
    * Gets the Ledger Addresses with Balances.
    * @param paymentType The Payment Type.
    * @returns The Ledger Addresses with Balances.
    */
   async function getLedgerAddressesWithBalances(
+    ledgerApp: AppClient,
+    bitcoinNetwork: Network,
     paymentType: SupportedPaymentType,
     accountIndex: number,
     startIndex: number
   ): Promise<BitcoinAddressInformation[]> {
     try {
-      setIsLoading([true, 'Loading Ledger App and Information']);
-      const ledgerApp = await getLedgerApp(
-        BITCOIN_NETWORK_MAP[appConfiguration.bitcoinNetwork] === bitcoin
-          ? LEDGER_APPS_MAP.BITCOIN_MAINNET
-          : LEDGER_APPS_MAP.BITCOIN_TESTNET
-      );
-      setLedgerApp(ledgerApp);
-
-      const masterFingerprint = await ledgerApp.getMasterFingerprint();
       const derivationPath = `${paymentType === 'wpkh' ? '84' : '86'}'/${appConfiguration.bitcoinNetworkIndex}'/${accountIndex}'`;
       const extendedPublicKey = await ledgerApp.getExtendedPubkey(`m/${derivationPath}`);
-      const accountPolicy = new DefaultWalletPolicy(
-        `${paymentType}(@0/**)`,
-        `[${masterFingerprint}/${derivationPath}]${extendedPublicKey}`
-      );
-
-      setIsLoading([
-        true,
-        `Loading ${paymentType === 'wpkh' ? 'Native Segwit' : 'Taproot'} Addresses`,
-      ]);
 
       const addresses: BitcoinAddressInformation[] = [];
       for (const i of range(startIndex, startIndex + 5)) {
-        const address = await ledgerApp.getWalletAddress(accountPolicy, null, 0, i, false);
+        const address = getBitcoinAddressFromExtendedPublicKey(
+          extendedPublicKey,
+          bitcoinNetwork,
+          i,
+          paymentType
+        );
 
         addresses.push({
           index: i,
@@ -181,7 +212,6 @@ export function useLedger(): UseLedgerReturnType {
         })
       );
 
-      setIsLoading([false, '']);
       return addressesWithBalances;
     } catch (error: any) {
       setIsLoading([false, '']);
@@ -318,7 +348,7 @@ export function useLedger(): UseLedgerReturnType {
   }
 
   return {
-    getLedgerAddressesWithBalances,
+    getAllLedgerAddressesWithBalances,
     connectLedgerWallet,
     handleFundingTransaction,
     handleDepositTransaction,
