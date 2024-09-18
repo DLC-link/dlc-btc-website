@@ -8,6 +8,7 @@
   "bitcoinBlockchainURL": "https://devnet.dlc.link/electrs",
   "bitcoinBlockchainExplorerURL": "https://devnet.dlc.link/electrs",
   "bitcoinBlockchainFeeEstimateURL": "https://devnet.dlc.link/electrs/fee-estimates",
+  "ledgerApp": "Bitcoin Test",
   "merchants": [
     {
       "name": "Amber",

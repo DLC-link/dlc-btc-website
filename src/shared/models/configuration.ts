@@ -37,6 +37,7 @@ export interface Configuration {
   bitcoinBlockchainURL: string;
   bitcoinBlockchainExplorerURL: string;
   bitcoinBlockchainFeeEstimateURL: string;
+  ledgerApp: string;
   merchants: Merchant[];
   protocols: Protocol[];
 }

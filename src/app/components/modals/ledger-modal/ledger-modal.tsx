@@ -18,7 +18,7 @@ import { LedgerModalSelectAddressMenu } from './components/ledger-modal-select-a
 import { LedgerModalSuccessIcon } from './components/ledger-modal-success-icon';
 
 export function LedgerModal({ isOpen, handleClose }: ModalComponentProps): React.JSX.Element {
-  const { getLedgerAddressesWithBalances, connectLedgerWallet, isLoading } = useLedger();
+  const { getAllLedgerAddressesWithBalances, connectLedgerWallet, isLoading } = useLedger();
 
   const { setBitcoinWalletType, setBitcoinWalletContextState } = useContext(BitcoinWalletContext);
 
@@ -47,14 +47,7 @@ export function LedgerModal({ isOpen, handleClose }: ModalComponentProps): React
     try {
       setLedgerError(undefined);
       setIsLoadingAddressList(true);
-      const nativeSegwitAddresses = await getLedgerAddressesWithBalances(
-        SupportedPaymentType.NATIVE_SEGWIT,
-        walletAccountIndex,
-        displayedAddressesStartIndex
-      );
-
-      const taprootAddresses = await getLedgerAddressesWithBalances(
-        SupportedPaymentType.TAPROOT,
+      const { nativeSegwitAddresses, taprootAddresses } = await getAllLedgerAddressesWithBalances(
         walletAccountIndex,
         displayedAddressesStartIndex
       );
