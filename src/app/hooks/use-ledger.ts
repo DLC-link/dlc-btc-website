@@ -12,7 +12,6 @@ import {
 } from '@providers/bitcoin-wallet-context-provider';
 import { LedgerDLCHandler } from 'dlc-btc-lib';
 import { getBalance, getBitcoinAddressFromExtendedPublicKey } from 'dlc-btc-lib/bitcoin-functions';
-import { bitcoin } from 'dlc-btc-lib/constants';
 import { Network, RawVault, Transaction } from 'dlc-btc-lib/models';
 import { delay, shiftValue, unshiftValue } from 'dlc-btc-lib/utilities';
 import { AppClient } from 'ledger-bitcoin';
@@ -139,11 +138,7 @@ export function useLedger(): UseLedgerReturnType {
     try {
       setIsLoading([true, 'Loading Ledger App and Information']);
       const bitcoinNetwork = BITCOIN_NETWORK_MAP[appConfiguration.bitcoinNetwork];
-      const ledgerApp = await getLedgerApp(
-        bitcoinNetwork === bitcoin
-          ? LEDGER_APPS_MAP.BITCOIN_MAINNET
-          : LEDGER_APPS_MAP.BITCOIN_TESTNET
-      );
+      const ledgerApp = await getLedgerApp(appConfiguration.ledgerApp);
       setLedgerApp(ledgerApp);
 
       setIsLoading([true, `Loading Bitcoin Addresses`]);

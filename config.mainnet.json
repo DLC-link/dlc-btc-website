@@ -8,6 +8,7 @@
   "bitcoinBlockchainURL": "https://mainnet.dlc.link/electrs",
   "bitcoinBlockchainExplorerURL": "https://mempool.space",
   "bitcoinBlockchainFeeEstimateURL": "https://mempool.space/api/v1/fees/recommended",
+  "ledgerApp": "Bitcoin",
   "merchants": [
     {
       "name": "Amber",
