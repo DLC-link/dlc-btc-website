@@ -33,6 +33,7 @@ interface DepositBitcoinTransactionFormProps {
   isAttestorApprovePending: boolean;
   userEthereumAddressRiskLevel: string;
   isUserEthereumAddressRiskLevelLoading: boolean;
+  depositLimit: { minimumDeposit: number; maximumDeposit: number } | undefined;
   handleConnect: () => void;
   handleDeposit: (depositAmount: number) => Promise<void>;
   handleCancel: () => void;
@@ -47,6 +48,7 @@ export function DepositBitcoinTransactionForm({
   isAttestorApprovePending,
   userEthereumAddressRiskLevel,
   isUserEthereumAddressRiskLevelLoading,
+  depositLimit,
   handleConnect,
   handleDeposit,
   handleCancel,
@@ -65,14 +67,16 @@ export function DepositBitcoinTransactionForm({
         initialValues={initialValues}
         onSubmit={async values => await handleClick(values.amount)}
       >
-        {({ handleSubmit, errors, touched, values }) => (
-          <Form onSubmit={handleSubmit}>
+        {({ handleSubmit, handleChange, errors, touched, values }) => (
+          <Form onSubmit={handleSubmit} onChange={handleChange}>
             <FormControl isInvalid={!!errors.amount && touched.amount}>
               <VStack w={'385px'} spacing={'16.5px'} h={'456.5px'}>
                 {vault && <VaultMiniCard vault={vault} />}
                 <TransactionFormInput
                   header={'Amount of dlcBTC to mint:'}
+                  type={'mint'}
                   values={values}
+                  depositLimit={depositLimit}
                   bitcoinPrice={bitcoinPrice}
                 />
                 <FormErrorMessage m={'0px'} fontSize={'xs'}>

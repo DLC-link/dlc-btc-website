@@ -17,6 +17,8 @@ enum AppEnvironment {
 }
 
 type BitcoinNetworkPrefix = 'bc1' | 'tb1' | 'bcrt1';
+export const ALL_SUPPORTED_BITCOIN_NETWORK_PREFIX: BitcoinNetworkPrefix[] = ['bc1', 'tb1', 'bcrt1'];
+
 export interface Configuration {
   appEnvironment: AppEnvironment;
   coordinatorURL: string;
@@ -35,6 +37,7 @@ export interface Configuration {
   bitcoinBlockchainURL: string;
   bitcoinBlockchainExplorerURL: string;
   bitcoinBlockchainFeeEstimateURL: string;
+  ledgerApp: string;
   merchants: Merchant[];
   protocols: Protocol[];
 }

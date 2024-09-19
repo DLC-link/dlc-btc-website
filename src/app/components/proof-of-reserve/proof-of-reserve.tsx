@@ -33,6 +33,7 @@ export function ProofOfReserve(): React.JSX.Element {
       <Text w={'100%'} color={'white'} fontSize={'6xl'} fontWeight={500}>
         Proof of Reserve
       </Text>
+
       <TokenStatsBoardLayout>
         <HStack w={'100%'}>
           <TokenStatsBoardTVL totalSupply={totalSupply} bitcoinPrice={bitcoinPrice} />

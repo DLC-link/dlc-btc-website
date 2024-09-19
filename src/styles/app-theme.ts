@@ -2,7 +2,7 @@ import { extendTheme } from '@chakra-ui/react';
 // Supports weights 100-900
 import '@fontsource-variable/onest';
 
-import bgImage from '../../src/assets/images/new_background_dots_remake_test.jpeg';
+import bgImage from '../../src/assets/images/dotted_hero.png';
 import { buttonTheme } from './button-theme';
 import { dividerTheme } from './divider-theme';
 import { menuTheme } from './menu-theme';
@@ -36,9 +36,9 @@ export const appTheme = extendTheme({
       body: {
         bg: 'background.website.01',
         bgImage: `url(${bgImage})`,
-        bgSize: 'cover',
         width: '100%',
-        bgPosition: 'top',
+        bgPosition: 'center 130px',
+        bgRepeat: 'no-repeat',
       },
     }),
   },
