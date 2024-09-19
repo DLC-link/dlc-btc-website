@@ -49,11 +49,6 @@ export function UnmintVaultSelector({
 
   const { ethereumNetworkConfiguration } = useContext(EthereumNetworkConfigurationContext);
 
-  function handleSelect(uuid: string): void {
-    const vault = fundedVaults.find(vault => vault.uuid === uuid);
-    if (vault) setSelectedVault(vault);
-  }
-
   useEffect(() => {
     setSelectedVault(fundedVaults.find(vault => vault.uuid === unmintStep[1]));
   }, [fundedVaults, unmintStep]);
@@ -124,11 +119,7 @@ export function UnmintVaultSelector({
             Select vault to withdraw Bitcoin:
           </Text>
           <VaultsList height={'425.5px'} isScrollable={!selectedVault}>
-            <VaultsListGroupContainer
-              vaults={fundedVaults}
-              isSelectable
-              handleSelect={handleSelect}
-            />
+            <VaultsListGroupContainer vaults={fundedVaults} isSelectable variant={'select'} />
           </VaultsList>
         </VStack>
       )}

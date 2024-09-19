@@ -2,22 +2,26 @@ import { Box, Progress, Text, VStack } from '@chakra-ui/react';
 import { VaultState } from 'dlc-btc-lib/models';
 
 interface VaultProgressBarProps {
-  confirmedBlocks: number;
+  bitcoinTransactionConfirmations?: number;
   vaultState: VaultState;
 }
 
 export function VaultProgressBar({
-  confirmedBlocks,
+  bitcoinTransactionConfirmations,
   vaultState,
-}: VaultProgressBarProps): React.JSX.Element | boolean {
-  const shouldBeIndeterminate = confirmedBlocks > 6 || Number.isNaN(confirmedBlocks);
+}: VaultProgressBarProps): React.JSX.Element | false {
+  if (vaultState !== VaultState.PENDING) return false;
 
-  if (vaultState === VaultState.CLOSED && confirmedBlocks > 6) return false;
+  const shouldBeIndeterminate =
+    bitcoinTransactionConfirmations === undefined ||
+    bitcoinTransactionConfirmations === 0 ||
+    bitcoinTransactionConfirmations > 6;
   return (
-    <VStack w={'100%'} alignItems={'end'} position="relative">
+    <VStack w={'100%'} position="relative">
       <Progress
         isIndeterminate={shouldBeIndeterminate}
-        value={confirmedBlocks}
+        value={bitcoinTransactionConfirmations}
+        isAnimated
         max={6}
         w={'100%'}
         h={'25px'}
@@ -34,7 +38,9 @@ export function VaultProgressBar({
         h="100%"
       >
         <Text color={'white'} fontSize={'xs'} fontWeight={800}>
-          {shouldBeIndeterminate ? 'PROCESSING' : `WAITING FOR CONFIRMATIONS: ${confirmedBlocks}/6`}
+          {shouldBeIndeterminate
+            ? 'PROCESSING'
+            : `WAITING FOR CONFIRMATIONS: ${bitcoinTransactionConfirmations}/6`}
         </Text>
       </Box>
     </VStack>
