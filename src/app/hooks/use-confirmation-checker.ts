@@ -12,57 +12,51 @@ export function useConfirmationChecker(): [string, number][] {
 
   const bitcoinTransactionBlockHeightMap = useRef(new Map<string, number>());
 
-  async function fetchBitcoinTransactionConfirmations(vault: Vault): Promise<number> {
+  async function fetchBitcoinTransactionBlockHeight(vault: Vault): Promise<number> {
     try {
-      let bitcoinTransactionBlockHeight: number;
+      const bitcoinExplorerTXURL = `${appConfiguration.bitcoinBlockchainURL}/tx/${vault?.withdrawDepositTX}`;
 
-      if (!bitcoinTransactionBlockHeightMap.current.has(vault.withdrawDepositTX)) {
-        const bitcoinExplorerTXURL = `${appConfiguration.bitcoinBlockchainURL}/tx/${vault?.withdrawDepositTX}`;
+      const bitcoinTransactionResponse = await fetch(bitcoinExplorerTXURL);
+      const bitcoinTransaction = await bitcoinTransactionResponse.json();
+      const bitcoinTransactionBlockHeight: number = bitcoinTransaction.status.block_height;
 
-        const bitcoinTransactionResponse = await fetch(bitcoinExplorerTXURL);
-        if (!bitcoinTransactionResponse.ok) throw new Error('Could not fetch Bitcoin Transaction');
+      if (!bitcoinTransactionBlockHeight)
+        throw new Error('Could not fetch Bitcoin Transaction Block Height');
 
-        const bitcoinTransaction = await bitcoinTransactionResponse.json();
-        bitcoinTransactionBlockHeight = bitcoinTransaction.status.block_height;
+      bitcoinTransactionBlockHeightMap.current.set(
+        vault.withdrawDepositTX,
+        bitcoinTransactionBlockHeight
+      );
 
-        if (!bitcoinTransactionBlockHeight)
-          throw new Error('Could not fetch Bitcoin Transaction Block Height');
-        bitcoinTransactionBlockHeightMap.current.set(
-          vault.withdrawDepositTX,
-          bitcoinTransactionBlockHeight
-        );
-      } else {
-        bitcoinTransactionBlockHeight = bitcoinTransactionBlockHeightMap.current.get(
-          vault.withdrawDepositTX
-        )!;
-      }
-
-      if (!blockHeight) throw new Error('Block Height is not available');
-
-      const bitcoinTransactionConfirmations = blockHeight + 1 - bitcoinTransactionBlockHeight;
-      return bitcoinTransactionConfirmations;
+      return bitcoinTransactionBlockHeight;
     } catch (error) {
-      console.error('Error fetching Bitcoin Transaction Confirmations', error);
+      throw new Error('Error fetching Bitcoin Transaction Block Height');
+    }
+  }
+
+  async function fetchBitcoinTransactionConfirmations(
+    vault: Vault,
+    blockHeight: number
+  ): Promise<number> {
+    try {
+      const bitcoinTransactionBlockHeight =
+        bitcoinTransactionBlockHeightMap.current.get(vault.withdrawDepositTX) ??
+        (await fetchBitcoinTransactionBlockHeight(vault));
+
+      return blockHeight - bitcoinTransactionBlockHeight;
+    } catch (error) {
       return 0;
     }
   }
 
   async function fetchAllBitcoinTransactionConfirmations(): Promise<[string, number][]> {
-    const bitcoinTransactionConfirmations: [string, number][] = await Promise.all(
+    if (!blockHeight) throw new Error('Block Height is not available');
+    return await Promise.all(
       pendingVaults.map(async vault => {
-        const confirmations = await fetchBitcoinTransactionConfirmations(vault);
+        const confirmations = await fetchBitcoinTransactionConfirmations(vault, blockHeight + 1);
         return [vault.uuid, confirmations] as [string, number];
       })
     );
-
-    const currentPendingVaultTXIDs = new Set(pendingVaults.map(vault => vault.withdrawDepositTX));
-
-    for (const key of bitcoinTransactionBlockHeightMap.current.keys()) {
-      if (!currentPendingVaultTXIDs.has(key)) {
-        bitcoinTransactionBlockHeightMap.current.delete(key);
-      }
-    }
-    return bitcoinTransactionConfirmations;
   }
 
   const { data: bitcoinTransactionConfirmations } = useQuery({
