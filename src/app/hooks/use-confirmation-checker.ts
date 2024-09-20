@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useRef } from 'react';
 
 import { Vault } from '@models/vault';
 import { VaultContext } from '@providers/vault-context-provider';
@@ -10,19 +10,41 @@ export function useConfirmationChecker(): [string, number][] {
   const blockHeight = useBlockchainHeightQuery();
   const { pendingVaults } = useContext(VaultContext);
 
+  const bitcoinTransactionBlockHeightMap = useRef(new Map<string, number>());
+
   async function fetchBitcoinTransactionConfirmations(vault: Vault): Promise<number> {
-    const bitcoinExplorerTXURL = `${appConfiguration.bitcoinBlockchainURL}/tx/${vault?.withdrawDepositTX}`;
+    try {
+      let bitcoinTransactionBlockHeight: number;
 
-    const bitcoinTransactionResponse = await fetch(bitcoinExplorerTXURL);
-    if (!bitcoinTransactionResponse.ok) return 0;
+      if (!bitcoinTransactionBlockHeightMap.current.has(vault.withdrawDepositTX)) {
+        const bitcoinExplorerTXURL = `${appConfiguration.bitcoinBlockchainURL}/tx/${vault?.withdrawDepositTX}`;
 
-    const bitcoinTransaction = await bitcoinTransactionResponse.json();
-    const bitcoinTransactionBlockHeight = bitcoinTransaction.status.block_height;
+        const bitcoinTransactionResponse = await fetch(bitcoinExplorerTXURL);
+        if (!bitcoinTransactionResponse.ok) throw new Error('Could not fetch Bitcoin Transaction');
 
-    if (!bitcoinTransactionBlockHeight || !blockHeight) return 0;
+        const bitcoinTransaction = await bitcoinTransactionResponse.json();
+        bitcoinTransactionBlockHeight = bitcoinTransaction.status.block_height;
 
-    const bitcoinTransactionConfirmations = blockHeight + 1 - bitcoinTransactionBlockHeight;
-    return bitcoinTransactionConfirmations;
+        if (!bitcoinTransactionBlockHeight)
+          throw new Error('Could not fetch Bitcoin Transaction Block Height');
+        bitcoinTransactionBlockHeightMap.current.set(
+          vault.withdrawDepositTX,
+          bitcoinTransactionBlockHeight
+        );
+      } else {
+        bitcoinTransactionBlockHeight = bitcoinTransactionBlockHeightMap.current.get(
+          vault.withdrawDepositTX
+        )!;
+      }
+
+      if (!blockHeight) throw new Error('Block Height is not available');
+
+      const bitcoinTransactionConfirmations = blockHeight + 1 - bitcoinTransactionBlockHeight;
+      return bitcoinTransactionConfirmations;
+    } catch (error) {
+      console.error('Error fetching Bitcoin Transaction Confirmations', error);
+      return 0;
+    }
   }
 
   async function fetchAllBitcoinTransactionConfirmations(): Promise<[string, number][]> {
@@ -32,6 +54,14 @@ export function useConfirmationChecker(): [string, number][] {
         return [vault.uuid, confirmations] as [string, number];
       })
     );
+
+    const currentPendingVaultTXIDs = new Set(pendingVaults.map(vault => vault.withdrawDepositTX));
+
+    for (const key of bitcoinTransactionBlockHeightMap.current.keys()) {
+      if (!currentPendingVaultTXIDs.has(key)) {
+        bitcoinTransactionBlockHeightMap.current.delete(key);
+      }
+    }
     return bitcoinTransactionConfirmations;
   }
 

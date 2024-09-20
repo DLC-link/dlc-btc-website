@@ -77,8 +77,8 @@ export function TransactionSummary({
                   flow === 'mint'
                     ? depositAmount
                     : parseInt(
-                        new Decimal(currentVault?.valueLocked!)
-                          .minus(currentVault?.valueMinted!)
+                        new Decimal(currentVault.valueLocked)
+                          .minus(currentVault.valueMinted)
                           .toFixed(2)
                       )
                 }
