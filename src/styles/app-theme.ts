@@ -1,4 +1,4 @@
-import { extendTheme } from '@chakra-ui/react';
+import { border, extendTheme } from '@chakra-ui/react';
 // Supports weights 100-900
 import '@fontsource-variable/onest';
 
@@ -20,6 +20,20 @@ export const appTheme = extendTheme({
     Text: textTheme,
     Tabs: tabsTheme,
     Divider: dividerTheme,
+    Input: {
+      baseStyle: {
+        field: {
+          fontWeight: 'bold',
+          color: 'white.01',
+          borderColor: 'red',
+          border: '35px solid',
+          focusBorderColor: 'accent.lightBlue.01',
+          _focus: {
+            borderColor: 'black',
+          },
+        },
+      },
+    },
     Progress: {
       baseStyle: {
         track: {
