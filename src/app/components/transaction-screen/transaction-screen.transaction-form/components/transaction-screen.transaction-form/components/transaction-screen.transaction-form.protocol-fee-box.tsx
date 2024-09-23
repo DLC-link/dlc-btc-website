@@ -2,10 +2,12 @@ import { HStack, Text, VStack } from '@chakra-ui/react';
 import Decimal from 'decimal.js';
 import { getFeeAmount } from 'dlc-btc-lib/bitcoin-functions';
 
-interface ProtocolFeeBoxProps {
+interface TransactionFormProtocolFeeStackProps {
+  formType: 'deposit' | 'withdraw' | 'burn';
   assetAmount?: number;
   bitcoinPrice?: number;
   protocolFeeBasisPoints?: number;
+  isBitcoinWalletLoading: [boolean, string];
 }
 
 function calculateProtocolFeeInUSD(
@@ -19,29 +21,32 @@ function calculateProtocolFeeInUSD(
   return result.toNumber().toLocaleString('en-US');
 }
 
-export function ProtocolFeeBox({
+export function TransactionFormProtocolFeeStack({
+  formType,
   assetAmount,
   bitcoinPrice,
   protocolFeeBasisPoints,
-}: ProtocolFeeBoxProps): React.JSX.Element {
+  isBitcoinWalletLoading,
+}: TransactionFormProtocolFeeStackProps): React.JSX.Element | false {
+  if (isBitcoinWalletLoading[0] || formType === 'burn') return false;
   return (
     <VStack
       alignItems={'end'}
-      p={'10px'}
+      p={'15px'}
       w={'100%'}
-      border={'1px solid'}
+      border={'1px dashed'}
       borderRadius={'md'}
-      borderColor={'border.lightBlue.01'}
+      borderColor={'orange.01'}
     >
       <HStack justifyContent={'space-between'} w={'100%'}>
-        <Text color={'white.02'} fontSize={'xs'}>
+        <Text color={'white.01'} fontSize={'xs'} fontWeight={'bold'}>
           Protocol Fee
         </Text>
         <Text color={'white.01'} fontSize={'xs'} fontWeight={800}>
           {`${
-            assetAmount &&
-            protocolFeeBasisPoints &&
-            getFeeAmount(assetAmount, protocolFeeBasisPoints)
+            assetAmount && protocolFeeBasisPoints
+              ? getFeeAmount(assetAmount, protocolFeeBasisPoints)
+              : 0
           }
           BTC`}
         </Text>{' '}
@@ -49,10 +54,9 @@ export function ProtocolFeeBox({
       <Text color={'white.02'} fontSize={'xs'}>
         {`~
         ${
-          assetAmount &&
-          bitcoinPrice &&
-          protocolFeeBasisPoints &&
-          calculateProtocolFeeInUSD(assetAmount, bitcoinPrice, protocolFeeBasisPoints)
+          assetAmount && bitcoinPrice && protocolFeeBasisPoints
+            ? calculateProtocolFeeInUSD(assetAmount, bitcoinPrice, protocolFeeBasisPoints)
+            : 0
         }
         $`}
       </Text>

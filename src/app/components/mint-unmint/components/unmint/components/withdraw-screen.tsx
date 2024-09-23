@@ -1,53 +1,44 @@
-import { useContext, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useContext } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
-import { Button, HStack, Spinner, Text, VStack, useToast } from '@chakra-ui/react';
-import { VaultMiniCard } from '@components/vault-mini/vault-mini-card';
+import { VStack, useToast } from '@chakra-ui/react';
+import { VaultTransactionForm } from '@components/transaction-screen/transaction-screen.transaction-form/components/transaction-screen.transaction-form/transaction-screen.transaction-form';
+import { Vault } from '@components/vault/vault';
 import {
   BitcoinWalletContext,
   BitcoinWalletContextState,
 } from '@providers/bitcoin-wallet-context-provider';
+import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
 import { VaultContext } from '@providers/vault-context-provider';
+import { RootState } from '@store/index';
+import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { modalActions } from '@store/slices/modal/modal.actions';
-import Decimal from 'decimal.js';
-
-import { AttestorApprovementPendingStack } from '../../attestor-approvement-pending-stack/attestor-approvement-pending-stack';
 
 interface WithdrawScreenProps {
-  currentStep: [number, string];
-  isBitcoinWalletLoading: [boolean, string];
   handleSignWithdrawTransaction: (vaultUUID: string, withdrawAmount: number) => Promise<void>;
+  isBitcoinWalletLoading: [boolean, string];
 }
 
 export function WithdrawScreen({
-  currentStep,
-  isBitcoinWalletLoading,
   handleSignWithdrawTransaction,
+  isBitcoinWalletLoading,
 }: WithdrawScreenProps): React.JSX.Element {
   const dispatch = useDispatch();
   const toast = useToast();
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isAttestorApprovePending, setIsAttestorApprovePending] = useState(false);
-  const { bitcoinWalletContextState } = useContext(BitcoinWalletContext);
+  const { bitcoinWalletContextState, resetBitcoinWalletContext } = useContext(BitcoinWalletContext);
 
+  const { bitcoinPrice, depositLimit } = useContext(ProofOfReserveContext);
   const { allVaults } = useContext(VaultContext);
-  const currentVault = allVaults.find(vault => vault.uuid === currentStep[1]);
 
-  const withdrawValue = new Decimal(currentVault?.valueLocked!).minus(currentVault?.valueMinted!);
+  const { unmintStep } = useSelector((state: RootState) => state.mintunmint);
+  const currentVault = allVaults.find(vault => vault.uuid === unmintStep[1]);
 
-  async function handleWithdraw(): Promise<void> {
+  async function handleWithdraw(withdrawAmount: number): Promise<void> {
     if (currentVault) {
       try {
-        const withdrawAmount = new Decimal(currentVault.valueLocked).minus(
-          currentVault.valueMinted
-        );
-        setIsSubmitting(true);
-        await handleSignWithdrawTransaction(currentVault.uuid, withdrawAmount.toNumber());
-        setIsAttestorApprovePending(true);
+        await handleSignWithdrawTransaction(currentVault.uuid, withdrawAmount);
       } catch (error) {
-        setIsSubmitting(false);
-        setIsAttestorApprovePending(false);
         toast({
           title: 'Failed to sign transaction',
           description: error instanceof Error ? error.message : '',
@@ -63,51 +54,30 @@ export function WithdrawScreen({
     dispatch(modalActions.toggleSelectBitcoinWalletModalVisibility());
   }
 
+  function handleCancel() {
+    resetBitcoinWalletContext();
+    dispatch(mintUnmintActions.setUnmintStep([0, '']));
+  }
+
+  async function handleButtonClick(assetAmount: number) {
+    bitcoinWalletContextState === BitcoinWalletContextState.READY
+      ? await handleWithdraw(assetAmount)
+      : handleConnect();
+  }
+
   return (
-    <VStack w={'45%'} h={'445px'} justifyContent={'center'}>
-      <VStack py={'25px'}>
-        <Text fontSize={'md'} color={'white.01'}>
-          {`Sign the Bitcoin transaction below to withdraw`}
-        </Text>
-        <Text fontSize={'md'} color={'white.01'} fontWeight={'bold'}>
-          {`${withdrawValue.toNumber()} BTC from your Vault`}
-        </Text>
-      </VStack>
-      {currentVault && <VaultMiniCard vault={currentVault} />}
-      {isBitcoinWalletLoading[0] && (
-        <HStack
-          p={'5%'}
-          w={'100%'}
-          spacing={4}
-          bgColor={'background.content.01'}
-          justifyContent={'space-between'}
-        >
-          <Text fontSize={'sm'} color={'white.01'}>
-            {isBitcoinWalletLoading[1]}
-          </Text>
-          <Spinner size="xs" color="accent.lightBlue.01" />
-        </HStack>
-      )}
-      {isAttestorApprovePending ? (
-        <AttestorApprovementPendingStack />
-      ) : (
-        <Button
-          isLoading={isSubmitting}
-          variant={'account'}
-          type={'submit'}
-          onClick={async () =>
-            bitcoinWalletContextState === BitcoinWalletContextState.READY
-              ? await handleWithdraw()
-              : handleConnect()
-          }
-        >
-          {[BitcoinWalletContextState.INITIAL, BitcoinWalletContextState.SELECTED].includes(
-            bitcoinWalletContextState
-          )
-            ? 'Connect Bitcoin Wallet'
-            : `Withdraw ${withdrawValue} BTC`}
-        </Button>
-      )}
+    <VStack w={'45%'} spacing={'15px'}>
+      <Vault vault={currentVault!} />
+      <VaultTransactionForm
+        vault={currentVault!}
+        type={'withdraw'}
+        currentBitcoinPrice={bitcoinPrice}
+        bitcoinWalletContextState={bitcoinWalletContextState}
+        isBitcoinWalletLoading={isBitcoinWalletLoading}
+        handleButtonClick={handleButtonClick}
+        handleCancelButtonClick={handleCancel}
+        depositLimit={depositLimit}
+      />
     </VStack>
   );
 }

@@ -4,7 +4,7 @@ import { Button, HStack, Text } from '@chakra-ui/react';
 interface VaultActionButtonProps {
   isExpanded: boolean;
   handleClick: () => void;
-  variant?: 'select';
+  variant?: 'select' | 'selected';
 }
 
 export function VaultActionButton({

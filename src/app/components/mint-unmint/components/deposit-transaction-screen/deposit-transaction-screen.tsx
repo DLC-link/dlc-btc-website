@@ -1,17 +1,20 @@
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { useToast } from '@chakra-ui/react';
-import { BitcoinWalletContext } from '@providers/bitcoin-wallet-context-provider';
+import { VStack, useToast } from '@chakra-ui/react';
+import { VaultTransactionForm } from '@components/transaction-screen/transaction-screen.transaction-form/components/transaction-screen.transaction-form/transaction-screen.transaction-form';
+import { Vault } from '@components/vault/vault';
+import {
+  BitcoinWalletContext,
+  BitcoinWalletContextState,
+} from '@providers/bitcoin-wallet-context-provider';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
 import { VaultContext } from '@providers/vault-context-provider';
 import { RootState } from '@store/index';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { modalActions } from '@store/slices/modal/modal.actions';
 
-import { DepositBitcoinTransactionForm } from './components/transaction-form';
-
-interface SignFundingTransactionScreenProps {
+interface DepositTransactionScreenProps {
   handleSignFundingTransaction: (vaultUUID: string, depositAmount: number) => Promise<void>;
   isBitcoinWalletLoading: [boolean, string];
   userEthereumAddressRiskLevel: string;
@@ -19,13 +22,13 @@ interface SignFundingTransactionScreenProps {
   isUserEthereumAddressRiskLevelLoading: boolean;
 }
 
-export function SignFundingTransactionScreen({
+export function DepositTransactionScreen({
   handleSignFundingTransaction,
   isBitcoinWalletLoading,
   userEthereumAddressRiskLevel,
   fetchUserEthereumAddressRiskLevel,
   isUserEthereumAddressRiskLevelLoading,
-}: SignFundingTransactionScreenProps): React.JSX.Element {
+}: DepositTransactionScreenProps): React.JSX.Element {
   const toast = useToast();
   const dispatch = useDispatch();
 
@@ -33,10 +36,6 @@ export function SignFundingTransactionScreen({
 
   const { bitcoinPrice, depositLimit } = useContext(ProofOfReserveContext);
   const { allVaults } = useContext(VaultContext);
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const [isAttestorApprovePending, setIsAttestorApprovePending] = useState(false);
 
   const { mintStep } = useSelector((state: RootState) => state.mintunmint);
 
@@ -46,14 +45,10 @@ export function SignFundingTransactionScreen({
     if (!currentVault) return;
 
     try {
-      setIsSubmitting(true);
       const currentRisk = await fetchUserEthereumAddressRiskLevel();
       if (currentRisk === 'High') throw new Error('Risk Level is too high');
       await handleSignFundingTransaction(currentVault.uuid, depositAmount);
-      setIsAttestorApprovePending(true);
     } catch (error: any) {
-      setIsSubmitting(false);
-      setIsAttestorApprovePending(false);
       toast({
         title: 'Failed to sign Deposit Transaction',
         description: error.message,
@@ -73,20 +68,27 @@ export function SignFundingTransactionScreen({
     dispatch(mintUnmintActions.setMintStep([0, '']));
   }
 
+  async function handleButtonClick(assetAmount: number) {
+    bitcoinWalletContextState === BitcoinWalletContextState.READY
+      ? await handleDeposit(assetAmount)
+      : handleConnect();
+  }
+
   return (
-    <DepositBitcoinTransactionForm
-      vault={currentVault}
-      bitcoinWalletContextState={bitcoinWalletContextState}
-      isBitcoinWalletLoading={isBitcoinWalletLoading}
-      bitcoinPrice={bitcoinPrice}
-      isSubmitting={isSubmitting}
-      isAttestorApprovePending={isAttestorApprovePending}
-      userEthereumAddressRiskLevel={userEthereumAddressRiskLevel}
-      isUserEthereumAddressRiskLevelLoading={isUserEthereumAddressRiskLevelLoading}
-      depositLimit={depositLimit}
-      handleConnect={handleConnect}
-      handleDeposit={handleDeposit}
-      handleCancel={handleCancel}
-    />
+    <VStack w={'45%'} spacing={'15px'}>
+      <Vault vault={currentVault!} />
+      <VaultTransactionForm
+        vault={currentVault!}
+        type={'deposit'}
+        currentBitcoinPrice={bitcoinPrice}
+        bitcoinWalletContextState={bitcoinWalletContextState}
+        isBitcoinWalletLoading={isBitcoinWalletLoading}
+        userEthereumAddressRiskLevel={userEthereumAddressRiskLevel}
+        isUserEthereumAddressRiskLevelLoading={isUserEthereumAddressRiskLevelLoading}
+        handleButtonClick={handleButtonClick}
+        handleCancelButtonClick={handleCancel}
+        depositLimit={depositLimit}
+      />
+    </VStack>
   );
 }
