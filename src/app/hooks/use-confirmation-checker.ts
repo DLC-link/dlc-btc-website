@@ -10,7 +10,6 @@ export function useConfirmationChecker(): [string, number][] {
   const blockHeight = useBlockchainHeightQuery();
   const { pendingVaults } = useContext(VaultContext);
 
-
   async function fetchBitcoinTransactionBlockHeight(vault: Vault): Promise<number> {
     try {
       const bitcoinExplorerTXURL = `${appConfiguration.bitcoinBlockchainURL}/tx/${vault?.withdrawDepositTX}`;
@@ -33,8 +32,7 @@ export function useConfirmationChecker(): [string, number][] {
     blockHeight: number
   ): Promise<number> {
     try {
-      const bitcoinTransactionBlockHeight =
-        await fetchBitcoinTransactionBlockHeight(vault);
+      const bitcoinTransactionBlockHeight = await fetchBitcoinTransactionBlockHeight(vault);
 
       return blockHeight - bitcoinTransactionBlockHeight;
     } catch (error) {
