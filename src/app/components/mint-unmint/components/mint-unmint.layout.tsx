@@ -9,7 +9,7 @@ export function MintUnmintLayout({ children }: MintUnmintLayoutProps): React.JSX
   return (
     <VStack
       px={'15px'}
-      w={'930px'}
+      w={'68.5%'}
       h={'625px'}
       bg={'background.container.01'}
       border={'1px solid'}

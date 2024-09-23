@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 import { Button, HStack, Spinner, Stack, Text, VStack } from '@chakra-ui/react';
-import { VaultCard } from '@components/vault/vault-card';
+import { Vault } from '@components/vault/vault';
 import { VaultContext } from '@providers/vault-context-provider';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import Decimal from 'decimal.js';
@@ -63,24 +63,28 @@ export function TransactionSummary({
         {currentStep[0] === 2 && <Spinner color={'accent.lightBlue.01'} size={'md'} />}
         <Text color={'accent.lightBlue.01'}>{flowPropertyMap[flow][currentStep[0]].title}:</Text>
       </HStack>
-      <VaultCard vault={currentVault} />
-      {currentStep[0] === 2 && (
+      {currentVault && (
         <>
-          <Text pt={'25px'} color={'white.01'}>
-            b) {flowPropertyMap[flow][currentStep[0]].subtitle}:
-          </Text>
-          <TransactionSummaryPreviewCard
-            blockchain={blockchain}
-            assetAmount={
-              flow === 'mint'
-                ? depositAmount
-                : parseInt(
-                    new Decimal(currentVault?.valueLocked!)
-                      .minus(currentVault?.valueMinted!)
-                      .toFixed(2)
-                  )
-            }
-          />
+          <Vault vault={currentVault} />
+          {currentStep[0] === 2 && (
+            <>
+              <Text pt={'25px'} color={'white.01'}>
+                b) {flowPropertyMap[flow][currentStep[0]].subtitle}:
+              </Text>
+              <TransactionSummaryPreviewCard
+                blockchain={blockchain}
+                assetAmount={
+                  flow === 'mint'
+                    ? depositAmount
+                    : parseInt(
+                        new Decimal(currentVault.valueLocked)
+                          .minus(currentVault.valueMinted)
+                          .toFixed(2)
+                      )
+                }
+              />
+            </>
+          )}
         </>
       )}
       <Stack p={'5px'} w={'100%'}>

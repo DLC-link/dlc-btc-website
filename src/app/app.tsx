@@ -9,7 +9,7 @@ import { MyVaults } from '@pages/my-vaults/my-vaults';
 import { PointsPage } from '@pages/points/points-page';
 import { ProofOfReservePage } from '@pages/proof-of-reserve/proof-of-reserve-page';
 import { BalanceContextProvider } from '@providers/balance-context-provider';
-import { BlockchainHeightContextProvider } from '@providers/bitcoin-query-provider';
+import { BitcoinTransactionConfirmationsProvider } from '@providers/bitcoin-query-provider';
 import { BitcoinWalletContextProvider } from '@providers/bitcoin-wallet-context-provider';
 import { EthereumNetworkConfigurationContextProvider } from '@providers/ethereum-network-configuration.provider';
 import { EthereumObserverProvider } from '@providers/ethereum-observer-provider';
@@ -32,7 +32,7 @@ export function App(): React.JSX.Element {
           <EthereumObserverProvider>
             <BitcoinWalletContextProvider>
               <VaultContextProvider>
-                <BlockchainHeightContextProvider>
+                <BitcoinTransactionConfirmationsProvider>
                   <BalanceContextProvider>
                     <ProofOfReserveContextProvider>
                       <AppLayout>
@@ -50,7 +50,7 @@ export function App(): React.JSX.Element {
                       </AppLayout>
                     </ProofOfReserveContextProvider>
                   </BalanceContextProvider>
-                </BlockchainHeightContextProvider>
+                </BitcoinTransactionConfirmationsProvider>
               </VaultContextProvider>
             </BitcoinWalletContextProvider>
           </EthereumObserverProvider>

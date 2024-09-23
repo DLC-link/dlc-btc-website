@@ -1,22 +1,25 @@
 import { createContext } from 'react';
 
-import { useBlockchainHeightQuery } from '@hooks/use-blockchain-height-query';
+import { useConfirmationChecker } from '@hooks/use-confirmation-checker';
 import { HasChildren } from '@models/has-children';
 
-interface BlockchainHeightContextProviderType {
-  blockHeight: number | undefined;
+interface BitcoinTransactionConfirmationsProviderType {
+  bitcoinTransactionConfirmations: [string, number][];
 }
 
-export const BlockchainHeightContext = createContext<BlockchainHeightContextProviderType>({
-  blockHeight: undefined,
-});
+export const BitcoinTransactionConfirmationsContext =
+  createContext<BitcoinTransactionConfirmationsProviderType>({
+    bitcoinTransactionConfirmations: [],
+  });
 
-export function BlockchainHeightContextProvider({ children }: HasChildren): React.JSX.Element {
-  const blockHeight = useBlockchainHeightQuery();
+export function BitcoinTransactionConfirmationsProvider({
+  children,
+}: HasChildren): React.JSX.Element {
+  const bitcoinTransactionConfirmations = useConfirmationChecker();
 
   return (
-    <BlockchainHeightContext.Provider value={{ blockHeight }}>
+    <BitcoinTransactionConfirmationsContext.Provider value={{ bitcoinTransactionConfirmations }}>
       {children}
-    </BlockchainHeightContext.Provider>
+    </BitcoinTransactionConfirmationsContext.Provider>
   );
 }

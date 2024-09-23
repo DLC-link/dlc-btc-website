@@ -23,10 +23,10 @@ export const appTheme = extendTheme({
     Progress: {
       baseStyle: {
         track: {
-          bg: 'white.03',
+          bg: 'white.04',
         },
         filledTrack: {
-          bg: 'border.lightBlue.01',
+          bg: 'orange.01',
         },
       },
     },
@@ -43,15 +43,19 @@ export const appTheme = extendTheme({
     }),
   },
   colors: {
+    'purple.01': 'rgba(104, 24, 173, 1)',
+    'orange.01': 'rgba(255, 168, 0, 1)',
     'background.website.01': 'rgba(0, 0, 0, 1)',
     'background.container.01': 'rgba(18, 18, 18, 1)',
     'background.content.01': 'rgba(51, 51, 51, 1)',
+    'grey.01': 'rgba(181, 182, 187, 1)',
     'border.lightBlue.01': 'rgba(50, 201, 247,0.75)',
     'border.white.01': 'rgba(255,255,255,0.25)',
     'accent.lightBlue.01': 'rgba(50, 201, 247, 1)',
     'white.01': 'rgba(255,255,255,1)',
     'white.02': 'rgba(255,255,255,0.75)',
     'white.03': 'rgba(255,255,255,0.35)',
+    'white.04': 'rgba(255,255,255,0.10)',
     'warning.01': 'rgba(255,204,85, 1)',
     'error.01': 'rgba(255,51,102, 1)',
     'table.background.green': 'rgba(50, 201, 247, 0.1)',

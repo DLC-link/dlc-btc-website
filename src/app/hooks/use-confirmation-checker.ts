@@ -1,49 +1,62 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
 
 import { Vault } from '@models/vault';
-import { BlockchainHeightContext } from '@providers/bitcoin-query-provider';
+import { VaultContext } from '@providers/vault-context-provider';
 import { useQuery } from '@tanstack/react-query';
-import { VaultState } from 'dlc-btc-lib/models';
 
-export function useConfirmationChecker(vault?: Vault): number {
-  const { blockHeight } = useContext(BlockchainHeightContext);
+import { useBlockchainHeightQuery } from './use-blockchain-height-query';
 
-  const [blockHeightAtBroadcast, setBlockHeightAtBroadcast] = useState<number | undefined>(
-    undefined
-  );
-  const [transactionProgress, setTransactionProgress] = useState<number>(0);
+export function useConfirmationChecker(): [string, number][] {
+  const blockHeight = useBlockchainHeightQuery();
+  const { pendingVaults } = useContext(VaultContext);
 
-  const bitcoinExplorerTXURL = `${appConfiguration.bitcoinBlockchainURL}/tx/${vault?.withdrawDepositTX}`;
+  async function fetchBitcoinTransactionBlockHeight(vault: Vault): Promise<number> {
+    try {
+      const bitcoinExplorerTXURL = `${appConfiguration.bitcoinBlockchainURL}/tx/${vault?.withdrawDepositTX}`;
 
-  async function fetchTransactionDetails() {
-    const response = await fetch(bitcoinExplorerTXURL);
-    if (!response.ok) throw new Error('Network response was not ok');
-    const transactionDetails = await response.json();
-    return transactionDetails.status.block_height;
+      const bitcoinTransactionResponse = await fetch(bitcoinExplorerTXURL);
+      const bitcoinTransaction = await bitcoinTransactionResponse.json();
+      const bitcoinTransactionBlockHeight: number = bitcoinTransaction.status.block_height;
+
+      if (!bitcoinTransactionBlockHeight)
+        throw new Error('Could not fetch Bitcoin Transaction Block Height');
+
+      return bitcoinTransactionBlockHeight;
+    } catch (error) {
+      throw new Error('Error fetching Bitcoin Transaction Block Height');
+    }
   }
 
-  const { data: txBlockHeightAtBroadcast } = useQuery({
-    queryKey: ['transactionDetails', vault?.withdrawDepositTX],
-    queryFn: () => fetchTransactionDetails(),
-    enabled:
-      !!vault?.withdrawDepositTX && vault?.state === VaultState.PENDING && !blockHeightAtBroadcast,
+  async function fetchBitcoinTransactionConfirmations(
+    vault: Vault,
+    blockHeight: number
+  ): Promise<number> {
+    try {
+      const bitcoinTransactionBlockHeight = await fetchBitcoinTransactionBlockHeight(vault);
+
+      return blockHeight - bitcoinTransactionBlockHeight;
+    } catch (error) {
+      return 0;
+    }
+  }
+
+  async function fetchAllBitcoinTransactionConfirmations(): Promise<[string, number][]> {
+    if (!blockHeight) throw new Error('Block Height is not available');
+    return await Promise.all(
+      pendingVaults.map(async vault => {
+        const confirmations = await fetchBitcoinTransactionConfirmations(vault, blockHeight + 1);
+        return [vault.uuid, confirmations] as [string, number];
+      })
+    );
+  }
+
+  const { data: bitcoinTransactionConfirmations } = useQuery({
+    queryKey: ['transactionDetails'],
+    initialData: [],
+    queryFn: () => fetchAllBitcoinTransactionConfirmations(),
+    enabled: pendingVaults.length > 0,
     refetchInterval: 10000,
   });
 
-  useEffect(() => {
-    if (txBlockHeightAtBroadcast && typeof txBlockHeightAtBroadcast === 'number') {
-      setBlockHeightAtBroadcast(txBlockHeightAtBroadcast);
-    }
-  }, [txBlockHeightAtBroadcast]);
-
-  useEffect(() => {
-    if (vault?.state != VaultState.PENDING || transactionProgress > 6) return;
-
-    const blockHeightDifference = (blockHeight as number) + 1 - (blockHeightAtBroadcast as number);
-    if (typeof blockHeightDifference === 'number' && blockHeightDifference >= 0) {
-      setTransactionProgress(blockHeightDifference);
-    }
-  }, [blockHeightAtBroadcast, blockHeight, vault?.state, transactionProgress]);
-
-  return transactionProgress;
+  return bitcoinTransactionConfirmations;
 }
