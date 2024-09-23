@@ -1,4 +1,4 @@
-import { useContext, useRef } from 'react';
+import { useContext } from 'react';
 
 import { Vault } from '@models/vault';
 import { VaultContext } from '@providers/vault-context-provider';
@@ -10,7 +10,6 @@ export function useConfirmationChecker(): [string, number][] {
   const blockHeight = useBlockchainHeightQuery();
   const { pendingVaults } = useContext(VaultContext);
 
-  const bitcoinTransactionBlockHeightMap = useRef(new Map<string, number>());
 
   async function fetchBitcoinTransactionBlockHeight(vault: Vault): Promise<number> {
     try {
@@ -22,11 +21,6 @@ export function useConfirmationChecker(): [string, number][] {
 
       if (!bitcoinTransactionBlockHeight)
         throw new Error('Could not fetch Bitcoin Transaction Block Height');
-
-      bitcoinTransactionBlockHeightMap.current.set(
-        vault.withdrawDepositTX,
-        bitcoinTransactionBlockHeight
-      );
 
       return bitcoinTransactionBlockHeight;
     } catch (error) {
@@ -40,8 +34,7 @@ export function useConfirmationChecker(): [string, number][] {
   ): Promise<number> {
     try {
       const bitcoinTransactionBlockHeight =
-        bitcoinTransactionBlockHeightMap.current.get(vault.withdrawDepositTX) ??
-        (await fetchBitcoinTransactionBlockHeight(vault));
+        await fetchBitcoinTransactionBlockHeight(vault);
 
       return blockHeight - bitcoinTransactionBlockHeight;
     } catch (error) {
