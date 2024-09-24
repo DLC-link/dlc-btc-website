@@ -1,4 +1,4 @@
-import { Divider, Skeleton, Text, VStack } from '@chakra-ui/react';
+import { Divider, Skeleton, Text, VStack, useBreakpointValue } from '@chakra-ui/react';
 
 import { formatNumber } from '@shared/utils';
 
@@ -9,9 +9,21 @@ interface TokenStatsBoardTotalPointsProps {
 export function TokenStatsBoardTotalPoints({
   totalPoints,
 }: TokenStatsBoardTotalPointsProps): React.JSX.Element {
+  const isMobile = useBreakpointValue({ base: true, md: false });
+
   return (
-    <VStack w={'100%'} px={'25px'} alignItems={'flex-start'} spacing={'20px'}>
-      <Text color={'white.01'} fontSize={'3xl'} fontWeight={'200'} textAlign={'left'}>
+    <VStack
+      w={'100%'}
+      px={isMobile ? '0px' : '25px'}
+      alignItems={'flex-start'}
+      spacing={isMobile ? '10px' : '20px'}
+    >
+      <Text
+        color={'white.01'}
+        fontSize={['xl', '2xl', '2xl', '3xl', '3xl']}
+        fontWeight={'200'}
+        textAlign={'left'}
+      >
         You've Earned
       </Text>
       <Skeleton w={'100%'} isLoaded={totalPoints !== undefined}>
@@ -25,7 +37,7 @@ export function TokenStatsBoardTotalPoints({
             {formatNumber(totalPoints)} Points
           </Text>
         ) : (
-          <Text fontSize={'5xl'} fontWeight={600} color={'gray.500'}>
+          <Text fontSize={isMobile ? '3xl' : '5xl'} fontWeight={600} color={'gray.500'}>
             Loading...
           </Text>
         )}

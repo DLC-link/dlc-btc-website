@@ -47,3 +47,6 @@ export function formatEvent(event: DetailedEvent): FormattedEvent {
     isCCIP: event.isCCIP,
   };
 }
+
+export const breakpoints = ['300px', '400px', '600px', '850px', '1280px', '1400px'];
+export const titleTextSize = ['2xl', '2xl', '4xl', '6xl'];

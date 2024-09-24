@@ -1,4 +1,4 @@
-import { VStack } from '@chakra-ui/react';
+import { VStack, useBreakpointValue } from '@chakra-ui/react';
 
 interface GenericTableLayoutProps {
   width?: string;
@@ -19,12 +19,13 @@ export function GenericTableLayout({
   children,
   bg = 'background.container.01',
 }: GenericTableLayoutProps): React.JSX.Element {
+  const isMobile = useBreakpointValue({ base: true, md: false });
   return (
     <VStack
       w={width}
       h={height}
       minH={'100px'}
-      padding={padding}
+      padding={isMobile ? '0px' : padding}
       alignItems={alignItems}
       borderRadius={borderRadius}
       bg={bg}
