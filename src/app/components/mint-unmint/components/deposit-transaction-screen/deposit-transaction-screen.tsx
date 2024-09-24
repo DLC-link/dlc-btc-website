@@ -79,7 +79,8 @@ export function DepositTransactionScreen({
       <Vault vault={currentVault!} />
       <VaultTransactionForm
         vault={currentVault!}
-        type={'deposit'}
+        flow={'mint'}
+        currentStep={mintStep[0]}
         currentBitcoinPrice={bitcoinPrice}
         bitcoinWalletContextState={bitcoinWalletContextState}
         isBitcoinWalletLoading={isBitcoinWalletLoading}

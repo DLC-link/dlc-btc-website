@@ -15,12 +15,12 @@ export function VaultAssetInformationStack({
       <VaultAssetRow
         assetLogo={'images/logos/dlc-btc-logo.svg'}
         assetValue={vaultTotalMintedValue}
-        assetSymbol={'BTC'}
+        assetSymbol={'dlcBTC'}
       />
       <VaultAssetRow
         assetLogo={'images/logos/bitcoin-logo.svg'}
         assetValue={vaultTotalLockedValue}
-        assetSymbol={'dlcBTC'}
+        assetSymbol={'BTC'}
       />
     </VStack>
   );

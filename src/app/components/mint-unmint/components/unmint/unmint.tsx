@@ -30,18 +30,10 @@ export function Unmint(): React.JSX.Element {
             isUserEthereumAddressRiskLevelLoading={isLoading}
           />
         )}
-        {[1].includes(unmintStep[0]) && (
+        {[1, 2].includes(unmintStep[0]) && (
           <WithdrawScreen
             isBitcoinWalletLoading={isBitcoinWalletLoading}
             handleSignWithdrawTransaction={handleSignWithdrawTransaction}
-          />
-        )}
-        {[2].includes(unmintStep[0]) && (
-          <TransactionSummary
-            currentStep={unmintStep}
-            flow={'unmint'}
-            blockchain={'bitcoin'}
-            width="45%"
           />
         )}
       </HStack>

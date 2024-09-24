@@ -50,7 +50,9 @@ export function BurnTokenTransactionForm({
 
   async function handleButtonClick(withdrawAmount: number): Promise<void> {
     if (!currentVault) return;
+    console.log('currentVault', currentVault);
 
+    console.log('burnAmount', withdrawAmount);
     try {
       const currentRisk = await fetchUserEthereumAddressRiskLevel();
       if (currentRisk === 'High') throw new Error('Risk Level is too high');
@@ -95,7 +97,8 @@ export function BurnTokenTransactionForm({
       <Vault vault={currentVault!} />
       <VaultTransactionForm
         vault={currentVault!}
-        type={'burn'}
+        flow={'burn'}
+        currentStep={unmintStep[0]}
         currentBitcoinPrice={bitcoinPrice}
         handleButtonClick={handleButtonClick}
         depositLimit={depositLimit}

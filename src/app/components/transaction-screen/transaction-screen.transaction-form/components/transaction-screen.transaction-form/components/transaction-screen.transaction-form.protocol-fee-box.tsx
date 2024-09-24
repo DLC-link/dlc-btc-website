@@ -1,9 +1,11 @@
+import { useEffect } from 'react';
+
 import { HStack, Text, VStack } from '@chakra-ui/react';
 import Decimal from 'decimal.js';
 import { getFeeAmount } from 'dlc-btc-lib/bitcoin-functions';
 
 interface TransactionFormProtocolFeeStackProps {
-  formType: 'deposit' | 'withdraw' | 'burn';
+  formType: 'mint' | 'burn';
   assetAmount?: number;
   bitcoinPrice?: number;
   protocolFeeBasisPoints?: number;
@@ -28,6 +30,9 @@ export function TransactionFormProtocolFeeStack({
   protocolFeeBasisPoints,
   isBitcoinWalletLoading,
 }: TransactionFormProtocolFeeStackProps): React.JSX.Element | false {
+  useEffect(() => {
+    console.log('assetAmount:', assetAmount);
+  }, [assetAmount]);
   if (isBitcoinWalletLoading[0] || formType === 'burn') return false;
   return (
     <VStack

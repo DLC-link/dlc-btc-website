@@ -28,7 +28,7 @@ export function Mint(): React.JSX.Element {
       <HStack w={'100%'} alignItems={'start'} justifyContent={'space-between'}>
         <Walkthrough flow={'mint'} currentStep={mintStep[0]} />
         {[0].includes(mintStep[0]) && <SetupVaultScreen />}
-        {[1].includes(mintStep[0]) && (
+        {[1, 2].includes(mintStep[0]) && (
           <DepositTransactionScreen
             handleSignFundingTransaction={handleSignFundingTransaction}
             isBitcoinWalletLoading={isBitcoinWalletLoading}
@@ -37,7 +37,7 @@ export function Mint(): React.JSX.Element {
             isUserEthereumAddressRiskLevelLoading={isLoading}
           />
         )}
-        {[2].includes(mintStep[0]) && (
+        {/* {[2].includes(mintStep[0]) && (
           <TransactionSummary
             depositAmount={bitcoinDepositAmount}
             currentStep={mintStep}
@@ -45,7 +45,7 @@ export function Mint(): React.JSX.Element {
             blockchain={'ethereum'}
             width="45%"
           />
-        )}
+        )} */}
       </HStack>
     </MintLayout>
   );

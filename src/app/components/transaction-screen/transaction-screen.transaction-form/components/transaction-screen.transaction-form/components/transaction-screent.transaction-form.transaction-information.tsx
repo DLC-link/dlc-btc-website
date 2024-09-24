@@ -1,7 +1,7 @@
 import { HStack, Text } from '@chakra-ui/react';
 
 interface TransactionFormWarningProps {
-  formType: 'deposit' | 'withdraw' | 'burn';
+  formType: 'mint' | 'burn';
   assetAmount: number;
   isBitcoinWalletLoading: [boolean, string];
 }
