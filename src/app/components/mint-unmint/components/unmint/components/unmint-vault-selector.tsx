@@ -1,24 +1,13 @@
-import { useContext, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useContext } from 'react';
+import { useSelector } from 'react-redux';
 
-import { Text, VStack, useToast } from '@chakra-ui/react';
+import { Text, VStack } from '@chakra-ui/react';
 import { VaultsListGroupContainer } from '@components/vaults-list/components/vaults-list-group-container';
 import { VaultsList } from '@components/vaults-list/vaults-list';
-import { useEthersSigner } from '@functions/configuration.functions';
-import { getAndFormatVault } from '@functions/vault.functions';
-import { Vault } from '@models/vault';
-import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
-import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
 import { VaultContext } from '@providers/vault-context-provider';
 import { RootState } from '@store/index';
-import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
-import { vaultActions } from '@store/slices/vault/vault.actions';
-import { withdraw } from 'dlc-btc-lib/ethereum-functions';
-import { EthereumNetworkID } from 'dlc-btc-lib/models';
-import { shiftValue } from 'dlc-btc-lib/utilities';
-import { useAccount } from 'wagmi';
 
-import { BurnTokenTransactionForm } from '../../sign-transaction-screen/components/ethereum-transaction-form';
+import { BurnTokenTransactionForm } from '../../burn-transaction-screen/burn-transaction-screen';
 
 interface UnmintVaultSelectorProps {
   userEthereumAddressRiskLevel: string;
@@ -31,83 +20,18 @@ export function UnmintVaultSelector({
   fetchUserEthereumAddressRiskLevel,
   isUserEthereumAddressRiskLevelLoading,
 }: UnmintVaultSelectorProps): React.JSX.Element {
-  const toast = useToast();
-  const dispatch = useDispatch();
-
-  const { bitcoinPrice } = useContext(ProofOfReserveContext);
   const { fundedVaults } = useContext(VaultContext);
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { unmintStep } = useSelector((state: RootState) => state.mintunmint);
 
-  const { chainId } = useAccount();
-
-  const [selectedVault, setSelectedVault] = useState<Vault | undefined>();
-
-  const signer = useEthersSigner();
-
-  const { ethereumNetworkConfiguration } = useContext(EthereumNetworkConfigurationContext);
-
-  useEffect(() => {
-    setSelectedVault(fundedVaults.find(vault => vault.uuid === unmintStep[1]));
-  }, [fundedVaults, unmintStep]);
-
-  async function handleBurn(withdrawAmount: number): Promise<void> {
-    if (selectedVault) {
-      try {
-        setIsSubmitting(true);
-        const currentRisk = await fetchUserEthereumAddressRiskLevel();
-        if (currentRisk === 'High') throw new Error('Risk Level is too high');
-        const formattedWithdrawAmount = BigInt(shiftValue(withdrawAmount));
-
-        await withdraw(
-          ethereumNetworkConfiguration.dlcManagerContract.connect(signer!),
-          selectedVault.uuid,
-          formattedWithdrawAmount
-        );
-
-        await getAndFormatVault(selectedVault.uuid, ethereumNetworkConfiguration.dlcManagerContract)
-          .then(vault => {
-            dispatch(
-              vaultActions.swapVault({
-                vaultUUID: selectedVault.uuid,
-                updatedVault: vault,
-                networkID: chainId?.toString() as EthereumNetworkID,
-              })
-            );
-          })
-          .then(() => {
-            dispatch(mintUnmintActions.setUnmintStep([1, selectedVault.uuid]));
-          });
-      } catch (error) {
-        setIsSubmitting(false);
-        toast({
-          title: 'Failed to sign Transaction',
-          description: error instanceof Error ? error.message : '',
-          status: 'error',
-          duration: 9000,
-          isClosable: true,
-        });
-      }
-    }
-  }
-
-  function handleCancel() {
-    setSelectedVault(undefined);
-  }
-
   return (
     <>
-      {selectedVault ? (
+      {unmintStep[1] ? (
         <BurnTokenTransactionForm
-          vault={selectedVault}
-          bitcoinPrice={bitcoinPrice}
-          isSubmitting={isSubmitting}
-          risk={userEthereumAddressRiskLevel}
-          isRiskLoading={isUserEthereumAddressRiskLevelLoading}
-          handleBurn={handleBurn}
-          handleCancel={handleCancel}
+          isBitcoinWalletLoading={[false, '']}
+          userEthereumAddressRiskLevel={userEthereumAddressRiskLevel}
+          fetchUserEthereumAddressRiskLevel={fetchUserEthereumAddressRiskLevel}
+          isUserEthereumAddressRiskLevelLoading={isUserEthereumAddressRiskLevelLoading}
         />
       ) : fundedVaults.length == 0 ? (
         <VStack w={'45%'}>
@@ -118,7 +42,7 @@ export function UnmintVaultSelector({
           <Text color={'accent.lightBlue.01'} fontSize={'md'} fontWeight={600}>
             Select vault to withdraw Bitcoin:
           </Text>
-          <VaultsList height={'425.5px'} isScrollable={!selectedVault}>
+          <VaultsList height={'425.5px'} isScrollable={!unmintStep[1]}>
             <VaultsListGroupContainer vaults={fundedVaults} isSelectable variant={'select'} />
           </VaultsList>
         </VStack>

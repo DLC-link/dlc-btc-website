@@ -13,7 +13,7 @@ import { VaultProgressBar } from './components/vault.progress-bar';
 
 interface VaultProps {
   vault: VaultModel;
-  variant?: 'select';
+  variant?: 'select' | 'selected';
 }
 
 export function Vault({ vault, variant }: VaultProps): React.JSX.Element {
@@ -22,7 +22,8 @@ export function Vault({ vault, variant }: VaultProps): React.JSX.Element {
 
   function handleMainButtonClick() {
     if (variant === 'select') {
-      dispatch(mintUnmintActions.setUnmintStep([0, vault.uuid]));
+      const step = vault.valueLocked === vault.valueMinted ? 0 : 1;
+      dispatch(mintUnmintActions.setUnmintStep([step, vault.uuid]));
     } else {
       setIsVaultExpanded(!isVaultExpanded);
     }

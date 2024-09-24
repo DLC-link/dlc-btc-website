@@ -8,7 +8,7 @@ interface VaultMainStackProps {
   vaultTotalMintedValue: number;
   isVaultExpanded: boolean;
   handleButtonClick: () => void;
-  variant?: 'select';
+  variant?: 'select' | 'selected';
 }
 
 export function VaultMainStack({

@@ -16,6 +16,7 @@ interface VaultDetailsProps {
   isVaultExpanded: boolean;
   vaultFundingTX?: string;
   vaultWithdrawDepositTX?: string;
+  variant?: 'select' | 'selected';
 }
 
 export function VaultDetails({
@@ -26,6 +27,7 @@ export function VaultDetails({
   vaultTotalLockedValue,
   vaultTotalMintedValue,
   isVaultExpanded,
+  variant,
 }: VaultDetailsProps): React.JSX.Element {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -56,7 +58,7 @@ export function VaultDetails({
               vaultFundingTX={vaultFundingTX}
               vaultWithdrawDepositTX={vaultWithdrawDepositTX}
             />
-            {vaultState !== VaultState.PENDING && (
+            {(vaultState !== VaultState.PENDING || variant !== 'selected') && (
               <VaultExpandedInformationButtonGroup
                 vaultState={vaultState}
                 vaultTotalLockedValue={vaultTotalLockedValue}
