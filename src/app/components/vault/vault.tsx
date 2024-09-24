@@ -22,9 +22,8 @@ export function Vault({ vault, variant }: VaultProps): React.JSX.Element {
 
   function handleMainButtonClick() {
     if (variant === 'select') {
-      vault.valueLocked === vault.valueMinted
-        ? dispatch(mintUnmintActions.setUnmintStep([0, vault.uuid]))
-        : dispatch(mintUnmintActions.setUnmintStep([1, vault.uuid]));
+      const step = vault.valueLocked === vault.valueMinted ? 0 : 1;
+      dispatch(mintUnmintActions.setUnmintStep([step, vault.uuid]));
     } else {
       setIsVaultExpanded(!isVaultExpanded);
     }
