@@ -1,4 +1,4 @@
-import { HStack } from '@chakra-ui/react';
+import { HStack, useBreakpointValue } from '@chakra-ui/react';
 
 import { NetworksMenu } from './components/networks-menu';
 
@@ -8,8 +8,9 @@ interface NetworkBoxProps {
 }
 
 export function NetworkBox({ isMenuOpen, setIsMenuOpen }: NetworkBoxProps): React.JSX.Element {
+  const isMobile = useBreakpointValue({ base: true, md: false });
   return (
-    <HStack w={'175px'}>
+    <HStack w={isMobile ? '85px' : '175px'}>
       <NetworksMenu isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
     </HStack>
   );

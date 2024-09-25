@@ -2,11 +2,21 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { HamburgerIcon } from '@chakra-ui/icons';
-import { HStack, IconButton, VStack, useBreakpointValue } from '@chakra-ui/react';
+import {
+  HStack,
+  IconButton,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  VStack,
+  useBreakpointValue,
+} from '@chakra-ui/react';
 import { Account } from '@components/account/account';
 import { CompanyWebsiteButton } from '@components/company-website-button/company-website-button';
 import { HeaderLayout } from '@components/header/components/header.layout';
 import { NetworkBox } from '@components/network/network';
+import { useActiveTabs } from '@hooks/use-active-tabs';
 import { useAccount } from 'wagmi';
 
 import { Banner } from './components/banner';
@@ -19,6 +29,7 @@ export function Header(): React.JSX.Element {
 
   const [showBanner, setShowBanner] = useState<boolean>(false);
   const [isNetworkMenuOpen, setIsNetworkMenuOpen] = useState<boolean>(false);
+  const { isActiveTabs } = useActiveTabs();
 
   const handleTabClick = (route: string) => {
     navigate(route);
@@ -53,13 +64,21 @@ export function Header(): React.JSX.Element {
         >
           <CompanyWebsiteButton />
           {isMobile ? (
-            <IconButton
-              aria-label="menu"
-              icon={<HamburgerIcon />}
-              onClick={() => {
-                console.log('clicked');
-              }}
-            />
+            <Menu>
+              <MenuButton as={IconButton} aria-label="Options" icon={<HamburgerIcon />} />
+              <MenuList>
+                <MenuItem onClick={() => navigate('/')}>Points</MenuItem>
+                <MenuItem onClick={() => navigate('/proof-of-reserve')}>Proof of Reserve</MenuItem>
+                {isActiveTabs && (
+                  <>
+                    <MenuItem onClick={() => navigate('/mint-withdraw')}>
+                      Mint/Withdraw dlcBTC
+                    </MenuItem>
+                    <MenuItem onClick={() => navigate('/my-vaults')}>My Vaults</MenuItem>
+                  </>
+                )}
+              </MenuList>
+            </Menu>
           ) : (
             <NavigationTabs activeTab={location.pathname} handleTabClick={handleTabClick} />
           )}
