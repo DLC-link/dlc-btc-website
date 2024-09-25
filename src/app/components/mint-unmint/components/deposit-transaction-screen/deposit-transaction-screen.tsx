@@ -76,7 +76,7 @@ export function DepositTransactionScreen({
 
   return (
     <VStack w={'45%'} spacing={'15px'}>
-      <Vault vault={currentVault!} />
+      <Vault vault={currentVault!} variant={'selected'} />
       <VaultTransactionForm
         vault={currentVault!}
         flow={'mint'}

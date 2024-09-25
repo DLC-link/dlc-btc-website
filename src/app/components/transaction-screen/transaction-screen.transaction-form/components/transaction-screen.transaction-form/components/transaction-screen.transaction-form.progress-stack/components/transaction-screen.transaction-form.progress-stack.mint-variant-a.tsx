@@ -2,16 +2,18 @@ import { HStack, VStack } from '@chakra-ui/react';
 import { VaultVerticalProgressBar } from '@components/vault/components/vault-vertical-progress-bar';
 import { TransactionFormAPI } from '@models/form.models';
 
-import { TransactionFormInputField } from '../../transaction-screen.transaction-form.input-field';
+import { TransactionFormInputField } from '../../transaction-screen.transaction-form.input';
 import { TransactionFormProgressStack } from '../../transaction-screen.transaction-form.progress-step-stack';
 
 interface TransactionFormProgressStackMintVariantAProps {
   formAPI: TransactionFormAPI;
   currentBitcoinPrice: number;
+  currentStep: number;
 }
 
 export function TransactionFormProgressStackMintVariantA({
   formAPI,
+  currentStep,
   currentBitcoinPrice,
 }: TransactionFormProgressStackMintVariantAProps): React.JSX.Element {
   return (
@@ -19,6 +21,7 @@ export function TransactionFormProgressStackMintVariantA({
       w={'100%'}
       p={'15px 15px 15px 0px'}
       bg={'white.04'}
+      h={'100%'}
       border={'1px solid'}
       borderColor={'white.03'}
       borderRadius={'md'}
@@ -28,11 +31,12 @@ export function TransactionFormProgressStackMintVariantA({
       <VStack w={'85%'}>
         <TransactionFormInputField
           formAPI={formAPI}
+          currentStep={currentStep}
           currentBitcoinPrice={currentBitcoinPrice}
           formType={'mint'}
         />
         <TransactionFormProgressStack
-          label={'Minting'}
+          label={'Mint'}
           assetLogo={'/images/logos/dlc-btc-logo.svg'}
           assetSymbol={'dlcBTC'}
           isActive={false}

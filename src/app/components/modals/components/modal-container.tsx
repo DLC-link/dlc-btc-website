@@ -35,9 +35,15 @@ export function ModalContainer(): React.JSX.Element {
       />
       <SuccessfulFlowModal
         isOpen={isSuccesfulFlowModalOpen[0]}
+        flow={isSuccesfulFlowModalOpen[2] as 'mint' | 'burn'}
+        assetAmount={isSuccesfulFlowModalOpen[3]}
         handleClose={() =>
           handleClosingModal(() =>
-            modalActions.toggleSuccessfulFlowModalVisibility({ vaultUUID: '' })
+            modalActions.toggleSuccessfulFlowModalVisibility({
+              vaultUUID: '',
+              flow: 'mint',
+              assetAmount: 0,
+            })
           )
         }
         vaultUUID={isSuccesfulFlowModalOpen[1] ? isSuccesfulFlowModalOpen[1] : ''}

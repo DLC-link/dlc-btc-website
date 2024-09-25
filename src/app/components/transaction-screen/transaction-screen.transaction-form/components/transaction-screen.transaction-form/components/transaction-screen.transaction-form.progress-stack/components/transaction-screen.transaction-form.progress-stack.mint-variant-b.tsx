@@ -3,21 +3,27 @@ import { VaultVerticalProgressBar } from '@components/vault/components/vault-ver
 
 import { TransactionFormProgressStack } from '../../transaction-screen.transaction-form.progress-step-stack';
 
-interface TransactionFormProgressStackMintVariantBProps {}
-
 export function TransactionFormProgressStackMintVariantB(): React.JSX.Element {
   return (
-    <HStack w={'100%'} justifyContent={'space-between'}>
-      <VaultVerticalProgressBar currentStep={1} />
+    <HStack
+      w={'100%'}
+      p={'15px 15px 15px 0px'}
+      bg={'white.04'}
+      border={'1px solid'}
+      borderColor={'white.03'}
+      borderRadius={'md'}
+      justifyContent={'space-between'}
+    >
+      <VaultVerticalProgressBar currentStep={0} variant={'small'} />
       <VStack w={'85%'}>
         <TransactionFormProgressStack
-          label={'Deposited'}
+          label={'Deposit'}
           assetLogo={'/images/logos/bitcoin-logo.svg'}
           assetSymbol={'BTC'}
           isActive={true}
         />
         <TransactionFormProgressStack
-          label={'Minting'}
+          label={'Mint'}
           assetLogo={'/images/logos/dlc-btc-logo.svg'}
           assetSymbol={'dlcBTC'}
           isActive={false}

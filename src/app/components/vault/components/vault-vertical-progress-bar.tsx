@@ -1,8 +1,10 @@
-import { Divider, HStack, Image, Spinner, Stack, VStack } from '@chakra-ui/react';
+import { Divider, Image, Spinner, Stack, VStack } from '@chakra-ui/react';
 
 interface VaultVerticalProgressBarProps {
   currentStep: number;
+  variant?: 'small';
 }
+
 const Status = {
   ACTIVE: 'ACTIVE',
   COMPLETED: 'COMPLETED',
@@ -34,10 +36,15 @@ function getComponent(status: string): React.JSX.Element | false {
 
 export function VaultVerticalProgressBar({
   currentStep,
+  variant,
 }: VaultVerticalProgressBarProps): React.JSX.Element {
   return (
     <Stack w={'15%'} h={'100%'}>
-      <VStack py={'25%'} h={'100%'} justifyContent={'space-between'}>
+      <VStack
+        py={'25%'}
+        h={variant === 'small' ? '125px' : '185px'}
+        justifyContent={'space-between'}
+      >
         <Stack>{getComponent(getStatus(currentStep, 0))}</Stack>
         <Divider orientation={'vertical'} variant={'thick'} />
         <Stack>{getComponent(getStatus(currentStep, 1))}</Stack>

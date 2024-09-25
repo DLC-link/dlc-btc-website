@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 
-import { Button, VStack } from '@chakra-ui/react';
+import { VStack } from '@chakra-ui/react';
 import { RiskBox } from '@components/mint-unmint/components/risk-box/risk-box';
 import { TransactionFormAPI } from '@models/form.models';
 import { Vault } from '@models/vault';
+import { BitcoinTransactionConfirmationsContext } from '@providers/bitcoin-query-provider';
 import { BitcoinWalletContextState } from '@providers/bitcoin-wallet-context-provider';
 import { useForm } from '@tanstack/react-form';
 import Decimal from 'decimal.js';
 
-import { formPropertyMap } from './components/transaction-screen.transaction-form.input-field';
+import { TransactionFormNavigateButtonGroup } from './components/transaction-screen.transaction-form.navigate-button-group';
 import { TransactionFormProgressStackBurnVariantA } from './components/transaction-screen.transaction-form.progress-stack/components/transaction-screen.transaction-form.progress-stack.burn-variant-a';
 import { TransactionFormProgressStackBurnVariantB } from './components/transaction-screen.transaction-form.progress-stack/components/transaction-screen.transaction-form.progress-stack.burn-variant-b';
 import { TransactionFormProgressStackBurnVariantC } from './components/transaction-screen.transaction-form.progress-stack/components/transaction-screen.transaction-form.progress-stack.burn-variant-c';
@@ -16,6 +17,7 @@ import { TransactionFormProgressStackMintVariantA } from './components/transacti
 import { TransactionFormProgressStackMintVariantB } from './components/transaction-screen.transaction-form.progress-stack/components/transaction-screen.transaction-form.progress-stack.mint-variant-b';
 import { TransactionFormProgressStackMintVariantC } from './components/transaction-screen.transaction-form.progress-stack/components/transaction-screen.transaction-form.progress-stack.mint-variant-c';
 import { TransactionFormProtocolFeeStack } from './components/transaction-screen.transaction-form.protocol-fee-box';
+import { TransactionFormSubmitButtonGroup } from './components/transaction-screen.transaction-form.submit-button-group';
 import { TransactionScreenWalletInformation } from './components/transaction-screen.transaction-form.wallet-information';
 import { TransactionFormTransactionInformation } from './components/transaction-screent.transaction-form.transaction-information';
 
@@ -35,7 +37,7 @@ function validateDepositAmount(
   return error;
 }
 
-function validateWithdrawAmount(value: number, valueMinted: number): string | undefined {
+function validateBurnAmount(value: number, valueMinted: number): string | undefined {
   let error;
 
   if (!value) {
@@ -52,7 +54,6 @@ function validateFormAmount(
   depositLimit?: { minimumDeposit: number; maximumDeposit: number },
   vault?: Vault
 ): string | undefined {
-  console.log('value', value);
   if (!vault) {
     return 'Vault is not available';
   } else if (!depositLimit) {
@@ -63,68 +64,67 @@ function validateFormAmount(
     case 'mint':
       return validateDepositAmount(value, depositLimit);
     case 'burn':
-      return validateWithdrawAmount(value, vault.valueMinted);
+      return validateBurnAmount(value, vault.valueMinted);
   }
-}
-
-function getButtonLabel(
-  formType: 'mint' | 'burn',
-  currentStep: number,
-  isSubmitting: boolean,
-  bitcoinWalletContextState: BitcoinWalletContextState
-): string {
-  if (isSubmitting) return 'Processing';
-
-  if (formType === 'burn') {
-    if (currentStep === 0) return 'Sign Burn Transaction';
-    return bitcoinWalletContextState === BitcoinWalletContextState.READY
-      ? 'Sign Withdraw Transaction'
-      : 'Connect Wallet';
-  }
-
-  return bitcoinWalletContextState === BitcoinWalletContextState.READY
-    ? 'Sign Deposit Transaction'
-    : 'Connect Wallet';
 }
 
 function getTransactionProgressStack(
   flow: 'mint' | 'burn',
   currentStep: number,
   formAPI: TransactionFormAPI,
-  currentBitcoinPrice: number
+  currentBitcoinPrice: number,
+  confirmations: number | undefined
 ): React.JSX.Element | undefined {
-  switch (flow) {
-    case 'mint':
-      switch (currentStep) {
-        case 1:
-          return (
-            <TransactionFormProgressStackMintVariantA
-              formAPI={formAPI}
-              currentBitcoinPrice={currentBitcoinPrice}
-            />
-          );
-        case 2:
-          return <TransactionFormProgressStackMintVariantB />;
-        case 3:
-          return <TransactionFormProgressStackMintVariantC />;
-      }
-      break;
-    case 'burn':
-      switch (currentStep) {
-        case 0:
-          return (
-            <TransactionFormProgressStackBurnVariantA
-              formAPI={formAPI}
-              currentBitcoinPrice={currentBitcoinPrice}
-            />
-          );
-        case 1:
-          return <TransactionFormProgressStackBurnVariantB />;
-        case 2:
-          return <TransactionFormProgressStackBurnVariantC />;
-      }
-      break;
-  }
+  const mintSteps = [
+    <TransactionFormProgressStackMintVariantA
+      formAPI={formAPI}
+      currentStep={currentStep}
+      currentBitcoinPrice={currentBitcoinPrice}
+    />,
+    <TransactionFormProgressStackMintVariantB />,
+    <TransactionFormProgressStackMintVariantC />,
+  ];
+
+  const burnSteps = [
+    <TransactionFormProgressStackBurnVariantA
+      formAPI={formAPI}
+      currentStep={currentStep}
+      currentBitcoinPrice={currentBitcoinPrice}
+    />,
+    <TransactionFormProgressStackBurnVariantB />,
+    <TransactionFormProgressStackBurnVariantC />,
+  ];
+
+  const stepComponents = flow === 'mint' ? mintSteps : burnSteps;
+  const step =
+    flow === 'mint' ? (confirmations! >= 6 ? currentStep : currentStep - 1) : currentStep;
+
+  return stepComponents[step];
+}
+
+function getTransactionButtonGroup(
+  flow: 'mint' | 'burn',
+  currentStep: number,
+  formAPI: TransactionFormAPI,
+  userEthereumAddressRiskLevel: any,
+  bitcoinWalletContextState: BitcoinWalletContextState,
+  handleCancelButtonClick: () => void
+): React.JSX.Element | false {
+  const showSubmitButtonGroup =
+    (flow === 'mint' && currentStep === 1) || (flow === 'burn' && [0, 1].includes(currentStep));
+
+  return showSubmitButtonGroup ? (
+    <TransactionFormSubmitButtonGroup
+      flow={flow}
+      currentStep={currentStep}
+      formAPI={formAPI}
+      userEthereumAddressRiskLevel={userEthereumAddressRiskLevel}
+      bitcoinWalletContextState={bitcoinWalletContextState}
+      handleCancelButtonClick={handleCancelButtonClick}
+    />
+  ) : (
+    <TransactionFormNavigateButtonGroup flow={flow} />
+  );
 }
 
 interface VaultTransactionFormProps {
@@ -155,23 +155,23 @@ export function VaultTransactionForm({
   depositLimit,
 }: VaultTransactionFormProps): React.JSX.Element {
   const [currentFieldValue, setCurrentFieldValue] = useState<number>(depositLimit?.minimumDeposit!);
+
+  const confirmations = useContext(
+    BitcoinTransactionConfirmationsContext
+  ).bitcoinTransactionConfirmations.find(v => v[0] === vault.uuid)?.[1];
+
   const form = useForm({
     defaultValues: {
       assetAmount: depositLimit?.minimumDeposit!.toString()!,
     },
     onSubmit: async ({ value }) => {
-      const assetAmount = new Decimal(value.assetAmount);
+      const assetAmount = new Decimal(value.assetAmount).toNumber();
       const burnAmount = new Decimal(vault.valueLocked).minus(vault.valueMinted).toNumber();
+      const isWithdrawStep = flow === 'burn' && currentStep !== 0;
 
-      if (flow === 'burn') {
-        if (currentStep === 0) {
-          await handleButtonClick(assetAmount.toNumber());
-        } else {
-          await handleButtonClick(burnAmount);
-        }
-      } else {
-        await handleButtonClick(assetAmount.toNumber());
-      }
+      const amountToHandle = isWithdrawStep ? burnAmount : assetAmount;
+
+      await handleButtonClick(amountToHandle);
     },
     validators: {
       onChange: ({ value }) => {
@@ -198,23 +198,21 @@ export function VaultTransactionForm({
         await form.handleSubmit();
       }}
     >
-      <VStack
-        w={'100%'}
-        h={'300px'}
-        spacing={'15px'}
-        minW={'364.8'}
-        justifyContent={'space-between'}
-      >
-        {getTransactionProgressStack(flow, currentStep, form, currentBitcoinPrice!)}
+      <VStack w={'100%'} spacing={'15px'} minW={'364.8px'} justifyContent={'space-between'}>
+        {getTransactionProgressStack(flow, currentStep, form, currentBitcoinPrice!, confirmations)}
         <TransactionFormProtocolFeeStack
-          formType={flow}
+          flow={flow}
+          vault={vault}
+          currentStep={currentStep}
           assetAmount={currentFieldValue}
           bitcoinPrice={currentBitcoinPrice}
           protocolFeeBasisPoints={vault?.btcMintFeeBasisPoints}
           isBitcoinWalletLoading={isBitcoinWalletLoading}
         />
         <TransactionFormTransactionInformation
-          formType={flow}
+          flow={flow}
+          vault={vault}
+          currentStep={currentStep}
           assetAmount={currentFieldValue}
           isBitcoinWalletLoading={isBitcoinWalletLoading}
         />
@@ -225,34 +223,14 @@ export function VaultTransactionForm({
           />
         )}
         <TransactionScreenWalletInformation isBitcoinWalletLoading={isBitcoinWalletLoading} />
-        <form.Subscribe
-          selector={state => [state.canSubmit, state.isSubmitting]}
-          children={([canSubmit, isSubmitting]) => (
-            <Button
-              w={'100%'}
-              p={'25px'}
-              fontSize={'lg'}
-              color={'white.01'}
-              bgColor={formPropertyMap[flow].color}
-              _hover={{ bgColor: 'accent.lightBlue.01' }}
-              type="submit"
-              isDisabled={
-                userEthereumAddressRiskLevel
-                  ? ['High', 'Severe'].includes(userEthereumAddressRiskLevel) || !canSubmit
-                  : !canSubmit
-              }
-            >
-              {getButtonLabel(flow, currentStep, isSubmitting, bitcoinWalletContextState)}
-            </Button>
-          )}
-        />
-        <Button
-          isLoading={form.state.isSubmitting}
-          variant={'navigate'}
-          onClick={handleCancelButtonClick}
-        >
-          Cancel
-        </Button>
+        {getTransactionButtonGroup(
+          flow,
+          currentStep,
+          form,
+          userEthereumAddressRiskLevel,
+          bitcoinWalletContextState,
+          handleCancelButtonClick
+        )}
       </VStack>
     </form>
   );

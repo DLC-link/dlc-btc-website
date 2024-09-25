@@ -35,8 +35,6 @@ export function WithdrawScreen({
   const currentVault = allVaults.find(vault => vault.uuid === unmintStep[1]);
 
   async function handleWithdraw(withdrawAmount: number): Promise<void> {
-    console.log('currentVault', currentVault);
-    console.log('withdrawAmount', withdrawAmount);
     if (currentVault) {
       try {
         await handleSignWithdrawTransaction(currentVault.uuid, withdrawAmount);
@@ -62,7 +60,6 @@ export function WithdrawScreen({
   }
 
   async function handleButtonClick(assetAmount: number) {
-    console.log('assetAmount', assetAmount);
     bitcoinWalletContextState === BitcoinWalletContextState.READY
       ? await handleWithdraw(assetAmount)
       : handleConnect();
@@ -70,7 +67,7 @@ export function WithdrawScreen({
 
   return (
     <VStack w={'45%'} spacing={'15px'}>
-      <Vault vault={currentVault!} />
+      <Vault vault={currentVault!} variant={'selected'} />
       <VaultTransactionForm
         vault={currentVault!}
         flow={'burn'}

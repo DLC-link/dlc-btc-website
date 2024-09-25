@@ -3,12 +3,18 @@ import { VaultVerticalProgressBar } from '@components/vault/components/vault-ver
 
 import { TransactionFormProgressStack } from '../../transaction-screen.transaction-form.progress-step-stack';
 
-interface TransactionFormProgressStackMintVariantCProps {}
-
 export function TransactionFormProgressStackBurnVariantC(): React.JSX.Element {
   return (
-    <HStack w={'100%'} justifyContent={'space-between'}>
-      <VaultVerticalProgressBar currentStep={2} />
+    <HStack
+      w={'100%'}
+      p={'15px 15px 15px 0px'}
+      bg={'white.04'}
+      border={'1px solid'}
+      borderColor={'white.03'}
+      borderRadius={'md'}
+      justifyContent={'space-between'}
+    >
+      <VaultVerticalProgressBar currentStep={1} variant={'small'} />
       <VStack w={'85%'}>
         <TransactionFormProgressStack
           label={'Burn'}

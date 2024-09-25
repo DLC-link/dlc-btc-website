@@ -35,7 +35,6 @@ export function VaultDetails({
   function handleDepositClick() {
     navigate('/mint-withdraw');
     dispatch(mintUnmintActions.setMintStep([1, vaultUUID]));
-    close();
   }
 
   function handleWithdrawClick() {
@@ -45,7 +44,15 @@ export function VaultDetails({
     } else {
       dispatch(mintUnmintActions.setUnmintStep([1, vaultUUID]));
     }
-    close();
+  }
+
+  function handleResumeClick() {
+    navigate('/mint-withdraw');
+    if (vaultTotalLockedValue === vaultTotalMintedValue) {
+      dispatch(mintUnmintActions.setMintStep([2, vaultUUID]));
+    } else {
+      dispatch(mintUnmintActions.setUnmintStep([2, vaultUUID]));
+    }
   }
 
   return (
@@ -58,14 +65,15 @@ export function VaultDetails({
               vaultFundingTX={vaultFundingTX}
               vaultWithdrawDepositTX={vaultWithdrawDepositTX}
             />
-            {(vaultState !== VaultState.PENDING || variant !== 'selected') && (
-              <VaultExpandedInformationButtonGroup
-                vaultState={vaultState}
-                vaultTotalLockedValue={vaultTotalLockedValue}
-                handleDepositClick={handleDepositClick}
-                handleWithdrawClick={handleWithdrawClick}
-              />
-            )}
+            <VaultExpandedInformationButtonGroup
+              variant={variant}
+              vaultState={vaultState}
+              vaultTotalLockedValue={vaultTotalLockedValue}
+              vaultTotalMintedValue={vaultTotalMintedValue}
+              handleDepositClick={handleDepositClick}
+              handleWithdrawClick={handleWithdrawClick}
+              handleResumeClick={handleResumeClick}
+            />
           </VStack>
         </VStack>
       </Collapse>

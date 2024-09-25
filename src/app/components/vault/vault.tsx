@@ -44,6 +44,7 @@ export function Vault({ vault, variant }: VaultProps): React.JSX.Element {
         handleButtonClick={handleMainButtonClick}
       />
       <VaultDetails
+        variant={variant}
         vaultUUID={vault.uuid}
         vaultState={vault.state}
         vaultTotalLockedValue={vault.valueLocked}
@@ -52,7 +53,12 @@ export function Vault({ vault, variant }: VaultProps): React.JSX.Element {
         vaultFundingTX={vault.fundingTX}
         vaultWithdrawDepositTX={vault.withdrawDepositTX}
       />
-      <VaultProgressBar bitcoinTransactionConfirmations={confirmations} vaultState={vault.state} />
+      <VaultProgressBar
+        bitcoinTransactionConfirmations={confirmations}
+        vaultState={vault.state}
+        vaultTotalLockedValue={vault.valueLocked}
+        vaultTotalMintedValue={vault.valueMinted}
+      />
     </VaultLayout>
   );
 }

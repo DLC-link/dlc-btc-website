@@ -25,11 +25,11 @@ const navigate = defineStyle({
   px: '25px',
   h: '50px',
   w: '100%',
-  fontSize: 'lg',
+  fontSize: 'sm',
   fontWeight: 600,
   bg: 'none',
   border: '1px solid',
-  borderColor: 'accent.lightBlue.01',
+  borderColor: 'white.03',
   _hover: {
     bg: 'accent.lightBlue.01',
   },

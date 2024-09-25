@@ -34,7 +34,7 @@ export function TransactionFormFieldInput({
           isInvalid={formField.state.meta.errors.length > 0}
           onChange={e => formField.handleChange(e)}
         >
-          <NumberInputField h={'35px'} color={'white.01'} fontWeight={'bold'} />
+          <NumberInputField h={'25px'} color={'white.01'} fontWeight={'bold'} fontSize={'sm'} />
         </NumberInput>
       </HStack>
       <Text fontSize={'sm'} fontWeight={'bold'} color={'white.01'}>

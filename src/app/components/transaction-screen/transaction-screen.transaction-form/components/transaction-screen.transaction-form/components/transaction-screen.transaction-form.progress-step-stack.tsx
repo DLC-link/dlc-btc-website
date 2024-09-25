@@ -1,4 +1,4 @@
-import { HStack, Image, Stack, Text, VStack } from '@chakra-ui/react';
+import { HStack, Image, Stack, Text } from '@chakra-ui/react';
 
 interface TransactionFormProgressStackProps {
   label: string;
@@ -26,7 +26,9 @@ export function TransactionFormProgressStack({
       <HStack w={'65%'}>
         <Image src={assetLogo} alt={'Asset Logo'} boxSize={'25px'} />
         <Stack>
-          <Text color={'white.01'}>{label}</Text>
+          <Text color={'white.01'} fontSize={'sm'}>
+            {label}
+          </Text>
         </Stack>
       </HStack>
       <Text fontSize={'sm'} fontWeight={'bold'} color={'white.01'}>
