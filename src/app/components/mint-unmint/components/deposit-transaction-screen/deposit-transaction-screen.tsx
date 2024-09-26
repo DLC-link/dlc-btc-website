@@ -14,39 +14,48 @@ import { RootState } from '@store/index';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { modalActions } from '@store/slices/modal/modal.actions';
 
-interface WithdrawScreenProps {
-  handleSignWithdrawTransaction: (vaultUUID: string, withdrawAmount: number) => Promise<void>;
+interface DepositTransactionScreenProps {
+  handleSignFundingTransaction: (vaultUUID: string, depositAmount: number) => Promise<void>;
   isBitcoinWalletLoading: [boolean, string];
+  userEthereumAddressRiskLevel: string;
+  fetchUserEthereumAddressRiskLevel: () => Promise<string>;
+  isUserEthereumAddressRiskLevelLoading: boolean;
 }
 
-export function WithdrawScreen({
-  handleSignWithdrawTransaction,
+export function DepositTransactionScreen({
+  handleSignFundingTransaction,
   isBitcoinWalletLoading,
-}: WithdrawScreenProps): React.JSX.Element {
-  const dispatch = useDispatch();
+  userEthereumAddressRiskLevel,
+  fetchUserEthereumAddressRiskLevel,
+  isUserEthereumAddressRiskLevelLoading,
+}: DepositTransactionScreenProps): React.JSX.Element {
   const toast = useToast();
+  const dispatch = useDispatch();
 
   const { bitcoinWalletContextState, resetBitcoinWalletContext } = useContext(BitcoinWalletContext);
 
   const { bitcoinPrice, depositLimit } = useContext(ProofOfReserveContext);
   const { allVaults } = useContext(VaultContext);
 
-  const { unmintStep } = useSelector((state: RootState) => state.mintunmint);
-  const currentVault = allVaults.find(vault => vault.uuid === unmintStep[1]);
+  const { mintStep } = useSelector((state: RootState) => state.mintunmint);
 
-  async function handleWithdraw(withdrawAmount: number): Promise<void> {
-    if (currentVault) {
-      try {
-        await handleSignWithdrawTransaction(currentVault.uuid, withdrawAmount);
-      } catch (error) {
-        toast({
-          title: 'Failed to sign transaction',
-          description: error instanceof Error ? error.message : '',
-          status: 'error',
-          duration: 9000,
-          isClosable: true,
-        });
-      }
+  const currentVault = allVaults.find(vault => vault.uuid === mintStep[1]);
+
+  async function handleDeposit(depositAmount: number) {
+    if (!currentVault) return;
+
+    try {
+      const currentRisk = await fetchUserEthereumAddressRiskLevel();
+      if (currentRisk === 'High') throw new Error('Risk Level is too high');
+      await handleSignFundingTransaction(currentVault.uuid, depositAmount);
+    } catch (error: any) {
+      toast({
+        title: 'Failed to sign Deposit Transaction',
+        description: error.message,
+        status: 'error',
+        duration: 9000,
+        isClosable: true,
+      });
     }
   }
 
@@ -56,12 +65,12 @@ export function WithdrawScreen({
 
   function handleCancel() {
     resetBitcoinWalletContext();
-    dispatch(mintUnmintActions.setUnmintStep([0, '']));
+    dispatch(mintUnmintActions.setMintStep([0, '']));
   }
 
   async function handleButtonClick(assetAmount: number) {
     bitcoinWalletContextState === BitcoinWalletContextState.READY
-      ? await handleWithdraw(assetAmount)
+      ? await handleDeposit(assetAmount)
       : handleConnect();
   }
 
@@ -70,10 +79,12 @@ export function WithdrawScreen({
       <Vault vault={currentVault!} />
       <VaultTransactionForm
         vault={currentVault!}
-        type={'withdraw'}
+        type={'deposit'}
         currentBitcoinPrice={bitcoinPrice}
         bitcoinWalletContextState={bitcoinWalletContextState}
         isBitcoinWalletLoading={isBitcoinWalletLoading}
+        userEthereumAddressRiskLevel={userEthereumAddressRiskLevel}
+        isUserEthereumAddressRiskLevelLoading={isUserEthereumAddressRiskLevelLoading}
         handleButtonClick={handleButtonClick}
         handleCancelButtonClick={handleCancel}
         depositLimit={depositLimit}
