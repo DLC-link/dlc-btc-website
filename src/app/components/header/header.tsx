@@ -64,21 +64,33 @@ export function Header(): React.JSX.Element {
         >
           <CompanyWebsiteButton />
           {isMobile ? (
-            <Menu>
-              <MenuButton as={IconButton} aria-label="Options" icon={<HamburgerIcon />} />
-              <MenuList>
-                <MenuItem onClick={() => navigate('/')}>Points</MenuItem>
-                <MenuItem onClick={() => navigate('/proof-of-reserve')}>Proof of Reserve</MenuItem>
-                {isActiveTabs && (
-                  <>
-                    <MenuItem onClick={() => navigate('/mint-withdraw')}>
-                      Mint/Withdraw dlcBTC
-                    </MenuItem>
-                    <MenuItem onClick={() => navigate('/my-vaults')}>My Vaults</MenuItem>
-                  </>
-                )}
-              </MenuList>
-            </Menu>
+            <HStack>
+              <NetworkBox isMenuOpen={isNetworkMenuOpen} setIsMenuOpen={setIsNetworkMenuOpen} />
+              <Account />
+              <Menu>
+                <MenuButton
+                  as={IconButton}
+                  aria-label="Options"
+                  icon={<HamburgerIcon />}
+                  height={'40px'}
+                  width={'40px'}
+                />
+                <MenuList>
+                  <MenuItem onClick={() => navigate('/')}>Points</MenuItem>
+                  <MenuItem onClick={() => navigate('/proof-of-reserve')}>
+                    Proof of Reserve
+                  </MenuItem>
+                  {isActiveTabs && (
+                    <>
+                      <MenuItem onClick={() => navigate('/mint-withdraw')}>
+                        Mint/Withdraw dlcBTC
+                      </MenuItem>
+                      <MenuItem onClick={() => navigate('/my-vaults')}>My Vaults</MenuItem>
+                    </>
+                  )}
+                </MenuList>
+              </Menu>
+            </HStack>
           ) : (
             <NavigationTabs activeTab={location.pathname} handleTabClick={handleTabClick} />
           )}

@@ -8,6 +8,7 @@ import {
   Text,
   useBreakpointValue,
 } from '@chakra-ui/react';
+import { EthereumNetworkID } from 'dlc-btc-lib/models';
 import { useAccount, useConfig, useSwitchChain } from 'wagmi';
 
 interface NetworksMenuProps {
@@ -15,17 +16,20 @@ interface NetworksMenuProps {
   setIsMenuOpen: (isMenuOpen: boolean) => void;
 }
 
-const networkLogos: Record<number, string> = {
-  1: './images/logos/arbitrum-token.svg', // Arbitrum
-  3: './images/logos/ethereum-token.svg', // Ethereum
-  4: './images/logos/base-token.svg', // Base
-};
-
-const getNetworkLogo = (chainId: number | undefined) => {
-  return chainId
-    ? //TODO: what to display in case of not connected?
-      networkLogos[chainId] || './images/logos/dlc-btc-logo.svg'
-    : './images/logos/dlc-btc-logo.svg';
+const getNetworkLogo = (ethereumNetworkId?: EthereumNetworkID) => {
+  switch (ethereumNetworkId) {
+    case EthereumNetworkID.Arbitrum:
+    case EthereumNetworkID.ArbitrumSepolia:
+      return './images/logos/arbitrum-token.svg';
+    case EthereumNetworkID.Sepolia:
+    case EthereumNetworkID.Mainnet:
+      return './images/logos/eth-token.svg';
+    case EthereumNetworkID.BaseSepolia:
+    case EthereumNetworkID.Base:
+      return './images/logos/base-token.svg';
+    default:
+      return './images/logos/arbitrum-token.svg';
+  }
 };
 
 export function NetworksMenu({
@@ -45,13 +49,17 @@ export function NetworksMenu({
 
   return (
     <Menu variant={'networkChange'} isOpen={isMenuOpen}>
-      <MenuButton onClick={() => setIsMenuOpen(!isMenuOpen)}>
+      <MenuButton onClick={() => setIsMenuOpen(!isMenuOpen)} h={isMobile ? '40px' : '50px'}>
         {isMobile ? (
-          <Image src={getNetworkLogo(chain?.id)} alt={'Selected network logo'} />
+          <Image
+            src={getNetworkLogo(chain?.id.toString() as EthereumNetworkID)}
+            alt={'Selected network logo'}
+            w={'30px'}
+            ml={'4px'}
+          />
         ) : (
           //TODO: what to display in case of not connected?
           <HStack justifyContent={'space-evenly'}>
-            <Text>Network</Text>
             <Text>{chain ? chain?.name : 'Not Connected'}</Text>
           </HStack>
         )}
@@ -65,6 +73,7 @@ export function NetworksMenu({
               onClick={() => {
                 switchChain({ chainId: ethereumNetwork.id });
                 setIsMenuOpen(!isMenuOpen);
+                getNetworkLogo(chain?.id.toString() as EthereumNetworkID);
               }}
             >
               {ethereumNetwork.name}

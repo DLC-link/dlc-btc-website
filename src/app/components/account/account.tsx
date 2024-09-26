@@ -1,6 +1,6 @@
 import { useDispatch } from 'react-redux';
 
-import { Button, HStack } from '@chakra-ui/react';
+import { Button, HStack, useBreakpointValue } from '@chakra-ui/react';
 import { AccountMenu } from '@components/account/components/account-menu';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { modalActions } from '@store/slices/modal/modal.actions';
@@ -11,6 +11,7 @@ export function Account(): React.JSX.Element {
 
   const { address, connector, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
   function onConnectWalletClick(): void {
     dispatch(modalActions.toggleSelectWalletModalVisibility());
@@ -22,7 +23,7 @@ export function Account(): React.JSX.Element {
   }
 
   return (
-    <HStack w={'275px'}>
+    <HStack h={isMobile ? '40px' : '50px'}>
       {isConnected ? (
         <AccountMenu
           address={address}
@@ -30,7 +31,12 @@ export function Account(): React.JSX.Element {
           handleDisconnectWallet={() => onDisconnectWalletClick()}
         />
       ) : (
-        <Button variant={'account'} onClick={() => onConnectWalletClick()}>
+        <Button
+          variant={'account'}
+          onClick={() => onConnectWalletClick()}
+          h={isMobile ? '40px' : '50px'}
+          w={isMobile ? '150px' : '275px'}
+        >
           Connect Wallet
         </Button>
       )}

@@ -10,7 +10,7 @@ interface NetworkBoxProps {
 export function NetworkBox({ isMenuOpen, setIsMenuOpen }: NetworkBoxProps): React.JSX.Element {
   const isMobile = useBreakpointValue({ base: true, md: false });
   return (
-    <HStack w={isMobile ? '85px' : '175px'}>
+    <HStack w={isMobile ? '40px' : '175px'}>
       <NetworksMenu isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
     </HStack>
   );
