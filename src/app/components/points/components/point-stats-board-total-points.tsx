@@ -1,6 +1,8 @@
-import { Divider, Skeleton, Text, VStack, useBreakpointValue } from '@chakra-ui/react';
+import { Divider, Skeleton, Text, useBreakpointValue } from '@chakra-ui/react';
 
 import { formatNumber } from '@shared/utils';
+
+import { TokenStatsBoardTotalPointsLayout } from './points-stats-board-total-points-layout';
 
 interface TokenStatsBoardTotalPointsProps {
   totalPoints: number | undefined;
@@ -12,12 +14,7 @@ export function TokenStatsBoardTotalPoints({
   const isMobile = useBreakpointValue({ base: true, md: false });
 
   return (
-    <VStack
-      w={'100%'}
-      px={isMobile ? '0px' : '25px'}
-      alignItems={'flex-start'}
-      spacing={isMobile ? '10px' : '20px'}
-    >
+    <TokenStatsBoardTotalPointsLayout isMobile={isMobile}>
       <Text
         color={'white.01'}
         fontSize={['xl', '2xl', '2xl', '3xl', '3xl']}
@@ -43,6 +40,6 @@ export function TokenStatsBoardTotalPoints({
         )}
       </Skeleton>
       <Divider orientation={'horizontal'} variant={'thick'} />
-    </VStack>
+    </TokenStatsBoardTotalPointsLayout>
   );
 }

@@ -15,7 +15,7 @@ export function PointsTable({ items }: PointsTableProps): React.JSX.Element {
   const isMobile = useBreakpointValue({ base: true, md: false });
 
   return (
-    <GenericTableLayout height={`${dynamicHeight}px`} width={isMobile ? '100%' : '50%'}>
+    <GenericTableLayout height={`${dynamicHeight}px`} width={'50%'} isMobile={isMobile}>
       <GenericTableHeader>
         <GenericTableHeaderText w={'25%'}>dlcBTC Used</GenericTableHeaderText>
         <GenericTableHeaderText w={'50%'}>Points Earned</GenericTableHeaderText>
