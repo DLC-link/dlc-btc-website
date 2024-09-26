@@ -6,8 +6,8 @@ export function MyVaultsSmallLayout({ children }: HasChildren): React.JSX.Elemen
     <VStack
       py={'2.5px'}
       px={'25px'}
-      w={'350px'}
-      h={'625px'}
+      w={'31.5%'}
+      h={'825px'}
       bg={'background.container.01'}
       border={'1px solid'}
       borderRadius={'md'}

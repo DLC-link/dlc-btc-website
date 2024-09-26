@@ -5,3 +5,5 @@ export const BITCOIN_NETWORK_MAP = {
   testnet: testnet,
   regtest: regtest,
 };
+
+export const BITCOIN_BLOCK_CONFIRMATIONS = 6;

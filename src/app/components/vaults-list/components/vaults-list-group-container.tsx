@@ -1,11 +1,12 @@
 import { Button, HStack, Image, Spinner, Text, VStack } from '@chakra-ui/react';
-import { VaultCard } from '@components/vault/vault-card';
+import { Vault } from '@components/vault/vault';
 import { useAddToken } from '@hooks/use-add-token';
-import { Vault } from '@models/vault';
+import { Vault as VaultModel } from '@models/vault';
 
 interface VaultsListGroupContainerProps {
   label?: string;
-  vaults: Vault[];
+  variant?: 'select';
+  vaults: VaultModel[];
   selectedVaultUUID?: string;
   isSelectable?: boolean;
   handleSelect?: (uuid: string) => void;
@@ -13,10 +14,8 @@ interface VaultsListGroupContainerProps {
 
 export function VaultsListGroupContainer({
   label,
+  variant,
   vaults,
-  selectedVaultUUID,
-  isSelectable = false,
-  handleSelect,
 }: VaultsListGroupContainerProps): React.JSX.Element | boolean {
   const addToken = useAddToken();
 
@@ -49,13 +48,7 @@ export function VaultsListGroupContainer({
         </HStack>
       )}
       {vaults.map((vault, index) => (
-        <VaultCard
-          key={index}
-          vault={vault}
-          isSelected={selectedVaultUUID === vault.uuid}
-          isSelectable={isSelectable}
-          handleSelect={() => handleSelect && handleSelect(vault.uuid)}
-        />
+        <Vault key={index} vault={vault} variant={variant} />
       ))}
     </VStack>
   );
