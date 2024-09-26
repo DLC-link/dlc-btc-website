@@ -1,18 +1,18 @@
 import { HStack, Image, Stack, Text } from '@chakra-ui/react';
 
-interface TransactionFormProgressStackProps {
+interface TransactionFormProgressStackItemProps {
   label: string;
   assetLogo: string;
   assetSymbol: string;
   isActive: boolean;
 }
 
-export function TransactionFormProgressStack({
+export function TransactionFormProgressStackItem({
   label,
   assetLogo,
   assetSymbol,
   isActive,
-}: TransactionFormProgressStackProps): React.JSX.Element {
+}: TransactionFormProgressStackItemProps): React.JSX.Element {
   return (
     <HStack
       w={'100%'}

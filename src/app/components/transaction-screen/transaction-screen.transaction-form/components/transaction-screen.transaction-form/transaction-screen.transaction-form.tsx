@@ -10,12 +10,7 @@ import { useForm } from '@tanstack/react-form';
 import Decimal from 'decimal.js';
 
 import { TransactionFormNavigateButtonGroup } from './components/transaction-screen.transaction-form.navigate-button-group';
-import { TransactionFormProgressStackBurnVariantA } from './components/transaction-screen.transaction-form.progress-stack/components/transaction-screen.transaction-form.progress-stack.burn-variant-a';
-import { TransactionFormProgressStackBurnVariantB } from './components/transaction-screen.transaction-form.progress-stack/components/transaction-screen.transaction-form.progress-stack.burn-variant-b';
-import { TransactionFormProgressStackBurnVariantC } from './components/transaction-screen.transaction-form.progress-stack/components/transaction-screen.transaction-form.progress-stack.burn-variant-c';
-import { TransactionFormProgressStackMintVariantA } from './components/transaction-screen.transaction-form.progress-stack/components/transaction-screen.transaction-form.progress-stack.mint-variant-a';
-import { TransactionFormProgressStackMintVariantB } from './components/transaction-screen.transaction-form.progress-stack/components/transaction-screen.transaction-form.progress-stack.mint-variant-b';
-import { TransactionFormProgressStackMintVariantC } from './components/transaction-screen.transaction-form.progress-stack/components/transaction-screen.transaction-form.progress-stack.mint-variant-c';
+import { TransactionFormProgressStack } from './components/transaction-screen.transaction-form.progress-stack/components/transaction-screen.transaction-form.progress-stack';
 import { TransactionFormProtocolFeeStack } from './components/transaction-screen.transaction-form.protocol-fee-box';
 import { TransactionFormSubmitButtonGroup } from './components/transaction-screen.transaction-form.submit-button-group';
 import { TransactionScreenWalletInformation } from './components/transaction-screen.transaction-form.wallet-information';
@@ -66,40 +61,6 @@ function validateFormAmount(
     case 'burn':
       return validateBurnAmount(value, vault.valueMinted);
   }
-}
-
-function getTransactionProgressStack(
-  flow: 'mint' | 'burn',
-  currentStep: number,
-  formAPI: TransactionFormAPI,
-  currentBitcoinPrice: number,
-  confirmations: number | undefined
-): React.JSX.Element | undefined {
-  const mintSteps = [
-    <TransactionFormProgressStackMintVariantA
-      formAPI={formAPI}
-      currentStep={currentStep}
-      currentBitcoinPrice={currentBitcoinPrice}
-    />,
-    <TransactionFormProgressStackMintVariantB />,
-    <TransactionFormProgressStackMintVariantC />,
-  ];
-
-  const burnSteps = [
-    <TransactionFormProgressStackBurnVariantA
-      formAPI={formAPI}
-      currentStep={currentStep}
-      currentBitcoinPrice={currentBitcoinPrice}
-    />,
-    <TransactionFormProgressStackBurnVariantB />,
-    <TransactionFormProgressStackBurnVariantC />,
-  ];
-
-  const stepComponents = flow === 'mint' ? mintSteps : burnSteps;
-  const step =
-    flow === 'mint' ? (confirmations! >= 6 ? currentStep : currentStep - 1) : currentStep;
-
-  return stepComponents[step];
 }
 
 function getTransactionButtonGroup(
@@ -199,7 +160,13 @@ export function VaultTransactionForm({
       }}
     >
       <VStack w={'100%'} spacing={'15px'} minW={'364.8px'} justifyContent={'space-between'}>
-        {getTransactionProgressStack(flow, currentStep, form, currentBitcoinPrice!, confirmations)}
+        <TransactionFormProgressStack
+          formAPI={form}
+          flow={flow}
+          confirmations={confirmations}
+          currentBitcoinPrice={currentBitcoinPrice!}
+          currentStep={currentStep}
+        />
         <TransactionFormProtocolFeeStack
           flow={flow}
           vault={vault}

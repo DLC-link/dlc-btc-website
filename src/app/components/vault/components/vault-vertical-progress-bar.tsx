@@ -1,7 +1,9 @@
 import { Divider, Image, Spinner, Stack, VStack } from '@chakra-ui/react';
 
 interface VaultVerticalProgressBarProps {
+  flow: 'mint' | 'burn';
   currentStep: number;
+  confirmations?: number;
   variant?: 'small';
 }
 
@@ -35,19 +37,28 @@ function getComponent(status: string): React.JSX.Element | false {
 }
 
 export function VaultVerticalProgressBar({
+  flow,
   currentStep,
-  variant,
+  confirmations = 0,
 }: VaultVerticalProgressBarProps): React.JSX.Element {
+  const isMintFlow = flow === 'mint';
+  const isBurnFlow = flow === 'burn';
+
+  const activeStatus =
+    (isMintFlow && [1, 2].includes(currentStep) && confirmations < 6) ||
+    (isBurnFlow && currentStep === 0)
+      ? 0
+      : 1;
+
+  const height =
+    (isMintFlow && currentStep !== 1) || (isBurnFlow && currentStep !== 0) ? '125px' : '185px';
+
   return (
-    <Stack w={'15%'} h={'100%'}>
-      <VStack
-        py={'25%'}
-        h={variant === 'small' ? '125px' : '185px'}
-        justifyContent={'space-between'}
-      >
-        <Stack>{getComponent(getStatus(currentStep, 0))}</Stack>
-        <Divider orientation={'vertical'} variant={'thick'} />
-        <Stack>{getComponent(getStatus(currentStep, 1))}</Stack>
+    <Stack w="15%" h="100%">
+      <VStack py="25%" h={height} justifyContent="space-between">
+        <Stack>{getComponent(getStatus(activeStatus, 0))}</Stack>
+        <Divider orientation="vertical" variant="thick" />
+        <Stack>{getComponent(getStatus(activeStatus, 1))}</Stack>
       </VStack>
     </Stack>
   );
