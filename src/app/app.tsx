@@ -29,9 +29,9 @@ export function App(): React.JSX.Element {
     <WagmiProvider config={wagmiConfiguration}>
       <QueryClientProvider client={queryClient}>
         <EthereumNetworkConfigurationContextProvider>
-          <EthereumObserverProvider>
-            <BitcoinWalletContextProvider>
-              <VaultContextProvider>
+          <BitcoinWalletContextProvider>
+            <VaultContextProvider>
+              <EthereumObserverProvider>
                 <BitcoinTransactionConfirmationsProvider>
                   <BalanceContextProvider>
                     <ProofOfReserveContextProvider>
@@ -51,9 +51,9 @@ export function App(): React.JSX.Element {
                     </ProofOfReserveContextProvider>
                   </BalanceContextProvider>
                 </BitcoinTransactionConfirmationsProvider>
-              </VaultContextProvider>
-            </BitcoinWalletContextProvider>
-          </EthereumObserverProvider>
+              </EthereumObserverProvider>
+            </VaultContextProvider>
+          </BitcoinWalletContextProvider>
         </EthereumNetworkConfigurationContextProvider>
       </QueryClientProvider>
     </WagmiProvider>

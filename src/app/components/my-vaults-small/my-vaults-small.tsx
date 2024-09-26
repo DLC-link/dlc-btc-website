@@ -26,7 +26,7 @@ export function MyVaultsSmall(): React.JSX.Element {
     <MyVaultsSmallLayout>
       <VaultsList
         title={'My Vaults'}
-        height={'725'}
+        height={'825'}
         isScrollable={!isLoading && allVaults.length > 0}
       >
         <Skeleton isLoaded={!isLoading} w={'100%'}>

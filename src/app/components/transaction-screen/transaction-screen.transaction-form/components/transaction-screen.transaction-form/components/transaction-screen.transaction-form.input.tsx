@@ -1,45 +1,83 @@
-import { HStack, Image, NumberInput, NumberInputField, Text } from '@chakra-ui/react';
-import { FieldApi } from '@tanstack/react-form';
+import { Text, VStack } from '@chakra-ui/react';
+import { TransactionFormAPI } from '@models/form.models';
 
-interface TransactionFormFieldInputProps {
-  assetLogo: string;
-  assetSymbol: string;
-  formField: FieldApi<
-    {
-      assetAmount: string;
-    },
-    'assetAmount',
-    undefined,
-    undefined,
-    string
-  >;
+import { TransactionFormFieldInput } from './transaction-screen.transaction-form.field-input';
+import { TransactionFormInputUSDText } from './transaction-screen.transaction-form.input-usd-text';
+import { VaultTransactionFormWarning } from './transaction-screen.transaction-form.warning';
+
+const bitcoinFormProperties = {
+  label: 'Deposit BTC',
+  logo: '/images/logos/bitcoin-logo.svg',
+  symbol: 'BTC',
+  color: 'orange.01',
+};
+const tokenFormProperties = {
+  label: 'Burn dlcBTC',
+  logo: '/images/logos/dlc-btc-logo.svg',
+  symbol: 'dlcBTC',
+  color: 'purple.01',
+};
+
+export function getFormProperties(
+  flow: 'mint' | 'burn',
+  currentStep: number
+): {
+  label: string;
+  logo: string;
+  symbol: string;
+  color: string;
+} {
+  switch (flow) {
+    case 'mint':
+      return bitcoinFormProperties;
+    case 'burn':
+      return currentStep === 1 ? bitcoinFormProperties : tokenFormProperties;
+    default:
+      throw new Error('Invalid Flow Type');
+  }
 }
 
-export function TransactionFormFieldInput({
-  assetLogo,
-  assetSymbol,
-  formField,
-}: TransactionFormFieldInputProps): React.JSX.Element {
+interface TransactionFormInputFieldProps {
+  formAPI: TransactionFormAPI;
+  currentStep: number;
+  formType: 'mint' | 'burn';
+  currentBitcoinPrice: number;
+}
+
+export function TransactionFormInputField({
+  formAPI,
+  currentStep,
+  currentBitcoinPrice,
+  formType,
+}: TransactionFormInputFieldProps): React.JSX.Element {
+  const formProperties = getFormProperties(formType, currentStep);
   return (
-    <HStack w={'100%'}>
-      <HStack w={'65%'}>
-        <Image src={assetLogo} alt={'Asset Logo'} boxSize={'25px'} />
-        <NumberInput
-          autoFocus
-          allowMouseWheel={false}
-          value={formField.state.value}
-          onBlur={formField.handleBlur}
-          borderColor={'white.01'}
-          focusBorderColor={'rgba(50, 201, 247, 1)'} // accent.lightBlue.01
-          isInvalid={formField.state.meta.errors.length > 0}
-          onChange={e => formField.handleChange(e)}
+    <formAPI.Field name={'assetAmount'}>
+      {field => (
+        <VStack
+          w={'100%'}
+          p={'15px'}
+          bg={'white.04'}
+          border={'1px solid'}
+          borderColor={'white.03'}
+          borderRadius={'md'}
         >
-          <NumberInputField h={'35px'} color={'white.01'} fontWeight={'bold'} />
-        </NumberInput>
-      </HStack>
-      <Text fontSize={'sm'} fontWeight={'bold'} color={'white.01'}>
-        {assetSymbol}
-      </Text>
-    </HStack>
+          <Text w={'100%'} fontSize={'sm'} fontWeight={'bold'} color={'accent.lightBlue.01'}>
+            {formProperties.label}
+          </Text>
+          <TransactionFormFieldInput
+            assetLogo={formProperties.logo}
+            assetSymbol={formProperties.symbol}
+            formField={field}
+          />
+          <TransactionFormInputUSDText
+            errors={field.state.meta.errors}
+            assetAmount={field.state.value}
+            currentBitcoinPrice={currentBitcoinPrice}
+          />
+          <VaultTransactionFormWarning formErrors={field.state.meta.errors} />
+        </VStack>
+      )}
+    </formAPI.Field>
   );
 }

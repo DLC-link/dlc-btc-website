@@ -67,10 +67,11 @@ export function WithdrawScreen({
 
   return (
     <VStack w={'45%'} spacing={'15px'}>
-      <Vault vault={currentVault!} />
+      <Vault vault={currentVault!} variant={'selected'} />
       <VaultTransactionForm
         vault={currentVault!}
-        type={'withdraw'}
+        flow={'burn'}
+        currentStep={unmintStep[0]}
         currentBitcoinPrice={bitcoinPrice}
         bitcoinWalletContextState={bitcoinWalletContextState}
         isBitcoinWalletLoading={isBitcoinWalletLoading}
