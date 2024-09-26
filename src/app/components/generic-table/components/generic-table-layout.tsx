@@ -1,4 +1,4 @@
-import { VStack, useBreakpointValue } from '@chakra-ui/react';
+import { VStack } from '@chakra-ui/react';
 
 interface GenericTableLayoutProps {
   width?: string;
