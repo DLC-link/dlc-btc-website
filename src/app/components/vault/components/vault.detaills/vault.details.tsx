@@ -1,7 +1,7 @@
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
-import { Collapse, Divider, Stack, VStack } from '@chakra-ui/react';
+import { Collapse, Stack, VStack } from '@chakra-ui/react';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { VaultState } from 'dlc-btc-lib/models';
 
@@ -59,7 +59,6 @@ export function VaultDetails({
     <Stack w={'100%'} spacing={'0px'}>
       <Collapse in={isVaultExpanded} unmountOnExit animateOpacity>
         <VStack w={'100%'}>
-          <Divider w={'100%'} borderColor={'grey.01'} borderStyle={'dashed'} />
           <VStack w={'100%'} justifyContent={'space-between'}>
             <VaultTransactionStack
               vaultFundingTX={vaultFundingTX}

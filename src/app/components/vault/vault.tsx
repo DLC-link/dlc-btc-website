@@ -37,6 +37,7 @@ export function Vault({ vault, variant }: VaultProps): React.JSX.Element {
     <VaultLayout>
       <VaultHeader vaultUUID={vault.uuid} vaultCreationTimestamp={vault.timestamp} />
       <VaultMainStack
+        vaultState={vault.state}
         vaultTotalLockedValue={vault.valueLocked}
         vaultTotalMintedValue={vault.valueMinted}
         isVaultExpanded={isVaultExpanded}

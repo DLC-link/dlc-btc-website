@@ -16,9 +16,9 @@ interface SuccessfulFlowModalProps extends ModalComponentProps {
 
 function getModalText(flow: 'mint' | 'burn', assetAmount?: number): string {
   if (flow === 'mint') {
-    return `You have succesfully deposited ${assetAmount} BTC into your Vault, and minted ${assetAmount} dlcBTC to your address.`;
+    return `You have successfully deposited ${assetAmount} BTC from you Bitcoin Wallet into your Vault, and minted ${assetAmount} dlcBTC to your address.`;
   } else {
-    return `You have succesfully burned ${assetAmount} dlcBTC from your address, and withdraw ${assetAmount} BTC from your Vault.`;
+    return `You have successfully burned ${assetAmount} dlcBTC from your address, and withdraw ${assetAmount} BTC from your Vault into your Bitcoin Wallet.`;
   }
 }
 

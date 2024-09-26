@@ -5,6 +5,8 @@ import { useEthersSigner } from '@functions/configuration.functions';
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { setupVault } from 'dlc-btc-lib/ethereum-functions';
 
+import { SetupVaultScreenVaultGraphics } from './components/setup-vault-screen.vault-graphics';
+
 export function SetupVaultScreen(): React.JSX.Element {
   const toast = useToast();
 
@@ -31,7 +33,8 @@ export function SetupVaultScreen(): React.JSX.Element {
   }
 
   return (
-    <VStack w={'45%'} h={'445px'} justifyContent={'center'}>
+    <VStack w={'45%'}>
+      <SetupVaultScreenVaultGraphics />
       <Button
         isLoading={isSubmitting}
         variant={'account'}
