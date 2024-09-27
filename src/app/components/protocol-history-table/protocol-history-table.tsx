@@ -10,7 +10,7 @@ interface ProtocolHistoryTableProps {
 }
 
 export function ProtocolHistoryTable({ items }: ProtocolHistoryTableProps): React.JSX.Element {
-  const dynamicHeight = items ? items.length * 65 + 20 : 20;
+  const dynamicHeight = items ? items.length * 59 + 20 : 20;
 
   return (
     <GenericTableLayout height={`${dynamicHeight}px`} width={'50%'}>
