@@ -69,7 +69,8 @@ function getTransactionButtonGroup(
   formAPI: TransactionFormAPI,
   userEthereumAddressRiskLevel: any,
   bitcoinWalletContextState: BitcoinWalletContextState,
-  handleCancelButtonClick: () => void
+  handleCancelButtonClick: () => void,
+  isSubmitting: boolean
 ): React.JSX.Element | false {
   const showSubmitButtonGroup =
     (flow === 'mint' && currentStep === 1) || (flow === 'burn' && [0, 1].includes(currentStep));
@@ -82,6 +83,7 @@ function getTransactionButtonGroup(
       userEthereumAddressRiskLevel={userEthereumAddressRiskLevel}
       bitcoinWalletContextState={bitcoinWalletContextState}
       handleCancelButtonClick={handleCancelButtonClick}
+      isSubmitting={isSubmitting}
     />
   ) : (
     <TransactionFormNavigateButtonGroup flow={flow} />
@@ -98,6 +100,7 @@ interface VaultTransactionFormProps {
   vault: Vault;
   handleButtonClick: (assetValue: number) => Promise<void>;
   handleCancelButtonClick: () => void;
+  isSubmitting: boolean;
   currentBitcoinPrice?: number;
   depositLimit?: { minimumDeposit: number; maximumDeposit: number } | undefined;
 }
@@ -112,6 +115,7 @@ export function VaultTransactionForm({
   vault,
   handleButtonClick,
   handleCancelButtonClick,
+  isSubmitting,
   currentBitcoinPrice,
   depositLimit,
 }: VaultTransactionFormProps): React.JSX.Element {
@@ -178,7 +182,6 @@ export function VaultTransactionForm({
         />
         <TransactionFormTransactionInformation
           flow={flow}
-          vault={vault}
           currentStep={currentStep}
           assetAmount={currentFieldValue}
           isBitcoinWalletLoading={isBitcoinWalletLoading}
@@ -196,7 +199,8 @@ export function VaultTransactionForm({
           form,
           userEthereumAddressRiskLevel,
           bitcoinWalletContextState,
-          handleCancelButtonClick
+          handleCancelButtonClick,
+          isSubmitting
         )}
       </VStack>
     </form>
