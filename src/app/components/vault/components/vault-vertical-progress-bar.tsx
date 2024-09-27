@@ -9,13 +9,14 @@ interface VaultVerticalProgressBarProps {
 
 const Status = {
   ACTIVE: 'ACTIVE',
+  PROGRESSING: 'PROGRESSING',
   COMPLETED: 'COMPLETED',
   INACTIVE: 'INACTIVE',
 };
 
-function getStatus(currentStep: number, stepIndex: number): string {
+function getStatus(currentStep: number, stepIndex: number, progressing: boolean): string {
   if (currentStep === stepIndex) {
-    return Status.ACTIVE;
+    return progressing ? Status.PROGRESSING : Status.ACTIVE;
   } else if (currentStep > stepIndex) {
     return Status.COMPLETED;
   } else {
@@ -26,7 +27,9 @@ function getStatus(currentStep: number, stepIndex: number): string {
 function getComponent(status: string): React.JSX.Element | false {
   switch (status) {
     case Status.ACTIVE:
-      return <Spinner thickness={'2.5px'} size={'xs'} color={'accent.lightBlue.01'} />;
+      return <Image src={'/images/loader-colored.svg'} alt={'Active Loader'} boxSize={'15px'} />;
+    case Status.PROGRESSING:
+      return <Spinner thickness={'3.5px'} size={'xs'} color={'accent.lightBlue.01'} />;
     case Status.COMPLETED:
       return <Image src={'/images/check.svg'} alt={'Icon'} boxSize={'15px'} />;
     case Status.INACTIVE:
@@ -56,9 +59,9 @@ export function VaultVerticalProgressBar({
   return (
     <Stack w="15%" h="100%">
       <VStack py="25%" h={height} justifyContent="space-between">
-        <Stack>{getComponent(getStatus(activeStatus, 0))}</Stack>
+        <Stack>{getComponent(getStatus(activeStatus, 0, currentStep === 2))}</Stack>
         <Divider orientation="vertical" variant="thick" />
-        <Stack>{getComponent(getStatus(activeStatus, 1))}</Stack>
+        <Stack>{getComponent(getStatus(activeStatus, 1, currentStep === 2))}</Stack>
       </VStack>
     </Stack>
   );
