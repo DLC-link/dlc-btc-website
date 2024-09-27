@@ -21,10 +21,10 @@ function getButtonLabel(
         ? 'Sign Burn Transaction'
         : isWalletReady
           ? 'Sign Withdraw Transaction'
-          : 'Connect Wallet';
+          : 'Connect Bitcoin Wallet';
 
     case 'mint':
-      return isWalletReady ? 'Sign Deposit Transaction' : 'Connect Wallet';
+      return isWalletReady ? 'Sign Deposit Transaction' : 'Connect Bitcoin Wallet';
     default:
       throw new Error('Invalid Flow Type');
   }
@@ -37,6 +37,7 @@ interface TransactionFormSubmitButtonGroupProps {
   userEthereumAddressRiskLevel: string;
   bitcoinWalletContextState: any;
   handleCancelButtonClick: () => void;
+  isSubmitting: boolean;
 }
 
 export function TransactionFormSubmitButtonGroup({
@@ -46,13 +47,14 @@ export function TransactionFormSubmitButtonGroup({
   userEthereumAddressRiskLevel,
   bitcoinWalletContextState,
   handleCancelButtonClick,
+  isSubmitting,
 }: TransactionFormSubmitButtonGroupProps): React.JSX.Element {
   const formProperties = getFormProperties(flow, currentStep);
   return (
     <VStack w={'100%'} spacing={'15px'}>
       <formAPI.Subscribe
-        selector={state => [state.canSubmit, state.isSubmitting]}
-        children={([canSubmit, isSubmitting]) => (
+        selector={state => [state.canSubmit]}
+        children={([canSubmit]) => (
           <Button
             w={'100%'}
             p={'25px'}
@@ -64,7 +66,7 @@ export function TransactionFormSubmitButtonGroup({
             isDisabled={
               userEthereumAddressRiskLevel
                 ? ['High', 'Severe'].includes(userEthereumAddressRiskLevel) || !canSubmit
-                : !canSubmit
+                : !canSubmit || isSubmitting
             }
           >
             {getButtonLabel(flow, currentStep, isSubmitting, bitcoinWalletContextState)}
@@ -73,7 +75,7 @@ export function TransactionFormSubmitButtonGroup({
       />
       <Button
         fontSize={'md'}
-        isLoading={formAPI.state.isSubmitting}
+        isLoading={isSubmitting}
         variant={'navigate'}
         onClick={handleCancelButtonClick}
       >

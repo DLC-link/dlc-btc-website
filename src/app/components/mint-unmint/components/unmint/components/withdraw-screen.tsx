@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { VStack, useToast } from '@chakra-ui/react';
@@ -34,11 +34,15 @@ export function WithdrawScreen({
   const { unmintStep } = useSelector((state: RootState) => state.mintunmint);
   const currentVault = allVaults.find(vault => vault.uuid === unmintStep[1]);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   async function handleWithdraw(withdrawAmount: number): Promise<void> {
     if (currentVault) {
       try {
+        setIsSubmitting(true);
         await handleSignWithdrawTransaction(currentVault.uuid, withdrawAmount);
       } catch (error) {
+        setIsSubmitting(false);
         toast({
           title: 'Failed to sign transaction',
           description: error instanceof Error ? error.message : '',
@@ -78,6 +82,7 @@ export function WithdrawScreen({
         handleButtonClick={handleButtonClick}
         handleCancelButtonClick={handleCancel}
         depositLimit={depositLimit}
+        isSubmitting={isSubmitting}
       />
     </VStack>
   );
