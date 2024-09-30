@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { HStack, VStack } from '@chakra-ui/react';
+import { HamburgerIcon } from '@chakra-ui/icons';
+import { HStack, IconButton, VStack, useBreakpointValue } from '@chakra-ui/react';
 import { Account } from '@components/account/account';
 import { CompanyWebsiteButton } from '@components/company-website-button/company-website-button';
 import { HeaderLayout } from '@components/header/components/header.layout';
@@ -23,6 +24,8 @@ export function Header(): React.JSX.Element {
     navigate(route);
   };
 
+  const isMobile = useBreakpointValue({ base: true, md: false });
+
   useEffect(() => {
     if (isConnected && !chain) {
       setShowBanner(true);
@@ -43,13 +46,31 @@ export function Header(): React.JSX.Element {
         />
       )}
       <HeaderLayout>
-        <HStack gap={'50px'}>
+        <HStack
+          justifyContent={isMobile ? 'space-between' : 'flex-start'}
+          w={'100%'}
+          gap={isMobile ? '0px' : '50px'}
+        >
           <CompanyWebsiteButton />
-          <NavigationTabs activeTab={location.pathname} handleTabClick={handleTabClick} />
+          {isMobile ? (
+            <IconButton
+              aria-label="menu"
+              icon={<HamburgerIcon />}
+              onClick={() => {
+                console.log('clicked');
+              }}
+            />
+          ) : (
+            <NavigationTabs activeTab={location.pathname} handleTabClick={handleTabClick} />
+          )}
         </HStack>
         <HStack>
-          <NetworkBox isMenuOpen={isNetworkMenuOpen} setIsMenuOpen={setIsNetworkMenuOpen} />
-          <Account />
+          {!isMobile && (
+            <>
+              <NetworkBox isMenuOpen={isNetworkMenuOpen} setIsMenuOpen={setIsNetworkMenuOpen} />
+              <Account />
+            </>
+          )}
         </HStack>
       </HeaderLayout>
     </VStack>

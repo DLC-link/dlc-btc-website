@@ -8,6 +8,7 @@ interface GenericTableLayoutProps {
   borderRadius?: string;
   bg?: string;
   children: React.ReactNode;
+  isMobile?: boolean;
 }
 
 export function GenericTableLayout({
@@ -18,13 +19,15 @@ export function GenericTableLayout({
   borderRadius = 'md',
   children,
   bg = 'background.container.01',
+  isMobile = false,
 }: GenericTableLayoutProps): React.JSX.Element {
+  // const isMobile = useBreakpointValue({ base: true, md: false });
   return (
     <VStack
-      w={width}
+      w={isMobile ? '100%' : width}
       h={height}
       minH={'100px'}
-      padding={padding}
+      padding={isMobile ? '0px' : padding}
       alignItems={alignItems}
       borderRadius={borderRadius}
       bg={bg}
