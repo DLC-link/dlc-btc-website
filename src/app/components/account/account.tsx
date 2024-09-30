@@ -36,6 +36,7 @@ export function Account(): React.JSX.Element {
           onClick={() => onConnectWalletClick()}
           h={isMobile ? '40px' : '50px'}
           w={isMobile ? '150px' : '275px'}
+          fontSize={isMobile ? 'md' : 'lg'}
         >
           Connect Wallet
         </Button>
