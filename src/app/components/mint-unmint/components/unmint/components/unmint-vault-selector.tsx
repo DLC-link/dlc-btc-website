@@ -42,7 +42,7 @@ export function UnmintVaultSelector({
           <Text color={'accent.lightBlue.01'} fontSize={'md'} fontWeight={600}>
             Select vault to withdraw Bitcoin:
           </Text>
-          <VaultsList height={'425.5px'} isScrollable={!unmintStep[1]}>
+          <VaultsList height={'625.5px'} isScrollable={!unmintStep[1]}>
             <VaultsListGroupContainer vaults={fundedVaults} isSelectable variant={'select'} />
           </VaultsList>
         </VStack>

@@ -1,9 +1,11 @@
 import { Divider, HStack } from '@chakra-ui/react';
+import { VaultState } from 'dlc-btc-lib/models';
 
 import { VaultActionButton } from './components/vault.main-stack.action-button';
 import { VaultAssetInformationStack } from './components/vault.main-stack.asset-information-stack/vault.main-stack.asset-information-stack';
 
 interface VaultMainStackProps {
+  vaultState: VaultState;
   vaultTotalLockedValue: number;
   vaultTotalMintedValue: number;
   isVaultExpanded: boolean;
@@ -12,6 +14,7 @@ interface VaultMainStackProps {
 }
 
 export function VaultMainStack({
+  vaultState,
   vaultTotalLockedValue,
   vaultTotalMintedValue,
   isVaultExpanded,
@@ -24,14 +27,23 @@ export function VaultMainStack({
         vaultTotalLockedValue={vaultTotalLockedValue}
         vaultTotalMintedValue={vaultTotalMintedValue}
       />
-      <Divider h={'68px'} orientation={'vertical'} borderColor={'grey.01'} borderStyle={'dashed'} />
-      <HStack w={'35%'}>
-        <VaultActionButton
-          isExpanded={isVaultExpanded}
-          handleClick={() => handleButtonClick()}
-          variant={variant}
-        />
-      </HStack>
+      {!(variant === 'selected' && vaultState === VaultState.READY) && (
+        <>
+          <Divider
+            h={'68px'}
+            orientation={'vertical'}
+            borderColor={'grey.01'}
+            borderStyle={'dashed'}
+          />
+          <HStack w={'35%'}>
+            <VaultActionButton
+              isExpanded={isVaultExpanded}
+              handleClick={() => handleButtonClick()}
+              variant={variant}
+            />
+          </HStack>
+        </>
+      )}
     </HStack>
   );
 }

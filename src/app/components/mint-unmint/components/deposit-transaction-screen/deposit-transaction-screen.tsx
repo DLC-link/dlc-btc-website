@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { VStack, useToast } from '@chakra-ui/react';
@@ -41,14 +41,18 @@ export function DepositTransactionScreen({
 
   const currentVault = allVaults.find(vault => vault.uuid === mintStep[1]);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   async function handleDeposit(depositAmount: number) {
     if (!currentVault) return;
 
     try {
+      setIsSubmitting(true);
       const currentRisk = await fetchUserEthereumAddressRiskLevel();
       if (currentRisk === 'High') throw new Error('Risk Level is too high');
       await handleSignFundingTransaction(currentVault.uuid, depositAmount);
     } catch (error: any) {
+      setIsSubmitting(false);
       toast({
         title: 'Failed to sign Deposit Transaction',
         description: error.message,
@@ -76,10 +80,11 @@ export function DepositTransactionScreen({
 
   return (
     <VStack w={'45%'} spacing={'15px'}>
-      <Vault vault={currentVault!} />
+      <Vault vault={currentVault!} variant={'selected'} />
       <VaultTransactionForm
         vault={currentVault!}
-        type={'deposit'}
+        flow={'mint'}
+        currentStep={mintStep[0]}
         currentBitcoinPrice={bitcoinPrice}
         bitcoinWalletContextState={bitcoinWalletContextState}
         isBitcoinWalletLoading={isBitcoinWalletLoading}
@@ -88,6 +93,7 @@ export function DepositTransactionScreen({
         handleButtonClick={handleButtonClick}
         handleCancelButtonClick={handleCancel}
         depositLimit={depositLimit}
+        isSubmitting={isSubmitting}
       />
     </VStack>
   );

@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { VStack, useToast } from '@chakra-ui/react';
@@ -45,13 +45,14 @@ export function BurnTokenTransactionForm({
   const signer = useEthersSigner();
 
   const { unmintStep } = useSelector((state: RootState) => state.mintunmint);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const currentVault = allVaults.find(vault => vault.uuid === unmintStep[1]);
 
   async function handleButtonClick(withdrawAmount: number): Promise<void> {
     if (!currentVault) return;
-
     try {
+      setIsSubmitting(true);
       const currentRisk = await fetchUserEthereumAddressRiskLevel();
       if (currentRisk === 'High') throw new Error('Risk Level is too high');
       const formattedWithdrawAmount = BigInt(shiftValue(withdrawAmount));
@@ -62,20 +63,21 @@ export function BurnTokenTransactionForm({
         formattedWithdrawAmount
       );
 
-      await getAndFormatVault(currentVault.uuid, ethereumNetworkConfiguration.dlcManagerContract)
-        .then(vault => {
-          dispatch(
-            vaultActions.swapVault({
-              vaultUUID: currentVault.uuid,
-              updatedVault: vault,
-              networkID: chainId?.toString() as EthereumNetworkID,
-            })
-          );
+      const updatedVault = await getAndFormatVault(
+        currentVault.uuid,
+        ethereumNetworkConfiguration.dlcManagerContract
+      );
+      dispatch(
+        vaultActions.swapVault({
+          vaultUUID: currentVault.uuid,
+          updatedVault: updatedVault,
+          networkID: chainId?.toString() as EthereumNetworkID,
         })
-        .then(() => {
-          dispatch(mintUnmintActions.setUnmintStep([1, currentVault.uuid]));
-        });
+      );
+      dispatch(mintUnmintActions.setUnmintStep([1, currentVault.uuid]));
+      setIsSubmitting(false);
     } catch (error) {
+      setIsSubmitting(false);
       toast({
         title: 'Failed to sign Transaction',
         description: error instanceof Error ? error.message : '',
@@ -91,11 +93,12 @@ export function BurnTokenTransactionForm({
   }
 
   return (
-    <VStack w={'45%'}>
-      <Vault vault={currentVault!} />
+    <VStack w={'45%'} spacing={'15px'}>
+      <Vault vault={currentVault!} variant={'selected'} />
       <VaultTransactionForm
         vault={currentVault!}
-        type={'burn'}
+        flow={'burn'}
+        currentStep={unmintStep[0]}
         currentBitcoinPrice={bitcoinPrice}
         handleButtonClick={handleButtonClick}
         depositLimit={depositLimit}
@@ -104,6 +107,7 @@ export function BurnTokenTransactionForm({
         userEthereumAddressRiskLevel={userEthereumAddressRiskLevel}
         isUserEthereumAddressRiskLevelLoading={isUserEthereumAddressRiskLevelLoading}
         handleCancelButtonClick={handleCancel}
+        isSubmitting={isSubmitting}
       />
     </VStack>
   );

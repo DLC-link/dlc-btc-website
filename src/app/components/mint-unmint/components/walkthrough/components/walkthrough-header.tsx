@@ -14,7 +14,7 @@ export function WalkthroughHeader({
   title,
 }: WalkthroughHeaderProps): React.JSX.Element {
   return (
-    <VStack alignItems={'start'}>
+    <VStack alignItems={'start'} pb={'25px'}>
       <HStack>
         <Text color={'accent.lightBlue.01'} fontSize={'lg'}>
           Step {currentStep !== undefined && currentStep + 1}

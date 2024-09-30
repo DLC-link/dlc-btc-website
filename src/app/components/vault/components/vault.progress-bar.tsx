@@ -6,6 +6,8 @@ import { BITCOIN_BLOCK_CONFIRMATIONS } from '@shared/constants/bitcoin.constants
 interface VaultProgressBarProps {
   bitcoinTransactionConfirmations?: number;
   vaultState: VaultState;
+  vaultTotalLockedValue: number;
+  vaultTotalMintedValue: number;
 }
 
 export function VaultProgressBar({

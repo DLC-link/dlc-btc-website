@@ -1,17 +1,20 @@
 import { HStack, Text } from '@chakra-ui/react';
 
 interface TransactionFormWarningProps {
-  formType: 'deposit' | 'withdraw' | 'burn';
+  flow: 'mint' | 'burn';
+  currentStep: number;
   assetAmount: number;
   isBitcoinWalletLoading: [boolean, string];
 }
 
 export function TransactionFormTransactionInformation({
-  formType,
+  flow,
+  currentStep,
   assetAmount,
   isBitcoinWalletLoading,
 }: TransactionFormWarningProps): React.JSX.Element | false {
-  if (isBitcoinWalletLoading[0] || formType === 'burn') return false;
+  if (isBitcoinWalletLoading[0] || !(flow === 'mint' && currentStep === 1)) return false;
+
   return (
     <HStack
       p={'15px'}

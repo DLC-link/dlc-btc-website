@@ -1,9 +1,12 @@
 import { HStack, Text, VStack } from '@chakra-ui/react';
+import { Vault } from '@models/vault';
 import Decimal from 'decimal.js';
 import { getFeeAmount } from 'dlc-btc-lib/bitcoin-functions';
 
 interface TransactionFormProtocolFeeStackProps {
-  formType: 'deposit' | 'withdraw' | 'burn';
+  flow: 'mint' | 'burn';
+  vault: Vault;
+  currentStep: number;
   assetAmount?: number;
   bitcoinPrice?: number;
   protocolFeeBasisPoints?: number;
@@ -22,13 +25,20 @@ function calculateProtocolFeeInUSD(
 }
 
 export function TransactionFormProtocolFeeStack({
-  formType,
+  flow,
+  vault,
+  currentStep,
   assetAmount,
   bitcoinPrice,
   protocolFeeBasisPoints,
   isBitcoinWalletLoading,
 }: TransactionFormProtocolFeeStackProps): React.JSX.Element | false {
-  if (isBitcoinWalletLoading[0] || formType === 'burn') return false;
+  if (isBitcoinWalletLoading[0] || [0, 2].includes(currentStep)) return false;
+
+  const amount =
+    flow === 'burn' && currentStep === 1
+      ? new Decimal(vault.valueLocked).minus(vault.valueMinted).toNumber()
+      : assetAmount;
   return (
     <VStack
       alignItems={'end'}
@@ -43,11 +53,7 @@ export function TransactionFormProtocolFeeStack({
           Protocol Fee
         </Text>
         <Text color={'white.01'} fontSize={'xs'} fontWeight={800}>
-          {`${
-            assetAmount && protocolFeeBasisPoints
-              ? getFeeAmount(assetAmount, protocolFeeBasisPoints)
-              : 0
-          }
+          {`${amount && protocolFeeBasisPoints ? getFeeAmount(amount, protocolFeeBasisPoints) : 0}
           BTC`}
         </Text>{' '}
       </HStack>
