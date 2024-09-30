@@ -1,7 +1,7 @@
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
-import { Collapse, Divider, Stack, VStack } from '@chakra-ui/react';
+import { Collapse, Stack, VStack } from '@chakra-ui/react';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { VaultState } from 'dlc-btc-lib/models';
 
@@ -35,7 +35,6 @@ export function VaultDetails({
   function handleDepositClick() {
     navigate('/mint-withdraw');
     dispatch(mintUnmintActions.setMintStep([1, vaultUUID]));
-    close();
   }
 
   function handleWithdrawClick() {
@@ -45,27 +44,35 @@ export function VaultDetails({
     } else {
       dispatch(mintUnmintActions.setUnmintStep([1, vaultUUID]));
     }
-    close();
+  }
+
+  function handleResumeClick() {
+    navigate('/mint-withdraw');
+    if (vaultTotalLockedValue === vaultTotalMintedValue) {
+      dispatch(mintUnmintActions.setMintStep([2, vaultUUID]));
+    } else {
+      dispatch(mintUnmintActions.setUnmintStep([2, vaultUUID]));
+    }
   }
 
   return (
     <Stack w={'100%'} spacing={'0px'}>
       <Collapse in={isVaultExpanded} unmountOnExit animateOpacity>
         <VStack w={'100%'}>
-          <Divider w={'100%'} borderColor={'grey.01'} borderStyle={'dashed'} />
           <VStack w={'100%'} justifyContent={'space-between'}>
             <VaultTransactionStack
               vaultFundingTX={vaultFundingTX}
               vaultWithdrawDepositTX={vaultWithdrawDepositTX}
             />
-            {(vaultState !== VaultState.PENDING || variant !== 'selected') && (
-              <VaultExpandedInformationButtonGroup
-                vaultState={vaultState}
-                vaultTotalLockedValue={vaultTotalLockedValue}
-                handleDepositClick={handleDepositClick}
-                handleWithdrawClick={handleWithdrawClick}
-              />
-            )}
+            <VaultExpandedInformationButtonGroup
+              variant={variant}
+              vaultState={vaultState}
+              vaultTotalLockedValue={vaultTotalLockedValue}
+              vaultTotalMintedValue={vaultTotalMintedValue}
+              handleDepositClick={handleDepositClick}
+              handleWithdrawClick={handleWithdrawClick}
+              handleResumeClick={handleResumeClick}
+            />
           </VStack>
         </VStack>
       </Collapse>

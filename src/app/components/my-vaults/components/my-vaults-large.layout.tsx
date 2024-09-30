@@ -12,7 +12,7 @@ export function MyVaultsLargeLayout({ children }: HasChildren): React.JSX.Elemen
       bg={'background.container.01'}
       border={'1px solid'}
       borderRadius={'md'}
-      borderColor={'border.lightBlue.01'}
+      borderColor={'white.03'}
     >
       {children}
     </VStack>

@@ -1,31 +1,54 @@
-import { HStack } from '@chakra-ui/react';
+import { Divider, HStack, VStack } from '@chakra-ui/react';
 import { VaultState } from 'dlc-btc-lib/models';
 
 import { VaultExpandedInformationButton } from './components/vault.details.button-group.button';
 
 interface VaultExpandedInformationButtonGroupProps {
+  variant?: 'select' | 'selected';
   vaultState: VaultState;
   vaultTotalLockedValue: number;
+  vaultTotalMintedValue: number;
   handleDepositClick: () => void;
   handleWithdrawClick: () => void;
+  handleResumeClick: () => void;
 }
 
 export function VaultExpandedInformationButtonGroup({
+  variant,
   vaultState,
   vaultTotalLockedValue,
+  vaultTotalMintedValue,
   handleDepositClick,
   handleWithdrawClick,
-}: VaultExpandedInformationButtonGroupProps): React.JSX.Element {
-  const isButtonDisabled = vaultState === VaultState.READY || vaultTotalLockedValue === 0;
+  handleResumeClick,
+}: VaultExpandedInformationButtonGroupProps): React.JSX.Element | false {
+  if (variant === 'selected') return false;
+
+  if (vaultState === VaultState.PENDING)
+    return (
+      <HStack w={'100%'} justifyContent={'space-between'}>
+        <VaultExpandedInformationButton label={'Resume'} onClick={handleResumeClick} />
+      </HStack>
+    );
+
+  const isWithdrawButtonDisabled = vaultState === VaultState.READY || vaultTotalLockedValue === 0;
+  const isDepositButtonDisabled = vaultTotalLockedValue !== vaultTotalMintedValue;
 
   return (
-    <HStack w={'100%'} justifyContent={'space-between'}>
-      <VaultExpandedInformationButton label={'Mint dlcBTC'} onClick={handleDepositClick} />
-      <VaultExpandedInformationButton
-        label={'Withdraw BTC'}
-        isDisabled={isButtonDisabled}
-        onClick={handleWithdrawClick}
-      />
-    </HStack>
+    <VStack w={'100%'}>
+      <Divider w={'100%'} borderColor={'grey.01'} borderStyle={'dashed'} />
+      <HStack w={'100%'} justifyContent={'space-between'}>
+        <VaultExpandedInformationButton
+          label={'Mint dlcBTC'}
+          onClick={handleDepositClick}
+          isDisabled={isDepositButtonDisabled}
+        />
+        <VaultExpandedInformationButton
+          label={'Withdraw BTC'}
+          isDisabled={isWithdrawButtonDisabled}
+          onClick={handleWithdrawClick}
+        />
+      </HStack>
+    </VStack>
   );
 }

@@ -10,11 +10,11 @@ export function MintUnmintLayout({ children }: MintUnmintLayoutProps): React.JSX
     <VStack
       px={'15px'}
       w={'68.5%'}
-      h={'825px'}
+      h={'925px'}
       bg={'background.container.01'}
       border={'1px solid'}
       borderRadius={'md'}
-      borderColor={'border.lightBlue.01'}
+      borderColor={'white.03'}
       css={{
         animation: `${boxShadowAnimation} 0.5s 2 ease-in-out`,
       }}
