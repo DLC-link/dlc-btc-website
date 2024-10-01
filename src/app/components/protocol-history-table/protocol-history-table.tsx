@@ -1,4 +1,4 @@
-import { Skeleton } from '@chakra-ui/react';
+import { Skeleton, useBreakpointValue } from '@chakra-ui/react';
 import { GenericTableBody } from '@components/generic-table/components/generic-table-body';
 import { GenericTableHeader } from '@components/generic-table/components/generic-table-header';
 import { GenericTableHeaderText } from '@components/generic-table/components/generic-table-header-text';
@@ -11,9 +11,10 @@ interface ProtocolHistoryTableProps {
 
 export function ProtocolHistoryTable({ items }: ProtocolHistoryTableProps): React.JSX.Element {
   const dynamicHeight = items ? items.length * 59 + 20 : 20;
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
   return (
-    <GenericTableLayout height={`${dynamicHeight}px`} width={'50%'}>
+    <GenericTableLayout height={`${dynamicHeight}px`} width={'50%'} isMobile={isMobile}>
       <GenericTableHeader>
         <GenericTableHeaderText w={'25%'}>Order Book</GenericTableHeaderText>
         <GenericTableHeaderText w={'25%'}>Merchant</GenericTableHeaderText>
