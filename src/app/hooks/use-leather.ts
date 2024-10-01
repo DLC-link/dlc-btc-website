@@ -26,21 +26,18 @@ import { BITCOIN_NETWORK_MAP } from '@shared/constants/bitcoin.constants';
 interface UseLeatherReturnType {
   connectLeatherWallet: () => Promise<void>;
   handleFundingTransaction: (
-    dlcHandler: SoftwareWalletDLCHandler,
     vault: RawVault,
     bitcoinAmount: number,
     attestorGroupPublicKey: string,
     feeRateMultiplier: number
   ) => Promise<Transaction>;
   handleDepositTransaction: (
-    dlcHandler: SoftwareWalletDLCHandler,
     vault: RawVault,
     bitcoinAmount: number,
     attestorGroupPublicKey: string,
     feeRateMultiplier: number
   ) => Promise<Transaction>;
   handleWithdrawalTransaction: (
-    dlcHandler: SoftwareWalletDLCHandler,
     withdrawAmount: number,
     attestorGroupPublicKey: string,
     vault: RawVault,
@@ -50,7 +47,7 @@ interface UseLeatherReturnType {
 }
 
 export function useLeather(): UseLeatherReturnType {
-  const { setDLCHandler, setBitcoinWalletContextState, setBitcoinWalletType } =
+  const { setDLCHandler, setBitcoinWalletContextState, setBitcoinWalletType, dlcHandler } =
     useContext(BitcoinWalletContext);
 
   const [isLoading, setIsLoading] = useState<[boolean, string]>([false, '']);
@@ -151,13 +148,20 @@ export function useLeather(): UseLeatherReturnType {
    * @returns The Signed Funding Transaction.
    */
   async function handleFundingTransaction(
-    dlcHandler: SoftwareWalletDLCHandler,
     vault: RawVault,
     bitcoinAmount: number,
     attestorGroupPublicKey: string,
     feeRateMultiplier: number
   ): Promise<Transaction> {
     try {
+      if (!dlcHandler) {
+        throw new LeatherError('DLC Handler not initialized');
+      }
+
+      if (!(dlcHandler instanceof SoftwareWalletDLCHandler)) {
+        throw new LeatherError('DLC Handler is not Software Wallet');
+      }
+
       setIsLoading([true, 'Creating Funding Transaction']);
 
       // ==> Create Funding Transaction
@@ -190,13 +194,20 @@ export function useLeather(): UseLeatherReturnType {
    * @returns The Signed Deposit Transaction.
    */
   async function handleDepositTransaction(
-    dlcHandler: SoftwareWalletDLCHandler,
     vault: RawVault,
     bitcoinAmount: number,
     attestorGroupPublicKey: string,
     feeRateMultiplier: number
   ): Promise<Transaction> {
     try {
+      if (!dlcHandler) {
+        throw new LeatherError('DLC Handler not initialized');
+      }
+
+      if (!(dlcHandler instanceof SoftwareWalletDLCHandler)) {
+        throw new LeatherError('DLC Handler is not Software Wallet');
+      }
+
       setIsLoading([true, 'Creating Deposit Transaction']);
 
       // ==> Create Deposit Transaction
@@ -231,13 +242,20 @@ export function useLeather(): UseLeatherReturnType {
   }
 
   async function handleWithdrawalTransaction(
-    dlcHandler: SoftwareWalletDLCHandler,
     withdrawAmount: number,
     attestorGroupPublicKey: string,
     vault: RawVault,
     feeRateMultiplier: number
   ): Promise<string> {
     try {
+      if (!dlcHandler) {
+        throw new LeatherError('DLC Handler not initialized');
+      }
+
+      if (!(dlcHandler instanceof SoftwareWalletDLCHandler)) {
+        throw new LeatherError('DLC Handler is not Software Wallet');
+      }
+
       setIsLoading([true, 'Creating Withdrawal Transaction']);
 
       const withdrawalTransaction = await dlcHandler.createWithdrawPSBT(

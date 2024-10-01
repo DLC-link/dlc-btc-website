@@ -41,21 +41,18 @@ interface UseLedgerReturnType {
     paymentType: SupportedPaymentType
   ) => Promise<void>;
   handleFundingTransaction: (
-    dlcHandler: LedgerDLCHandler,
     vault: RawVault,
     bitcoinAmount: number,
     attestorGroupPublicKey: string,
     feeRateMultiplier: number
   ) => Promise<Transaction>;
   handleDepositTransaction: (
-    dlcHandler: LedgerDLCHandler,
     vault: RawVault,
     withdrawAmount: number,
     attestorGroupPublicKey: string,
     feeRateMultiplier: number
   ) => Promise<Transaction>;
   handleWithdrawalTransaction: (
-    dlcHandler: LedgerDLCHandler,
     withdrawAmount: number,
     attestorGroupPublicKey: string,
     vault: RawVault,
@@ -65,7 +62,8 @@ interface UseLedgerReturnType {
 }
 
 export function useLedger(): UseLedgerReturnType {
-  const { setBitcoinWalletContextState, setDLCHandler } = useContext(BitcoinWalletContext);
+  const { setBitcoinWalletContextState, setDLCHandler, dlcHandler } =
+    useContext(BitcoinWalletContext);
 
   const [ledgerApp, setLedgerApp] = useState<AppClient | undefined>(undefined);
   const [isLoading, setIsLoading] = useState<[boolean, string]>([false, '']);
@@ -252,13 +250,20 @@ export function useLedger(): UseLedgerReturnType {
    * @returns The Signed Funding Transaction.
    */
   async function handleFundingTransaction(
-    dlcHandler: LedgerDLCHandler,
     vault: RawVault,
     bitcoinAmount: number,
     attestorGroupPublicKey: string,
     feeRateMultiplier: number
   ): Promise<Transaction> {
     try {
+      if (!dlcHandler) {
+        throw new LedgerError('DLC Handler not initialized');
+      }
+
+      if (!(dlcHandler instanceof LedgerDLCHandler)) {
+        throw new LedgerError('DLC Handler is not Ledger Wallet');
+      }
+
       setIsLoading([true, 'Accept Multisig Wallet Policy on your Ledger Device']);
 
       // ==> Create Funding Transaction
@@ -283,13 +288,20 @@ export function useLedger(): UseLedgerReturnType {
   }
 
   async function handleDepositTransaction(
-    dlcHandler: LedgerDLCHandler,
     vault: RawVault,
     withdrawAmount: number,
     attestorGroupPublicKey: string,
     feeRateMultiplier: number
   ): Promise<Transaction> {
     try {
+      if (!dlcHandler) {
+        throw new LedgerError('DLC Handler not initialized');
+      }
+
+      if (!(dlcHandler instanceof LedgerDLCHandler)) {
+        throw new LedgerError('DLC Handler is not Ledger Wallet');
+      }
+
       setIsLoading([true, 'Accept Multisig Wallet Policy on your Ledger Device']);
 
       const depositPSBT = await dlcHandler.createDepositPSBT(
@@ -313,13 +325,20 @@ export function useLedger(): UseLedgerReturnType {
   }
 
   async function handleWithdrawalTransaction(
-    dlcHandler: LedgerDLCHandler,
     withdrawAmount: number,
     attestorGroupPublicKey: string,
     vault: RawVault,
     feeRateMultiplier: number
   ): Promise<string> {
     try {
+      if (!dlcHandler) {
+        throw new LedgerError('DLC Handler not initialized');
+      }
+
+      if (!(dlcHandler instanceof LedgerDLCHandler)) {
+        throw new LedgerError('DLC Handler is not Ledger Wallet');
+      }
+
       setIsLoading([true, 'Accept Multisig Wallet Policy on your Ledger Device']);
 
       const withdrawalPSBT = await dlcHandler.createWithdrawPSBT(
