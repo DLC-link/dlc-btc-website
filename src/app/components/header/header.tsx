@@ -48,7 +48,7 @@ export function Header(): React.JSX.Element {
           <NavigationTabs activeTab={location.pathname} handleTabClick={handleTabClick} />
         </HStack>
         <HStack>
-          <NetworkBox isMenuOpen={isNetworkMenuOpen} setIsMenuOpen={setIsNetworkMenuOpen} />
+          {/* <NetworkBox isMenuOpen={isNetworkMenuOpen} setIsMenuOpen={setIsNetworkMenuOpen} /> */}
           <Account />
         </HStack>
       </HeaderLayout>

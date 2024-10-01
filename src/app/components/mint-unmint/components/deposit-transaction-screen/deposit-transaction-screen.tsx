@@ -39,7 +39,11 @@ export function DepositTransactionScreen({
 
   const { mintStep } = useSelector((state: RootState) => state.mintunmint);
 
+  console.log('allVaultsDEPOSIT', allVaults);
+
   const currentVault = allVaults.find(vault => vault.uuid === mintStep[1]);
+
+  console.log('currentVaultDEPOSIT', currentVault);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 

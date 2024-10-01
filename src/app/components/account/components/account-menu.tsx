@@ -21,12 +21,8 @@ export function AccountMenu({
         <HStack justifyContent={'space-evenly'}>
           <Image
             p={'2.5px'}
-            src={
-              wagmiConnector.name === 'WalletConnect'
-                ? './images/logos/walletconnect.svg'
-                : wagmiConnector.icon
-            }
-            alt={wagmiConnector.name}
+            src={'./images/logos/xpr-logo.svg'}
+            alt={;'xrpl'}
             boxSize={'35px'}
           />
           <Text>{truncateAddress(address)}</Text>

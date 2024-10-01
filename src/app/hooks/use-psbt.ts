@@ -11,7 +11,7 @@ import {
   submitWithdrawDepositPSBT,
 } from 'dlc-btc-lib/attestor-request-functions';
 import { getAttestorGroupPublicKey, getRawVault } from 'dlc-btc-lib/ethereum-functions';
-import { AttestorChainID, Transaction, VaultState } from 'dlc-btc-lib/models';
+import { Transaction, VaultState } from 'dlc-btc-lib/models';
 import { useAccount } from 'wagmi';
 
 import { useLeather } from './use-leather';
@@ -149,8 +149,7 @@ export function usePSBT(): UsePSBTReturnType {
             fundingPSBT: bytesToHex(fundingTransaction.toPSBT()),
             userEthereumAddress: ethereumUserAddress,
             userBitcoinTaprootPublicKey: dlcHandler.getTaprootDerivedPublicKey(),
-            attestorChainID:
-              ethereumNetworkConfiguration.ethereumAttestorChainID as AttestorChainID,
+            attestorChainID: 'ripple-xrpl-testnet',
           });
           break;
         default:

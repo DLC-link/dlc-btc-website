@@ -1,5 +1,6 @@
 import { createContext } from 'react';
 
+import { useNFTs } from '@hooks/use-nfts';
 import { useVaults } from '@hooks/use-vaults';
 import { HasChildren } from '@models/has-children';
 import { Vault } from '@models/vault';
@@ -11,7 +12,6 @@ interface VaultContextType {
   fundedVaults: Vault[];
   closingVaults: Vault[];
   closedVaults: Vault[];
-  isLoading: boolean;
 }
 
 export const VaultContext = createContext<VaultContextType>({
@@ -21,19 +21,11 @@ export const VaultContext = createContext<VaultContextType>({
   fundedVaults: [],
   closingVaults: [],
   closedVaults: [],
-  isLoading: true,
 });
 
 export function VaultContextProvider({ children }: HasChildren): React.JSX.Element {
-  const {
-    allVaults,
-    readyVaults,
-    fundedVaults,
-    pendingVaults,
-    closingVaults,
-    closedVaults,
-    isLoading,
-  } = useVaults();
+  const { allVaults, readyVaults, fundedVaults, pendingVaults, closingVaults, closedVaults } =
+    useNFTs();
 
   return (
     <VaultContext.Provider
@@ -44,7 +36,6 @@ export function VaultContextProvider({ children }: HasChildren): React.JSX.Eleme
         fundedVaults,
         closingVaults,
         closedVaults,
-        isLoading,
       }}
     >
       {children}

@@ -3,6 +3,7 @@ import { useContext, useState } from 'react';
 import { Button, VStack, useToast } from '@chakra-ui/react';
 import { useEthersSigner } from '@functions/configuration.functions';
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
+import { RippleHandler } from 'dlc-btc-lib';
 import { setupVault } from 'dlc-btc-lib/ethereum-functions';
 
 import { SetupVaultScreenVaultGraphics } from './components/setup-vault-screen.vault-graphics';
@@ -19,7 +20,8 @@ export function SetupVaultScreen(): React.JSX.Element {
   async function handleSetup() {
     try {
       setIsSubmitting(true);
-      await setupVault(ethereumNetworkConfiguration.dlcManagerContract.connect(signer!));
+      const xrplHandler = RippleHandler.fromWhatever();
+      await xrplHandler.setupVault();
     } catch (error: any) {
       setIsSubmitting(false);
       toast({
