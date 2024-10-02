@@ -28,13 +28,14 @@ export function MerchantTableItem({
   const isMobile = useBreakpointValue({ base: true, md: false });
 
   return (
-    <VStack w={'100%'} gap={'10px'}>
+    <VStack w={'100%'} gap={isMobile ? '20px' : '10px'}>
       <Stack
         justifyContent={'space-between'}
         py={'5px'}
         w={'100%'}
         alignItems={isMobile ? 'center' : 'flex-start'}
         direction={isMobile ? 'column' : 'row'}
+        gap={isMobile ? '10px' : '0px'}
       >
         <HStack>
           <HStack w={isMobile ? 'auto' : '280px'}>

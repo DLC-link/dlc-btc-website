@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { HStack, Image, Text } from '@chakra-ui/react';
+import { HStack, Image, Text, useBreakpointValue } from '@chakra-ui/react';
 import { CustomSkeleton } from '@components/custom-skeleton/custom-skeleton';
 import { DetailedEvent } from '@models/ethereum-models';
 import { truncateAddress, unshiftValue } from 'dlc-btc-lib/utilities';
@@ -23,7 +23,7 @@ export function ProtocolHistoryTableItem(
   const ethereumNetwork = findEthereumNetworkByName(eventChain);
 
   console.log('dlcBTCAmount', dlcBTCAmount);
-
+  const isMobile = useBreakpointValue({ base: true, md: false });
   return (
     <HStack
       p={'10px'}
@@ -36,7 +36,62 @@ export function ProtocolHistoryTableItem(
       borderColor={'border.white.01'}
       justifyContent={'space-between'}
     >
-      <HStack w={'25%'}>
+      {isMobile ? (
+        <>
+          <HStack w={'50%'}>
+            <Image src={'/images/logos/dlc-btc-logo.svg'} alt={'dlcBTC Logo'} boxSize={'20px'} />
+            <Text color={'white'} fontWeight={800}>
+              {unshiftValue(dlcBTCAmount)}
+            </Text>
+          </HStack>
+          <HStack w={'50%'}>
+            <Text
+              color={'accent.lightBlue.01'}
+              fontSize={'sm'}
+              onClick={() =>
+                window.open(`${ethereumNetwork.blockExplorers?.default.url}/tx/${txHash}`, '_blank')
+              }
+              cursor={'pointer'}
+              textDecoration={'underline'}
+            >
+              {truncateAddress(txHash)}
+            </Text>
+          </HStack>
+        </>
+      ) : (
+        <>
+          <HStack w={'25%'}>
+            <Image src={'/images/logos/dlc-btc-logo.svg'} alt={'dlcBTC Logo'} boxSize={'20px'} />
+            <Text color={'white'} fontWeight={800}>
+              {unshiftValue(dlcBTCAmount)}
+            </Text>
+          </HStack>
+          <HStack w={'25%'}>
+            <Text color={'white'} fontSize={'sm'} fontWeight={800}>
+              {truncateAddress(merchant)}
+            </Text>
+          </HStack>
+          <HStack w={'25%'}>
+            <Text
+              color={'accent.lightBlue.01'}
+              fontSize={'sm'}
+              onClick={() =>
+                window.open(`${ethereumNetwork.blockExplorers?.default.url}/tx/${txHash}`, '_blank')
+              }
+              cursor={'pointer'}
+              textDecoration={'underline'}
+            >
+              {truncateAddress(txHash)}
+            </Text>
+          </HStack>
+          <HStack w={'25%'}>
+            <Text color={'white'} fontSize={'sm'}>
+              {date}
+            </Text>
+          </HStack>
+        </>
+      )}
+      {/* <HStack w={'25%'}>
         <Image src={'/images/logos/dlc-btc-logo.svg'} alt={'dlcBTC Logo'} boxSize={'20px'} />
         <Text color={'white'} fontWeight={800}>
           {unshiftValue(dlcBTCAmount)}
@@ -64,7 +119,7 @@ export function ProtocolHistoryTableItem(
         <Text color={'white'} fontSize={'sm'}>
           {date}
         </Text>
-      </HStack>
+      </HStack> */}
     </HStack>
   );
 }

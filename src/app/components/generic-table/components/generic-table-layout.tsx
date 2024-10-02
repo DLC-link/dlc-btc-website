@@ -21,7 +21,6 @@ export function GenericTableLayout({
   bg = 'background.container.01',
   isMobile = false,
 }: GenericTableLayoutProps): React.JSX.Element {
-  // const isMobile = useBreakpointValue({ base: true, md: false });
   return (
     <VStack
       w={isMobile ? '100%' : width}

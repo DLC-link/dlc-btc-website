@@ -16,10 +16,19 @@ export function ProtocolHistoryTable({ items }: ProtocolHistoryTableProps): Reac
   return (
     <GenericTableLayout height={`${dynamicHeight}px`} width={'50%'} isMobile={isMobile}>
       <GenericTableHeader>
-        <GenericTableHeaderText w={'25%'}>Order Book</GenericTableHeaderText>
-        <GenericTableHeaderText w={'25%'}>Merchant</GenericTableHeaderText>
-        <GenericTableHeaderText w={'25%'}>Transaction</GenericTableHeaderText>
-        <GenericTableHeaderText w={'25%'}>Date</GenericTableHeaderText>
+        {isMobile ? (
+          <>
+            <GenericTableHeaderText w={'50%'}>Order Book</GenericTableHeaderText>
+            <GenericTableHeaderText w={'50%'}>Transaction</GenericTableHeaderText>
+          </>
+        ) : (
+          <>
+            <GenericTableHeaderText w={'25%'}>Order Book</GenericTableHeaderText>
+            <GenericTableHeaderText w={'25%'}>Merchant</GenericTableHeaderText>
+            <GenericTableHeaderText w={'25%'}>Transaction</GenericTableHeaderText>
+            <GenericTableHeaderText w={'25%'}>Date</GenericTableHeaderText>
+          </>
+        )}
       </GenericTableHeader>
       <Skeleton isLoaded={items !== undefined} height={'50px'} w={'100%'}>
         <GenericTableBody>
