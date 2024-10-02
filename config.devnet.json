@@ -1,6 +1,6 @@
 {
   "appEnvironment": "devnet",
-  "coordinatorURL": "https://devnet.dlc.link/attestor-1",
+  "coordinatorURL": "http://localhost:8811",
   "enabledEthereumNetworkIDs": ["421614", "84532", "11155111"],
   "bitcoinNetwork": "regtest",
   "bitcoinNetworkIndex": 1,

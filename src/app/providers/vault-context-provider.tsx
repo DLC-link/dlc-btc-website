@@ -1,7 +1,6 @@
 import { createContext } from 'react';
 
 import { useNFTs } from '@hooks/use-nfts';
-import { useVaults } from '@hooks/use-vaults';
 import { HasChildren } from '@models/has-children';
 import { Vault } from '@models/vault';
 

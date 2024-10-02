@@ -13,6 +13,7 @@ export function useProofOfReserve(): UseProofOfReserveReturnType {
     queryKey: ['proofOfReserve'],
     queryFn: fetchAllProofOfReserve,
     refetchInterval: 60000,
+    enabled: false,
   });
 
   async function fetchProofOfReserve(merchantAddress?: string): Promise<number> {

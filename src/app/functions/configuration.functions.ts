@@ -1,12 +1,10 @@
-import { useMemo } from 'react';
-
 import { supportedEthereumNetworks } from 'dlc-btc-lib/constants';
 import { getEthereumContract, getProvider } from 'dlc-btc-lib/ethereum-functions';
 import { EthereumDeploymentPlan, EthereumNetwork, EthereumNetworkID } from 'dlc-btc-lib/models';
-import { Contract, providers } from 'ethers';
+import { Contract } from 'ethers';
 import { filter, fromPairs, includes, map, pipe } from 'ramda';
-import { Account, Chain, Client, HttpTransport, Transport, http } from 'viem';
-import { Config, createConfig, useConnectorClient } from 'wagmi';
+import { Chain, HttpTransport, http } from 'viem';
+import { Config, createConfig } from 'wagmi';
 import { walletConnect } from 'wagmi/connectors';
 
 import { SUPPORTED_VIEM_CHAINS } from '@shared/constants/ethereum.constants';
@@ -74,20 +72,20 @@ export function getWagmiConfiguration(ethereumNetworkIDs: EthereumNetworkID[]): 
   });
 }
 
-function clientToSigner(client: Client<Transport, Chain, Account>): providers.JsonRpcSigner {
-  const { account, chain, transport } = client;
+// function clientToSigner(client: Client<Transport, Chain, Account>): providers.JsonRpcSigner {
+//   const { account, chain, transport } = client;
 
-  const network = {
-    chainId: chain.id,
-    name: chain.name,
-    ensAddress: chain.contracts?.ensRegistry?.address,
-  };
-  return new providers.Web3Provider(transport, network).getSigner(account.address);
-}
+//   const network = {
+//     chainId: chain.id,
+//     name: chain.name,
+//     ensAddress: chain.contracts?.ensRegistry?.address,
+//   };
+//   return new providers.Web3Provider(transport, network).getSigner(account.address);
+// }
 
-export function useEthersSigner({ chainId }: { chainId?: number } = {}):
-  | providers.JsonRpcSigner
-  | undefined {
-  const { data: client } = useConnectorClient<Config>({ chainId });
-  return useMemo(() => (client ? clientToSigner(client) : undefined), [client]);
-}
+// export function useEthersSigner({ chainId }: { chainId?: number } = {}):
+//   | providers.JsonRpcSigner
+//   | undefined {
+//   const { data: client } = useConnectorClient<Config>({ chainId });
+//   return useMemo(() => (client ? clientToSigner(client) : undefined), [client]);
+// }

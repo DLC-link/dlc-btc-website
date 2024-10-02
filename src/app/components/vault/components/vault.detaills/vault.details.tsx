@@ -1,7 +1,9 @@
+import { useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 import { Collapse, Stack, VStack } from '@chakra-ui/react';
+import { VaultContext } from '@providers/vault-context-provider';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { VaultState } from 'dlc-btc-lib/models';
 
@@ -32,17 +34,20 @@ export function VaultDetails({
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const { allVaults } = useContext(VaultContext);
+  const vault = allVaults.find(vault => vault.uuid === vaultUUID);
+
   function handleDepositClick() {
     navigate('/mint-withdraw');
-    dispatch(mintUnmintActions.setMintStep([1, vaultUUID]));
+    dispatch(mintUnmintActions.setMintStep([1, vaultUUID, vault]));
   }
 
   function handleWithdrawClick() {
     navigate('/mint-withdraw');
     if (vaultTotalLockedValue === vaultTotalMintedValue) {
-      dispatch(mintUnmintActions.setUnmintStep([0, vaultUUID]));
+      dispatch(mintUnmintActions.setUnmintStep([0, vaultUUID, vault]));
     } else {
-      dispatch(mintUnmintActions.setUnmintStep([1, vaultUUID]));
+      dispatch(mintUnmintActions.setUnmintStep([1, vaultUUID, vault]));
     }
   }
 

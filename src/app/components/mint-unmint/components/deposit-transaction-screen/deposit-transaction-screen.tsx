@@ -41,7 +41,7 @@ export function DepositTransactionScreen({
 
   console.log('allVaultsDEPOSIT', allVaults);
 
-  const currentVault = allVaults.find(vault => vault.uuid === mintStep[1]);
+  const currentVault = mintStep[2];
 
   console.log('currentVaultDEPOSIT', currentVault);
 

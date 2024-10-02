@@ -19,6 +19,8 @@ export function Header(): React.JSX.Element {
   const [showBanner, setShowBanner] = useState<boolean>(false);
   const [isNetworkMenuOpen, setIsNetworkMenuOpen] = useState<boolean>(false);
 
+  console.log('isNetworkMenuOpen', isNetworkMenuOpen);
+
   const handleTabClick = (route: string) => {
     navigate(route);
   };
@@ -48,7 +50,9 @@ export function Header(): React.JSX.Element {
           <NavigationTabs activeTab={location.pathname} handleTabClick={handleTabClick} />
         </HStack>
         <HStack>
-          {/* <NetworkBox isMenuOpen={isNetworkMenuOpen} setIsMenuOpen={setIsNetworkMenuOpen} /> */}
+          {(0 + 1 === 2) === true && (
+            <NetworkBox isMenuOpen={isNetworkMenuOpen} setIsMenuOpen={setIsNetworkMenuOpen} />
+          )}
           <Account />
         </HStack>
       </HeaderLayout>

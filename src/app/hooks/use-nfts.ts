@@ -4,7 +4,9 @@ import { useDispatch } from 'react-redux';
 import { formatVault } from '@functions/vault.functions';
 import { Vault } from '@models/vault';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
+import { modalActions } from '@store/slices/modal/modal.actions';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import Decimal from 'decimal.js';
 import { RippleHandler } from 'dlc-btc-lib';
 import { VaultState } from 'dlc-btc-lib/models';
 import { isEmpty } from 'ramda';
@@ -22,59 +24,115 @@ export function useNFTs(): useNFTsReturnType {
   const queryClient = useQueryClient();
   const dispatch = useDispatch();
   const [dispatchTuple, setDispatchTuple] = useState<
-    [string, 'deposit' | 'burn' | 'depositPending' | 'withdrawPending']
+    [
+      string,
+      (
+        | 'deposit'
+        | 'withdraw'
+        | 'depositPending'
+        | 'withdrawPending'
+        | 'depositSuccess'
+        | 'withdrawSuccess'
+      ),
+      number?,
+    ]
   >(['', 'deposit']);
 
   async function fetchXRPLVaults(): Promise<Vault[]> {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const xrplHandler = RippleHandler.fromWhatever();
-    const xrplNFTs = await xrplHandler.getContractVaults();
+    console.log('xrplHandler', xrplHandler);
+    console.log('Fetching XRPL Vaults');
+    let xrplRawVaults: any[] = [];
+    try {
+      xrplRawVaults = await xrplHandler.getContractVaults();
+    } catch (error) {
+      console.error('Error fetching XRPL Vaults', error);
+      return [];
+    }
+    console.log('xrpl vaults', xrplRawVaults);
+
     const previousVaults: Vault[] | undefined = queryClient.getQueryData(['xrpl-vaults']);
 
-    const xrplVaults = xrplNFTs.map(vault => {
+    const xrplVaults = xrplRawVaults.map(vault => {
       return formatVault(vault);
     });
 
-    // Update the xrplVaults state first
-    queryClient.setQueryData(['xrpl-vaults'], xrplVaults);
-
-    if (previousVaults && previousVaults.length > 0) {
-      console.log('Previous vaults', previousVaults);
-      const newVaults = xrplVaults.filter((vault: Vault) => {
-        const previousVault = previousVaults.find(
-          (previousVault: Vault) => previousVault.uuid === vault.uuid
-        );
-        return !previousVault || previousVault.state !== vault.state;
+    if (previousVaults) {
+      const missingVaults = previousVaults.filter((previousVault: Vault) => {
+        return !xrplVaults.some((vault: Vault) => vault.uuid === previousVault.uuid);
       });
 
-      console.log('New vaults', newVaults);
+      if (missingVaults.length > 0) {
+        return previousVaults;
+      }
+    }
+
+    // Update the xrplVaults state first
+    console.log('Setting XRPL Vaults');
+    queryClient.setQueryData(['xrpl-vaults'], xrplVaults);
+
+    // await delay(5000);
+
+    if (previousVaults && previousVaults.length > 0) {
+      const newVaults = xrplVaults.filter((vault: Vault) => {
+        return !previousVaults.some(
+          (previousVault: Vault) =>
+            previousVault.uuid === vault.uuid &&
+            previousVault.state === vault.state &&
+            previousVault.valueLocked === vault.valueLocked &&
+            previousVault.valueMinted === vault.valueMinted
+        );
+      });
+      console.log('New XRPL Vaults', newVaults);
 
       newVaults.forEach((vault: Vault) => {
-        console.log('checking new vault');
         const previousVault = previousVaults.find(
           (previousVault: Vault) => previousVault.uuid === vault.uuid
         );
-        console.log('previous vault', previousVault);
+
         if (!previousVault) {
-          console.log('New vault', vault);
-          // Dispatch action for new vault
+          console.log('New XRPL Vault', vault);
+
           setDispatchTuple([vault.uuid, 'deposit']);
-        } else if (previousVault.state !== vault.state) {
-          if (vault.state === VaultState.PENDING) {
-            if (previousVault.valueLocked !== vault.valueMinted) {
-              setDispatchTuple([vault.uuid, 'withdrawPending']);
-            } else {
-              setDispatchTuple([vault.uuid, 'depositPending']);
-            }
-          } else if (
-            previousVault.state === VaultState.PENDING &&
-            vault.state === VaultState.FUNDED
-          ) {
-            console.log('SUCCESSFUL FUNDING');
-          } else {
-            console.log('Vault state change', vault);
-            setDispatchTuple([vault.uuid, 'deposit']);
+          return;
+        }
+
+        if (previousVault.state !== vault.state) {
+          switch (vault.state) {
+            case VaultState.FUNDED:
+              if (previousVault.valueMinted < previousVault.valueLocked) {
+                console.log('XRPL Vault Withdraw Success');
+                setDispatchTuple([
+                  vault.uuid,
+                  'withdrawSuccess',
+                  new Decimal(previousVault.valueLocked).minus(vault.valueLocked).toNumber(),
+                ]);
+              } else {
+                console.log('XRPL Vault Deposit Success');
+                setDispatchTuple([
+                  vault.uuid,
+                  'depositSuccess',
+                  new Decimal(vault.valueLocked).minus(previousVault.valueLocked).toNumber(),
+                ]);
+              }
+              break;
+            case VaultState.PENDING:
+              if (vault.valueLocked !== vault.valueMinted) {
+                console.log('XRPL Vault Withdraw Pending');
+                setDispatchTuple([vault.uuid, 'withdrawPending']);
+              } else {
+                console.log('XRPL Vault Deposit Pending');
+                setDispatchTuple([vault.uuid, 'depositPending']);
+              }
+              break;
           }
+          return;
+        }
+
+        if (previousVault.valueMinted !== vault.valueMinted) {
+          console.log('XRPL Vault Withdraw');
+          setDispatchTuple([vault.uuid, 'withdraw']);
+          return;
         }
       });
     }
@@ -92,25 +150,48 @@ export function useNFTs(): useNFTsReturnType {
   function dispatchVaultAction() {
     if (!isEmpty(dispatchTuple[0])) {
       const updatedVault = vaults.find(vault => vault.uuid === dispatchTuple[0]);
+      if (!updatedVault) {
+        throw new Error('Vault not found');
+      }
       switch (dispatchTuple[1]) {
         case 'deposit':
-          dispatch(mintUnmintActions.setMintStep([1, dispatchTuple[0]]));
+          dispatch(mintUnmintActions.setMintStep([1, dispatchTuple[0], updatedVault]));
           break;
-        case 'burn':
-          dispatch(mintUnmintActions.setUnmintStep([1, dispatchTuple[0]]));
+        case 'depositSuccess':
+          dispatch(
+            modalActions.toggleSuccessfulFlowModalVisibility({
+              vaultUUID: updatedVault.uuid,
+              vault: updatedVault,
+              flow: 'mint',
+              assetAmount: dispatchTuple[2]!,
+            })
+          );
+          dispatch(mintUnmintActions.setMintStep([0, '']));
           break;
-        case 'pending':
-          if (!updatedVault) return;
-          if (updatedVault.valueLocked !== updatedVault.valueMinted) {
-            dispatch(mintUnmintActions.setUnmintStep([2, dispatchTuple[0]]));
-          } else {
-            dispatch(mintUnmintActions.setMintStep([2, dispatchTuple[0]]));
-          }
+        case 'withdrawSuccess':
+          dispatch(
+            modalActions.toggleSuccessfulFlowModalVisibility({
+              vaultUUID: updatedVault.uuid,
+              vault: updatedVault,
+              flow: 'burn',
+              assetAmount: dispatchTuple[2]!,
+            })
+          );
+          dispatch(mintUnmintActions.setMintStep([0, '']));
+          break;
+        case 'depositPending':
+          dispatch(mintUnmintActions.setMintStep([2, updatedVault.uuid, updatedVault]));
+          break;
+        case 'withdrawPending':
+          dispatch(mintUnmintActions.setUnmintStep([2, updatedVault.uuid, updatedVault]));
+          break;
+        case 'withdraw':
+          dispatch(mintUnmintActions.setUnmintStep([1, updatedVault.uuid, updatedVault]));
           break;
       }
     }
   }
-  const { data } = useQuery({
+  useQuery({
     queryKey: ['newVault', dispatchTuple],
     queryFn: dispatchVaultAction,
   });

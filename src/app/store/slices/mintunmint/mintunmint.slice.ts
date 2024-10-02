@@ -1,14 +1,15 @@
+import { Vault } from '@models/vault';
 import { createSlice } from '@reduxjs/toolkit';
 
 interface MintUnmintState {
-  mintStep: [number, string];
-  unmintStep: [number, string];
+  mintStep: [number, string, Vault | undefined];
+  unmintStep: [number, string, Vault | undefined];
   activeTab: 0 | 1;
 }
 
 const initialMintUnmintState: MintUnmintState = {
-  mintStep: [0, ''],
-  unmintStep: [0, ''],
+  mintStep: [0, '', undefined],
+  unmintStep: [0, '', undefined],
   activeTab: 0,
 };
 
@@ -28,8 +29,8 @@ export const mintUnmintSlice = createSlice({
       state.activeTab = action.payload;
     },
     resetMintUnmintState: state => {
-      state.mintStep = [0, ''];
-      state.unmintStep = [0, ''];
+      state.mintStep = [0, '', undefined];
+      state.unmintStep = [0, '', undefined];
       state.activeTab = 0;
     },
   },

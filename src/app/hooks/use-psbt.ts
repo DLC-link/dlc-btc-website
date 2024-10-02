@@ -4,13 +4,11 @@ import { BitcoinError } from '@models/error-types';
 import { BitcoinWalletType } from '@models/wallet';
 import { bytesToHex } from '@noble/hashes/utils';
 import { BitcoinWalletContext } from '@providers/bitcoin-wallet-context-provider';
-import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
-import { LedgerDLCHandler, SoftwareWalletDLCHandler } from 'dlc-btc-lib';
+import { LedgerDLCHandler, RippleHandler, SoftwareWalletDLCHandler } from 'dlc-btc-lib';
 import {
   submitFundingPSBT,
   submitWithdrawDepositPSBT,
 } from 'dlc-btc-lib/attestor-request-functions';
-import { getAttestorGroupPublicKey, getRawVault } from 'dlc-btc-lib/ethereum-functions';
 import { Transaction, VaultState } from 'dlc-btc-lib/models';
 import { useAccount } from 'wagmi';
 
@@ -52,8 +50,6 @@ export function usePSBT(): UsePSBTReturnType {
     isLoading: isUnisatLoading,
   } = useUnisat();
 
-  const { ethereumNetworkConfiguration } = useContext(EthereumNetworkConfigurationContext);
-
   const [bitcoinDepositAmount, setBitcoinDepositAmount] = useState(0);
 
   async function handleSignFundingTransaction(
@@ -66,10 +62,11 @@ export function usePSBT(): UsePSBTReturnType {
 
       const feeRateMultiplier = import.meta.env.VITE_FEE_RATE_MULTIPLIER;
 
-      const dlcManagerContract = ethereumNetworkConfiguration.dlcManagerContract;
+      const attestorGroupPublicKey =
+        'tpubDD8dCy2CrA7VgZdyLLmJB75nxWaokiCSZsPpqkj1uWjbLtxzuBCZQBtBMHpq9GU16v5RrhRz9EfhyK8QyenS3EtL7DAeEi6EBXRiaM2Usdm';
 
-      const attestorGroupPublicKey = await getAttestorGroupPublicKey(dlcManagerContract);
-      const vault = await getRawVault(dlcManagerContract, vaultUUID);
+      const rippleHandler = RippleHandler.fromWhatever();
+      const vault = await rippleHandler.getRawVault(vaultUUID);
 
       let fundingTransaction: Transaction;
       switch (bitcoinWalletType) {
@@ -176,10 +173,10 @@ export function usePSBT(): UsePSBTReturnType {
 
       const feeRateMultiplier = import.meta.env.VITE_FEE_RATE_MULTIPLIER;
 
-      const dlcManagerContract = ethereumNetworkConfiguration.dlcManagerContract;
-
-      const attestorGroupPublicKey = await getAttestorGroupPublicKey(dlcManagerContract);
-      const vault = await getRawVault(dlcManagerContract, vaultUUID);
+      const attestorGroupPublicKey =
+        'tpubDD8dCy2CrA7VgZdyLLmJB75nxWaokiCSZsPpqkj1uWjbLtxzuBCZQBtBMHpq9GU16v5RrhRz9EfhyK8QyenS3EtL7DAeEi6EBXRiaM2Usdm';
+      const rippleHandler = RippleHandler.fromWhatever();
+      const vault = await rippleHandler.getRawVault(vaultUUID);
 
       if (!bitcoinWalletType) throw new Error('Bitcoin Wallet is not setup');
 
