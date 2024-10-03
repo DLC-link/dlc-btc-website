@@ -1,20 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-import { HamburgerIcon } from '@chakra-ui/icons';
-import { HStack, IconButton, VStack, useBreakpointValue } from '@chakra-ui/react';
-import { Account } from '@components/account/account';
-import { CompanyWebsiteButton } from '@components/company-website-button/company-website-button';
-import { HeaderLayout } from '@components/header/components/header.layout';
-import { NetworkBox } from '@components/network/network';
+import { VStack, useBreakpointValue } from '@chakra-ui/react';
 import { useAccount } from 'wagmi';
 
 import { Banner } from './components/banner';
-import { NavigationTabs } from './components/tabs';
+import DesktopHeader from './components/desktop-header';
+import MobileHeader from './components/mobile-header';
 
 export function Header(): React.JSX.Element {
   const navigate = useNavigate();
-  const location = useLocation();
   const { chain, isConnected } = useAccount();
 
   const [showBanner, setShowBanner] = useState<boolean>(false);
@@ -45,34 +40,18 @@ export function Header(): React.JSX.Element {
           }}
         />
       )}
-      <HeaderLayout>
-        <HStack
-          justifyContent={isMobile ? 'space-between' : 'flex-start'}
-          w={'100%'}
-          gap={isMobile ? '0px' : '50px'}
-        >
-          <CompanyWebsiteButton />
-          {isMobile ? (
-            <IconButton
-              aria-label="menu"
-              icon={<HamburgerIcon />}
-              onClick={() => {
-                console.log('clicked');
-              }}
-            />
-          ) : (
-            <NavigationTabs activeTab={location.pathname} handleTabClick={handleTabClick} />
-          )}
-        </HStack>
-        <HStack>
-          {!isMobile && (
-            <>
-              <NetworkBox isMenuOpen={isNetworkMenuOpen} setIsMenuOpen={setIsNetworkMenuOpen} />
-              <Account />
-            </>
-          )}
-        </HStack>
-      </HeaderLayout>
+      {isMobile ? (
+        <MobileHeader
+          isNetworkMenuOpen={isNetworkMenuOpen}
+          setIsNetworkMenuOpen={setIsNetworkMenuOpen}
+        />
+      ) : (
+        <DesktopHeader
+          isNetworkMenuOpen={isNetworkMenuOpen}
+          setIsNetworkMenuOpen={setIsNetworkMenuOpen}
+          handleTabClick={handleTabClick}
+        />
+      )}
     </VStack>
   );
 }
