@@ -12,14 +12,9 @@ import { HeaderLayout } from './header.layout';
 interface MobileHeaderProps {
   isNetworkMenuOpen: boolean;
   setIsNetworkMenuOpen: (isOpen: boolean) => void;
-  isActiveTabs: boolean;
 }
 
-const MobileHeader: React.FC<MobileHeaderProps> = ({
-  isNetworkMenuOpen,
-  setIsNetworkMenuOpen,
-  isActiveTabs,
-}) => {
+const MobileHeader: React.FC<MobileHeaderProps> = ({ isNetworkMenuOpen, setIsNetworkMenuOpen }) => {
   const navigate = useNavigate();
   return (
     <HeaderLayout>
@@ -31,22 +26,52 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
           <Menu>
             <MenuButton
               as={IconButton}
-              aria-label="Options"
+              aria-label={'Options'}
               icon={<HamburgerIcon />}
-              height={'40px'}
-              width={'40px'}
+              justifyContent={'center'}
+              p={'3px'}
+              h={'40px'}
+              w={'40px'}
+              bg={'background.content.01'}
+              border={'1.5px solid'}
+              borderColor={'border.white.01'}
+              borderRadius={'md'}
+              color={'white'}
+              fontSize={'sm'}
+              fontWeight={600}
             />
-            <MenuList>
-              <MenuItem onClick={() => navigate('/')}>Points</MenuItem>
-              <MenuItem onClick={() => navigate('/proof-of-reserve')}>Proof of Reserve</MenuItem>
-              {isActiveTabs && (
-                <>
-                  <MenuItem onClick={() => navigate('/mint-withdraw')}>
-                    Mint/Withdraw dlcBTC
-                  </MenuItem>
-                  <MenuItem onClick={() => navigate('/my-vaults')}>My Vaults</MenuItem>
-                </>
-              )}
+            <MenuList
+              p={'5px'}
+              w={'200px'}
+              bgColor={'background.container.01'}
+              border={'1.5px solid'}
+              borderColor={'border.white.01'}
+              borderRadius={'md'}
+            >
+              <MenuItem
+                justifyContent={'center'}
+                bgColor={'inherit'}
+                borderRadius={'md'}
+                color={'white'}
+                fontSize={'xs'}
+                fontWeight={400}
+                transition={'all 0.05s ease-in-out'}
+                onClick={() => navigate('/')}
+              >
+                Points
+              </MenuItem>
+              <MenuItem
+                justifyContent={'center'}
+                bgColor={'inherit'}
+                borderRadius={'md'}
+                color={'white'}
+                fontSize={'xs'}
+                fontWeight={400}
+                transition={'all 0.05s ease-in-out'}
+                onClick={() => navigate('/proof-of-reserve')}
+              >
+                Proof of Reserve
+              </MenuItem>
             </MenuList>
           </Menu>
         </HStack>

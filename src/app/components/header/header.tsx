@@ -46,7 +46,6 @@ export function Header(): React.JSX.Element {
         <MobileHeader
           isNetworkMenuOpen={isNetworkMenuOpen}
           setIsNetworkMenuOpen={setIsNetworkMenuOpen}
-          isActiveTabs={isActiveTabs}
         />
       ) : (
         <DesktopHeader
