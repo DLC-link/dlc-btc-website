@@ -22,7 +22,7 @@ export function AccountMenu({
           <Stack bg={'white.01'} borderRadius={'full'} p={'5px'}>
             <Image p={'2.5px'} src={'./images/logos/xpr-logo.svg'} alt={'xrpl'} boxSize={'25px'} />
           </Stack>
-          <Text>{truncateAddress('rNHKCxi2FNFrj9jsz3aagJ64Si8v14Knx')}</Text>
+          <Text>{truncateAddress('rfvtbrXSxLsxVWDktR4sdzjJgv8EnMKFKG')}</Text>
           <ChevronDownIcon boxSize={'35px'} color={'white'} />
         </HStack>
       </MenuButton>

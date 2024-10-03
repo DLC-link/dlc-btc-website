@@ -23,6 +23,8 @@ interface useNFTsReturnType {
 export function useNFTs(): useNFTsReturnType {
   const queryClient = useQueryClient();
   const dispatch = useDispatch();
+  const xrplHandler = RippleHandler.fromWhatever();
+
   const [dispatchTuple, setDispatchTuple] = useState<
     [
       string,
@@ -39,19 +41,21 @@ export function useNFTs(): useNFTsReturnType {
   >(['', 'deposit']);
 
   async function fetchXRPLVaults(): Promise<Vault[]> {
-    const xrplHandler = RippleHandler.fromWhatever();
     console.log('xrplHandler', xrplHandler);
     console.log('Fetching XRPL Vaults');
     let xrplRawVaults: any[] = [];
+
+    console.log('xrpl vaults', xrplRawVaults);
+
+    const previousVaults: Vault[] | undefined = queryClient.getQueryData(['xrpl-vaults']);
+
     try {
       xrplRawVaults = await xrplHandler.getContractVaults();
     } catch (error) {
       console.error('Error fetching XRPL Vaults', error);
-      return [];
+      return previousVaults ?? [];
     }
-    console.log('xrpl vaults', xrplRawVaults);
-
-    const previousVaults: Vault[] | undefined = queryClient.getQueryData(['xrpl-vaults']);
+    console.log('Previous XRPL Vaults', previousVaults);
 
     const xrplVaults = xrplRawVaults.map(vault => {
       return formatVault(vault);
@@ -68,7 +72,12 @@ export function useNFTs(): useNFTsReturnType {
     }
 
     // Update the xrplVaults state first
-    console.log('Setting XRPL Vaults');
+    console.log(
+      'Setting XRPL Vaults',
+      xrplVaults.filter(
+        vault => vault.uuid !== '0x0000000000000000000000000000000000000000000000000000000000000000'
+      )
+    );
     queryClient.setQueryData(['xrpl-vaults'], xrplVaults);
 
     // await delay(5000);
@@ -92,7 +101,8 @@ export function useNFTs(): useNFTsReturnType {
 
         if (!previousVault) {
           console.log('New XRPL Vault', vault);
-
+          if (vault.uuid === '0x0000000000000000000000000000000000000000000000000000000000000000')
+            return;
           setDispatchTuple([vault.uuid, 'deposit']);
           return;
         }
@@ -144,7 +154,7 @@ export function useNFTs(): useNFTsReturnType {
     queryKey: ['xrpl-vaults'],
     initialData: [],
     queryFn: fetchXRPLVaults,
-    refetchInterval: 10000,
+    refetchInterval: 20000,
   });
 
   function dispatchVaultAction() {
