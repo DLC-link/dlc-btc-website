@@ -1,10 +1,12 @@
 import { useContext } from 'react';
 
-import { Divider, HStack, Text } from '@chakra-ui/react';
+import { Divider, Stack, Text, useBreakpointValue } from '@chakra-ui/react';
 import { ProtocolHistoryTable } from '@components/protocol-history-table/protocol-history-table';
 import { Merchant } from '@models/merchant';
 import { bitcoin, dlcBTC } from '@models/token';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
+
+import { titleTextSize } from '@shared/utils';
 
 import { MerchantTableHeader } from './components/merchant-table/components/merchant-table-header';
 import { MerchantTableItem } from './components/merchant-table/components/merchant-table-item';
@@ -28,22 +30,44 @@ export function ProofOfReserve(): React.JSX.Element {
     }),
   ];
 
+  const isMobile = useBreakpointValue({ base: true, md: false });
+
   return (
     <ProofOfReserveLayout>
-      <Text w={'100%'} color={'white'} fontSize={'6xl'} fontWeight={500}>
+      <Text w={'100%'} color={'white'} fontSize={titleTextSize} fontWeight={500}>
         Proof of Reserve
       </Text>
 
       <TokenStatsBoardLayout>
-        <HStack w={'100%'}>
+        <Stack
+          w={'100%'}
+          alignItems={'flex-start'}
+          direction={isMobile ? 'column' : 'row'}
+          gap={isMobile ? '20px' : '0px'}
+        >
           <TokenStatsBoardTVL totalSupply={totalSupply} bitcoinPrice={bitcoinPrice} />
-          <Divider orientation={'vertical'} px={'15px'} height={'75px'} variant={'thick'} />
+          <Divider
+            orientation={isMobile ? 'horizontal' : 'vertical'}
+            px={isMobile ? '0px' : '15px'}
+            height={isMobile ? '1px' : '75px'}
+            variant={'thick'}
+          />
           <TokenStatsBoardToken token={dlcBTC} totalSupply={totalSupply} />
-          <Divider orientation={'vertical'} px={'15px'} height={'75px'} variant={'thick'} />
+          <Divider
+            orientation={isMobile ? 'horizontal' : 'vertical'}
+            px={isMobile ? '0px' : '15px'}
+            height={isMobile ? '1px' : '75px'}
+            variant={'thick'}
+          />
           <TokenStatsBoardToken token={bitcoin} totalSupply={proofOfReserveSum} />
-        </HStack>
+        </Stack>
       </TokenStatsBoardLayout>
-      <HStack w={'100%'} gap={'20px'} alignItems={'flex-start'}>
+      <Stack
+        w={'100%'}
+        alignItems={'flex-start'}
+        direction={isMobile ? 'column' : 'row'}
+        gap={isMobile ? '40px' : '20px'}
+      >
         <MerchantTableLayout>
           <MerchantTableHeader />
           {merchantProofOfReserves.map(item => (
@@ -51,7 +75,7 @@ export function ProofOfReserve(): React.JSX.Element {
           ))}
         </MerchantTableLayout>
         <ProtocolHistoryTable items={allMintBurnEvents} />
-      </HStack>
+      </Stack>
     </ProofOfReserveLayout>
   );
 }

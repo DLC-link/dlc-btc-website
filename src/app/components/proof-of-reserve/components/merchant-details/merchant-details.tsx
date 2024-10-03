@@ -2,9 +2,20 @@ import { useContext } from 'react';
 import { MdArrowBack } from 'react-icons/md';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { Divider, HStack, Icon, Image, Link, Text } from '@chakra-ui/react';
+import {
+  Divider,
+  HStack,
+  Icon,
+  Image,
+  Link,
+  Stack,
+  Text,
+  useBreakpointValue,
+} from '@chakra-ui/react';
 import { bitcoin, dlcBTC } from '@models/token';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
+
+import { titleTextSize } from '@shared/utils';
 
 import { MerchantDetailsTable } from '../merchant-table/merchant-details-table';
 import { TokenStatsBoardToken } from '../token-stats-board/components/token-stats-board-token';
@@ -20,6 +31,7 @@ export function MerchantDetails(): React.JSX.Element {
 
   const selectedMerchant = proofOfReserve?.[1].find(item => item.merchant.name === name);
   const mintBurnEvents = merchantMintBurnEvents?.find(item => item.name === name)?.mintBurnEvents;
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
   if (!name) return <Text>Error: No merchant name provided</Text>;
 
@@ -28,10 +40,10 @@ export function MerchantDetails(): React.JSX.Element {
       <Text
         w={'100%'}
         color={'white'}
-        fontSize={'5xl'}
+        fontSize={titleTextSize}
         fontWeight={600}
         pt={'50px'}
-        lineHeight={'60px'}
+        lineHeight={isMobile ? '35px' : '60px'}
       >
         {`${name}`}
         <br />
@@ -51,23 +63,43 @@ export function MerchantDetails(): React.JSX.Element {
       </Link>
 
       <TokenStatsBoardLayout width={'100%'}>
-        <HStack w={'100%'} alignItems={'center'} justifyContent={'space-evenly'}>
+        <Stack
+          w={'100%'}
+          alignItems={isMobile ? 'flex-start' : 'center'}
+          direction={isMobile ? 'column' : 'row'}
+          gap={isMobile ? '20px' : '0px'}
+        >
           <Image
             src={selectedMerchant?.merchant.logo}
             alt={'Merchant logo'}
-            boxSize={'100px'}
-            mx={'30px'}
+            width={isMobile ? '150px' : '100px'}
+            mx={isMobile ? '0px' : '30px'}
           />
-          <Divider orientation={'vertical'} px={'10px'} height={'75px'} variant={'thick'} />
+          <Divider
+            orientation={isMobile ? 'horizontal' : 'vertical'}
+            px={isMobile ? '0px' : '10px'}
+            height={isMobile ? '1px' : '75px'}
+            variant={'thick'}
+          />
           <TokenStatsBoardTVL
             totalSupply={selectedMerchant?.dlcBTCAmount}
             bitcoinPrice={bitcoinPrice}
           />
-          <Divider orientation={'vertical'} px={'10px'} height={'75px'} variant={'thick'} />
+          <Divider
+            orientation={isMobile ? 'horizontal' : 'vertical'}
+            px={isMobile ? '0px' : '10px'}
+            height={isMobile ? '1px' : '75px'}
+            variant={'thick'}
+          />
           <TokenStatsBoardToken token={dlcBTC} totalSupply={selectedMerchant?.dlcBTCAmount} />
-          <Divider orientation={'vertical'} px={'10px'} height={'75px'} variant={'thick'} />
+          <Divider
+            orientation={isMobile ? 'horizontal' : 'vertical'}
+            px={isMobile ? '0px' : '10px'}
+            height={isMobile ? '1px' : '75px'}
+            variant={'thick'}
+          />
           <TokenStatsBoardToken token={bitcoin} totalSupply={selectedMerchant?.dlcBTCAmount} />
-        </HStack>
+        </Stack>
       </TokenStatsBoardLayout>
       <MerchantDetailsTable items={mintBurnEvents} />
     </MerchantDetailsLayout>
