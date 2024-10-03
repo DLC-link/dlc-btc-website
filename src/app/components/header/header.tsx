@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { VStack, useBreakpointValue } from '@chakra-ui/react';
-import { useActiveTabs } from '@hooks/use-active-tabs';
 import { useAccount } from 'wagmi';
 
 import { Banner } from './components/banner';
@@ -15,7 +14,6 @@ export function Header(): React.JSX.Element {
 
   const [showBanner, setShowBanner] = useState<boolean>(false);
   const [isNetworkMenuOpen, setIsNetworkMenuOpen] = useState<boolean>(false);
-  const { isActiveTabs } = useActiveTabs();
 
   const handleTabClick = (route: string) => {
     navigate(route);
