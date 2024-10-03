@@ -52,7 +52,7 @@ export function MerchantTableItem({
         </HStack>
 
         <Button
-          w={'150px'}
+          w={isMobile ? '100%' : '150px'}
           variant={'merchantTableItem'}
           onClick={() => navigate(`/merchant-details/${merchant.name}`)}
         >
