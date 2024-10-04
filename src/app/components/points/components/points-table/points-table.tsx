@@ -17,9 +17,18 @@ export function PointsTable({ items }: PointsTableProps): React.JSX.Element {
   return (
     <GenericTableLayout height={`${dynamicHeight}px`} width={'50%'} isMobile={isMobile}>
       <GenericTableHeader>
-        <GenericTableHeaderText w={'25%'}>dlcBTC Used</GenericTableHeaderText>
-        <GenericTableHeaderText w={'50%'}>Points Earned</GenericTableHeaderText>
-        <GenericTableHeaderText w={'25%'}>DeFi Protocol</GenericTableHeaderText>
+        {isMobile ? (
+          <>
+            <GenericTableHeaderText w={'50%'}>DeFi Protocol</GenericTableHeaderText>
+            <GenericTableHeaderText w={'50%'}>Points Earned</GenericTableHeaderText>
+          </>
+        ) : (
+          <>
+            <GenericTableHeaderText w={'25%'}>dlcBTC Used</GenericTableHeaderText>
+            <GenericTableHeaderText w={'50%'}>Points Earned</GenericTableHeaderText>
+            <GenericTableHeaderText w={'25%'}>DeFi Protocol</GenericTableHeaderText>
+          </>
+        )}
       </GenericTableHeader>
       <Skeleton isLoaded={items !== undefined} height={'50px'} w={'100%'}>
         <GenericTableBody>
