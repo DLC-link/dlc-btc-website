@@ -11,7 +11,7 @@ export function VaultCopyButton({
   hasCopiedUUID,
 }: VaultCopyButtonProps): React.JSX.Element {
   return (
-    <HStack w={'25%'} justifyContent={'flex-end'}>
+    <HStack justifyContent={'flex-end'}>
       <Tooltip
         textAlign={'center'}
         label={hasCopiedUUID ? 'Copied' : 'Copy'}
