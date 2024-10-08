@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { LandingPage } from '@components/mint-unmint/components/landing-page/landing-page';
 // import { LandingPage } from '@components/mint-unmint/components/landing-page/landing-page';
 import { MintUnmint } from '@components/mint-unmint/mint-unmint';
 import { MyVaultsSmall } from '@components/my-vaults-small/my-vaults-small';
@@ -18,7 +19,7 @@ export function Dashboard(): React.JSX.Element {
         <MyVaultsSmall />
       </>
       {/* ) : ( */}
-      {/* <LandingPage /> */}
+      {2 + 2 === 5 && <LandingPage />}
       {/* )} */}
     </PageLayout>
   );

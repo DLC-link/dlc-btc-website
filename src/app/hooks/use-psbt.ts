@@ -1,5 +1,6 @@
 import { useContext, useState } from 'react';
 
+import { getAttestorGroupPublicKey } from '@functions/fetch.functions';
 import { BitcoinError } from '@models/error-types';
 import { BitcoinWalletType } from '@models/wallet';
 import { bytesToHex } from '@noble/hashes/utils';
@@ -10,8 +11,8 @@ import {
   submitWithdrawDepositPSBT,
 } from 'dlc-btc-lib/attestor-request-functions';
 import { Transaction, VaultState } from 'dlc-btc-lib/models';
-import { useAccount } from 'wagmi';
 
+// import { useAccount } from 'wagmi';
 import { useLeather } from './use-leather';
 import { useLedger } from './use-ledger';
 import { useUnisat } from './use-unisat';
@@ -24,7 +25,7 @@ interface UsePSBTReturnType {
 }
 
 export function usePSBT(): UsePSBTReturnType {
-  const { address: ethereumUserAddress } = useAccount();
+  // const { address: ethereumUserAddress } = useAccount();
 
   const { bitcoinWalletType, dlcHandler, resetBitcoinWalletContext } =
     useContext(BitcoinWalletContext);
@@ -58,12 +59,11 @@ export function usePSBT(): UsePSBTReturnType {
   ): Promise<void> {
     try {
       if (!dlcHandler) throw new Error('DLC Handler is not setup');
-      if (!ethereumUserAddress) throw new Error('User Address is not setup');
+      // if (!ethereumUserAddress) throw new Error('User Address is not setup');
 
       const feeRateMultiplier = import.meta.env.VITE_FEE_RATE_MULTIPLIER;
 
-      const attestorGroupPublicKey =
-        'tpubDD8dCy2CrA7VgZdyLLmJB75nxWaokiCSZsPpqkj1uWjbLtxzuBCZQBtBMHpq9GU16v5RrhRz9EfhyK8QyenS3EtL7DAeEi6EBXRiaM2Usdm';
+      const attestorGroupPublicKey = await getAttestorGroupPublicKey();
 
       const xrplHandler = RippleHandler.fromSeed('sEdSKUhR1Hhwomo7CsUzAe2pv7nqUXT');
       const vault = await xrplHandler.getRawVault(vaultUUID);
@@ -144,7 +144,7 @@ export function usePSBT(): UsePSBTReturnType {
           await submitFundingPSBT([appConfiguration.coordinatorURL], {
             vaultUUID,
             fundingPSBT: bytesToHex(fundingTransaction.toPSBT()),
-            userEthereumAddress: ethereumUserAddress,
+            userEthereumAddress: '',
             userBitcoinTaprootPublicKey: dlcHandler.getTaprootDerivedPublicKey(),
             attestorChainID: 'ripple-xrpl-testnet',
           });
@@ -169,12 +169,11 @@ export function usePSBT(): UsePSBTReturnType {
   ): Promise<void> {
     try {
       if (!dlcHandler) throw new Error('DLC Handler is not setup');
-      if (!ethereumUserAddress) throw new Error('User Address is not setup');
+      // if (!ethereumUserAddress) throw new Error('User Address is not setup');
 
       const feeRateMultiplier = import.meta.env.VITE_FEE_RATE_MULTIPLIER;
 
-      const attestorGroupPublicKey =
-        'tpubDD8dCy2CrA7VgZdyLLmJB75nxWaokiCSZsPpqkj1uWjbLtxzuBCZQBtBMHpq9GU16v5RrhRz9EfhyK8QyenS3EtL7DAeEi6EBXRiaM2Usdm';
+      const attestorGroupPublicKey = await getAttestorGroupPublicKey();
       const xrplHandler = RippleHandler.fromSeed('sEdSKUhR1Hhwomo7CsUzAe2pv7nqUXT');
       const vault = await xrplHandler.getRawVault(vaultUUID);
 

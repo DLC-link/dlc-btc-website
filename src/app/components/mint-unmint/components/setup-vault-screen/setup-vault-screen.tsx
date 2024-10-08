@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { Button, VStack, useToast } from '@chakra-ui/react';
-import { RippleHandler } from 'dlc-btc-lib';
+import { setupXRPLVault } from '@functions/fetch.functions';
 
 import { SetupVaultScreenVaultGraphics } from './components/setup-vault-screen.vault-graphics';
 
@@ -14,6 +14,7 @@ export function SetupVaultScreen(): React.JSX.Element {
     try {
       setIsSubmitting(true);
       // const xrplHandler = RippleHandler.fromSeed('sEdSKUhR1Hhwomo7CsUzAe2pv7nqUXT');
+      await setupXRPLVault();
     } catch (error: any) {
       setIsSubmitting(false);
       toast({

@@ -22,8 +22,6 @@ export function ProtocolHistoryTableItem(
 
   const ethereumNetwork = findEthereumNetworkByName(eventChain);
 
-  console.log('dlcBTCAmount', dlcBTCAmount);
-
   return (
     <HStack
       p={'10px'}

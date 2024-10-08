@@ -19,8 +19,6 @@ export function Header(): React.JSX.Element {
   const [showBanner, setShowBanner] = useState<boolean>(false);
   const [isNetworkMenuOpen, setIsNetworkMenuOpen] = useState<boolean>(false);
 
-  console.log('isNetworkMenuOpen', isNetworkMenuOpen);
-
   const handleTabClick = (route: string) => {
     navigate(route);
   };

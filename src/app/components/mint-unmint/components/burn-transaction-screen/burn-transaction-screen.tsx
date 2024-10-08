@@ -21,7 +21,7 @@ interface BurnTokenTransactionFormProps {
 export function BurnTokenTransactionForm({
   isBitcoinWalletLoading,
   userEthereumAddressRiskLevel,
-  fetchUserEthereumAddressRiskLevel,
+  // fetchUserEthereumAddressRiskLevel,
   isUserEthereumAddressRiskLevelLoading,
 }: BurnTokenTransactionFormProps): React.JSX.Element {
   const toast = useToast();
@@ -40,12 +40,12 @@ export function BurnTokenTransactionForm({
     if (!currentVault) return;
     try {
       setIsSubmitting(true);
-      const currentRisk = await fetchUserEthereumAddressRiskLevel();
-      if (currentRisk === 'High') throw new Error('Risk Level is too high');
+      // const currentRisk = await fetchUserEthereumAddressRiskLevel();
+      // if (currentRisk === 'High') throw new Error('Risk Level is too high');
       const formattedWithdrawAmount = BigInt(shiftValue(withdrawAmount));
 
       const xrplHandler = RippleHandler.fromSeed('sEdSKUhR1Hhwomo7CsUzAe2pv7nqUXT');
-      await xrplHandler.createCheck(formattedWithdrawAmount.toString(), currentVault.uuid);
+      await xrplHandler.createCheck(formattedWithdrawAmount.toString(), currentVault.uuid.slice(2));
 
       // const updatedVault = await getAndFormatVault(
       //   currentVault.uuid,

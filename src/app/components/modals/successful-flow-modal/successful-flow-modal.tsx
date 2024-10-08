@@ -24,13 +24,11 @@ function getModalText(flow: 'mint' | 'burn', assetAmount?: number): string {
 export function SuccessfulFlowModal({
   isOpen,
   handleClose,
-  vaultUUID,
+  // vaultUUID,
   vault,
   flow,
   assetAmount,
 }: SuccessfulFlowModalProps): React.JSX.Element {
-  console.log('vaultUUID', vaultUUID);
-
   return (
     <ModalVaultLayout title={'Success!'} isOpen={isOpen} onClose={() => handleClose()}>
       <VStack w={'100%'} spacing={'25px'}>

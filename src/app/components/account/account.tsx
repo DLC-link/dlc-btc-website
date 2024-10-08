@@ -1,20 +1,20 @@
 import { useDispatch } from 'react-redux';
 
-import { Button, HStack } from '@chakra-ui/react';
+import { HStack } from '@chakra-ui/react';
 import { AccountMenu } from '@components/account/components/account-menu';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
-import { modalActions } from '@store/slices/modal/modal.actions';
+// import { modalActions } from '@store/slices/modal/modal.actions';
 import { useAccount, useDisconnect } from 'wagmi';
 
 export function Account(): React.JSX.Element {
   const dispatch = useDispatch();
 
-  const { address, connector, isConnected } = useAccount();
+  const { address, connector } = useAccount();
   const { disconnect } = useDisconnect();
 
-  function onConnectWalletClick(): void {
-    dispatch(modalActions.toggleSelectWalletModalVisibility());
-  }
+  // function onConnectWalletClick(): void {
+  //   dispatch(modalActions.toggleSelectWalletModalVisibility());
+  // }
 
   function onDisconnectWalletClick(): void {
     disconnect();

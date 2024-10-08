@@ -1,6 +1,6 @@
 {
   "appEnvironment": "devnet",
-  "coordinatorURL": "http://localhost:8811",
+  "coordinatorURL": "https://devnet-ripple.dlc.link/attestor-1",
   "enabledEthereumNetworkIDs": ["421614", "84532", "11155111"],
   "bitcoinNetwork": "regtest",
   "bitcoinNetworkIndex": 1,

@@ -9,7 +9,6 @@ import {
   BitcoinWalletContextState,
 } from '@providers/bitcoin-wallet-context-provider';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
-import { VaultContext } from '@providers/vault-context-provider';
 import { RootState } from '@store/index';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { modalActions } from '@store/slices/modal/modal.actions';
@@ -26,7 +25,7 @@ export function DepositTransactionScreen({
   handleSignFundingTransaction,
   isBitcoinWalletLoading,
   userEthereumAddressRiskLevel,
-  fetchUserEthereumAddressRiskLevel,
+  // fetchUserEthereumAddressRiskLevel,
   isUserEthereumAddressRiskLevelLoading,
 }: DepositTransactionScreenProps): React.JSX.Element {
   const toast = useToast();
@@ -35,15 +34,10 @@ export function DepositTransactionScreen({
   const { bitcoinWalletContextState, resetBitcoinWalletContext } = useContext(BitcoinWalletContext);
 
   const { bitcoinPrice, depositLimit } = useContext(ProofOfReserveContext);
-  const { allVaults } = useContext(VaultContext);
 
   const { mintStep } = useSelector((state: RootState) => state.mintunmint);
 
-  console.log('allVaultsDEPOSIT', allVaults);
-
   const currentVault = mintStep[2];
-
-  console.log('currentVaultDEPOSIT', currentVault);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -52,8 +46,8 @@ export function DepositTransactionScreen({
 
     try {
       setIsSubmitting(true);
-      const currentRisk = await fetchUserEthereumAddressRiskLevel();
-      if (currentRisk === 'High') throw new Error('Risk Level is too high');
+      // const currentRisk = await fetchUserEthereumAddressRiskLevel();
+      // if (currentRisk === 'High') throw new Error('Risk Level is too high');
       await handleSignFundingTransaction(currentVault.uuid, depositAmount);
     } catch (error: any) {
       setIsSubmitting(false);

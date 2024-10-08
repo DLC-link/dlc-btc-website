@@ -44,12 +44,12 @@ export function TransactionFormSubmitButtonGroup({
   flow,
   formAPI,
   currentStep,
-  userEthereumAddressRiskLevel,
+  // userEthereumAddressRiskLevel,
   bitcoinWalletContextState,
   handleCancelButtonClick,
   isSubmitting,
 }: TransactionFormSubmitButtonGroupProps): React.JSX.Element {
-  console.log('userEthereumAddressRiskLevel', userEthereumAddressRiskLevel);
+  // console.log('userEthereumAddressRiskLevel', userEthereumAddressRiskLevel);
   const formProperties = getFormProperties(flow, currentStep);
   return (
     <VStack w={'100%'} spacing={'15px'}>

@@ -1,9 +1,7 @@
 import { useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { useQuery } from '@tanstack/react-query';
-import { isUserWhitelisted, isWhitelistingEnabled } from 'dlc-btc-lib/ethereum-functions';
 import { useAccount } from 'wagmi';
 
 interface UseActiveTabsReturnType {
@@ -11,11 +9,9 @@ interface UseActiveTabsReturnType {
 }
 
 export function useActiveTabs(): UseActiveTabsReturnType {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const { chain, address } = useAccount();
-  const { isEthereumNetworkConfigurationLoading, ethereumNetworkConfiguration } = useContext(
-    EthereumNetworkConfigurationContext
-  );
+  const { isEthereumNetworkConfigurationLoading } = useContext(EthereumNetworkConfigurationContext);
 
   async function shouldActivateTabs(): Promise<boolean> {
     // if (!address || !chain) {
