@@ -1,15 +1,16 @@
-import { useMemo, useState } from 'react';
+import { useContext, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { formatVault } from '@functions/vault.functions';
 import { Vault } from '@models/vault';
+import { NetworkConfigurationContext } from '@providers/network-configuration.provider';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { modalActions } from '@store/slices/modal/modal.actions';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Decimal from 'decimal.js';
 import { RippleHandler } from 'dlc-btc-lib';
 import { VaultState } from 'dlc-btc-lib/models';
-import { isEmpty } from 'ramda';
+import { isEmpty, set } from 'ramda';
 
 interface useNFTsReturnType {
   allVaults: Vault[];
@@ -18,12 +19,16 @@ interface useNFTsReturnType {
   fundedVaults: Vault[];
   closingVaults: Vault[];
   closedVaults: Vault[];
+  isLoading: boolean;
 }
 
 export function useNFTs(): useNFTsReturnType {
   const queryClient = useQueryClient();
   const dispatch = useDispatch();
-  const xrplHandler = RippleHandler.fromWhatever();
+  const [isLoading, setIsLoading] = useState(true);
+
+  const { networkType } = useContext(NetworkConfigurationContext);
+  const xrplHandler = RippleHandler.fromSeed('sEdSKUhR1Hhwomo7CsUzAe2pv7nqUXT');
 
   const [dispatchTuple, setDispatchTuple] = useState<
     [
@@ -41,6 +46,7 @@ export function useNFTs(): useNFTsReturnType {
   >(['', 'deposit']);
 
   async function fetchXRPLVaults(): Promise<Vault[]> {
+    setIsLoading(true);
     console.log('xrplHandler', xrplHandler);
     console.log('Fetching XRPL Vaults');
     let xrplRawVaults: any[] = [];
@@ -147,6 +153,7 @@ export function useNFTs(): useNFTsReturnType {
       });
     }
 
+    setIsLoading(false);
     return xrplVaults;
   }
 
@@ -155,6 +162,7 @@ export function useNFTs(): useNFTsReturnType {
     initialData: [],
     queryFn: fetchXRPLVaults,
     refetchInterval: 20000,
+    enabled: networkType === 'xrpl',
   });
 
   function dispatchVaultAction() {
@@ -253,5 +261,6 @@ export function useNFTs(): useNFTsReturnType {
     closingVaults,
     fundedVaults,
     closedVaults,
+    isLoading,
   };
 }

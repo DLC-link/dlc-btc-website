@@ -1,7 +1,9 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
+import { NetworkConfigurationContext } from '@providers/network-configuration.provider';
+import { RippleNetworkConfigurationContext } from '@providers/ripple-network-configuration.provider';
 import { useQuery } from '@tanstack/react-query';
 import { isUserWhitelisted, isWhitelistingEnabled } from 'dlc-btc-lib/ethereum-functions';
 import { useAccount } from 'wagmi';
@@ -17,20 +19,35 @@ export function useActiveTabs(): UseActiveTabsReturnType {
     EthereumNetworkConfigurationContext
   );
 
+  const { isRippleWalletConnected, isRippleNetworkConfigurationLoading } = useContext(
+    RippleNetworkConfigurationContext
+  );
+  const { networkType } = useContext(NetworkConfigurationContext);
+
   async function shouldActivateTabs(): Promise<boolean> {
-    if (!address || !chain) {
+    console.log('networkType', networkType);
+    if (networkType === 'evm') {
+      if (!address || !chain) {
+        navigate('/');
+        return false;
+      }
+      const dlcManagerContract = ethereumNetworkConfiguration.dlcManagerContract;
+      if (!(await isWhitelistingEnabled(dlcManagerContract))) return true;
+      return await isUserWhitelisted(dlcManagerContract, address);
+    } else {
+      console.log('isRippleWalletConnected', isRippleWalletConnected);
       navigate('/');
-      return false;
+      return isRippleWalletConnected;
     }
-    const dlcManagerContract = ethereumNetworkConfiguration.dlcManagerContract;
-    if (!(await isWhitelistingEnabled(dlcManagerContract))) return true;
-    return await isUserWhitelisted(dlcManagerContract, address);
   }
 
   const { data: isActiveTabs } = useQuery({
-    queryKey: ['activeTabs', chain, address],
+    queryKey: ['activeTabs', chain, address, networkType, isRippleWalletConnected],
     queryFn: shouldActivateTabs,
-    enabled: !isEthereumNetworkConfigurationLoading,
+    enabled:
+      networkType === 'evm'
+        ? !isEthereumNetworkConfigurationLoading
+        : !isRippleNetworkConfigurationLoading,
   });
 
   return {

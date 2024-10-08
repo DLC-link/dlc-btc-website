@@ -65,7 +65,7 @@ export function usePSBT(): UsePSBTReturnType {
       const attestorGroupPublicKey =
         'tpubDD8dCy2CrA7VgZdyLLmJB75nxWaokiCSZsPpqkj1uWjbLtxzuBCZQBtBMHpq9GU16v5RrhRz9EfhyK8QyenS3EtL7DAeEi6EBXRiaM2Usdm';
 
-      const rippleHandler = RippleHandler.fromWhatever();
+      const rippleHandler = RippleHandler.fromSeed('sEdSKUhR1Hhwomo7CsUzAe2pv7nqUXT');
       const vault = await rippleHandler.getRawVault(vaultUUID);
 
       let fundingTransaction: Transaction;
@@ -175,7 +175,7 @@ export function usePSBT(): UsePSBTReturnType {
 
       const attestorGroupPublicKey =
         'tpubDD8dCy2CrA7VgZdyLLmJB75nxWaokiCSZsPpqkj1uWjbLtxzuBCZQBtBMHpq9GU16v5RrhRz9EfhyK8QyenS3EtL7DAeEi6EBXRiaM2Usdm';
-      const rippleHandler = RippleHandler.fromWhatever();
+      const rippleHandler = RippleHandler.fromSeed('sEdSKUhR1Hhwomo7CsUzAe2pv7nqUXT');
       const vault = await rippleHandler.getRawVault(vaultUUID);
 
       if (!bitcoinWalletType) throw new Error('Bitcoin Wallet is not setup');

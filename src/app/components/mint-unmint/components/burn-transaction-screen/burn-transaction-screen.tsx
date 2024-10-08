@@ -44,7 +44,7 @@ export function BurnTokenTransactionForm({
       if (currentRisk === 'High') throw new Error('Risk Level is too high');
       const formattedWithdrawAmount = BigInt(shiftValue(withdrawAmount));
 
-      const xrplHandler = RippleHandler.fromWhatever();
+      const xrplHandler = RippleHandler.fromSeed('sEdSKUhR1Hhwomo7CsUzAe2pv7nqUXT');
       await xrplHandler.createCheck(formattedWithdrawAmount.toString(), currentVault.uuid);
 
       // const updatedVault = await getAndFormatVault(

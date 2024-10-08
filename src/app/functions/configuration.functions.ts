@@ -1,3 +1,4 @@
+import { RippleNetwork, RippleNetworkID } from '@models/ripple.models';
 import { supportedEthereumNetworks } from 'dlc-btc-lib/constants';
 import { getEthereumContract, getProvider } from 'dlc-btc-lib/ethereum-functions';
 import { EthereumDeploymentPlan, EthereumNetwork, EthereumNetworkID } from 'dlc-btc-lib/models';
@@ -8,6 +9,7 @@ import { Config, createConfig } from 'wagmi';
 import { walletConnect } from 'wagmi/connectors';
 
 import { SUPPORTED_VIEM_CHAINS } from '@shared/constants/ethereum.constants';
+import { supportedRippleNetworks } from '@shared/constants/ripple.constants';
 
 export function getEthereumNetworkDeploymentPlans(ethereumChain: Chain): EthereumDeploymentPlan[] {
   const ethereumNetwork: EthereumNetwork | undefined = supportedEthereumNetworks.find(
@@ -39,6 +41,14 @@ export function getEthereumNetworkByID(ethereumNetworkID: EthereumNetworkID): Et
     throw new Error(`Unsupported Ethereum network: ${ethereumNetworkID}`);
   }
   return ethereumNetwork;
+}
+
+export function getRippleNetworkByID(rippleNetworkID: RippleNetworkID): RippleNetwork {
+  const rippleNetwork = supportedRippleNetworks.find(network => network.id === rippleNetworkID);
+  if (!rippleNetwork) {
+    throw new Error(`Unsupported Ripple network: ${rippleNetworkID}`);
+  }
+  return rippleNetwork;
 }
 
 export function getEthereumContractWithProvider(

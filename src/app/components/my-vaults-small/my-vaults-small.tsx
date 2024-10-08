@@ -1,8 +1,9 @@
+import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Button, Skeleton } from '@chakra-ui/react';
 import { VaultsList } from '@components/vaults-list/vaults-list';
-import { useNFTs } from '@hooks/use-nfts';
+import { VaultContext } from '@providers/vault-context-provider';
 
 import { VaultsListGroupContainer } from '../vaults-list/components/vaults-list-group-container';
 import { MyVaultsSmallLayout } from './components/my-vaults-small.layout';
@@ -11,7 +12,7 @@ export function MyVaultsSmall(): React.JSX.Element {
   const navigate = useNavigate();
 
   const { readyVaults, pendingVaults, fundedVaults, closingVaults, closedVaults, allVaults } =
-    useNFTs();
+    useContext(VaultContext);
 
   return (
     <MyVaultsSmallLayout>

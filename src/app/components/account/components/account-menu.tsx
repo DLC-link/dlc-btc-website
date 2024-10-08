@@ -1,5 +1,14 @@
 import { ChevronDownIcon } from '@chakra-ui/icons';
-import { HStack, Image, Menu, MenuButton, MenuItem, MenuList, Stack, Text } from '@chakra-ui/react';
+import {
+  HStack,
+  Image,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Text,
+  useBreakpointValue,
+} from '@chakra-ui/react';
 import { truncateAddress } from 'dlc-btc-lib/utilities';
 import { Connector } from 'wagmi';
 
@@ -14,16 +23,31 @@ export function AccountMenu({
   wagmiConnector,
   handleDisconnectWallet,
 }: AccountMenuProps): React.JSX.Element | false {
-  if (!address || !wagmiConnector) return false;
+  const isMobile = useBreakpointValue({ base: true, md: false });
+
+  if (!address) return false;
   return (
     <Menu variant={'account'}>
-      <MenuButton>
+      <MenuButton h={isMobile ? '40px' : '50px'} w={isMobile ? '120px' : '275px'}>
         <HStack justifyContent={'space-evenly'}>
-          <Stack bg={'white.01'} borderRadius={'full'} p={'5px'}>
-            <Image p={'2.5px'} src={'./images/logos/xpr-logo.svg'} alt={'xrpl'} boxSize={'25px'} />
-          </Stack>
-          <Text>{truncateAddress('rfvtbrXSxLsxVWDktR4sdzjJgv8EnMKFKG')}</Text>
-          <ChevronDownIcon boxSize={'35px'} color={'white'} />
+          {!isMobile ? (
+            <>
+              <Image
+                p={'2.5px'}
+                src={
+                  wagmiConnector.name === 'WalletConnect'
+                    ? './images/logos/walletconnect.svg'
+                    : wagmiConnector.icon
+                }
+                alt={wagmiConnector.name}
+                boxSize={'35px'}
+              />
+              <Text>{truncateAddress(address)}</Text>
+              <ChevronDownIcon boxSize={'35px'} color={'white'} />
+            </>
+          ) : (
+            <Text>{truncateAddress(address)}</Text>
+          )}
         </HStack>
       </MenuButton>
       <MenuList>
