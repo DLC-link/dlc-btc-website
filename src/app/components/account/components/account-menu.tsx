@@ -10,11 +10,11 @@ interface AccountMenuProps {
 }
 
 export function AccountMenu({
-  address,
-  wagmiConnector,
+  // address,
+  // wagmiConnector,
   handleDisconnectWallet,
 }: AccountMenuProps): React.JSX.Element | false {
-  if (!address || !wagmiConnector) return false;
+  // if (!address || !wagmiConnector) return false;
   return (
     <Menu variant={'account'}>
       <MenuButton>

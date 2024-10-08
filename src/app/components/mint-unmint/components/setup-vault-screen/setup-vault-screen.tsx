@@ -13,8 +13,7 @@ export function SetupVaultScreen(): React.JSX.Element {
   async function handleSetup() {
     try {
       setIsSubmitting(true);
-      const xrplHandler = RippleHandler.fromWhatever();
-      await xrplHandler.setupVault();
+      // const xrplHandler = RippleHandler.fromSeed('sEdSKUhR1Hhwomo7CsUzAe2pv7nqUXT');
     } catch (error: any) {
       setIsSubmitting(false);
       toast({

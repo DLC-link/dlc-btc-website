@@ -23,7 +23,7 @@ interface useNFTsReturnType {
 export function useNFTs(): useNFTsReturnType {
   const queryClient = useQueryClient();
   const dispatch = useDispatch();
-  const xrplHandler = RippleHandler.fromWhatever();
+  const xrplHandler = RippleHandler.fromSeed('sEdSKUhR1Hhwomo7CsUzAe2pv7nqUXT');
 
   const [dispatchTuple, setDispatchTuple] = useState<
     [

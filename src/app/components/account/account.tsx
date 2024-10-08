@@ -23,17 +23,17 @@ export function Account(): React.JSX.Element {
 
   return (
     <HStack w={'275px'}>
-      {isConnected ? (
-        <AccountMenu
-          address={address}
-          wagmiConnector={connector}
-          handleDisconnectWallet={() => onDisconnectWalletClick()}
-        />
-      ) : (
-        <Button variant={'account'} onClick={() => onConnectWalletClick()}>
-          Connect Wallet
-        </Button>
-      )}
+      {/* {isConnected ? ( */}
+      <AccountMenu
+        address={address}
+        wagmiConnector={connector}
+        handleDisconnectWallet={() => onDisconnectWalletClick()}
+      />
+      {/* ) : ( */}
+      {/* <Button variant={'account'} onClick={() => onConnectWalletClick()}> */}
+      {/* Connect Wallet */}
+      {/* </Button> */}
+      {/* )} */}
     </HStack>
   );
 }

@@ -18,13 +18,14 @@ export function useActiveTabs(): UseActiveTabsReturnType {
   );
 
   async function shouldActivateTabs(): Promise<boolean> {
-    if (!address || !chain) {
-      navigate('/');
-      return false;
-    }
-    const dlcManagerContract = ethereumNetworkConfiguration.dlcManagerContract;
-    if (!(await isWhitelistingEnabled(dlcManagerContract))) return true;
-    return await isUserWhitelisted(dlcManagerContract, address);
+    // if (!address || !chain) {
+    //   navigate('/');
+    //   return false;
+    // }
+    // const dlcManagerContract = ethereumNetworkConfiguration.dlcManagerContract;
+    // if (!(await isWhitelistingEnabled(dlcManagerContract))) return true;
+    // return await isUserWhitelisted(dlcManagerContract, address);
+    return true;
   }
 
   const { data: isActiveTabs } = useQuery({
