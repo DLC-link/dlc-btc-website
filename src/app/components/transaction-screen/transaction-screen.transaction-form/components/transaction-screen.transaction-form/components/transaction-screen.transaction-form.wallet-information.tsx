@@ -1,12 +1,5 @@
-import { HStack, Text, keyframes } from '@chakra-ui/react';
-
-const borderColorKeyframes = keyframes`
-  0% { border-color: rgba(255, 168, 0, 0.11); }
-  25% { border-color: rgba(255, 168, 0, 0.3); }
-  50% { border-color: rgba(255, 168, 0, 0.5); }
-  75% { border-color: rgba(255, 168, 0, 0.7); }
-  100% { border-color: rgba(255, 168, 0, 0.1); }
-`;
+import { HStack, Text } from '@chakra-ui/react';
+import { orangeBoxShadowAnimation } from '@styles/css-styles';
 
 interface TransactionScreenWalletInformationProps {
   isBitcoinWalletLoading: [boolean, string];
@@ -22,9 +15,11 @@ export function TransactionScreenWalletInformation({
       w={'100%'}
       bgColor={'background.content.01'}
       justifyContent={'space-between'}
-      border={'1px solid'}
+      border={'2px solid transparent'}
       borderRadius={'md'}
-      animation={`${borderColorKeyframes} 2s linear infinite`}
+      css={{
+        animation: `${orangeBoxShadowAnimation} 1.5s infinite ease-in-out`,
+      }}
     >
       <HStack w={'100%'}>
         <Text fontSize={'sm'} color={'white.01'}>
