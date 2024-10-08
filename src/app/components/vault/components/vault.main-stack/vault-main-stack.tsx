@@ -34,7 +34,6 @@ export function VaultMainStack({
             orientation={'vertical'}
             borderColor={'grey.01'}
             borderStyle={'dashed'}
-            borderWidth={'1px'}
           />
           <HStack w={'35%'}>
             <VaultActionButton
