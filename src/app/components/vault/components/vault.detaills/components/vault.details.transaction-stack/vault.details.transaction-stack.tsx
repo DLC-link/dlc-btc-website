@@ -15,7 +15,7 @@ export function VaultTransactionStack({
 
   return (
     <VStack w={'100%'} justifyContent={'space-between'}>
-      <Divider w={'100%'} borderColor={'grey.01'} borderStyle={'dashed'} height={'1px'} />
+      <Divider w={'100%'} borderColor={'grey.01'} borderStyle={'dashed'} />
       <VaultTransactionRow label={'Funding TX'} value={vaultFundingTX} />
       <VaultTransactionRow label={'Withdraw/Deposit TX'} value={vaultWithdrawDepositTX} />
     </VStack>
