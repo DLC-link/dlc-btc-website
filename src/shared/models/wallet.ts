@@ -2,6 +2,7 @@ export enum BitcoinWalletType {
   Leather = 'Leather',
   Ledger = 'Ledger',
   Unisat = 'Unisat',
+  Fordefi = 'Fordefi',
 }
 
 export interface BitcoinWallet {
@@ -28,4 +29,10 @@ const unisat: BitcoinWallet = {
   logo: '/images/logos/unisat-logo.svg',
 };
 
-export const bitcoinWallets: BitcoinWallet[] = [leather, ledger, unisat];
+const fordefi: BitcoinWallet = {
+  id: BitcoinWalletType.Fordefi,
+  name: 'Fordefi',
+  logo: '/images/logos/fordefi-logo.svg',
+};
+
+export const bitcoinWallets: BitcoinWallet[] = [leather, ledger, unisat, fordefi];
