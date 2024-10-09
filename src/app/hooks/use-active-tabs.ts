@@ -25,18 +25,16 @@ export function useActiveTabs(): UseActiveTabsReturnType {
   const { networkType } = useContext(NetworkConfigurationContext);
 
   async function shouldActivateTabs(): Promise<boolean> {
-    console.log('networkType', networkType);
     if (networkType === 'evm') {
       if (!address || !chain) {
-        navigate('/');
+        navigate('/mint-withdraw');
         return false;
       }
       const dlcManagerContract = ethereumNetworkConfiguration.dlcManagerContract;
       if (!(await isWhitelistingEnabled(dlcManagerContract))) return true;
       return await isUserWhitelisted(dlcManagerContract, address);
     } else {
-      console.log('isRippleWalletConnected', isRippleWalletConnected);
-      navigate('/');
+      navigate('/mint-withdraw');
       return isRippleWalletConnected;
     }
   }

@@ -10,7 +10,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Decimal from 'decimal.js';
 import { RippleHandler } from 'dlc-btc-lib';
 import { VaultState } from 'dlc-btc-lib/models';
-import { isEmpty, set } from 'ramda';
+import { isEmpty } from 'ramda';
 
 interface useNFTsReturnType {
   allVaults: Vault[];
@@ -22,6 +22,15 @@ interface useNFTsReturnType {
   isLoading: boolean;
 }
 
+enum VaultAction {
+  DEPOSIT = 'deposit',
+  WITHDRAW = 'withdraw',
+  DEPOSIT_PENDING = 'depositPending',
+  WITHDRAW_PENDING = 'withdrawPending',
+  DEPOSIT_SUCCESS = 'depositSuccess',
+  WITHDRAW_SUCCESS = 'withdrawSuccess',
+}
+
 export function useNFTs(): useNFTsReturnType {
   const queryClient = useQueryClient();
   const dispatch = useDispatch();
@@ -30,28 +39,14 @@ export function useNFTs(): useNFTsReturnType {
   const { networkType } = useContext(NetworkConfigurationContext);
   const xrplHandler = RippleHandler.fromSeed('sEdSKUhR1Hhwomo7CsUzAe2pv7nqUXT');
 
-  const [dispatchTuple, setDispatchTuple] = useState<
-    [
-      string,
-      (
-        | 'deposit'
-        | 'withdraw'
-        | 'depositPending'
-        | 'withdrawPending'
-        | 'depositSuccess'
-        | 'withdrawSuccess'
-      ),
-      number?,
-    ]
-  >(['', 'deposit']);
+  const [dispatchTuple, setDispatchTuple] = useState<[string, VaultAction, number?]>([
+    '',
+    VaultAction.DEPOSIT,
+  ]);
 
   async function fetchXRPLVaults(): Promise<Vault[]> {
     setIsLoading(true);
-    console.log('xrplHandler', xrplHandler);
-    console.log('Fetching XRPL Vaults');
     let xrplRawVaults: any[] = [];
-
-    console.log('xrpl vaults', xrplRawVaults);
 
     const previousVaults: Vault[] | undefined = queryClient.getQueryData(['xrpl-vaults']);
 
@@ -61,7 +56,6 @@ export function useNFTs(): useNFTsReturnType {
       console.error('Error fetching XRPL Vaults', error);
       return previousVaults ?? [];
     }
-    console.log('Previous XRPL Vaults', previousVaults);
 
     const xrplVaults = xrplRawVaults.map(vault => {
       return formatVault(vault);
@@ -77,16 +71,7 @@ export function useNFTs(): useNFTsReturnType {
       }
     }
 
-    // Update the xrplVaults state first
-    console.log(
-      'Setting XRPL Vaults',
-      xrplVaults.filter(
-        vault => vault.uuid !== '0x0000000000000000000000000000000000000000000000000000000000000000'
-      )
-    );
     queryClient.setQueryData(['xrpl-vaults'], xrplVaults);
-
-    // await delay(5000);
 
     if (previousVaults && previousVaults.length > 0) {
       const newVaults = xrplVaults.filter((vault: Vault) => {
@@ -98,7 +83,6 @@ export function useNFTs(): useNFTsReturnType {
             previousVault.valueMinted === vault.valueMinted
         );
       });
-      console.log('New XRPL Vaults', newVaults);
 
       newVaults.forEach((vault: Vault) => {
         const previousVault = previousVaults.find(
@@ -106,10 +90,9 @@ export function useNFTs(): useNFTsReturnType {
         );
 
         if (!previousVault) {
-          console.log('New XRPL Vault', vault);
-          if (vault.uuid === '0x0000000000000000000000000000000000000000000000000000000000000000')
-            return;
-          setDispatchTuple([vault.uuid, 'deposit']);
+          if (vault.uuid !== '0x0000000000000000000000000000000000000000000000000000000000000000') {
+            setDispatchTuple([vault.uuid, VaultAction.DEPOSIT]);
+          }
           return;
         }
 
@@ -117,28 +100,24 @@ export function useNFTs(): useNFTsReturnType {
           switch (vault.state) {
             case VaultState.FUNDED:
               if (previousVault.valueMinted < previousVault.valueLocked) {
-                console.log('XRPL Vault Withdraw Success');
                 setDispatchTuple([
                   vault.uuid,
-                  'withdrawSuccess',
+                  VaultAction.WITHDRAW_SUCCESS,
                   new Decimal(previousVault.valueLocked).minus(vault.valueLocked).toNumber(),
                 ]);
               } else {
-                console.log('XRPL Vault Deposit Success');
                 setDispatchTuple([
                   vault.uuid,
-                  'depositSuccess',
+                  VaultAction.DEPOSIT_SUCCESS,
                   new Decimal(vault.valueLocked).minus(previousVault.valueLocked).toNumber(),
                 ]);
               }
               break;
             case VaultState.PENDING:
               if (vault.valueLocked !== vault.valueMinted) {
-                console.log('XRPL Vault Withdraw Pending');
-                setDispatchTuple([vault.uuid, 'withdrawPending']);
+                setDispatchTuple([vault.uuid, VaultAction.WITHDRAW_PENDING]);
               } else {
-                console.log('XRPL Vault Deposit Pending');
-                setDispatchTuple([vault.uuid, 'depositPending']);
+                setDispatchTuple([vault.uuid, VaultAction.DEPOSIT_PENDING]);
               }
               break;
           }
@@ -146,8 +125,7 @@ export function useNFTs(): useNFTsReturnType {
         }
 
         if (previousVault.valueMinted !== vault.valueMinted) {
-          console.log('XRPL Vault Withdraw');
-          setDispatchTuple([vault.uuid, 'withdraw']);
+          setDispatchTuple([vault.uuid, VaultAction.WITHDRAW]);
           return;
         }
       });
@@ -161,7 +139,7 @@ export function useNFTs(): useNFTsReturnType {
     queryKey: ['xrpl-vaults'],
     initialData: [],
     queryFn: fetchXRPLVaults,
-    refetchInterval: 20000,
+    refetchInterval: 10000,
     enabled: networkType === 'xrpl',
   });
 

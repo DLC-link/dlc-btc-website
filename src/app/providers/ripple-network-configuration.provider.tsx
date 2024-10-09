@@ -1,5 +1,6 @@
 import React, { createContext, useEffect, useState } from 'react';
 
+import { RippleWallet } from '@components/modals/select-wallet-modal/select-wallet-modal';
 import { getRippleNetworkByID } from '@functions/configuration.functions';
 import { HasChildren } from '@models/has-children';
 import { RippleNetwork, RippleNetworkConfiguration, RippleNetworkID } from '@models/ripple.models';
@@ -52,7 +53,10 @@ interface RippleNetworkConfigurationContext {
   rippleNetworkConfiguration: RippleNetworkConfiguration;
   setRippleNetworkID: (rippleNetworkID: RippleNetworkID) => void;
   enabledRippleNetworks: RippleNetwork[];
+  rippleUserAddress: string | undefined;
   isRippleWalletConnected: boolean;
+  rippleWallet: RippleWallet | undefined;
+  setRippleWallet: (rippleWallet: RippleWallet) => void;
   setIsRippleWalletConnected: (isConnected: boolean) => void;
   isRippleNetworkConfigurationLoading: boolean;
 }
@@ -60,7 +64,10 @@ export const RippleNetworkConfigurationContext = createContext<RippleNetworkConf
   setRippleNetworkID: () => {},
   rippleNetworkConfiguration: defaultRippleNetworkConfiguration,
   enabledRippleNetworks,
+  rippleUserAddress: undefined,
+  rippleWallet: undefined,
   isRippleWalletConnected: false,
+  setRippleWallet: () => {},
   setIsRippleWalletConnected: () => {},
   isRippleNetworkConfigurationLoading: false,
 });
@@ -71,6 +78,12 @@ export function RippleNetworkConfigurationContextProvider({
   const [rippleNetworkID, setRippleNetworkID] = useState<RippleNetworkID>(defaultRippleNetwork.id);
   const [rippleNetworkConfiguration, setRippleNetworkConfiguration] =
     useState<RippleNetworkConfiguration>(defaultRippleNetworkConfiguration);
+
+  const [rippleUserAddress, setRippleUserAddress] = useState<string | undefined>(
+    'rfvtbrXSxLsxVWDktR4sdzjJgv8EnMKFKG'
+  );
+
+  const [rippleWallet, setRippleWallet] = useState<RippleWallet | undefined>(undefined);
 
   const [isRippleNetworkConfigurationLoading, setIsRippleNetworkConfigurationLoading] =
     useState(false);
@@ -94,6 +107,9 @@ export function RippleNetworkConfigurationContextProvider({
         rippleNetworkConfiguration,
         isRippleNetworkConfigurationLoading,
         enabledRippleNetworks,
+        rippleUserAddress,
+        rippleWallet,
+        setRippleWallet,
         isRippleWalletConnected,
         setIsRippleWalletConnected,
         setRippleNetworkID,

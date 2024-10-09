@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 
 import { HStack, Menu, MenuButton, MenuItem, MenuList, Text } from '@chakra-ui/react';
+import { useNetworkConnection } from '@hooks/use-connected';
 import { NetworkConfigurationContext } from '@providers/network-configuration.provider';
 import { RippleNetworkConfigurationContext } from '@providers/ripple-network-configuration.provider';
 import { useAccount, useConfig, useSwitchChain } from 'wagmi';
@@ -15,19 +16,11 @@ export function NetworksMenu({
   setIsMenuOpen,
 }: NetworksMenuProps): React.JSX.Element | null {
   const { chains } = useConfig();
-  const [isConnected, setIsConnected] = useState<boolean>(false);
-  const { address, chain, isConnected: isEthereumWalletConnected } = useAccount();
-  const { isRippleWalletConnected, setIsRippleWalletConnected } = useContext(
-    RippleNetworkConfigurationContext
-  );
+  const { isConnected } = useNetworkConnection();
+  const { chain: ethereumNetwork } = useAccount();
+
   const { networkType } = useContext(NetworkConfigurationContext);
-  useEffect(() => {
-    if (networkType === 'evm') {
-      setIsConnected(isEthereumWalletConnected);
-    } else {
-      setIsConnected(isRippleWalletConnected);
-    }
-  }, [isEthereumWalletConnected, isRippleWalletConnected, networkType]);
+
   const { switchChain } = useSwitchChain();
 
   if (!isConnected || networkType === 'xrpl') {
@@ -38,7 +31,7 @@ export function NetworksMenu({
     <Menu variant={'networkChange'} isOpen={isMenuOpen}>
       <MenuButton onClick={() => setIsMenuOpen(!isMenuOpen)}>
         <HStack justifyContent={'space-evenly'}>
-          <Text>{chain ? chain?.name : 'Not Connected'}</Text>
+          <Text>{ethereumNetwork ? ethereumNetwork?.name : 'Not Connected'}</Text>
         </HStack>
       </MenuButton>
       <MenuList>

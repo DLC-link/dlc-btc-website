@@ -4,7 +4,6 @@ import { CheckIcon } from '@chakra-ui/icons';
 import { HStack, ScaleFade, Tab, TabList, Tabs, Text, VStack } from '@chakra-ui/react';
 import { ModalComponentProps } from '@components/modals/components/modal-container';
 import { ModalLayout } from '@components/modals/components/modal.layout';
-import { SelectWalletMenu } from '@components/modals/select-wallet-modal/components/select-wallet-menu';
 import { SelectNetworkButton } from '@components/select-network-button/select-network-button';
 import { RippleNetworkID } from '@models/ripple.models';
 import { NetworkConfigurationContext } from '@providers/network-configuration.provider';
@@ -35,9 +34,12 @@ export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps):
   const { chains: ethereumNetworks } = useConfig();
 
   const { setNetworkType } = useContext(NetworkConfigurationContext);
-  const { enabledRippleNetworks, setIsRippleWalletConnected } = useContext(
-    RippleNetworkConfigurationContext
-  );
+  const {
+    enabledRippleNetworks,
+    isRippleWalletConnected,
+    setIsRippleWalletConnected,
+    setRippleWallet,
+  } = useContext(RippleNetworkConfigurationContext);
 
   const ethereumNetworkIDs = ethereumNetworks.map(
     ethereumNetwork => ethereumNetwork.id.toString() as EthereumNetworkID
@@ -57,17 +59,18 @@ export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps):
   const networkTypes = ['evm', 'xrpl'];
 
   useEffect(() => {
-    if (isSuccess) {
+    if (isSuccess || isRippleWalletConnected) {
       void handleCloseAfterSuccess();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccess]);
+  }, [isSuccess, isRippleWalletConnected]);
 
   async function handleCloseAfterSuccess() {
     await delay(1000);
     setSelectedNetworkID(undefined);
     setSelectedWagmiConnectorID(undefined);
-    if (selectedWagmiConnectorID && selectedWagmiConnectorID !== 'walletConnect') handleClose();
+    if (selectedWagmiConnectorID !== 'walletConnect') handleClose();
+    setSelectedNetworkType('evm');
   }
 
   async function handleConnectEthereumWallet(wagmiConnector: Connector) {
@@ -81,10 +84,9 @@ export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps):
   }
 
   async function handleConnectRippleWallet(id: string) {
-    console.log('handleConnectRippleWallet', id);
     setNetworkType('xrpl');
+    setRippleWallet(seedWallet);
     setIsRippleWalletConnected(true);
-    handleClose();
   }
 
   const handleChangeNetwork = (networkID: EthereumNetworkID | RippleNetworkID) => {

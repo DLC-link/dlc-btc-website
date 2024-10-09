@@ -1,3 +1,5 @@
+import { useContext } from 'react';
+
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import {
   HStack,
@@ -9,18 +11,19 @@ import {
   Text,
   useBreakpointValue,
 } from '@chakra-ui/react';
+import { RippleWallet } from '@components/modals/select-wallet-modal/select-wallet-modal';
 import { truncateAddress } from 'dlc-btc-lib/utilities';
 import { Connector } from 'wagmi';
 
 interface AccountMenuProps {
   address?: string;
-  wagmiConnector?: Connector;
+  wallet?: Connector | RippleWallet;
   handleDisconnectWallet: () => void;
 }
 
 export function AccountMenu({
   address,
-  wagmiConnector,
+  wallet,
   handleDisconnectWallet,
 }: AccountMenuProps): React.JSX.Element | false {
   const isMobile = useBreakpointValue({ base: true, md: false });
@@ -35,11 +38,11 @@ export function AccountMenu({
               <Image
                 p={'2.5px'}
                 src={
-                  wagmiConnector.name === 'WalletConnect'
+                  wallet?.name === 'WalletConnect'
                     ? './images/logos/walletconnect.svg'
-                    : wagmiConnector.icon
+                    : wallet?.icon
                 }
-                alt={wagmiConnector.name}
+                alt={wallet?.name}
                 boxSize={'35px'}
               />
               <Text>{truncateAddress(address)}</Text>

@@ -27,10 +27,6 @@ export function useVaults(): UseVaultsReturnType {
 
   const { vaults } = useSelector((state: RootState) => state.vault);
 
-  useEffect(() => {
-    console.log('stored vaults', vaults);
-  }, [vaults]);
-
   const [isLoading, setIsLoading] = useState(true);
 
   const { ethereumNetworkConfiguration, isEthereumNetworkConfigurationLoading } = useContext(
@@ -42,7 +38,6 @@ export function useVaults(): UseVaultsReturnType {
 
     await getAllAddressVaults(ethereumNetworkConfiguration.dlcManagerContract, ethereumAddress)
       .then(vaults => {
-        console.log('vaults', vaults);
         const formattedVaults = vaults.map(vault => {
           return formatVault(vault);
         });

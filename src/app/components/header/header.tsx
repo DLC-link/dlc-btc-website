@@ -6,9 +6,8 @@ import { Account } from '@components/account/account';
 import { CompanyWebsiteButton } from '@components/company-website-button/company-website-button';
 import { HeaderLayout } from '@components/header/components/header.layout';
 import { NetworkBox } from '@components/network/network';
+import { useNetworkConnection } from '@hooks/use-connected';
 import { NetworkConfigurationContext } from '@providers/network-configuration.provider';
-import { RippleNetworkConfigurationContext } from '@providers/ripple-network-configuration.provider';
-import { chain } from 'ramda';
 import { useAccount } from 'wagmi';
 
 import { Banner } from './components/banner';
@@ -17,38 +16,26 @@ import { NavigationTabs } from './components/tabs';
 export function Header(): React.JSX.Element {
   const navigate = useNavigate();
   const location = useLocation();
-  const [isConnected, setIsConnected] = useState<boolean>(false);
-  const { address, connector, isConnected: isEthereumWalletConnected } = useAccount();
-  const { isRippleWalletConnected, setIsRippleWalletConnected } = useContext(
-    RippleNetworkConfigurationContext
-  );
+  const { isConnected } = useNetworkConnection();
+
   const { networkType } = useContext(NetworkConfigurationContext);
-  useEffect(() => {
-    if (networkType === 'evm') {
-      setIsConnected(isEthereumWalletConnected);
-    } else {
-      setIsConnected(isRippleWalletConnected);
-    }
-  }, [isEthereumWalletConnected, isRippleWalletConnected, networkType]);
+  const { chain: ethereumNetwork } = useAccount();
 
   const [showBanner, setShowBanner] = useState<boolean>(false);
   const [isNetworkMenuOpen, setIsNetworkMenuOpen] = useState<boolean>(false);
-
-  console.log('isNetworkMenuOpen', isNetworkMenuOpen);
 
   const handleTabClick = (route: string) => {
     navigate(route);
   };
 
   useEffect(() => {
-    if (networkType === 'evm' && isEthereumWalletConnected && !chain) {
+    if (networkType === 'evm' && isConnected && !ethereumNetwork) {
       setShowBanner(true);
     } else {
       setShowBanner(false);
     }
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chain]);
+  }, [isConnected, ethereumNetwork]);
 
   return (
     <VStack>

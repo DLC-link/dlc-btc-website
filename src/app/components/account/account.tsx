@@ -1,41 +1,57 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { Button, HStack } from '@chakra-ui/react';
 import { AccountMenu } from '@components/account/components/account-menu';
+import { RippleWallet } from '@components/modals/select-wallet-modal/select-wallet-modal';
+import { useNetworkConnection } from '@hooks/use-connected';
 import { NetworkConfigurationContext } from '@providers/network-configuration.provider';
 import { RippleNetworkConfigurationContext } from '@providers/ripple-network-configuration.provider';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { modalActions } from '@store/slices/modal/modal.actions';
-import { useAccount, useDisconnect } from 'wagmi';
+import { Connector, useAccount, useDisconnect } from 'wagmi';
 
 export function Account(): React.JSX.Element {
   const dispatch = useDispatch();
-  const [isConnected, setIsConnected] = useState(false);
 
-  const { address, connector, isConnected: isEthereumWalletConnected } = useAccount();
-  const { isRippleWalletConnected, setIsRippleWalletConnected } = useContext(
+  const { isConnected } = useNetworkConnection();
+  const { networkType } = useContext(NetworkConfigurationContext);
+
+  const { address: ethereumUserAddress, connector: ethereumWallet } = useAccount();
+  const { disconnect: disconnectEthereumWallet } = useDisconnect();
+  const { setIsRippleWalletConnected, rippleUserAddress, rippleWallet } = useContext(
     RippleNetworkConfigurationContext
   );
-  const { networkType } = useContext(NetworkConfigurationContext);
-  useEffect(() => {
-    if (networkType === 'evm') {
-      setIsConnected(isEthereumWalletConnected);
-    } else {
-      setIsConnected(isRippleWalletConnected);
+
+  function getWalletInformation():
+    | { address: string; wallet: RippleWallet | Connector }
+    | undefined {
+    switch (networkType) {
+      case 'evm':
+        if (!ethereumUserAddress || !ethereumWallet) return undefined;
+        return { address: ethereumUserAddress, wallet: ethereumWallet };
+      case 'xrpl':
+        if (!rippleUserAddress || !rippleWallet) return undefined;
+        return { address: rippleUserAddress, wallet: rippleWallet };
+      default:
+        throw new Error('Invalid Network Type');
     }
-  }, [isEthereumWalletConnected, isRippleWalletConnected, networkType]);
-  const { disconnect } = useDisconnect();
+  }
 
   function onConnectWalletClick(): void {
     dispatch(modalActions.toggleSelectWalletModalVisibility());
   }
 
   function onDisconnectWalletClick(): void {
-    if (networkType === 'evm') {
-      disconnect();
-    } else {
-      setIsRippleWalletConnected(false);
+    switch (networkType) {
+      case 'evm':
+        disconnectEthereumWallet();
+        break;
+      case 'xrpl':
+        setIsRippleWalletConnected(false);
+        break;
+      default:
+        break;
     }
     dispatch(mintUnmintActions.resetMintUnmintState());
   }
@@ -44,8 +60,8 @@ export function Account(): React.JSX.Element {
     <HStack w={'275px'}>
       {isConnected ? (
         <AccountMenu
-          address={address}
-          wagmiConnector={connector}
+          address={getWalletInformation()?.address}
+          wallet={getWalletInformation()?.wallet}
           handleDisconnectWallet={() => onDisconnectWalletClick()}
         />
       ) : (
