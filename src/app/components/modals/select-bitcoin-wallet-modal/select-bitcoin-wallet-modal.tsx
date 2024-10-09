@@ -47,6 +47,19 @@ export function SelectBitcoinWalletModal({
           });
         }
         break;
+      case BitcoinWalletType.Fordefi:
+        try {
+          await connectUnisatWallet(true);
+        } catch (error: any) {
+          toast({
+            title: 'Failed to connect to Unisat Wallet',
+            description: error.message,
+            status: 'error',
+            duration: 9000,
+            isClosable: true,
+          });
+        }
+        break;
       case BitcoinWalletType.Ledger:
         dispatch(modalActions.toggleLedgerModalVisibility());
         break;
