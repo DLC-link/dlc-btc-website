@@ -1,5 +1,5 @@
-export async function setupXRPLVault(): Promise<string> {
-  const setupXRPLVaultEndpoint = `/.netlify/functions/setup-xrpl-vault`;
+export async function setupXRPLVault(userAddress: string): Promise<string> {
+  const setupXRPLVaultEndpoint = `/.netlify/functions/setup-xrpl-vault?userXRPLAddress=${userAddress}`;
 
   const response = await fetch(setupXRPLVaultEndpoint);
   return response.text();

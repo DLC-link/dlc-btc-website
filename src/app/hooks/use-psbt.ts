@@ -5,12 +5,13 @@ import { BitcoinError } from '@models/error-types';
 import { BitcoinWalletType } from '@models/wallet';
 import { bytesToHex } from '@noble/hashes/utils';
 import { BitcoinWalletContext } from '@providers/bitcoin-wallet-context-provider';
-import { LedgerDLCHandler, RippleHandler, SoftwareWalletDLCHandler } from 'dlc-btc-lib';
+import { LedgerDLCHandler, SoftwareWalletDLCHandler } from 'dlc-btc-lib';
 import {
   submitFundingPSBT,
   submitWithdrawDepositPSBT,
 } from 'dlc-btc-lib/attestor-request-functions';
-import { Transaction, VaultState } from 'dlc-btc-lib/models';
+import { Client, Transaction, VaultState } from 'dlc-btc-lib/models';
+import { getRippleClient, getRippleVault } from 'dlc-btc-lib/ripple-functions';
 
 // import { useAccount } from 'wagmi';
 import { useLeather } from './use-leather';
@@ -65,8 +66,10 @@ export function usePSBT(): UsePSBTReturnType {
 
       const attestorGroupPublicKey = await getAttestorGroupPublicKey();
 
-      const xrplHandler = RippleHandler.fromSeed('sEdSKUhR1Hhwomo7CsUzAe2pv7nqUXT');
-      const vault = await xrplHandler.getRawVault(vaultUUID);
+      const issuerAddress = 'ra9epzthPkNXykgfadCwu8D7mtajj8DVCP';
+      const rippleClient: Client = getRippleClient('wss://s.altnet.rippletest.net:51233');
+
+      const vault = await getRippleVault(rippleClient, issuerAddress, vaultUUID);
 
       let fundingTransaction: Transaction;
       switch (bitcoinWalletType) {
@@ -174,8 +177,10 @@ export function usePSBT(): UsePSBTReturnType {
       const feeRateMultiplier = import.meta.env.VITE_FEE_RATE_MULTIPLIER;
 
       const attestorGroupPublicKey = await getAttestorGroupPublicKey();
-      const xrplHandler = RippleHandler.fromSeed('sEdSKUhR1Hhwomo7CsUzAe2pv7nqUXT');
-      const vault = await xrplHandler.getRawVault(vaultUUID);
+      const issuerAddress = 'ra9epzthPkNXykgfadCwu8D7mtajj8DVCP';
+      const rippleClient: Client = getRippleClient('wss://s.altnet.rippletest.net:51233');
+
+      const vault = await getRippleVault(rippleClient, issuerAddress, vaultUUID);
 
       if (!bitcoinWalletType) throw new Error('Bitcoin Wallet is not setup');
 

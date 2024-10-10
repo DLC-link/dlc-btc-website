@@ -5182,10 +5182,10 @@ dir-glob@^3.0.1:
   dependencies:
     path-type "^4.0.0"
 
-dlc-btc-lib@^2.2.10:
-  version "2.2.10"
-  resolved "https://registry.yarnpkg.com/dlc-btc-lib/-/dlc-btc-lib-2.2.10.tgz#34bee9ee687c7ead3ec27498f1f80539003525a3"
-  integrity sha512-SzqnGptBUGexr5rbvc183sTY30SP0MUVX7wQAW0W5wJsuUvNgYfgboc+EC0fLxScwnm1H92mrvMWlovNu8d8iQ==
+dlc-btc-lib@2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/dlc-btc-lib/-/dlc-btc-lib-2.3.0.tgz#e65fa4a56cb21dd14fe07f3d08c25327ea1be114"
+  integrity sha512-2yL+9tm1shpHpnwxRqJvW/aXzTlD3Vrc70I82h/FgSUY94X+qLlLCV5iItIHajm/gfevCjqgwObac0fHbgZAig==
   dependencies:
     "@ledgerhq/hw-app-btc" "10.4.1"
     "@noble/hashes" "1.4.0"

@@ -7,8 +7,8 @@ import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { modalActions } from '@store/slices/modal/modal.actions';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Decimal from 'decimal.js';
-import { RippleHandler } from 'dlc-btc-lib';
-import { VaultState } from 'dlc-btc-lib/models';
+import { Client, VaultState } from 'dlc-btc-lib/models';
+import { getAllRippleVaults, getRippleClient } from 'dlc-btc-lib/ripple-functions';
 import { isEmpty } from 'ramda';
 
 interface useNFTsReturnType {
@@ -23,7 +23,7 @@ interface useNFTsReturnType {
 export function useNFTs(): useNFTsReturnType {
   const queryClient = useQueryClient();
   const dispatch = useDispatch();
-  const xrplHandler = RippleHandler.fromSeed('sEdSKUhR1Hhwomo7CsUzAe2pv7nqUXT');
+  const rippleClient: Client = getRippleClient('wss://s.altnet.rippletest.net:51233');
 
   const [dispatchTuple, setDispatchTuple] = useState<
     [
@@ -47,7 +47,9 @@ export function useNFTs(): useNFTsReturnType {
     const previousVaults: Vault[] | undefined = queryClient.getQueryData(['xrpl-vaults']);
 
     try {
-      xrplRawVaults = await xrplHandler.getContractVaults();
+      const issuerAddress = 'ra9epzthPkNXykgfadCwu8D7mtajj8DVCP';
+
+      xrplRawVaults = await getAllRippleVaults(rippleClient, issuerAddress);
     } catch (error) {
       console.error('Error fetching XRPL Vaults', error);
       return previousVaults ?? [];
