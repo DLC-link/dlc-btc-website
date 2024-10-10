@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useContext, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { formatVault } from '@functions/vault.functions';
 import { Vault } from '@models/vault';
+import { RippleWalletContext } from '@providers/ripple-user-wallet-context-provider';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { modalActions } from '@store/slices/modal/modal.actions';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -24,6 +25,8 @@ export function useNFTs(): useNFTsReturnType {
   const queryClient = useQueryClient();
   const dispatch = useDispatch();
   const rippleClient: Client = getRippleClient('wss://s.altnet.rippletest.net:51233');
+
+  const { rippleWallet, isRippleWalletInitialized } = useContext(RippleWalletContext);
 
   const [dispatchTuple, setDispatchTuple] = useState<
     [
@@ -47,9 +50,18 @@ export function useNFTs(): useNFTsReturnType {
     const previousVaults: Vault[] | undefined = queryClient.getQueryData(['xrpl-vaults']);
 
     try {
+      if (!rippleClient.isConnected()) {
+        await rippleClient.connect();
+      }
       const issuerAddress = 'ra9epzthPkNXykgfadCwu8D7mtajj8DVCP';
 
       xrplRawVaults = await getAllRippleVaults(rippleClient, issuerAddress);
+      console.log(rippleWallet?.classicAddress);
+      console.log('XRPL Vaults', xrplRawVaults);
+      xrplRawVaults = xrplRawVaults.filter(
+        vault => vault.creator === rippleWallet?.classicAddress.toLowerCase()
+      );
+      console.log('filtered XRPL Vaults', xrplRawVaults);
     } catch (error) {
       console.error('Error fetching XRPL Vaults', error);
       return previousVaults ?? [];
@@ -140,10 +152,11 @@ export function useNFTs(): useNFTsReturnType {
   }
 
   const { data: vaults } = useQuery({
-    queryKey: ['xrpl-vaults'],
+    queryKey: ['xrpl-vaults', rippleWallet?.classicAddress],
     initialData: [],
     queryFn: fetchXRPLVaults,
     refetchInterval: 10000,
+    enabled: isRippleWalletInitialized,
   });
 
   function dispatchVaultAction() {

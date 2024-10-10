@@ -1,56 +1,126 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
-import { CheckIcon } from '@chakra-ui/icons';
-import { HStack, ScaleFade, Text, VStack } from '@chakra-ui/react';
+import { Button, HStack, Input, Text, VStack } from '@chakra-ui/react';
 import { ModalComponentProps } from '@components/modals/components/modal-container';
 import { ModalLayout } from '@components/modals/components/modal.layout';
-import { SelectWalletMenu } from '@components/modals/select-wallet-modal/components/select-wallet-menu';
-import { SelectNetworkButton } from '@components/select-network-button/select-network-button';
-import { delay } from 'dlc-btc-lib/utilities';
-import { Chain } from 'viem';
-import { Connector, useConfig, useConnect } from 'wagmi';
+import { RippleWalletContext } from '@providers/ripple-user-wallet-context-provider';
+import { useForm } from '@tanstack/react-form';
+
+function validateXRPLSeed(userSeed: string): string | undefined {
+  if (userSeed.length !== 31) {
+    return 'Please enter a valid XRPL address';
+  }
+}
 
 export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps): React.JSX.Element {
-  const { connect, isPending, isSuccess, connectors } = useConnect();
-  const { chains } = useConfig();
+  // const { connect, isPending, isSuccess, connectors } = useConnect();
 
-  const [selectedEthereumNetwork, setSelectedEthereumNetwork] = useState<Chain | undefined>(
-    undefined
-  );
-  const [selectedWagmiConnectorID, setSelectedWagmiConnectorID] = useState<string | undefined>(
-    undefined
-  );
+  // const { chains } = useConfig();
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { setRippleWallet, isRippleWalletInitialized } = useContext(RippleWalletContext);
+
+  // const [selectedEthereumNetwork, setSelectedEthereumNetwork] = useState<Chain | undefined>(
+  //   undefined
+  // );
+  // const [selectedWagmiConnectorID, setSelectedWagmiConnectorID] = useState<string | undefined>(
+  //   undefined
+  // );
 
   useEffect(() => {
-    if (isSuccess) {
+    if (isRippleWalletInitialized) {
+      console.log('isRippleWalletInitialized', isRippleWalletInitialized);
       void handleCloseAfterSuccess();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccess]);
+  }, [isRippleWalletInitialized]);
 
   async function handleCloseAfterSuccess() {
-    await delay(1000);
-    setSelectedEthereumNetwork(undefined);
-    setSelectedWagmiConnectorID(undefined);
-    if (selectedWagmiConnectorID && selectedWagmiConnectorID !== 'walletConnect') handleClose();
+    handleClose();
   }
 
-  async function handleConnectWallet(wagmiConnector: Connector) {
-    setSelectedWagmiConnectorID(wagmiConnector.id);
-    connect({ chainId: selectedEthereumNetwork?.id, connector: wagmiConnector });
-    if (wagmiConnector.id === 'walletConnect') {
-      handleClose();
-    }
+  // async function handleConnectWallet(wagmiConnector: Connector) {
+  //   setSelectedWagmiConnectorID(wagmiConnector.id);
+  //   connect({ chainId: selectedEthereumNetwork?.id, connector: wagmiConnector });
+  //   if (wagmiConnector.id === 'walletConnect') {
+  //     handleClose();
+  //   }
+  // }
+
+  // const handleChangeNetwork = (ethereumNetwork: Chain) => {
+  //   setSelectedEthereumNetwork(ethereumNetwork);
+  // };
+
+  async function handleButtonClick(userSeed: string) {
+    setIsSubmitting(true);
+    console.log('setting it to true');
+    await setRippleWallet(userSeed);
+    setIsSubmitting(false);
   }
 
-  const handleChangeNetwork = (ethereumNetwork: Chain) => {
-    setSelectedEthereumNetwork(ethereumNetwork);
-  };
+  useEffect(() => {
+    console.log('isSubmitting', isSubmitting);
+  }, [isSubmitting]);
+
+  const form = useForm({
+    defaultValues: {
+      userSeed: '',
+    },
+    onSubmit: async ({ value }) => {
+      await handleButtonClick(value.userSeed);
+    },
+    validators: {
+      onChange: ({ value }) => {
+        return {
+          fields: {
+            userSeed: validateXRPLSeed(value.userSeed),
+          },
+        };
+      },
+    },
+  });
 
   return (
     <ModalLayout title="Connect Wallet" isOpen={isOpen} onClose={() => handleClose()}>
       <VStack alignItems={'start'} spacing={'25px'}>
-        {!selectedEthereumNetwork ? (
+        <Text variant={'header'}>Enter XRPL Seed</Text>
+        <form
+          onSubmit={async e => {
+            e.preventDefault();
+            e.stopPropagation();
+            await form.handleSubmit();
+          }}
+        >
+          <form.Field name={'userSeed'}>
+            {field => (
+              <HStack w={'100%'}>
+                <Input
+                  id={field.name}
+                  name={field.name}
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={e => field.handleChange(e.target.value)}
+                />
+                <form.Subscribe
+                  selector={state => [state.canSubmit]}
+                  children={([canSubmit]) => (
+                    <Button
+                      w={'25%'}
+                      variant={'navigate'}
+                      fontSize={'xs'}
+                      onClick={form.handleSubmit}
+                      isDisabled={!canSubmit}
+                    >
+                      {isSubmitting ? 'Loading' : 'Connect'}
+                    </Button>
+                  )}
+                />
+              </HStack>
+            )}
+          </form.Field>
+        </form>
+        {/* {!selectedEthereumNetwork ? (
           <Text variant={'header'}>Select Network</Text>
         ) : (
           <HStack w={'100%'} justifyContent={'space-between'}>
@@ -86,9 +156,9 @@ export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps):
                 isConnectWalletSuccess={isSuccess}
                 handleConnectWallet={handleConnectWallet}
               />
-            ))}
-          </VStack>
-        </ScaleFade>
+            ))} */}
+        {/* </VStack> */}
+        {/* </ScaleFade> */}
       </VStack>
     </ModalLayout>
   );

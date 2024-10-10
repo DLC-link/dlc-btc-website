@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 
 import { Button, VStack, useToast } from '@chakra-ui/react';
 import { setupXRPLVault } from '@functions/fetch.functions';
-import { getRippleWallet } from 'dlc-btc-lib/ripple-functions';
+import { RippleWalletContext } from '@providers/ripple-user-wallet-context-provider';
 
 import { SetupVaultScreenVaultGraphics } from './components/setup-vault-screen.vault-graphics';
 
@@ -10,12 +10,12 @@ export function SetupVaultScreen(): React.JSX.Element {
   const toast = useToast();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { rippleWallet } = useContext(RippleWalletContext);
 
   async function handleSetup() {
     try {
       setIsSubmitting(true);
-      const xrplWallet = getRippleWallet('sEdSKUhR1Hhwomo7CsUzAe2pv7nqUXT');
-      await setupXRPLVault(xrplWallet.classicAddress);
+      await setupXRPLVault(rippleWallet?.classicAddress!);
     } catch (error: any) {
       setIsSubmitting(false);
       toast({

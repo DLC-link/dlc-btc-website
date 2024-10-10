@@ -6,10 +6,11 @@ import { VaultTransactionForm } from '@components/transaction-screen/transaction
 import { Vault } from '@components/vault/vault';
 import { BitcoinWalletContext } from '@providers/bitcoin-wallet-context-provider';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
+import { RippleWalletContext } from '@providers/ripple-user-wallet-context-provider';
 import { RootState } from '@store/index';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { Client } from 'dlc-btc-lib/models';
-import { createCheck, getRippleClient, getRippleWallet } from 'dlc-btc-lib/ripple-functions';
+import { createCheck, getRippleClient } from 'dlc-btc-lib/ripple-functions';
 import { shiftValue } from 'dlc-btc-lib/utilities';
 
 interface BurnTokenTransactionFormProps {
@@ -35,6 +36,8 @@ export function BurnTokenTransactionForm({
   const { unmintStep } = useSelector((state: RootState) => state.mintunmint);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const { rippleWallet } = useContext(RippleWalletContext);
+
   const currentVault = unmintStep[2];
 
   async function handleButtonClick(withdrawAmount: number): Promise<void> {
@@ -45,12 +48,14 @@ export function BurnTokenTransactionForm({
       // if (currentRisk === 'High') throw new Error('Risk Level is too high');
       const formattedWithdrawAmount = BigInt(shiftValue(withdrawAmount));
 
-      const rippleWallet = getRippleWallet('sEdSKUhR1Hhwomo7CsUzAe2pv7nqUXT');
       const issuerAddress = 'ra9epzthPkNXykgfadCwu8D7mtajj8DVCP';
       const rippleClient: Client = getRippleClient('wss://s.altnet.rippletest.net:51233');
+      if (!rippleClient.isConnected()) {
+        await rippleClient.connect();
+      }
       await createCheck(
         rippleClient,
-        rippleWallet,
+        rippleWallet!,
         issuerAddress,
         undefined,
         formattedWithdrawAmount.toString(),
