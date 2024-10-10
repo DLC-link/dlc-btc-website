@@ -5182,10 +5182,8 @@ dir-glob@^3.0.1:
   dependencies:
     path-type "^4.0.0"
 
-dlc-btc-lib@^2.2.10:
-  version "2.2.10"
-  resolved "https://registry.yarnpkg.com/dlc-btc-lib/-/dlc-btc-lib-2.2.10.tgz#34bee9ee687c7ead3ec27498f1f80539003525a3"
-  integrity sha512-SzqnGptBUGexr5rbvc183sTY30SP0MUVX7wQAW0W5wJsuUvNgYfgboc+EC0fLxScwnm1H92mrvMWlovNu8d8iQ==
+"dlc-btc-lib@file:../dlc-btc-lib":
+  version "2.3.0"
   dependencies:
     "@ledgerhq/hw-app-btc" "10.4.1"
     "@noble/hashes" "1.4.0"
@@ -7109,9 +7107,9 @@ multiformats@^9.4.2:
   integrity sha512-HoMUjhH9T8DDBNT+6xzkrd9ga/XiBI4xLr58LJACwK6G3HTOPeMz4nB4KJs33L2BelrIJa7P0VuNaVF3hMYfjg==
 
 nan@^2.13.2:
-  version "2.20.0"
-  resolved "https://registry.yarnpkg.com/nan/-/nan-2.20.0.tgz#08c5ea813dd54ed16e5bd6505bf42af4f7838ca3"
-  integrity sha512-bk3gXBZDGILuuo/6sKtr0DQmSThYHLtNCdSdXk9YkxD/jK6X2vmCyyXBBxyqZ4XcnzTyYEAThfX3DCEnLf6igw==
+  version "2.21.0"
+  resolved "https://registry.yarnpkg.com/nan/-/nan-2.21.0.tgz#203ab765a02e6676c8cb92e1cad9503e7976d55b"
+  integrity sha512-MCpOGmdWvAOMi4RWnpxS5G24l7dVMtdSHtV87I3ltjaLdFOTO74HVJ+DfYiAXjxGKsYR/UCmm1rBwhMN7KqS1A==
 
 nanoid@^3.3.7:
   version "3.3.7"

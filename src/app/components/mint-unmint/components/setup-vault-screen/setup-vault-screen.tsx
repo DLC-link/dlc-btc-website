@@ -1,20 +1,36 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 
 import { Button, VStack, useToast } from '@chakra-ui/react';
-import { RippleHandler } from 'dlc-btc-lib';
+import { submitSetupXRPLVaultRequest } from '@functions/attestor-request.functions';
+import { useEthersSigner } from '@functions/configuration.functions';
+import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
+import { NetworkConfigurationContext } from '@providers/network-configuration.provider';
+import { setupVault } from 'dlc-btc-lib/ethereum-functions';
+import { getRippleWallet } from 'dlc-btc-lib/ripple-functions';
 
 import { SetupVaultScreenVaultGraphics } from './components/setup-vault-screen.vault-graphics';
 
 export function SetupVaultScreen(): React.JSX.Element {
   const toast = useToast();
+  const { networkType } = useContext(NetworkConfigurationContext);
+
+  const { ethereumNetworkConfiguration } = useContext(EthereumNetworkConfigurationContext);
+
+  const signer = useEthersSigner();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSetup() {
     try {
       setIsSubmitting(true);
-      const xrplHandler = RippleHandler.fromSeed('sEdSKUhR1Hhwomo7CsUzAe2pv7nqUXT');
-      await xrplHandler.setupVault('');
+      if (networkType === 'xrpl') {
+        const xrplWallet = getRippleWallet('sEdSKUhR1Hhwomo7CsUzAe2pv7nqUXT');
+        await submitSetupXRPLVaultRequest(xrplWallet.classicAddress);
+      } else if (networkType === 'evm') {
+        await setupVault(ethereumNetworkConfiguration.dlcManagerContract.connect(signer!));
+      } else {
+        throw new Error('Unsupported Network Type');
+      }
     } catch (error: any) {
       setIsSubmitting(false);
       toast({

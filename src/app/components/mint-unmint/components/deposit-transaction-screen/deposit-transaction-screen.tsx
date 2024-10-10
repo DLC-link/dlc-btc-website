@@ -35,15 +35,10 @@ export function DepositTransactionScreen({
   const { bitcoinWalletContextState, resetBitcoinWalletContext } = useContext(BitcoinWalletContext);
 
   const { bitcoinPrice, depositLimit } = useContext(ProofOfReserveContext);
-  const { allVaults } = useContext(VaultContext);
 
   const { mintStep } = useSelector((state: RootState) => state.mintunmint);
 
-  console.log('allVaultsDEPOSIT', allVaults);
-
   const currentVault = mintStep[2];
-
-  console.log('currentVaultDEPOSIT', currentVault);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
