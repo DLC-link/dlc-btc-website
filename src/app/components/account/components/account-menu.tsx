@@ -1,5 +1,3 @@
-import { useContext } from 'react';
-
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import {
   HStack,

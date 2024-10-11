@@ -1,4 +1,4 @@
-import { Box, Button, HStack, Image, Spinner, Text } from '@chakra-ui/react';
+import { Box, Button, HStack, Image, Text } from '@chakra-ui/react';
 
 import { RippleWallet } from '../select-wallet-modal';
 

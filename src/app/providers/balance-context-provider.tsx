@@ -1,15 +1,22 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext } from 'react';
 
+import { useNetworkConnection } from '@hooks/use-connected';
 import { HasChildren } from '@models/has-children';
+import { useQuery } from '@tanstack/react-query';
 import {
   getAddressDLCBTCBalance,
   getAllAddressVaults,
   getLockedBTCBalance,
 } from 'dlc-btc-lib/ethereum-functions';
+import {
+  getDLCBTCBalance,
+  getLockedBTCBalance as getLockedBTCBalanceXRPL,
+} from 'dlc-btc-lib/ripple-functions';
 import { useAccount } from 'wagmi';
 
 import { EthereumNetworkConfigurationContext } from './ethereum-network-configuration.provider';
-import { VaultContext } from './vault-context-provider';
+import { NetworkConfigurationContext } from './network-configuration.provider';
+import { RippleNetworkConfigurationContext } from './ripple-network-configuration.provider';
 
 interface VaultContextType {
   dlcBTCBalance: number | undefined;
@@ -22,44 +29,54 @@ export const BalanceContext = createContext<VaultContextType>({
 });
 
 export function BalanceContextProvider({ children }: HasChildren): React.JSX.Element {
-  const { ethereumNetworkConfiguration, isEthereumNetworkConfigurationLoading } = useContext(
-    EthereumNetworkConfigurationContext
+  const {
+    ethereumNetworkConfiguration: { dlcBTCContract, dlcManagerContract },
+  } = useContext(EthereumNetworkConfigurationContext);
+  const { networkType } = useContext(NetworkConfigurationContext);
+  const { isConnected } = useNetworkConnection();
+  const { rippleUserAddress, rippleClient, rippleWalletClient } = useContext(
+    RippleNetworkConfigurationContext
   );
+
   const { address: ethereumUserAddress } = useAccount();
-  const { fundedVaults } = useContext(VaultContext);
 
-  const [dlcBTCBalance, setDLCBTCBalance] = useState<number | undefined>(undefined);
-  const [lockedBTCBalance, setLockedBTCBalance] = useState<number | undefined>(undefined);
+  const fetchEVMBalances = async () => {
+    const dlcBTCBalance = await getAddressDLCBTCBalance(dlcBTCContract, ethereumUserAddress!);
 
-  const fetchBalancesIfReady = async (ethereumAddress: string) => {
-    const currentTokenBalance = await getAddressDLCBTCBalance(
-      ethereumNetworkConfiguration.dlcBTCContract,
-      ethereumAddress
+    const lockedBTCBalance = await getLockedBTCBalance(
+      await getAllAddressVaults(dlcManagerContract, ethereumUserAddress!)
     );
 
-    if (currentTokenBalance !== dlcBTCBalance) {
-      setDLCBTCBalance(currentTokenBalance);
-    }
-
-    const userFundedVaults = await getAllAddressVaults(
-      ethereumNetworkConfiguration.dlcManagerContract,
-      ethereumAddress
-    );
-    const currentLockedBTCBalance = await getLockedBTCBalance(userFundedVaults);
-    if (currentLockedBTCBalance !== lockedBTCBalance) {
-      setLockedBTCBalance(currentLockedBTCBalance);
-    }
+    return { dlcBTCBalance, lockedBTCBalance };
   };
 
-  useEffect(() => {
-    ethereumUserAddress &&
-      !isEthereumNetworkConfigurationLoading &&
-      void fetchBalancesIfReady(ethereumUserAddress);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ethereumUserAddress, fundedVaults]);
+  const fetchXRPLBalances = async () => {
+    const dlcBTCBalance = await getDLCBTCBalance(
+      rippleClient,
+      rippleWalletClient!,
+      appConfiguration.rippleIssuerAddress
+    );
+    console.log('dlcBTCBalance', dlcBTCBalance);
+    const lockedBTCBalance = await getLockedBTCBalanceXRPL(
+      rippleClient,
+      rippleWalletClient!,
+      appConfiguration.rippleIssuerAddress
+    );
+    console.log('lockedBTCBalance', lockedBTCBalance);
+    return { dlcBTCBalance, lockedBTCBalance };
+  };
+
+  const { data } = useQuery({
+    queryKey: ['balances', networkType === 'evm' ? ethereumUserAddress : rippleUserAddress],
+    queryFn: networkType === 'evm' ? fetchEVMBalances : fetchXRPLBalances,
+    enabled: isConnected,
+    refetchInterval: 10000,
+  });
 
   return (
-    <BalanceContext.Provider value={{ dlcBTCBalance, lockedBTCBalance }}>
+    <BalanceContext.Provider
+      value={{ dlcBTCBalance: data?.dlcBTCBalance, lockedBTCBalance: data?.lockedBTCBalance }}
+    >
       {children}
     </BalanceContext.Provider>
   );

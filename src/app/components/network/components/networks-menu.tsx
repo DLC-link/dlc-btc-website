@@ -1,9 +1,8 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
 
 import { HStack, Menu, MenuButton, MenuItem, MenuList, Text } from '@chakra-ui/react';
 import { useNetworkConnection } from '@hooks/use-connected';
 import { NetworkConfigurationContext } from '@providers/network-configuration.provider';
-import { RippleNetworkConfigurationContext } from '@providers/ripple-network-configuration.provider';
 import { useAccount, useConfig, useSwitchChain } from 'wagmi';
 
 interface NetworksMenuProps {

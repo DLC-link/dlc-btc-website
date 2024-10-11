@@ -84,6 +84,7 @@ export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps):
   }
 
   async function handleConnectRippleWallet(id: string) {
+    console.log('id', id);
     setNetworkType('xrpl');
     setRippleWallet(seedWallet);
     setIsRippleWalletConnected(true);

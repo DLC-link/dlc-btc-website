@@ -5,7 +5,6 @@ import { HStack, Menu, MenuButton, MenuItem, MenuList, Text } from '@chakra-ui/r
 import { getEthereumNetworkByID, getRippleNetworkByID } from '@functions/configuration.functions';
 import { RippleNetwork, RippleNetworkID } from '@models/ripple.models';
 import { EthereumNetwork, EthereumNetworkID } from 'dlc-btc-lib/models';
-import { Chain } from 'viem';
 
 interface SelectNetworkButtonProps {
   handleChangeNetwork: (networkID: EthereumNetworkID | RippleNetworkID) => void;

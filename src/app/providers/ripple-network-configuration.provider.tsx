@@ -4,6 +4,8 @@ import { RippleWallet } from '@components/modals/select-wallet-modal/select-wall
 import { getRippleNetworkByID } from '@functions/configuration.functions';
 import { HasChildren } from '@models/has-children';
 import { RippleNetwork, RippleNetworkConfiguration, RippleNetworkID } from '@models/ripple.models';
+import { Client, Wallet } from 'dlc-btc-lib/models';
+import { getRippleClient, getRippleWallet } from 'dlc-btc-lib/ripple-functions';
 import { equals, find } from 'ramda';
 
 import { supportedRippleNetworks } from '@shared/constants/ripple.constants';
@@ -56,6 +58,9 @@ interface RippleNetworkConfigurationContext {
   rippleUserAddress: string | undefined;
   isRippleWalletConnected: boolean;
   rippleWallet: RippleWallet | undefined;
+  rippleWalletClient: Wallet | undefined;
+  setRippleWalletClient: (seed: string) => void;
+  rippleClient: Client;
   setRippleWallet: (rippleWallet: RippleWallet) => void;
   setIsRippleWalletConnected: (isConnected: boolean) => void;
   isRippleNetworkConfigurationLoading: boolean;
@@ -66,6 +71,9 @@ export const RippleNetworkConfigurationContext = createContext<RippleNetworkConf
   enabledRippleNetworks,
   rippleUserAddress: undefined,
   rippleWallet: undefined,
+  rippleWalletClient: undefined,
+  setRippleWalletClient: () => {},
+  rippleClient: new Client(appConfiguration.xrplWebsocket),
   isRippleWalletConnected: false,
   setRippleWallet: () => {},
   setIsRippleWalletConnected: () => {},
@@ -83,7 +91,20 @@ export function RippleNetworkConfigurationContextProvider({
     'rfvtbrXSxLsxVWDktR4sdzjJgv8EnMKFKG'
   );
 
+  const [rippleWalletClient, setRippleWalletClient] = useState<Wallet | undefined>(undefined);
+  console.log('rippleWalletClient', rippleWalletClient);
+
+  const rippleClient = getRippleClient(rippleNetworkConfiguration.websocketURL);
+
   const [rippleWallet, setRippleWallet] = useState<RippleWallet | undefined>(undefined);
+
+  function setRippleWalletClientForUser(seed: string) {
+    const rippleWalletClient = getRippleWallet(seed);
+    setRippleUserAddress(rippleWalletClient.classicAddress);
+    setRippleWalletClient(rippleWalletClient);
+  }
+
+  const rippleWalletC = getRippleWallet('sEdSKUhR1Hhwomo7CsUzAe2pv7nqUXT');
 
   const [isRippleNetworkConfigurationLoading, setIsRippleNetworkConfigurationLoading] =
     useState(false);
@@ -109,6 +130,9 @@ export function RippleNetworkConfigurationContextProvider({
         enabledRippleNetworks,
         rippleUserAddress,
         rippleWallet,
+        rippleWalletClient: rippleWalletC,
+        setRippleWalletClient: setRippleWalletClientForUser,
+        rippleClient,
         setRippleWallet,
         isRippleWalletConnected,
         setIsRippleWalletConnected,

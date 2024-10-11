@@ -5,7 +5,6 @@ import { VStack, useToast } from '@chakra-ui/react';
 import { VaultTransactionForm } from '@components/transaction-screen/transaction-screen.transaction-form/components/transaction-screen.transaction-form/transaction-screen.transaction-form';
 import { Vault } from '@components/vault/vault';
 import { useEthersSigner } from '@functions/configuration.functions';
-import { getAndFormatVault } from '@functions/vault.functions';
 import { BitcoinWalletContext } from '@providers/bitcoin-wallet-context-provider';
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { NetworkConfigurationContext } from '@providers/network-configuration.provider';
@@ -13,15 +12,13 @@ import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provi
 import { RootState } from '@store/index';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { withdraw } from 'dlc-btc-lib/ethereum-functions';
-import { EthereumNetworkID } from 'dlc-btc-lib/models';
 import {
   connectRippleClient,
   createCheck,
   getRippleClient,
   getRippleWallet,
 } from 'dlc-btc-lib/ripple-functions';
-import { shiftValue, unshiftValue } from 'dlc-btc-lib/utilities';
-import { useAccount } from 'wagmi';
+import { shiftValue } from 'dlc-btc-lib/utilities';
 
 interface BurnTokenTransactionFormProps {
   isBitcoinWalletLoading: [boolean, string];
@@ -45,8 +42,6 @@ export function BurnTokenTransactionForm({
   const { bitcoinPrice, depositLimit } = useContext(ProofOfReserveContext);
 
   const { ethereumNetworkConfiguration } = useContext(EthereumNetworkConfigurationContext);
-
-  const { chainId } = useAccount();
 
   const signer = useEthersSigner();
 

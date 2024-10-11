@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+
 import { Divider, HStack, Text, VStack } from '@chakra-ui/react';
 
 import { MyVaultsHeaderBalanceInfo } from './components/my-vaults-header-balance-info';
@@ -13,6 +15,10 @@ export function MyVaultsLargeHeader({
   dlcBTCBalance,
   lockedBTCBalance,
 }: MyVaultsLargeHeaderProps): React.JSX.Element {
+  useEffect(() => {
+    console.log('dlcBTCBalance', dlcBTCBalance);
+    console.log('lockedBTCBalance', lockedBTCBalance);
+  }, [dlcBTCBalance, lockedBTCBalance]);
   return (
     <VStack w={'100%'} h={'100px'}>
       <HStack w={'100%'} h={'150px'} justifyContent={'space-between'} pr={'25px'}>

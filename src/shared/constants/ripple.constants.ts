@@ -1,12 +1,11 @@
 import { RippleNetwork, RippleNetworkID } from '@models/ripple.models';
 
-export const RippleMainnet: RippleNetwork = {
+const RippleMainnet: RippleNetwork = {
   id: RippleNetworkID.Mainnet,
   name: 'Mainnet',
   displayName: 'Mainnet',
 };
-
-export const RippleTestnet: RippleNetwork = {
+const RippleTestnet: RippleNetwork = {
   id: RippleNetworkID.Testnet,
   name: 'Testnet',
   displayName: 'Testnet',
