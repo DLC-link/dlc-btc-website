@@ -12,11 +12,15 @@ import { NetworkConfigurationContext } from '@providers/network-configuration.pr
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
 import { RootState } from '@store/index';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
-import { vaultActions } from '@store/slices/vault/vault.actions';
 import { withdraw } from 'dlc-btc-lib/ethereum-functions';
 import { EthereumNetworkID } from 'dlc-btc-lib/models';
-import { createCheck, getRippleClient, getRippleWallet } from 'dlc-btc-lib/ripple-functions';
-import { shiftValue } from 'dlc-btc-lib/utilities';
+import {
+  connectRippleClient,
+  createCheck,
+  getRippleClient,
+  getRippleWallet,
+} from 'dlc-btc-lib/ripple-functions';
+import { shiftValue, unshiftValue } from 'dlc-btc-lib/utilities';
 import { useAccount } from 'wagmi';
 
 interface BurnTokenTransactionFormProps {
@@ -58,13 +62,16 @@ export function BurnTokenTransactionForm({
       if (networkType === 'xrpl') {
         const xrplWallet = getRippleWallet('sEdSKUhR1Hhwomo7CsUzAe2pv7nqUXT');
         const xrplClient = getRippleClient('wss://s.altnet.rippletest.net:51233');
+        await connectRippleClient(xrplClient);
+        const formattedWithdrawAmount = BigInt(shiftValue(withdrawAmount));
+
         await createCheck(
           xrplClient,
           xrplWallet,
           appConfiguration.rippleIssuerAddress,
           undefined,
-          withdrawAmount.toString(),
-          currentVault.uuid
+          formattedWithdrawAmount.toString(),
+          currentVault.uuid.slice(2)
         );
       } else if (networkType === 'evm') {
         const currentRisk = await fetchUserEthereumAddressRiskLevel();
@@ -76,23 +83,9 @@ export function BurnTokenTransactionForm({
           currentVault.uuid,
           formattedWithdrawAmount
         );
-
-        const updatedVault = await getAndFormatVault(
-          currentVault.uuid,
-          ethereumNetworkConfiguration.dlcManagerContract
-        );
-        dispatch(
-          vaultActions.swapVault({
-            vaultUUID: currentVault.uuid,
-            updatedVault: updatedVault,
-            networkID: chainId?.toString() as EthereumNetworkID,
-          })
-        );
-        dispatch(mintUnmintActions.setUnmintStep([1, currentVault.uuid]));
       } else {
         throw new Error('Unsupported Network Type');
       }
-      setIsSubmitting(false);
     } catch (error) {
       setIsSubmitting(false);
       toast({

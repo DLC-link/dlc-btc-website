@@ -8,6 +8,7 @@ import {
   BitcoinWalletContext,
   BitcoinWalletContextState,
 } from '@providers/bitcoin-wallet-context-provider';
+import { NetworkConfigurationContext } from '@providers/network-configuration.provider';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
 import { VaultContext } from '@providers/vault-context-provider';
 import { RootState } from '@store/index';
@@ -35,6 +36,7 @@ export function DepositTransactionScreen({
   const { bitcoinWalletContextState, resetBitcoinWalletContext } = useContext(BitcoinWalletContext);
 
   const { bitcoinPrice, depositLimit } = useContext(ProofOfReserveContext);
+  const { networkType } = useContext(NetworkConfigurationContext);
 
   const { mintStep } = useSelector((state: RootState) => state.mintunmint);
 
@@ -47,8 +49,10 @@ export function DepositTransactionScreen({
 
     try {
       setIsSubmitting(true);
-      const currentRisk = await fetchUserEthereumAddressRiskLevel();
-      if (currentRisk === 'High') throw new Error('Risk Level is too high');
+      if (networkType === 'evm') {
+        const currentRisk = await fetchUserEthereumAddressRiskLevel();
+        if (currentRisk === 'High') throw new Error('Risk Level is too high');
+      }
       await handleSignFundingTransaction(currentVault.uuid, depositAmount);
     } catch (error: any) {
       setIsSubmitting(false);

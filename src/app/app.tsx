@@ -12,13 +12,9 @@ import { BalanceContextProvider } from '@providers/balance-context-provider';
 import { BitcoinTransactionConfirmationsProvider } from '@providers/bitcoin-query-provider';
 import { BitcoinWalletContextProvider } from '@providers/bitcoin-wallet-context-provider';
 import { EthereumNetworkConfigurationContextProvider } from '@providers/ethereum-network-configuration.provider';
-import { EthereumObserverProvider } from '@providers/ethereum-observer-provider';
 import { NetworkConfigurationContextProvider } from '@providers/network-configuration.provider';
 import { ProofOfReserveContextProvider } from '@providers/proof-of-reserve-context-provider';
-import {
-  RippleNetworkConfigurationContext,
-  RippleNetworkConfigurationContextProvider,
-} from '@providers/ripple-network-configuration.provider';
+import { RippleNetworkConfigurationContextProvider } from '@providers/ripple-network-configuration.provider';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WagmiProvider } from 'wagmi';
 
@@ -38,27 +34,25 @@ export function App(): React.JSX.Element {
             <EthereumNetworkConfigurationContextProvider>
               <BitcoinWalletContextProvider>
                 <VaultContextProvider>
-                  <EthereumObserverProvider>
-                    <BitcoinTransactionConfirmationsProvider>
-                      <BalanceContextProvider>
-                        <ProofOfReserveContextProvider>
-                          <AppLayout>
-                            <Route path="/" element={<PointsPage />} />
-                            <Route path="/my-vaults" element={<MyVaults />} />
-                            {/* <Route path="/how-it-works" element={<About />} /> */}
-                            <Route path="/proof-of-reserve" element={<ProofOfReservePage />} />
-                            <Route path="/attestor-details" element={<AttestorDetailsPage />} />
-                            <Route
-                              path="/attestor-details-select"
-                              element={<AttestorDetailsSelectPage />}
-                            />
-                            <Route path="/merchant-details/:name" element={<MerchantDetails />} />
-                            <Route path="/mint-withdraw" element={<Dashboard />} />
-                          </AppLayout>
-                        </ProofOfReserveContextProvider>
-                      </BalanceContextProvider>
-                    </BitcoinTransactionConfirmationsProvider>
-                  </EthereumObserverProvider>
+                  <BitcoinTransactionConfirmationsProvider>
+                    <BalanceContextProvider>
+                      <ProofOfReserveContextProvider>
+                        <AppLayout>
+                          <Route path="/" element={<PointsPage />} />
+                          <Route path="/my-vaults" element={<MyVaults />} />
+                          {/* <Route path="/how-it-works" element={<About />} /> */}
+                          <Route path="/proof-of-reserve" element={<ProofOfReservePage />} />
+                          <Route path="/attestor-details" element={<AttestorDetailsPage />} />
+                          <Route
+                            path="/attestor-details-select"
+                            element={<AttestorDetailsSelectPage />}
+                          />
+                          <Route path="/merchant-details/:name" element={<MerchantDetails />} />
+                          <Route path="/mint-withdraw" element={<Dashboard />} />
+                        </AppLayout>
+                      </ProofOfReserveContextProvider>
+                    </BalanceContextProvider>
+                  </BitcoinTransactionConfirmationsProvider>
                 </VaultContextProvider>
               </BitcoinWalletContextProvider>
             </EthereumNetworkConfigurationContextProvider>

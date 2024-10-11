@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react';
 
-import { useNFTs } from '@hooks/use-nfts';
-import { useVaults } from '@hooks/use-vaults';
+import { useEVMVaults } from '@hooks/use-evm-vaults';
+import { useXRPLVaults } from '@hooks/use-xrpl-vaults';
 import { HasChildren } from '@models/has-children';
 import { Vault } from '@models/vault';
 
@@ -26,14 +26,12 @@ export const VaultContext = createContext<VaultContextType>({
 });
 
 export function VaultContextProvider({ children }: HasChildren): React.JSX.Element {
-  const rippleVaults = useNFTs();
-  const ethereumVaults = useVaults();
+  const xrplVaults = useXRPLVaults();
+  const evmVaults = useEVMVaults();
   const { networkType } = useContext(NetworkConfigurationContext);
 
   const getVaults = (vaultType: keyof VaultContextType) =>
-    networkType === 'evm' ? ethereumVaults[vaultType] : rippleVaults[vaultType];
-
-  console.log('ethereumVaults', ethereumVaults);
+    networkType === 'evm' ? evmVaults[vaultType] : xrplVaults[vaultType];
 
   return (
     <VaultContext.Provider
