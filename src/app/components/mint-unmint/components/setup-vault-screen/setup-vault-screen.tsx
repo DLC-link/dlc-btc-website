@@ -5,6 +5,7 @@ import { submitSetupXRPLVaultRequest } from '@functions/attestor-request.functio
 import { useEthersSigner } from '@functions/configuration.functions';
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { NetworkConfigurationContext } from '@providers/network-configuration.provider';
+import { RippleNetworkConfigurationContext } from '@providers/ripple-network-configuration.provider';
 import { setupVault } from 'dlc-btc-lib/ethereum-functions';
 import { getRippleWallet } from 'dlc-btc-lib/ripple-functions';
 
@@ -13,6 +14,7 @@ import { SetupVaultScreenVaultGraphics } from './components/setup-vault-screen.v
 export function SetupVaultScreen(): React.JSX.Element {
   const toast = useToast();
   const { networkType } = useContext(NetworkConfigurationContext);
+  const { rippleUserAddress } = useContext(RippleNetworkConfigurationContext);
 
   const { ethereumNetworkConfiguration } = useContext(EthereumNetworkConfigurationContext);
 
@@ -24,8 +26,7 @@ export function SetupVaultScreen(): React.JSX.Element {
     try {
       setIsSubmitting(true);
       if (networkType === 'xrpl') {
-        const xrplWallet = getRippleWallet('sEdSKUhR1Hhwomo7CsUzAe2pv7nqUXT');
-        await submitSetupXRPLVaultRequest(xrplWallet.classicAddress);
+        await submitSetupXRPLVaultRequest(rippleUserAddress!);
       } else if (networkType === 'evm') {
         await setupVault(ethereumNetworkConfiguration.dlcManagerContract.connect(signer!));
       } else {

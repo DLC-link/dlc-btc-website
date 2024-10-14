@@ -81,6 +81,7 @@ export function usePSBT(): UsePSBTReturnType {
         vaultUUID
       );
       const attestorGroupPublicKey = await getAttestorExtendedGroupPublicKey();
+      console.log('attestorGroupPublicKey', attestorGroupPublicKey);
       return {
         userAddress: rippleUserAddress,
         vault,

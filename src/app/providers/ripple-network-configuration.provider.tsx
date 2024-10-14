@@ -2,6 +2,8 @@ import React, { createContext, useEffect, useState } from 'react';
 
 import { RippleWallet } from '@components/modals/select-wallet-modal/select-wallet-modal';
 import { getRippleNetworkByID } from '@functions/configuration.functions';
+import { useXRPLLedger } from '@hooks/use-xrpl-ledger';
+import Xrp from '@ledgerhq/hw-app-xrp';
 import { HasChildren } from '@models/has-children';
 import { RippleNetwork, RippleNetworkConfiguration, RippleNetworkID } from '@models/ripple.models';
 import { Client, Wallet } from 'dlc-btc-lib/models';
@@ -57,59 +59,46 @@ interface RippleNetworkConfigurationContext {
   enabledRippleNetworks: RippleNetwork[];
   rippleUserAddress: string | undefined;
   isRippleWalletConnected: boolean;
+  connectLedgerWallet: (derivationPath: string) => Promise<void>;
+  signTransaction: (transaction: any) => Promise<any>;
   rippleWallet: RippleWallet | undefined;
-  rippleWalletClient: Wallet | undefined;
-  setRippleWalletClient: (seed: string) => void;
   rippleClient: Client;
   setRippleWallet: (rippleWallet: RippleWallet) => void;
-  setIsRippleWalletConnected: (isConnected: boolean) => void;
   isRippleNetworkConfigurationLoading: boolean;
 }
 export const RippleNetworkConfigurationContext = createContext<RippleNetworkConfigurationContext>({
-  setRippleNetworkID: () => {},
+  setRippleNetworkID: (rippleNetworkID: RippleNetworkID) => {},
   rippleNetworkConfiguration: defaultRippleNetworkConfiguration,
   enabledRippleNetworks,
   rippleUserAddress: undefined,
-  rippleWallet: undefined,
-  rippleWalletClient: undefined,
-  setRippleWalletClient: () => {},
+  connectLedgerWallet: async (_derivationPath: string) => {},
+  signTransaction: async (_transaction: any) => {},
   rippleClient: new Client(appConfiguration.xrplWebsocket),
+  rippleWallet: undefined,
+  setRippleWallet: (_rippleWallet: RippleWallet) => {},
   isRippleWalletConnected: false,
-  setRippleWallet: () => {},
-  setIsRippleWalletConnected: () => {},
   isRippleNetworkConfigurationLoading: false,
 });
 
 export function RippleNetworkConfigurationContextProvider({
   children,
 }: HasChildren): React.JSX.Element {
+  const { xrplAddress, connectLedgerWallet, signTransaction, isConnected } = useXRPLLedger();
   const [rippleNetworkID, setRippleNetworkID] = useState<RippleNetworkID>(defaultRippleNetwork.id);
   const [rippleNetworkConfiguration, setRippleNetworkConfiguration] =
     useState<RippleNetworkConfiguration>(defaultRippleNetworkConfiguration);
-
-  const [rippleUserAddress, setRippleUserAddress] = useState<string | undefined>(
-    'rfvtbrXSxLsxVWDktR4sdzjJgv8EnMKFKG'
-  );
-
-  const [rippleWalletClient, setRippleWalletClient] = useState<Wallet | undefined>(undefined);
-  console.log('rippleWalletClient', rippleWalletClient);
 
   const rippleClient = getRippleClient(rippleNetworkConfiguration.websocketURL);
 
   const [rippleWallet, setRippleWallet] = useState<RippleWallet | undefined>(undefined);
 
-  function setRippleWalletClientForUser(seed: string) {
-    const rippleWalletClient = getRippleWallet(seed);
-    setRippleUserAddress(rippleWalletClient.classicAddress);
-    setRippleWalletClient(rippleWalletClient);
-  }
-
-  const rippleWalletC = getRippleWallet('sEdSKUhR1Hhwomo7CsUzAe2pv7nqUXT');
-
   const [isRippleNetworkConfigurationLoading, setIsRippleNetworkConfigurationLoading] =
     useState(false);
 
-  const [isRippleWalletConnected, setIsRippleWalletConnected] = useState(false);
+  useEffect(() => {
+    console.log('isConnected', isConnected);
+  }, [isConnected]);
+
   useEffect(() => {
     setIsRippleNetworkConfigurationLoading(true);
 
@@ -128,14 +117,13 @@ export function RippleNetworkConfigurationContextProvider({
         rippleNetworkConfiguration,
         isRippleNetworkConfigurationLoading,
         enabledRippleNetworks,
-        rippleUserAddress,
-        rippleWallet,
-        rippleWalletClient: rippleWalletC,
-        setRippleWalletClient: setRippleWalletClientForUser,
+        rippleUserAddress: xrplAddress,
+        signTransaction,
         rippleClient,
+        rippleWallet,
         setRippleWallet,
-        isRippleWalletConnected,
-        setIsRippleWalletConnected,
+        connectLedgerWallet,
+        isRippleWalletConnected: isConnected,
         setRippleNetworkID,
       }}
     >

@@ -28,4 +28,28 @@ const unisat: BitcoinWallet = {
   logo: '/images/logos/unisat-logo.svg',
 };
 
+export enum XRPWalletType {
+  Ledger = 'Ledger',
+  Gem = 'Gem',
+}
+
+export interface XRPWallet {
+  id: XRPWalletType;
+  name: string;
+  icon: string;
+}
+
+const ledgerXRP: XRPWallet = {
+  id: XRPWalletType.Ledger,
+  name: 'Ledger',
+  icon: '/images/logos/ledger-logo.svg',
+};
+
+// const gemXRP: XRPWallet = {
+//   id: XRPWalletType.Gem,
+//   name: 'Gem',
+//   icon: '/images/logos/gem-logo.svg',
+// };
+
+export const xrpWallets: XRPWallet[] = [ledgerXRP];
 export const bitcoinWallets: BitcoinWallet[] = [leather, ledger, unisat];

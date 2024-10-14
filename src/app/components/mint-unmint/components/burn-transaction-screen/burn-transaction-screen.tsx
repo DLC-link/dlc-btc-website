@@ -9,6 +9,7 @@ import { BitcoinWalletContext } from '@providers/bitcoin-wallet-context-provider
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { NetworkConfigurationContext } from '@providers/network-configuration.provider';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
+import { RippleNetworkConfigurationContext } from '@providers/ripple-network-configuration.provider';
 import { RootState } from '@store/index';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { withdraw } from 'dlc-btc-lib/ethereum-functions';
@@ -19,6 +20,7 @@ import {
   getRippleWallet,
 } from 'dlc-btc-lib/ripple-functions';
 import { shiftValue } from 'dlc-btc-lib/utilities';
+import { decode } from 'ripple-binary-codec';
 
 interface BurnTokenTransactionFormProps {
   isBitcoinWalletLoading: [boolean, string];
@@ -38,6 +40,9 @@ export function BurnTokenTransactionForm({
 
   const { networkType } = useContext(NetworkConfigurationContext);
   const { bitcoinWalletContextState } = useContext(BitcoinWalletContext);
+  const { rippleUserAddress, rippleClient, signTransaction } = useContext(
+    RippleNetworkConfigurationContext
+  );
 
   const { bitcoinPrice, depositLimit } = useContext(ProofOfReserveContext);
 
@@ -55,19 +60,21 @@ export function BurnTokenTransactionForm({
       if (!currentVault) return;
       setIsSubmitting(true);
       if (networkType === 'xrpl') {
-        const xrplWallet = getRippleWallet('sEdSKUhR1Hhwomo7CsUzAe2pv7nqUXT');
-        const xrplClient = getRippleClient('wss://s.altnet.rippletest.net:51233');
-        await connectRippleClient(xrplClient);
+        await connectRippleClient(rippleClient);
         const formattedWithdrawAmount = BigInt(shiftValue(withdrawAmount));
 
-        await createCheck(
-          xrplClient,
-          xrplWallet,
+        const check = await createCheck(
+          rippleClient,
+          rippleUserAddress!,
           appConfiguration.rippleIssuerAddress,
           undefined,
           formattedWithdrawAmount.toString(),
           currentVault.uuid.slice(2)
         );
+        const signedCheck = await signTransaction(check);
+        console.log('signedCheck', signedCheck);
+        const submitResponse = await rippleClient.submitAndWait(signedCheck);
+        console.log('Check submitted', submitResponse);
       } else if (networkType === 'evm') {
         const currentRisk = await fetchUserEthereumAddressRiskLevel();
         if (currentRisk === 'High') throw new Error('Risk Level is too high');

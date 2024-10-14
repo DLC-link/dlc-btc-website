@@ -30,6 +30,7 @@
     "@fontsource/inter": "^5.0.18",
     "@fontsource/onest": "^5.0.3",
     "@fontsource/poppins": "^5.0.8",
+    "@ledgerhq/hw-app-xrp": "^6.29.4",
     "@ledgerhq/hw-transport-webusb": "^6.28.6",
     "@netlify/functions": "^2.8.1",
     "@reduxjs/toolkit": "^1.9.7",

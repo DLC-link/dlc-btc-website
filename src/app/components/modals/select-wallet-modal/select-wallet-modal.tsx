@@ -27,7 +27,13 @@ const seedWallet: RippleWallet = {
   icon: './images/logos/xpr-logo.svg',
 };
 
-const rippleWallets = [seedWallet];
+const ledgerWallet: RippleWallet = {
+  id: 'ledger',
+  name: 'Ledger',
+  icon: './images/logos/ledger-logo.svg',
+};
+
+const rippleWallets = [ledgerWallet];
 
 export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps): React.JSX.Element {
   const { connect, isPending, isSuccess, connectors } = useConnect();
@@ -37,8 +43,9 @@ export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps):
   const {
     enabledRippleNetworks,
     isRippleWalletConnected,
-    setIsRippleWalletConnected,
     setRippleWallet,
+    rippleWallet,
+    connectLedgerWallet,
   } = useContext(RippleNetworkConfigurationContext);
 
   const ethereumNetworkIDs = ethereumNetworks.map(
@@ -84,10 +91,10 @@ export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps):
   }
 
   async function handleConnectRippleWallet(id: string) {
-    console.log('id', id);
     setNetworkType('xrpl');
-    setRippleWallet(seedWallet);
-    setIsRippleWalletConnected(true);
+    setRippleWallet(rippleWallets[0]);
+
+    await connectLedgerWallet("44'/144'/0'/0/0");
   }
 
   const handleChangeNetwork = (networkID: EthereumNetworkID | RippleNetworkID) => {

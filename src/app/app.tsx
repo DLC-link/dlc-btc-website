@@ -32,6 +32,7 @@ export function App(): React.JSX.Element {
         <NetworkConfigurationContextProvider>
           <RippleNetworkConfigurationContextProvider>
             <EthereumNetworkConfigurationContextProvider>
+              {/* <XRPWalletContextProvider> */}
               <BitcoinWalletContextProvider>
                 <VaultContextProvider>
                   <BitcoinTransactionConfirmationsProvider>
@@ -55,6 +56,7 @@ export function App(): React.JSX.Element {
                   </BitcoinTransactionConfirmationsProvider>
                 </VaultContextProvider>
               </BitcoinWalletContextProvider>
+              {/* </XRPWalletContextProvider> */}
             </EthereumNetworkConfigurationContextProvider>
           </RippleNetworkConfigurationContextProvider>
         </NetworkConfigurationContextProvider>

@@ -22,6 +22,7 @@ export function useNetworkConnection(): UseNetworkConnectionReturnType {
         setIsConnected(isEthereumWalletConnected);
         break;
       case 'xrpl':
+        console.log('isRippleWalletConnected', isRippleWalletConnected);
         setIsConnected(isRippleWalletConnected);
         break;
       default:

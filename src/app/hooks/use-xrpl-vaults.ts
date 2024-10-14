@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux';
 import { formatVault } from '@functions/vault.functions';
 import { Vault } from '@models/vault';
 import { NetworkConfigurationContext } from '@providers/network-configuration.provider';
+import { RippleNetworkConfigurationContext } from '@providers/ripple-network-configuration.provider';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { modalActions } from '@store/slices/modal/modal.actions';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -60,6 +61,7 @@ export function useXRPLVaults(): useXRPLVaultsReturnType {
   const [isLoading, setIsLoading] = useState(true);
 
   const { networkType } = useContext(NetworkConfigurationContext);
+  const { rippleUserAddress } = useContext(RippleNetworkConfigurationContext);
 
   const issuerAddress = appConfiguration.rippleIssuerAddress;
   const xrplClient = getRippleClient('wss://s.altnet.rippletest.net:51233');
@@ -69,7 +71,7 @@ export function useXRPLVaults(): useXRPLVaultsReturnType {
     initialData: [],
     queryFn: fetchXRPLVaults,
     refetchInterval: 10000,
-    enabled: networkType === 'xrpl',
+    enabled: networkType === 'xrpl' && !!rippleUserAddress,
   });
 
   async function fetchXRPLVaults(): Promise<Vault[]> {
@@ -80,7 +82,8 @@ export function useXRPLVaults(): useXRPLVaultsReturnType {
     try {
       await connectRippleClient(xrplClient);
 
-      const xrplRawVaults = await getAllRippleVaults(xrplClient, issuerAddress);
+      const xrplRawVaults = await getAllRippleVaults(xrplClient, issuerAddress, rippleUserAddress);
+      console.log('xrpVaults', xrplRawVaults);
       const xrplVaults = xrplRawVaults.map(formatVault);
 
       if (previousVaults?.length === 0) {
