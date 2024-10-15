@@ -1,64 +1,71 @@
-// import { createContext, useState } from 'react';
+import { createContext, useState } from 'react';
 
-// import { HasChildren } from '@models/has-children';
-// import { BitcoinWalletType, XRPWalletType } from '@models/wallet';
-// import { LedgerDLCHandler, SoftwareWalletDLCHandler } from 'dlc-btc-lib';
+import { HasChildren } from '@models/has-children';
+import { XRPWalletType } from '@models/wallet';
+import { LedgerXRPHandler } from 'dlc-btc-lib';
 
-// export enum XRPWalletContextState {
-//   INITIAL = 0,
-//   SELECTED = 1,
-//   READY = 2,
-// }
+export enum XRPWalletContextState {
+  INITIAL = 0,
+  SELECTED = 1,
+  READY = 2,
+}
 
-// interface XRPWalletContextProviderType {
-//   xrpWalletType: XRPWalletType | undefined;
-//   setXRPWalletType: React.Dispatch<React.SetStateAction<XRPWalletType | undefined>>;
-//   xrpWalletContextState: XRPWalletContextState;
-//   setXRPWalletContextState: React.Dispatch<React.SetStateAction<XRPWalletContextState>>;
-//   dlcHandler: SoftwareWalletDLCHandler | LedgerDLCHandler | undefined;
-//   setDLCHandler: React.Dispatch<
-//     React.SetStateAction<SoftwareWalletDLCHandler | LedgerDLCHandler | undefined>
-//   >;
-//   resetBitcoinWalletContext: () => void;
-// }
+interface XRPWalletContextProviderType {
+  xrpWalletType: XRPWalletType | undefined;
+  setXRPWalletType: React.Dispatch<React.SetStateAction<XRPWalletType | undefined>>;
+  xrpWalletContextState: XRPWalletContextState;
+  setXRPWalletContextState: React.Dispatch<React.SetStateAction<XRPWalletContextState>>;
+  xrpHandler: LedgerXRPHandler | undefined;
+  setXRPHandler: React.Dispatch<React.SetStateAction<LedgerXRPHandler | undefined>>;
+  setUserAddress: React.Dispatch<React.SetStateAction<string | undefined>>;
+  userAddress: string | undefined;
+  resetXRPWalletContext: () => void;
+}
 
-// export const XRPWalletContext = createContext<XRPWalletContextProviderType>({
-//   bitcoinWalletType: undefined,
-//   setBitcoinWalletType: () => {},
-//   bitcoinWalletContextState: BitcoinWalletContextState.INITIAL,
-//   setBitcoinWalletContextState: () => {},
-//   dlcHandler: undefined,
-//   setDLCHandler: () => {},
-//   resetBitcoinWalletContext: () => {},
-// });
+export const XRPWalletContext = createContext<XRPWalletContextProviderType>({
+  xrpWalletType: undefined,
+  setXRPWalletType: () => {},
+  xrpWalletContextState: XRPWalletContextState.INITIAL,
+  setXRPWalletContextState: () => {},
+  xrpHandler: undefined,
+  setXRPHandler: () => {},
+  setUserAddress: () => {},
+  userAddress: undefined,
+  resetXRPWalletContext: () => {},
+});
 
-// export function BitcoinWalletContextProvider({ children }: HasChildren): React.JSX.Element {
-//   const [bitcoinWalletContextState, setBitcoinWalletContextState] =
-//     useState<BitcoinWalletContextState>(BitcoinWalletContextState.INITIAL);
-//   const [bitcoinWalletType, setBitcoinWalletType] = useState<BitcoinWalletType | undefined>(
-//     BitcoinWalletType.Leather
-//   );
-//   const [dlcHandler, setDLCHandler] = useState<SoftwareWalletDLCHandler | LedgerDLCHandler>();
+export function XRPWalletContextProvider({ children }: HasChildren): React.JSX.Element {
+  const [xrpWalletContextState, setXRPWalletContextState] = useState<XRPWalletContextState>(
+    XRPWalletContextState.INITIAL
+  );
+  const [xrpWalletType, setXRPWalletType] = useState<XRPWalletType | undefined>(
+    XRPWalletType.Ledger
+  );
+  const [xrpHandler, setXRPHandler] = useState<LedgerXRPHandler>();
+  const [userAddress, setUserAddress] = useState<string | undefined>(undefined);
 
-//   function resetBitcoinWalletContext() {
-//     setBitcoinWalletContextState(BitcoinWalletContextState.INITIAL);
-//     setBitcoinWalletType(undefined);
-//     setDLCHandler(undefined);
-//   }
+  function resetXRPWalletContext() {
+    setXRPWalletContextState(XRPWalletContextState.INITIAL);
+    setXRPWalletType(undefined);
+    setXRPHandler(undefined);
+    setUserAddress(undefined);
+  }
 
-//   return (
-//     <BitcoinWalletContext.Provider
-//       value={{
-//         bitcoinWalletType,
-//         setBitcoinWalletType,
-//         bitcoinWalletContextState,
-//         setBitcoinWalletContextState,
-//         dlcHandler,
-//         setDLCHandler,
-//         resetBitcoinWalletContext,
-//       }}
-//     >
-//       {children}
-//     </BitcoinWalletContext.Provider>
-//   );
-// }
+  return (
+    <XRPWalletContext.Provider
+      value={{
+        xrpWalletType,
+        setXRPWalletType,
+        xrpWalletContextState,
+        setXRPWalletContextState,
+        xrpHandler,
+        setXRPHandler,
+        setUserAddress,
+        userAddress,
+        resetXRPWalletContext,
+      }}
+    >
+      {children}
+    </XRPWalletContext.Provider>
+  );
+}

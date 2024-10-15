@@ -54,9 +54,9 @@ export function VaultDetails({
   function handleResumeClick() {
     navigate('/mint-withdraw');
     if (vaultTotalLockedValue === vaultTotalMintedValue) {
-      dispatch(mintUnmintActions.setMintStep([2, vaultUUID]));
+      dispatch(mintUnmintActions.setMintStep([2, vaultUUID, vault]));
     } else {
-      dispatch(mintUnmintActions.setUnmintStep([2, vaultUUID]));
+      dispatch(mintUnmintActions.setUnmintStep([2, vaultUUID, vault]));
     }
   }
 

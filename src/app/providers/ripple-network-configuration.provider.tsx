@@ -1,13 +1,10 @@
 import React, { createContext, useEffect, useState } from 'react';
 
-import { RippleWallet } from '@components/modals/select-wallet-modal/select-wallet-modal';
 import { getRippleNetworkByID } from '@functions/configuration.functions';
-import { useXRPLLedger } from '@hooks/use-xrpl-ledger';
-import Xrp from '@ledgerhq/hw-app-xrp';
 import { HasChildren } from '@models/has-children';
 import { RippleNetwork, RippleNetworkConfiguration, RippleNetworkID } from '@models/ripple.models';
-import { Client, Wallet } from 'dlc-btc-lib/models';
-import { getRippleClient, getRippleWallet } from 'dlc-btc-lib/ripple-functions';
+import { Client } from 'dlc-btc-lib/models';
+import { getRippleClient } from 'dlc-btc-lib/ripple-functions';
 import { equals, find } from 'ramda';
 
 import { supportedRippleNetworks } from '@shared/constants/ripple.constants';
@@ -57,47 +54,29 @@ interface RippleNetworkConfigurationContext {
   rippleNetworkConfiguration: RippleNetworkConfiguration;
   setRippleNetworkID: (rippleNetworkID: RippleNetworkID) => void;
   enabledRippleNetworks: RippleNetwork[];
-  rippleUserAddress: string | undefined;
-  isRippleWalletConnected: boolean;
-  connectLedgerWallet: (derivationPath: string) => Promise<void>;
-  signTransaction: (transaction: any) => Promise<any>;
-  rippleWallet: RippleWallet | undefined;
   rippleClient: Client;
-  setRippleWallet: (rippleWallet: RippleWallet) => void;
   isRippleNetworkConfigurationLoading: boolean;
 }
 export const RippleNetworkConfigurationContext = createContext<RippleNetworkConfigurationContext>({
-  setRippleNetworkID: (rippleNetworkID: RippleNetworkID) => {},
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  setRippleNetworkID: (_rippleNetworkID: RippleNetworkID) => {},
   rippleNetworkConfiguration: defaultRippleNetworkConfiguration,
   enabledRippleNetworks,
-  rippleUserAddress: undefined,
-  connectLedgerWallet: async (_derivationPath: string) => {},
-  signTransaction: async (_transaction: any) => {},
   rippleClient: new Client(appConfiguration.xrplWebsocket),
-  rippleWallet: undefined,
-  setRippleWallet: (_rippleWallet: RippleWallet) => {},
-  isRippleWalletConnected: false,
   isRippleNetworkConfigurationLoading: false,
 });
 
 export function RippleNetworkConfigurationContextProvider({
   children,
 }: HasChildren): React.JSX.Element {
-  const { xrplAddress, connectLedgerWallet, signTransaction, isConnected } = useXRPLLedger();
   const [rippleNetworkID, setRippleNetworkID] = useState<RippleNetworkID>(defaultRippleNetwork.id);
   const [rippleNetworkConfiguration, setRippleNetworkConfiguration] =
     useState<RippleNetworkConfiguration>(defaultRippleNetworkConfiguration);
 
   const rippleClient = getRippleClient(rippleNetworkConfiguration.websocketURL);
 
-  const [rippleWallet, setRippleWallet] = useState<RippleWallet | undefined>(undefined);
-
   const [isRippleNetworkConfigurationLoading, setIsRippleNetworkConfigurationLoading] =
     useState(false);
-
-  useEffect(() => {
-    console.log('isConnected', isConnected);
-  }, [isConnected]);
 
   useEffect(() => {
     setIsRippleNetworkConfigurationLoading(true);
@@ -117,13 +96,7 @@ export function RippleNetworkConfigurationContextProvider({
         rippleNetworkConfiguration,
         isRippleNetworkConfigurationLoading,
         enabledRippleNetworks,
-        rippleUserAddress: xrplAddress,
-        signTransaction,
         rippleClient,
-        rippleWallet,
-        setRippleWallet,
-        connectLedgerWallet,
-        isRippleWalletConnected: isConnected,
         setRippleNetworkID,
       }}
     >

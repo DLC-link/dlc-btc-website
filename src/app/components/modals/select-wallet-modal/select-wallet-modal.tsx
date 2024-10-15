@@ -5,9 +5,13 @@ import { HStack, ScaleFade, Tab, TabList, Tabs, Text, VStack } from '@chakra-ui/
 import { ModalComponentProps } from '@components/modals/components/modal-container';
 import { ModalLayout } from '@components/modals/components/modal.layout';
 import { SelectNetworkButton } from '@components/select-network-button/select-network-button';
+import { TransactionScreenWalletInformation } from '@components/transaction-screen/transaction-screen.transaction-form/components/transaction-screen.transaction-form/components/transaction-screen.transaction-form.wallet-information';
+import { useXRPLLedger } from '@hooks/use-xrpl-ledger';
 import { RippleNetworkID } from '@models/ripple.models';
+import { xrpWallets } from '@models/wallet';
 import { NetworkConfigurationContext } from '@providers/network-configuration.provider';
 import { RippleNetworkConfigurationContext } from '@providers/ripple-network-configuration.provider';
+import { XRPWalletContext, XRPWalletContextState } from '@providers/xrp-wallet-context-provider';
 import { EthereumNetworkID } from 'dlc-btc-lib/models';
 import { delay } from 'dlc-btc-lib/utilities';
 import { Connector, useConfig, useConnect } from 'wagmi';
@@ -15,38 +19,20 @@ import { Connector, useConfig, useConnect } from 'wagmi';
 import { SelectEthereumWalletMenu } from './components/select-ethereum-wallet-menu';
 import { SelectRippleWalletMenu } from './components/select-ripple-wallet-menu';
 
-export interface RippleWallet {
-  id: string;
-  name: string;
-  icon: string;
-}
-
-const seedWallet: RippleWallet = {
-  id: 'seed',
-  name: 'Seed Phrase',
-  icon: './images/logos/xpr-logo.svg',
-};
-
-const ledgerWallet: RippleWallet = {
-  id: 'ledger',
-  name: 'Ledger',
-  icon: './images/logos/ledger-logo.svg',
-};
-
-const rippleWallets = [ledgerWallet];
-
 export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps): React.JSX.Element {
   const { connect, isPending, isSuccess, connectors } = useConnect();
   const { chains: ethereumNetworks } = useConfig();
 
   const { setNetworkType } = useContext(NetworkConfigurationContext);
   const {
-    enabledRippleNetworks,
-    isRippleWalletConnected,
-    setRippleWallet,
-    rippleWallet,
-    connectLedgerWallet,
-  } = useContext(RippleNetworkConfigurationContext);
+    setXRPWalletType,
+    setXRPWalletContextState,
+    setUserAddress,
+    xrpWalletContextState,
+    setXRPHandler,
+  } = useContext(XRPWalletContext);
+  const { connectLedgerWallet, isLoading } = useXRPLLedger();
+  const { enabledRippleNetworks } = useContext(RippleNetworkConfigurationContext);
 
   const ethereumNetworkIDs = ethereumNetworks.map(
     ethereumNetwork => ethereumNetwork.id.toString() as EthereumNetworkID
@@ -66,11 +52,11 @@ export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps):
   const networkTypes = ['evm', 'xrpl'];
 
   useEffect(() => {
-    if (isSuccess || isRippleWalletConnected) {
+    if (isSuccess || xrpWalletContextState === XRPWalletContextState.READY) {
       void handleCloseAfterSuccess();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccess, isRippleWalletConnected]);
+  }, [isSuccess, xrpWalletContextState]);
 
   async function handleCloseAfterSuccess() {
     await delay(1000);
@@ -90,11 +76,15 @@ export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps):
     }
   }
 
-  async function handleConnectRippleWallet(id: string) {
+  async function handleConnectRippleWallet() {
     setNetworkType('xrpl');
-    setRippleWallet(rippleWallets[0]);
+    setXRPWalletType(xrpWallets[0].id);
 
-    await connectLedgerWallet("44'/144'/0'/0/0");
+    const { xrpHandler, userAddress } = await connectLedgerWallet("44'/144'/0'/0/1");
+
+    setXRPHandler(xrpHandler);
+    setUserAddress(userAddress);
+    setXRPWalletContextState(XRPWalletContextState.READY);
   }
 
   const handleChangeNetwork = (networkID: EthereumNetworkID | RippleNetworkID) => {
@@ -155,13 +145,14 @@ export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps):
                     handleConnectWallet={handleConnectEthereumWallet}
                   />
                 ))
-              : rippleWallets.map(rippleWallet => (
+              : xrpWallets.map(rippleWallet => (
                   <SelectRippleWalletMenu
                     key={rippleWallet.id}
                     rippleWallet={rippleWallet}
                     handleConnectWallet={handleConnectRippleWallet}
                   />
                 ))}
+            <TransactionScreenWalletInformation isBitcoinWalletLoading={isLoading} />
           </VStack>
         </ScaleFade>
       </VStack>

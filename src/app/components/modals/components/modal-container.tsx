@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { SelectWalletModal } from '@components/modals/select-wallet-modal/select-wallet-modal';
@@ -27,10 +26,6 @@ export function ModalContainer(): React.JSX.Element {
   const handleClosingModal = (actionCreator: () => AnyAction) => {
     dispatch(actionCreator());
   };
-
-  useEffect(() => {
-    console.log(isSuccesfulFlowModalOpen);
-  }, [isSuccesfulFlowModalOpen]);
 
   return (
     <>

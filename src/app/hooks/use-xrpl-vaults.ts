@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import { formatVault } from '@functions/vault.functions';
 import { Vault } from '@models/vault';
 import { NetworkConfigurationContext } from '@providers/network-configuration.provider';
-import { RippleNetworkConfigurationContext } from '@providers/ripple-network-configuration.provider';
+import { XRPWalletContext } from '@providers/xrp-wallet-context-provider';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { modalActions } from '@store/slices/modal/modal.actions';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -61,7 +61,7 @@ export function useXRPLVaults(): useXRPLVaultsReturnType {
   const [isLoading, setIsLoading] = useState(true);
 
   const { networkType } = useContext(NetworkConfigurationContext);
-  const { rippleUserAddress } = useContext(RippleNetworkConfigurationContext);
+  const { userAddress: rippleUserAddress } = useContext(XRPWalletContext);
 
   const issuerAddress = appConfiguration.rippleIssuerAddress;
   const xrplClient = getRippleClient('wss://s.altnet.rippletest.net:51233');
@@ -83,10 +83,15 @@ export function useXRPLVaults(): useXRPLVaultsReturnType {
       await connectRippleClient(xrplClient);
 
       const xrplRawVaults = await getAllRippleVaults(xrplClient, issuerAddress, rippleUserAddress);
-      console.log('xrpVaults', xrplRawVaults);
       const xrplVaults = xrplRawVaults.map(formatVault);
 
-      if (previousVaults?.length === 0) {
+      if (
+        previousVaults?.length === 0 &&
+        xrplVaults.length === 1 &&
+        xrplVaults[0].state === VaultState.READY
+      ) {
+        handleVaultStateChange(previousVaults[0], xrplVaults[0]);
+      } else if (previousVaults?.length === 0) {
         return xrplVaults;
       }
 
@@ -115,7 +120,6 @@ export function useXRPLVaults(): useXRPLVaultsReturnType {
 
   const handleVaultStateChange = (previousVault: Vault | undefined, vault: Vault) => {
     if (!previousVault && vault.uuid !== INITIAL_VAULT_UUID) {
-      console.log('New Vault', vault);
       dispatch(mintUnmintActions.setMintStep([1, vault.uuid, vault]));
       return;
     } else if (previousVault && previousVault.state !== vault.state) {

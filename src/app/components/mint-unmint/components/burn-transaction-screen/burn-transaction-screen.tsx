@@ -5,22 +5,18 @@ import { VStack, useToast } from '@chakra-ui/react';
 import { VaultTransactionForm } from '@components/transaction-screen/transaction-screen.transaction-form/components/transaction-screen.transaction-form/transaction-screen.transaction-form';
 import { Vault } from '@components/vault/vault';
 import { useEthersSigner } from '@functions/configuration.functions';
+import { useXRPLLedger } from '@hooks/use-xrpl-ledger';
 import { BitcoinWalletContext } from '@providers/bitcoin-wallet-context-provider';
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { NetworkConfigurationContext } from '@providers/network-configuration.provider';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
-import { RippleNetworkConfigurationContext } from '@providers/ripple-network-configuration.provider';
+import { XRPWalletContext } from '@providers/xrp-wallet-context-provider';
+// import { XRPWalletContext } from '@providers/xrp-wallet-context-provider';
 import { RootState } from '@store/index';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { withdraw } from 'dlc-btc-lib/ethereum-functions';
-import {
-  connectRippleClient,
-  createCheck,
-  getRippleClient,
-  getRippleWallet,
-} from 'dlc-btc-lib/ripple-functions';
+import { getRippleClient, getRippleVault } from 'dlc-btc-lib/ripple-functions';
 import { shiftValue } from 'dlc-btc-lib/utilities';
-import { decode } from 'ripple-binary-codec';
 
 interface BurnTokenTransactionFormProps {
   isBitcoinWalletLoading: [boolean, string];
@@ -40,9 +36,8 @@ export function BurnTokenTransactionForm({
 
   const { networkType } = useContext(NetworkConfigurationContext);
   const { bitcoinWalletContextState } = useContext(BitcoinWalletContext);
-  const { rippleUserAddress, rippleClient, signTransaction } = useContext(
-    RippleNetworkConfigurationContext
-  );
+  const { xrpHandler } = useContext(XRPWalletContext);
+  const { handleCreateCheck, connectLedgerWallet, isLoading } = useXRPLLedger();
 
   const { bitcoinPrice, depositLimit } = useContext(ProofOfReserveContext);
 
@@ -60,21 +55,16 @@ export function BurnTokenTransactionForm({
       if (!currentVault) return;
       setIsSubmitting(true);
       if (networkType === 'xrpl') {
-        await connectRippleClient(rippleClient);
-        const formattedWithdrawAmount = BigInt(shiftValue(withdrawAmount));
-
-        const check = await createCheck(
+        const rippleClient = getRippleClient(appConfiguration.xrplWebsocket);
+        const vault = await getRippleVault(
           rippleClient,
-          rippleUserAddress!,
           appConfiguration.rippleIssuerAddress,
-          undefined,
-          formattedWithdrawAmount.toString(),
-          currentVault.uuid.slice(2)
+          currentVault.uuid
         );
-        const signedCheck = await signTransaction(check);
-        console.log('signedCheck', signedCheck);
-        const submitResponse = await rippleClient.submitAndWait(signedCheck);
-        console.log('Check submitted', submitResponse);
+        await connectLedgerWallet("44'/144'/0'/0/0");
+
+        if (!xrpHandler) throw new Error('No XRP Handler');
+        await handleCreateCheck(xrpHandler, vault, withdrawAmount);
       } else if (networkType === 'evm') {
         const currentRisk = await fetchUserEthereumAddressRiskLevel();
         if (currentRisk === 'High') throw new Error('Risk Level is too high');
@@ -115,7 +105,11 @@ export function BurnTokenTransactionForm({
         handleButtonClick={handleButtonClick}
         depositLimit={depositLimit}
         bitcoinWalletContextState={bitcoinWalletContextState}
-        isBitcoinWalletLoading={isBitcoinWalletLoading}
+        isBitcoinWalletLoading={
+          currentVault?.valueLocked === currentVault?.valueMinted
+            ? isLoading
+            : isBitcoinWalletLoading
+        }
         userEthereumAddressRiskLevel={userEthereumAddressRiskLevel}
         isUserEthereumAddressRiskLevelLoading={isUserEthereumAddressRiskLevelLoading}
         handleCancelButtonClick={handleCancel}

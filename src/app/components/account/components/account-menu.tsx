@@ -9,13 +9,13 @@ import {
   Text,
   useBreakpointValue,
 } from '@chakra-ui/react';
-import { RippleWallet } from '@components/modals/select-wallet-modal/select-wallet-modal';
+import { XRPWallet } from '@models/wallet';
 import { truncateAddress } from 'dlc-btc-lib/utilities';
 import { Connector } from 'wagmi';
 
 interface AccountMenuProps {
   address?: string;
-  wallet?: Connector | RippleWallet;
+  wallet?: Connector | XRPWallet;
   handleDisconnectWallet: () => void;
 }
 

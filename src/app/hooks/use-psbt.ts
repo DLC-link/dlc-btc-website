@@ -7,7 +7,7 @@ import { bytesToHex } from '@noble/hashes/utils';
 import { BitcoinWalletContext } from '@providers/bitcoin-wallet-context-provider';
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { NetworkConfigurationContext } from '@providers/network-configuration.provider';
-import { RippleNetworkConfigurationContext } from '@providers/ripple-network-configuration.provider';
+import { XRPWalletContext } from '@providers/xrp-wallet-context-provider';
 import { LedgerDLCHandler, SoftwareWalletDLCHandler } from 'dlc-btc-lib';
 import {
   submitFundingPSBT,
@@ -34,7 +34,7 @@ export function usePSBT(): UsePSBTReturnType {
     ethereumNetworkConfiguration: { dlcManagerContract, ethereumAttestorChainID },
   } = useContext(EthereumNetworkConfigurationContext);
   const { address: ethereumUserAddress } = useAccount();
-  const { rippleUserAddress } = useContext(RippleNetworkConfigurationContext);
+  const { userAddress: rippleUserAddress } = useContext(XRPWalletContext);
 
   const { bitcoinWalletType, dlcHandler, resetBitcoinWalletContext } =
     useContext(BitcoinWalletContext);

@@ -88,7 +88,13 @@ export function useEVMVaults(): useEVMVaultsReturnType {
       );
       const evmVaults = evmRawVaults.map(formatVault);
 
-      if (previousVaults?.length === 0) {
+      if (
+        previousVaults?.length === 0 &&
+        evmVaults.length === 1 &&
+        evmVaults[0].state === VaultState.READY
+      ) {
+        handleVaultStateChange(previousVaults[0], evmVaults[0]);
+      } else if (previousVaults?.length === 0) {
         return evmVaults;
       }
 

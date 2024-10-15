@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { NetworkConfigurationContext } from '@providers/network-configuration.provider';
 import { RippleNetworkConfigurationContext } from '@providers/ripple-network-configuration.provider';
+import { XRPWalletContext, XRPWalletContextState } from '@providers/xrp-wallet-context-provider';
 import { useQuery } from '@tanstack/react-query';
 import { isUserWhitelisted, isWhitelistingEnabled } from 'dlc-btc-lib/ethereum-functions';
 import { useAccount } from 'wagmi';
@@ -19,9 +20,8 @@ export function useActiveTabs(): UseActiveTabsReturnType {
     EthereumNetworkConfigurationContext
   );
 
-  const { isRippleWalletConnected, isRippleNetworkConfigurationLoading } = useContext(
-    RippleNetworkConfigurationContext
-  );
+  const { isRippleNetworkConfigurationLoading } = useContext(RippleNetworkConfigurationContext);
+  const { xrpWalletContextState } = useContext(XRPWalletContext);
   const { networkType } = useContext(NetworkConfigurationContext);
 
   async function shouldActivateTabs(): Promise<boolean> {
@@ -35,12 +35,12 @@ export function useActiveTabs(): UseActiveTabsReturnType {
       return await isUserWhitelisted(dlcManagerContract, address);
     } else {
       navigate('/mint-withdraw');
-      return isRippleWalletConnected;
+      return xrpWalletContextState === XRPWalletContextState.READY;
     }
   }
 
   const { data: isActiveTabs } = useQuery({
-    queryKey: ['activeTabs', chain, address, networkType, isRippleWalletConnected],
+    queryKey: ['activeTabs', chain, address, networkType, xrpWalletContextState],
     queryFn: shouldActivateTabs,
     enabled:
       networkType === 'evm'

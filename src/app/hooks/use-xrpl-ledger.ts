@@ -1,111 +1,152 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 
 import Xrp from '@ledgerhq/hw-app-xrp';
 import Transport from '@ledgerhq/hw-transport-webusb';
-import { Client } from 'dlc-btc-lib/models';
-import { getRippleClient, setTrustLine } from 'dlc-btc-lib/ripple-functions';
-import { encode } from 'ripple-binary-codec';
+import { LEDGER_APPS_MAP } from '@models/ledger';
+import { RippleNetworkConfigurationContext } from '@providers/ripple-network-configuration.provider';
+import { LedgerXRPHandler } from 'dlc-btc-lib';
+import { LedgerError, RawVault } from 'dlc-btc-lib/models';
+import { delay, shiftValue } from 'dlc-btc-lib/utilities';
+import AppClient from 'ledger-bitcoin';
 
 interface useXRPLLedgerReturnType {
-  xrplAddress: string | undefined;
-  isConnected: boolean;
-  connectLedgerWallet: (derivationPath: string) => Promise<void>;
-  fetchXRPLAddress: () => Promise<any>;
-  signTransaction: (transaction: any) => Promise<any>;
+  isLoading: [boolean, string];
+  connectLedgerWallet: (
+    derivationPath: string
+  ) => Promise<{ xrpHandler: LedgerXRPHandler; userAddress: string }>;
+  handleCreateCheck: (
+    xrpHandler: LedgerXRPHandler,
+    vault: RawVault,
+    withdrawAmount: number
+  ) => Promise<any>;
+  handleSetTrustLine: (xrpHandler: LedgerXRPHandler) => Promise<any>;
 }
 
+type TransportInstance = Awaited<ReturnType<typeof Transport.create>>;
+
 export function useXRPLLedger(): useXRPLLedgerReturnType {
-  const [derivationPath, setDerivationPath] = useState<string | undefined>(undefined);
-  const [xrplWallet, setXRPLWallet] = useState<Xrp | undefined>(undefined);
-  const [xrplAddress, setXRPLAddress] = useState<string | undefined>(undefined);
-  const [isConnected, setIsConnected] = useState<boolean>(false);
+  const { rippleClient } = useContext(RippleNetworkConfigurationContext);
+
+  const [isLoading, setIsLoading] = useState<[boolean, string]>([false, '']);
+
+  // Reference: https://github.com/LedgerHQ/ledger-live/blob/v22.0.1/src/hw/quitApp.ts\
+  /**
+   * Quits the Ledger App.
+   * @param transport The Ledger Transport.
+   * @returns A Promise that resolves when the Ledger App is quit.
+   */
+  async function quitApp(transport: TransportInstance): Promise<void> {
+    await transport.send(0xb0, 0xa7, 0x00, 0x00);
+  }
+
+  // Reference: https://github.com/LedgerHQ/ledger-live/blob/v22.0.1/src/hw/openApp.ts
+  /**
+   * Opens the Ledger App.
+   * @param transport The Ledger Transport.
+   * @param name The name of the Ledger App.
+   * @returns A Promise that resolves when the Ledger App is opened.
+   */
+  async function openApp(transport: TransportInstance, name: string): Promise<void> {
+    await transport.send(0xe0, 0xd8, 0x00, 0x00, Buffer.from(name, 'ascii'));
+  }
+
+  /**
+   * Gets the Ledger App.
+   * @param appName The name of the Ledger App.
+   * @returns The Ledger App.
+   */
+  async function getLedgerApp(appName: string): Promise<AppClient> {
+    setIsLoading([true, `Opening Ledger ${appName} App`]);
+    const transport = await Transport.create();
+    const ledgerApp = new AppClient(transport);
+    const appAndVersion = await ledgerApp.getAppAndVersion();
+
+    if (appAndVersion.name === appName) {
+      setIsLoading([false, '']);
+      return new AppClient(transport);
+    }
+
+    if (appAndVersion.name === LEDGER_APPS_MAP.MAIN_MENU) {
+      setIsLoading([true, `Open ${appName} App on your Ledger Device`]);
+      await openApp(transport, appName);
+      await delay(1500);
+      setIsLoading([false, '']);
+      return new AppClient(await Transport.create());
+    }
+
+    if (appAndVersion.name !== appName) {
+      await quitApp(await Transport.create());
+      await delay(1500);
+      setIsLoading([true, `Open ${appName} App on your Ledger Device`]);
+      await openApp(await Transport.create(), appName);
+      await delay(1500);
+      setIsLoading([false, '']);
+      return new AppClient(await Transport.create());
+    }
+
+    throw new LedgerError(`Could not open Ledger ${appName} App`);
+  }
 
   async function connectLedgerWallet(derivationPath: string) {
     try {
-      console.log('Connecting ledger wallet');
+      setIsLoading([true, 'Connecting To Ledger Wallet']);
+
+      await getLedgerApp(LEDGER_APPS_MAP.XRP);
       const transport = await Transport.create();
-      console.log('Transport created');
       const xrplWallet = new Xrp(transport);
-      console.log('XRPL wallet created');
       const xrplAddress = await xrplWallet.getAddress(derivationPath);
-      console.log('XRPL address fetched', xrplAddress);
-      // const trustset = await setTrustLine(
-      //   getRippleClient(appConfiguration.xrplWebsocket),
-      //   xrplAddress.address,
-      //   appConfiguration.rippleIssuerAddress
-      // );
-      // const trustset2 = {
-      //   SigningPubKey: xrplAddress.publicKey.toUpperCase(),
-      //   ...trustset,
-      // };
-      // console.log('Trustline set', trustset2);
-      // const encoded = encode(trustset2);
-      // console.log('Trustline encoded', encoded);
-      // const signtrustset = await xrplWallet.signTransaction("44'/144'/0'/0/0", encoded);
-      // console.log('Trustline signed', signtrustset);
-      // const xrplClient = getRippleClient(appConfiguration.xrplWebsocket);
-      // const trustline = await xrplClient.submitAndWait(signtrustset);
-      // console.log('Trustline', trustline);
+      const xrpHandler = new LedgerXRPHandler(
+        xrplWallet,
+        derivationPath,
+        rippleClient,
+        appConfiguration.rippleIssuerAddress
+      );
 
-      setDerivationPath(derivationPath);
-      setXRPLWallet(xrplWallet);
-      setXRPLAddress(xrplAddress.address);
-      setIsConnected(true);
-      console.log('Ledger wallet connected');
+      return { xrpHandler, userAddress: xrplAddress.address };
     } catch (error) {
-      console.error('Error connecting ledger wallet', error);
+      throw new LedgerError(`Error connecting to Ledger Wallet: ${error}`);
+    } finally {
+      setIsLoading([false, '']);
     }
   }
 
-  function fetchXRPLAddress() {
-    if (!xrplWallet) {
-      throw new Error('Ledger wallet not connected');
-    }
+  async function handleCreateCheck(
+    xrpHandler: LedgerXRPHandler,
+    vault: RawVault,
+    withdrawAmount: number
+  ) {
+    try {
+      setIsLoading([true, 'Sign Check on your Ledger Device']);
 
-    if (!derivationPath) {
-      throw new Error('Derivation path not set');
+      const formattedWithdrawAmount = BigInt(shiftValue(withdrawAmount));
+
+      return await xrpHandler.createCheck(formattedWithdrawAmount.toString(), vault.uuid.slice(2));
+    } catch (error) {
+      throw new LedgerError(`Error creating check: ${error}`);
+    } finally {
+      setIsLoading([false, '']);
     }
-    return xrplWallet.getAddress(derivationPath);
   }
 
-  async function signTransaction(transaction: any) {
-    if (!xrplWallet) {
-      throw new Error('Ledger wallet not connected');
+  async function handleSetTrustLine(xrpHandler: LedgerXRPHandler) {
+    try {
+      setIsLoading([true, 'Set Trust Line on your Ledger Device']);
+
+      console.log('Setting trust line');
+      const trustLine = await xrpHandler.setTrustLine();
+      console.log('Trust line set');
+      return trustLine;
+    } catch (error) {
+      throw new LedgerError(`Error setting trust line: ${error}`);
+    } finally {
+      setIsLoading([false, '']);
     }
-
-    if (!derivationPath) {
-      throw new Error('Derivation path not set');
-    }
-
-    const deviceData = await xrplWallet.getAddress(derivationPath);
-
-    console.log('transaction', transaction);
-
-    const updatedTransaction = {
-      ...transaction,
-      Flags: 2147483648,
-      SigningPubKey: deviceData.publicKey.toUpperCase(),
-    };
-
-    console.log('Updated transaction', updatedTransaction);
-
-    const encodedTransaction = encode(updatedTransaction);
-    console.log('encodedTransaction', encodedTransaction);
-    const signature = await xrplWallet.signTransaction(derivationPath, encodedTransaction);
-
-    console.log('Signed transaction', signature);
-    const signedTransaction = {
-      ...updatedTransaction,
-      TxnSignature: signature,
-    };
-    return signedTransaction;
   }
 
   return {
-    xrplAddress,
+    isLoading,
     connectLedgerWallet,
-    fetchXRPLAddress,
-    signTransaction,
-    isConnected,
+    handleCreateCheck,
+    handleSetTrustLine,
   };
 }

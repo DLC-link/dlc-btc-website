@@ -42,7 +42,7 @@ export interface XRPWallet {
 const ledgerXRP: XRPWallet = {
   id: XRPWalletType.Ledger,
   name: 'Ledger',
-  icon: '/images/logos/ledger-logo.svg',
+  icon: './images/logos/ledger-logo.svg',
 };
 
 // const gemXRP: XRPWallet = {

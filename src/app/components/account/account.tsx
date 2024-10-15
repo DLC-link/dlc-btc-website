@@ -3,10 +3,10 @@ import { useDispatch } from 'react-redux';
 
 import { Button, HStack } from '@chakra-ui/react';
 import { AccountMenu } from '@components/account/components/account-menu';
-import { RippleWallet } from '@components/modals/select-wallet-modal/select-wallet-modal';
 import { useNetworkConnection } from '@hooks/use-connected';
+import { XRPWallet, xrpWallets } from '@models/wallet';
 import { NetworkConfigurationContext } from '@providers/network-configuration.provider';
-import { RippleNetworkConfigurationContext } from '@providers/ripple-network-configuration.provider';
+import { XRPWalletContext } from '@providers/xrp-wallet-context-provider';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { modalActions } from '@store/slices/modal/modal.actions';
 import { Connector, useAccount, useDisconnect } from 'wagmi';
@@ -19,18 +19,23 @@ export function Account(): React.JSX.Element {
 
   const { address: ethereumUserAddress, connector: ethereumWallet } = useAccount();
   const { disconnect: disconnectEthereumWallet } = useDisconnect();
-  const { rippleUserAddress, rippleWallet } = useContext(RippleNetworkConfigurationContext);
+  const {
+    userAddress: rippleUserAddress,
+    xrpWalletType,
+    resetXRPWalletContext,
+  } = useContext(XRPWalletContext);
 
-  function getWalletInformation():
-    | { address: string; wallet: RippleWallet | Connector }
-    | undefined {
+  function getWalletInformation(): { address: string; wallet: XRPWallet | Connector } | undefined {
     switch (networkType) {
       case 'evm':
         if (!ethereumUserAddress || !ethereumWallet) return undefined;
         return { address: ethereumUserAddress, wallet: ethereumWallet };
       case 'xrpl':
         if (!rippleUserAddress) return undefined;
-        return { address: rippleUserAddress, wallet: rippleWallet! };
+        return {
+          address: rippleUserAddress,
+          wallet: xrpWallets.find(xrpWallet => xrpWallet.id === xrpWalletType)!,
+        };
       default:
         throw new Error('Invalid Network Type');
     }
@@ -41,17 +46,17 @@ export function Account(): React.JSX.Element {
   }
 
   function onDisconnectWalletClick(): void {
-    // switch (networkType) {
-    //   case 'evm':
-    //     disconnectEthereumWallet();
-    //     break;
-    //   case 'xrpl':
-    //     setIsRippleWalletConnected(false);
-    //     break;
-    //   default:
-    //     break;
-    // }
-    // dispatch(mintUnmintActions.resetMintUnmintState());
+    switch (networkType) {
+      case 'evm':
+        disconnectEthereumWallet();
+        break;
+      case 'xrpl':
+        resetXRPWalletContext();
+        break;
+      default:
+        break;
+    }
+    dispatch(mintUnmintActions.resetMintUnmintState());
   }
 
   return (

@@ -34,16 +34,12 @@ const handler: Handler = async (event: HandlerEvent) => {
     const coordinatorURL = event.queryStringParameters.coordinatorURL;
     const userXRPLAddress = event.queryStringParameters.userXRPLAddress;
 
-    console.log('coordinatorURL', coordinatorURL);
-    console.log('userXRPLAddress', userXRPLAddress);
-
     await submitSetupXRPLVaultRequest(coordinatorURL, userXRPLAddress);
 
     return {
       statusCode: 200,
     };
   } catch (error: any) {
-    console.log('IDE NEEEEEEZZZZZZZZ', error);
     return {
       statusCode: 500,
       body: JSON.stringify({

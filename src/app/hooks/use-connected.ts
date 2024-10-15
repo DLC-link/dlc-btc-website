@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 
 import { NetworkConfigurationContext } from '@providers/network-configuration.provider';
-import { RippleNetworkConfigurationContext } from '@providers/ripple-network-configuration.provider';
+import { XRPWalletContext, XRPWalletContextState } from '@providers/xrp-wallet-context-provider';
 import { useAccount } from 'wagmi';
 
 interface UseNetworkConnectionReturnType {
@@ -14,7 +14,7 @@ export function useNetworkConnection(): UseNetworkConnectionReturnType {
   const { networkType } = useContext(NetworkConfigurationContext);
 
   const { isConnected: isEthereumWalletConnected } = useAccount();
-  const { isRippleWalletConnected } = useContext(RippleNetworkConfigurationContext);
+  const { xrpWalletContextState } = useContext(XRPWalletContext);
 
   useEffect(() => {
     switch (networkType) {
@@ -22,13 +22,12 @@ export function useNetworkConnection(): UseNetworkConnectionReturnType {
         setIsConnected(isEthereumWalletConnected);
         break;
       case 'xrpl':
-        console.log('isRippleWalletConnected', isRippleWalletConnected);
-        setIsConnected(isRippleWalletConnected);
+        setIsConnected(xrpWalletContextState === XRPWalletContextState.READY);
         break;
       default:
         setIsConnected(false);
     }
-  }, [networkType, isRippleWalletConnected, isEthereumWalletConnected]);
+  }, [networkType, xrpWalletContextState, isEthereumWalletConnected]);
 
   return { isConnected };
 }

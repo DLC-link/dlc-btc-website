@@ -8,15 +8,11 @@ import {
   getAllAddressVaults,
   getLockedBTCBalance,
 } from 'dlc-btc-lib/ethereum-functions';
-import {
-  getDLCBTCBalance,
-  getLockedBTCBalance as getLockedBTCBalanceXRPL,
-} from 'dlc-btc-lib/ripple-functions';
 import { useAccount } from 'wagmi';
 
 import { EthereumNetworkConfigurationContext } from './ethereum-network-configuration.provider';
 import { NetworkConfigurationContext } from './network-configuration.provider';
-import { RippleNetworkConfigurationContext } from './ripple-network-configuration.provider';
+import { XRPWalletContext } from './xrp-wallet-context-provider';
 
 interface VaultContextType {
   dlcBTCBalance: number | undefined;
@@ -34,9 +30,8 @@ export function BalanceContextProvider({ children }: HasChildren): React.JSX.Ele
   } = useContext(EthereumNetworkConfigurationContext);
   const { networkType } = useContext(NetworkConfigurationContext);
   const { isConnected } = useNetworkConnection();
-  const { rippleUserAddress, rippleClient, rippleWalletClient } = useContext(
-    RippleNetworkConfigurationContext
-  );
+  const { userAddress } = useContext(XRPWalletContext);
+  const { xrpHandler } = useContext(XRPWalletContext);
 
   const { address: ethereumUserAddress } = useAccount();
 
@@ -51,23 +46,14 @@ export function BalanceContextProvider({ children }: HasChildren): React.JSX.Ele
   };
 
   const fetchXRPLBalances = async () => {
-    const dlcBTCBalance = await getDLCBTCBalance(
-      rippleClient,
-      rippleWalletClient!,
-      appConfiguration.rippleIssuerAddress
-    );
-    console.log('dlcBTCBalance', dlcBTCBalance);
-    const lockedBTCBalance = await getLockedBTCBalanceXRPL(
-      rippleClient,
-      rippleWalletClient!,
-      appConfiguration.rippleIssuerAddress
-    );
+    const dlcBTCBalance = await xrpHandler?.getDLCBTCBalance();
+    const lockedBTCBalance = await xrpHandler?.getLockedBTCBalance();
     console.log('lockedBTCBalance', lockedBTCBalance);
     return { dlcBTCBalance, lockedBTCBalance };
   };
 
   const { data } = useQuery({
-    queryKey: ['balances', networkType === 'evm' ? ethereumUserAddress : rippleUserAddress],
+    queryKey: ['balances', networkType === 'evm' ? ethereumUserAddress : userAddress],
     queryFn: networkType === 'evm' ? fetchEVMBalances : fetchXRPLBalances,
     enabled: isConnected,
     refetchInterval: 10000,

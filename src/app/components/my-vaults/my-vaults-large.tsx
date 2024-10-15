@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 
 import { HStack } from '@chakra-ui/react';
 import { VaultsListGroupBlankContainer } from '@components/vaults-list/components/vaults-list-group-blank-container';
@@ -15,11 +15,6 @@ import { MyVaultsSetupInformationStack } from './components/my-vaults-setup-info
 export function MyVaultsLarge(): React.JSX.Element {
   const { isConnected } = useNetworkConnection();
   const { dlcBTCBalance, lockedBTCBalance } = useContext(BalanceContext);
-
-  useEffect(() => {
-    console.log('dlcBTCBalance', dlcBTCBalance);
-    console.log('lockedBTCBalance', lockedBTCBalance);
-  }, [dlcBTCBalance, lockedBTCBalance]);
 
   const { readyVaults, pendingVaults, fundedVaults, closingVaults, closedVaults, allVaults } =
     useContext(VaultContext);
