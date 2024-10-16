@@ -1,9 +1,9 @@
 import { Box, Button, HStack, Image, Text } from '@chakra-ui/react';
-import { XRPWallet } from '@models/wallet';
+import { XRPWallet, XRPWalletType } from '@models/wallet';
 
 interface SelectRippleWalletMenuProps {
   rippleWallet: XRPWallet;
-  handleConnectWallet: (id: string) => void;
+  handleConnectWallet: (xrpWalletType: XRPWalletType) => void;
 }
 
 export function SelectRippleWalletMenu({

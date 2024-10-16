@@ -4,17 +4,14 @@ import { useDispatch } from 'react-redux';
 import { formatVault } from '@functions/vault.functions';
 import { Vault } from '@models/vault';
 import { NetworkConfigurationContext } from '@providers/network-configuration.provider';
+import { RippleNetworkConfigurationContext } from '@providers/ripple-network-configuration.provider';
 import { XRPWalletContext } from '@providers/xrp-wallet-context-provider';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { modalActions } from '@store/slices/modal/modal.actions';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Decimal from 'decimal.js';
 import { VaultState } from 'dlc-btc-lib/models';
-import {
-  connectRippleClient,
-  getAllRippleVaults,
-  getRippleClient,
-} from 'dlc-btc-lib/ripple-functions';
+import { connectRippleClient, getAllRippleVaults } from 'dlc-btc-lib/ripple-functions';
 
 const INITIAL_VAULT_UUID = '0x0000000000000000000000000000000000000000000000000000000000000000';
 
@@ -61,28 +58,31 @@ export function useXRPLVaults(): useXRPLVaultsReturnType {
   const [isLoading, setIsLoading] = useState(true);
 
   const { networkType } = useContext(NetworkConfigurationContext);
-  const { userAddress: rippleUserAddress } = useContext(XRPWalletContext);
+  const { userAddress: xrpUserAddress } = useContext(XRPWalletContext);
+  const { rippleClient } = useContext(RippleNetworkConfigurationContext);
 
   const issuerAddress = appConfiguration.rippleIssuerAddress;
-  const xrplClient = getRippleClient('wss://s.altnet.rippletest.net:51233');
 
   const { data: xrplVaults } = useQuery({
-    queryKey: ['xrpl-vaults'],
+    queryKey: ['xrpl-vaults', xrpUserAddress],
     initialData: [],
     queryFn: fetchXRPLVaults,
-    refetchInterval: 10000,
-    enabled: networkType === 'xrpl' && !!rippleUserAddress,
+    refetchInterval: 20000,
+    enabled: networkType === 'xrpl' && !!xrpUserAddress,
   });
 
   async function fetchXRPLVaults(): Promise<Vault[]> {
     setIsLoading(true);
 
-    const previousVaults: Vault[] | undefined = queryClient.getQueryData(['xrpl-vaults']);
+    const previousVaults: Vault[] | undefined = queryClient.getQueryData([
+      'xrpl-vaults',
+      xrpUserAddress,
+    ]);
 
     try {
-      await connectRippleClient(xrplClient);
+      await connectRippleClient(rippleClient);
 
-      const xrplRawVaults = await getAllRippleVaults(xrplClient, issuerAddress, rippleUserAddress);
+      const xrplRawVaults = await getAllRippleVaults(rippleClient, issuerAddress, xrpUserAddress);
       const xrplVaults = xrplRawVaults.map(formatVault);
 
       if (
@@ -105,7 +105,6 @@ export function useXRPLVaults(): useXRPLVaultsReturnType {
         const previousVault = previousVaults?.find(
           previousVault => previousVault.uuid === vault.uuid
         );
-
         handleVaultStateChange(previousVault, vault);
       });
 

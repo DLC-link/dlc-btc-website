@@ -8,9 +8,14 @@ import { WalkthroughLayout } from './components/walkthrough.layout';
 interface WalkthroughProps {
   flow: 'mint' | 'unmint';
   currentStep: number;
+  networkType: 'evm' | 'xrpl';
 }
 
-export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.Element {
+export function Walkthrough({
+  flow,
+  currentStep,
+  networkType,
+}: WalkthroughProps): React.JSX.Element {
   const addToken = useAddToken();
 
   switch (flow) {
@@ -22,20 +27,28 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
               <WalkthroughHeader
                 currentStep={currentStep}
                 title={'Create Vault'}
-                blockchain={'ethereum'}
+                blockchain={networkType}
               />
-              <Text color={'white.01'} fontSize={'md'}>
-                Initiate a Vault on the blockchain and confirm it in your{' '}
-                <Link
-                  color={'accent.lightBlue.01'}
-                  href="https://metamask.io/"
-                  isExternal
-                  textDecoration={'underline'}
-                >
-                  Ethereum Wallet
-                </Link>
-                .
-              </Text>
+              {networkType === 'evm' ? (
+                <Text color={'white.01'} fontSize={'md'}>
+                  Initiate a Vault on the blockchain and confirm it in your{' '}
+                  <Link
+                    color={'accent.lightBlue.01'}
+                    href="https://metamask.io/"
+                    isExternal
+                    textDecoration={'underline'}
+                  >
+                    Ethereum Wallet
+                  </Link>
+                  .
+                </Text>
+              ) : (
+                <Text color={'white.01'} fontSize={'md'}>
+                  Initiate a Setup Vault request. If the TrustLine is not yet established, sign the
+                  Set TrustLine Transaction in your wallet. Then, wait for the Attestors to confirm
+                  your request and set up the Vault on the blockchain.
+                </Text>
+              )}
               <TutorialVideo />
             </WalkthroughLayout>
           );
@@ -49,16 +62,8 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
               />
               <Text color={'white.01'} fontSize={'md'}>
                 Enter the Bitcoin amount you wish to deposit into the vault, then verify the
-                transaction through your{' '}
-                <Link
-                  color={'accent.lightBlue.01'}
-                  href="https://leather.io/"
-                  isExternal
-                  textDecoration={'underline'}
-                >
-                  Bitcoin Wallet{' '}
-                </Link>
-                which will lock your Bitcoin on-chain. You will receive equivalent amount of dlcBTC.
+                transaction through your Bitcoin Wallet which will lock your Bitcoin on-chain. You
+                will receive equivalent amount of dlcBTC.
               </Text>
             </WalkthroughLayout>
           );
@@ -68,32 +73,33 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
               <WalkthroughHeader
                 currentStep={currentStep}
                 title={'Mint dlcBTC'}
-                blockchain={'ethereum'}
+                blockchain={networkType}
               />
               <Text color={'white.01'} fontSize={'sm'}>
-                Wait for Bitcoin to get locked on chain{' '}
-                <Link
-                  color={'accent.lightBlue.01'}
-                  href="https://ethereum.org/"
-                  isExternal
-                  textDecoration={'underline'}
-                >
-                  (~1 hour)
-                </Link>
-                . After 6 confirmations, dlcBTC tokens will appear in your Ethereum Wallet.
+                Wait for Bitcoin to get locked on chain (~1 hour). After 6 confirmations, dlcBTC
+                tokens will appear in your Wallet.
               </Text>
-              <Text color={'white.01'} fontSize={'sm'}>
-                To ensure your <span style={{ fontWeight: 800 }}>dlcBTC tokens </span>
-                are <span style={{ fontWeight: 800 }}>visible </span>
-                simply <span style={{ fontWeight: 800 }}>add them </span>
-                to your Ethereum Wallet.
-              </Text>
-              <Button variant={'vault'} onClick={async () => await addToken()}>
-                <HStack>
-                  <Image src={'/images/logos/dlc-btc-logo.svg'} alt={'dlcBTC'} boxSize={'25px'} />
-                  <Text> Add Token to Wallet</Text>
-                </HStack>
-              </Button>
+              {networkType === 'evm' && (
+                <>
+                  <Text color={'white.01'} fontSize={'sm'}>
+                    To ensure your <span style={{ fontWeight: 800 }}>dlcBTC tokens </span>
+                    are <span style={{ fontWeight: 800 }}>visible </span>
+                    simply <span style={{ fontWeight: 800 }}>add them </span>
+                    to your Ethereum Wallet.
+                  </Text>
+
+                  <Button variant={'vault'} onClick={async () => await addToken()}>
+                    <HStack>
+                      <Image
+                        src={'/images/logos/dlc-btc-logo.svg'}
+                        alt={'dlcBTC'}
+                        boxSize={'25px'}
+                      />
+                      <Text> Add Token to Wallet</Text>
+                    </HStack>
+                  </Button>
+                </>
+              )}
             </WalkthroughLayout>
           );
         default:
@@ -102,7 +108,7 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
               <WalkthroughHeader
                 currentStep={undefined}
                 title={'Minted dlcBTC'}
-                blockchain={'ethereum'}
+                blockchain={networkType}
               />
             </WalkthroughLayout>
           );
@@ -115,12 +121,19 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
               <WalkthroughHeader
                 currentStep={currentStep}
                 title={'Burn dlcBTC'}
-                blockchain={'ethereum'}
+                blockchain={networkType}
               />
-              <Text color={'white.01'} fontSize={'md'}>
-                Select the dlcBTC vault you would like to withdraw from. Burn the desired amount of
-                dlcBTC to receive the equivalent amount of BTC.
-              </Text>
+              {networkType === 'evm' ? (
+                <Text color={'white.01'} fontSize={'md'}>
+                  Select the dlcBTC vault you would like to withdraw from. Burn the desired amount
+                  of dlcBTC to receive the equivalent amount of BTC.
+                </Text>
+              ) : (
+                <Text color={'white.01'} fontSize={'md'}>
+                  Select the dlcBTC vault you would like to withdraw from. Sign a check with the
+                  desired amount of dlcBTC to receive the equivalent amount of BTC.
+                </Text>
+              )}
             </WalkthroughLayout>
           );
         case 1:
@@ -161,7 +174,7 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
               <WalkthroughHeader
                 currentStep={undefined}
                 title={'Withdrawn dlcBTC'}
-                blockchain={'ethereum'}
+                blockchain={networkType}
               />
             </WalkthroughLayout>
           );

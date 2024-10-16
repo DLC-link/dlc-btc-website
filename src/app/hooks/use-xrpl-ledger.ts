@@ -14,12 +14,8 @@ interface useXRPLLedgerReturnType {
   connectLedgerWallet: (
     derivationPath: string
   ) => Promise<{ xrpHandler: LedgerXRPHandler; userAddress: string }>;
-  handleCreateCheck: (
-    xrpHandler: LedgerXRPHandler,
-    vault: RawVault,
-    withdrawAmount: number
-  ) => Promise<any>;
-  handleSetTrustLine: (xrpHandler: LedgerXRPHandler) => Promise<any>;
+  handleCreateCheck: (vault: RawVault, withdrawAmount: number) => Promise<any>;
+  handleSetTrustLine: () => Promise<any>;
 }
 
 type TransportInstance = Awaited<ReturnType<typeof Transport.create>>;
@@ -99,7 +95,9 @@ export function useXRPLLedger(): useXRPLLedgerReturnType {
         xrplWallet,
         derivationPath,
         rippleClient,
-        appConfiguration.rippleIssuerAddress
+        appConfiguration.rippleIssuerAddress,
+        xrplAddress.address,
+        xrplAddress.publicKey
       );
 
       return { xrpHandler, userAddress: xrplAddress.address };
@@ -110,34 +108,34 @@ export function useXRPLLedger(): useXRPLLedgerReturnType {
     }
   }
 
-  async function handleCreateCheck(
-    xrpHandler: LedgerXRPHandler,
-    vault: RawVault,
-    withdrawAmount: number
-  ) {
+  async function handleCreateCheck(vault: RawVault, withdrawAmount: number) {
     try {
+      const { xrpHandler: currentXRPHandler } = await connectLedgerWallet("44'/144'/0'/0/0");
+
       setIsLoading([true, 'Sign Check on your Ledger Device']);
 
       const formattedWithdrawAmount = BigInt(shiftValue(withdrawAmount));
 
-      return await xrpHandler.createCheck(formattedWithdrawAmount.toString(), vault.uuid.slice(2));
+      return await currentXRPHandler.createCheck(
+        formattedWithdrawAmount.toString(),
+        vault.uuid.slice(2)
+      );
     } catch (error) {
-      throw new LedgerError(`Error creating check: ${error}`);
+      throw new LedgerError(`Error creating Check: ${error}`);
     } finally {
       setIsLoading([false, '']);
     }
   }
 
-  async function handleSetTrustLine(xrpHandler: LedgerXRPHandler) {
+  async function handleSetTrustLine() {
     try {
+      const { xrpHandler: currentXRPHandler } = await connectLedgerWallet("44'/144'/0'/0/0");
+
       setIsLoading([true, 'Set Trust Line on your Ledger Device']);
 
-      console.log('Setting trust line');
-      const trustLine = await xrpHandler.setTrustLine();
-      console.log('Trust line set');
-      return trustLine;
+      return await currentXRPHandler.setTrustLine();
     } catch (error) {
-      throw new LedgerError(`Error setting trust line: ${error}`);
+      throw new LedgerError(`Error setting Trust Line: ${error}`);
     } finally {
       setIsLoading([false, '']);
     }

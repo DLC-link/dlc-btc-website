@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from 'react';
+import React, { createContext, useState } from 'react';
 
 import { HasChildren } from '@models/has-children';
 
@@ -13,10 +13,6 @@ export const NetworkConfigurationContext = createContext<NetworkConfigurationCon
 
 export function NetworkConfigurationContextProvider({ children }: HasChildren): React.JSX.Element {
   const [networkType, setNetworkType] = useState<'evm' | 'xrpl'>('evm');
-
-  useEffect(() => {
-    console.log('networkType in provioder', networkType);
-  }, [networkType]);
 
   return (
     <NetworkConfigurationContext.Provider

@@ -7,6 +7,7 @@ import { bytesToHex } from '@noble/hashes/utils';
 import { BitcoinWalletContext } from '@providers/bitcoin-wallet-context-provider';
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { NetworkConfigurationContext } from '@providers/network-configuration.provider';
+import { RippleNetworkConfigurationContext } from '@providers/ripple-network-configuration.provider';
 import { XRPWalletContext } from '@providers/xrp-wallet-context-provider';
 import { LedgerDLCHandler, SoftwareWalletDLCHandler } from 'dlc-btc-lib';
 import {
@@ -15,7 +16,7 @@ import {
 } from 'dlc-btc-lib/attestor-request-functions';
 import { getAttestorGroupPublicKey, getRawVault } from 'dlc-btc-lib/ethereum-functions';
 import { AttestorChainID, RawVault, Transaction, VaultState } from 'dlc-btc-lib/models';
-import { getRippleClient, getRippleVault } from 'dlc-btc-lib/ripple-functions';
+import { getRippleVault } from 'dlc-btc-lib/ripple-functions';
 import { useAccount } from 'wagmi';
 
 import { useLeather } from './use-leather';
@@ -35,6 +36,7 @@ export function usePSBT(): UsePSBTReturnType {
   } = useContext(EthereumNetworkConfigurationContext);
   const { address: ethereumUserAddress } = useAccount();
   const { userAddress: rippleUserAddress } = useContext(XRPWalletContext);
+  const { rippleClient } = useContext(RippleNetworkConfigurationContext);
 
   const { bitcoinWalletType, dlcHandler, resetBitcoinWalletContext } =
     useContext(BitcoinWalletContext);
@@ -74,14 +76,12 @@ export function usePSBT(): UsePSBTReturnType {
       return { userAddress: ethereumUserAddress, vault, attestorGroupPublicKey };
     } else if (networkType === 'xrpl') {
       if (!rippleUserAddress) throw new Error('User Address is not setup');
-      const rippleClient = getRippleClient(appConfiguration.xrplWebsocket);
       const vault = await getRippleVault(
         rippleClient,
         appConfiguration.rippleIssuerAddress,
         vaultUUID
       );
       const attestorGroupPublicKey = await getAttestorExtendedGroupPublicKey();
-      console.log('attestorGroupPublicKey', attestorGroupPublicKey);
       return {
         userAddress: rippleUserAddress,
         vault,

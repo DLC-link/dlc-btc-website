@@ -1,14 +1,15 @@
 import { useContext, useEffect, useState } from 'react';
 
 import { CheckIcon } from '@chakra-ui/icons';
-import { HStack, ScaleFade, Tab, TabList, Tabs, Text, VStack } from '@chakra-ui/react';
+import { HStack, ScaleFade, Tab, TabList, Tabs, Text, VStack, useToast } from '@chakra-ui/react';
 import { ModalComponentProps } from '@components/modals/components/modal-container';
 import { ModalLayout } from '@components/modals/components/modal.layout';
 import { SelectNetworkButton } from '@components/select-network-button/select-network-button';
 import { TransactionScreenWalletInformation } from '@components/transaction-screen/transaction-screen.transaction-form/components/transaction-screen.transaction-form/components/transaction-screen.transaction-form.wallet-information';
+import { useGemWallet } from '@hooks/use-xrpl-gem';
 import { useXRPLLedger } from '@hooks/use-xrpl-ledger';
 import { RippleNetworkID } from '@models/ripple.models';
-import { xrpWallets } from '@models/wallet';
+import { XRPWalletType, xrpWallets } from '@models/wallet';
 import { NetworkConfigurationContext } from '@providers/network-configuration.provider';
 import { RippleNetworkConfigurationContext } from '@providers/ripple-network-configuration.provider';
 import { XRPWalletContext, XRPWalletContextState } from '@providers/xrp-wallet-context-provider';
@@ -19,7 +20,18 @@ import { Connector, useConfig, useConnect } from 'wagmi';
 import { SelectEthereumWalletMenu } from './components/select-ethereum-wallet-menu';
 import { SelectRippleWalletMenu } from './components/select-ripple-wallet-menu';
 
+function formatErrorMessage(error: string): string {
+  if (error.includes('0x6985')) {
+    return 'Action Rejected by User';
+  } else if (error.includes('0x5515')) {
+    return 'Locked Device';
+  } else {
+    return error;
+  }
+}
+
 export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps): React.JSX.Element {
+  const toast = useToast();
   const { connect, isPending, isSuccess, connectors } = useConnect();
   const { chains: ethereumNetworks } = useConfig();
 
@@ -32,6 +44,7 @@ export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps):
     setXRPHandler,
   } = useContext(XRPWalletContext);
   const { connectLedgerWallet, isLoading } = useXRPLLedger();
+  const { connectGemWallet } = useGemWallet();
   const { enabledRippleNetworks } = useContext(RippleNetworkConfigurationContext);
 
   const ethereumNetworkIDs = ethereumNetworks.map(
@@ -76,15 +89,49 @@ export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps):
     }
   }
 
-  async function handleConnectRippleWallet() {
+  async function handleConnectGemWallet() {
     setNetworkType('xrpl');
-    setXRPWalletType(xrpWallets[0].id);
+    setXRPWalletType(XRPWalletType.Gem);
 
-    const { xrpHandler, userAddress } = await connectLedgerWallet("44'/144'/0'/0/1");
+    const { xrpHandler, userAddress } = await connectGemWallet();
 
     setXRPHandler(xrpHandler);
     setUserAddress(userAddress);
     setXRPWalletContextState(XRPWalletContextState.READY);
+  }
+
+  async function handleConnectLedgerWallet() {
+    try {
+      setNetworkType('xrpl');
+      setXRPWalletType(XRPWalletType.Ledger);
+
+      const { xrpHandler, userAddress } = await connectLedgerWallet("44'/144'/0'/0/0");
+
+      setXRPHandler(xrpHandler);
+      setUserAddress(userAddress);
+      setXRPWalletContextState(XRPWalletContextState.READY);
+    } catch (error: any) {
+      toast({
+        title: 'Failed to connect Ledger Wallet',
+        description: error instanceof Error ? formatErrorMessage(error.message) : '',
+        status: 'error',
+        duration: 9000,
+        isClosable: true,
+      });
+    }
+  }
+
+  async function handleConnectRippleWallet(xrpWalletType: XRPWalletType) {
+    switch (xrpWalletType) {
+      case XRPWalletType.Gem:
+        await handleConnectGemWallet();
+        break;
+      case XRPWalletType.Ledger:
+        await handleConnectLedgerWallet();
+        break;
+      default:
+        break;
+    }
   }
 
   const handleChangeNetwork = (networkID: EthereumNetworkID | RippleNetworkID) => {

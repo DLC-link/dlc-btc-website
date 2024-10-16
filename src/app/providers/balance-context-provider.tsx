@@ -48,7 +48,6 @@ export function BalanceContextProvider({ children }: HasChildren): React.JSX.Ele
   const fetchXRPLBalances = async () => {
     const dlcBTCBalance = await xrpHandler?.getDLCBTCBalance();
     const lockedBTCBalance = await xrpHandler?.getLockedBTCBalance();
-    console.log('lockedBTCBalance', lockedBTCBalance);
     return { dlcBTCBalance, lockedBTCBalance };
   };
 

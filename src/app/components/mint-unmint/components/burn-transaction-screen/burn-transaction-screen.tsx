@@ -5,17 +5,14 @@ import { VStack, useToast } from '@chakra-ui/react';
 import { VaultTransactionForm } from '@components/transaction-screen/transaction-screen.transaction-form/components/transaction-screen.transaction-form/transaction-screen.transaction-form';
 import { Vault } from '@components/vault/vault';
 import { useEthersSigner } from '@functions/configuration.functions';
-import { useXRPLLedger } from '@hooks/use-xrpl-ledger';
+import { useXRPWallet } from '@hooks/use-xrp-wallet';
 import { BitcoinWalletContext } from '@providers/bitcoin-wallet-context-provider';
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { NetworkConfigurationContext } from '@providers/network-configuration.provider';
 import { ProofOfReserveContext } from '@providers/proof-of-reserve-context-provider';
-import { XRPWalletContext } from '@providers/xrp-wallet-context-provider';
-// import { XRPWalletContext } from '@providers/xrp-wallet-context-provider';
 import { RootState } from '@store/index';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { withdraw } from 'dlc-btc-lib/ethereum-functions';
-import { getRippleClient, getRippleVault } from 'dlc-btc-lib/ripple-functions';
 import { shiftValue } from 'dlc-btc-lib/utilities';
 
 interface BurnTokenTransactionFormProps {
@@ -36,8 +33,7 @@ export function BurnTokenTransactionForm({
 
   const { networkType } = useContext(NetworkConfigurationContext);
   const { bitcoinWalletContextState } = useContext(BitcoinWalletContext);
-  const { xrpHandler } = useContext(XRPWalletContext);
-  const { handleCreateCheck, connectLedgerWallet, isLoading } = useXRPLLedger();
+  const { handleCreateCheck, isLoading } = useXRPWallet();
 
   const { bitcoinPrice, depositLimit } = useContext(ProofOfReserveContext);
 
@@ -55,16 +51,7 @@ export function BurnTokenTransactionForm({
       if (!currentVault) return;
       setIsSubmitting(true);
       if (networkType === 'xrpl') {
-        const rippleClient = getRippleClient(appConfiguration.xrplWebsocket);
-        const vault = await getRippleVault(
-          rippleClient,
-          appConfiguration.rippleIssuerAddress,
-          currentVault.uuid
-        );
-        await connectLedgerWallet("44'/144'/0'/0/0");
-
-        if (!xrpHandler) throw new Error('No XRP Handler');
-        await handleCreateCheck(xrpHandler, vault, withdrawAmount);
+        await handleCreateCheck(currentVault.uuid, withdrawAmount);
       } else if (networkType === 'evm') {
         const currentRisk = await fetchUserEthereumAddressRiskLevel();
         if (currentRisk === 'High') throw new Error('Risk Level is too high');

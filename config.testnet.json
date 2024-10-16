@@ -1,6 +1,6 @@
 {
   "appEnvironment": "testnet",
-  "coordinatorURL": "http://localhost:8811",
+  "coordinatorURL": "https://testnet-ripple.dlc.link/attestor-1",
   "enabledEthereumNetworkIDs": ["421614", "84532", "11155111"],
   "enabledRippleNetworkIDs": ["1"],
   "bitcoinNetwork": "testnet",
@@ -10,7 +10,7 @@
   "bitcoinBlockchainExplorerURL": "https://mempool.space/testnet",
   "bitcoinBlockchainFeeEstimateURL": "https://mempool.space/testnet/api/v1/fees/recommended",
   "rippleIssuerAddress": "ra9epzthPkNXykgfadCwu8D7mtajj8DVCP",
-  "xrplWebsocket": "wss://s.altnet.rippletest.net:51233",
+  "xrplWebsocket": "wss://testnet.xrpl-labs.com/",
   "ledgerApp": "Bitcoin Test",
   "merchants": [
     {

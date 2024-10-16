@@ -45,11 +45,11 @@ const ledgerXRP: XRPWallet = {
   icon: './images/logos/ledger-logo.svg',
 };
 
-// const gemXRP: XRPWallet = {
-//   id: XRPWalletType.Gem,
-//   name: 'Gem',
-//   icon: '/images/logos/gem-logo.svg',
-// };
+const gemXRP: XRPWallet = {
+  id: XRPWalletType.Gem,
+  name: 'Gem',
+  icon: '/images/logos/gem-wallet-logo.svg',
+};
 
-export const xrpWallets: XRPWallet[] = [ledgerXRP];
+export const xrpWallets: XRPWallet[] = [ledgerXRP, gemXRP];
 export const bitcoinWallets: BitcoinWallet[] = [leather, ledger, unisat];

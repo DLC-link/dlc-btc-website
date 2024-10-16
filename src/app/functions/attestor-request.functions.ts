@@ -26,6 +26,6 @@ export async function submitSetupXRPLVaultRequest(userAddress: string): Promise<
       throw new Error(`HTTP Error: ${errorMessage}`);
     }
   } catch (error: any) {
-    throw new Error(`Failed to get Attestor Group Public Key: ${error.message}`);
+    throw new Error(`Failed to submit Setup XRPL Vault Request: ${error.message}`);
   }
 }

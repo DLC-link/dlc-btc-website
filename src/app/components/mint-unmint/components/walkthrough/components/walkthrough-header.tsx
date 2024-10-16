@@ -3,7 +3,7 @@ import { HStack, Text, VStack } from '@chakra-ui/react';
 import { WalkthroughBlockchainTag } from './walkthrough-blockchain-tag';
 
 interface WalkthroughHeaderProps {
-  blockchain: 'ethereum' | 'bitcoin';
+  blockchain: 'evm' | 'bitcoin' | 'xrpl';
   currentStep?: number;
   title: string;
 }
