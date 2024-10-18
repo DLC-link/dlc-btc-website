@@ -11,7 +11,7 @@ const blockchainTagPropertyMap = {
   },
   xrpl: {
     logo: '/images/logos/xrp-logo.svg',
-    text: 'ON XRP',
+    text: 'ON XRPL',
   },
 };
 

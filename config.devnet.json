@@ -9,7 +9,7 @@
   "bitcoinBlockchainURL": "https://devnet.dlc.link/electrs",
   "bitcoinBlockchainExplorerURL": "https://devnet.dlc.link/electrs",
   "bitcoinBlockchainFeeEstimateURL": "https://devnet.dlc.link/electrs/fee-estimates",
-  "rippleIssuerAddress": "ra9epzthPkNXykgfadCwu8D7mtajj8DVCP",
+  "rippleIssuerAddress": "sEdVdXVaTV9nbEfyjtiowJtyagiE1it",
   "xrplWebsocket": "wss://s.altnet.rippletest.net:51233",
   "ledgerApp": "Bitcoin Test",
   "merchants": [

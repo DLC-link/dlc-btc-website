@@ -161,7 +161,7 @@ export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps):
         >
           <TabList>
             <Tab>Ethereum</Tab>
-            <Tab>Ripple</Tab>
+            <Tab>XRPL</Tab>
           </TabList>
         </Tabs>
         <SelectNetworkButton
