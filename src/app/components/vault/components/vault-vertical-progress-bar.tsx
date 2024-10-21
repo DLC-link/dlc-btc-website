@@ -29,7 +29,7 @@ function getComponent(status: string): React.JSX.Element | false {
     case Status.ACTIVE:
       return <Image src={'/images/loader-colored.svg'} alt={'Active Loader'} boxSize={'15px'} />;
     case Status.PROGRESSING:
-      return <Spinner thickness={'3.5px'} size={'xs'} color={'accent.lightBlue.01'} />;
+      return <Spinner thickness={'3.5px'} size={'xs'} color={'pink.01'} />;
     case Status.COMPLETED:
       return <Image src={'/images/check.svg'} alt={'Icon'} boxSize={'15px'} />;
     case Status.INACTIVE:

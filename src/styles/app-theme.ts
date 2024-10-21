@@ -45,6 +45,7 @@ export const appTheme = extendTheme({
   colors: {
     'purple.01': 'rgba(104, 24, 173, 1)',
     'orange.01': 'rgba(255, 168, 0, 1)',
+    'pink.01': 'rgba(188, 143, 249, 1)',
     'background.website.01': 'rgba(0, 0, 0, 1)',
     'background.container.01': 'rgba(23, 24, 29, 1)',
     'background.content.01': 'rgba(51, 51, 51, 1)',

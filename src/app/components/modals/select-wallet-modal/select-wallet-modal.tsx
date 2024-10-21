@@ -55,7 +55,7 @@ export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps):
         ) : (
           <HStack w={'100%'} justifyContent={'space-between'}>
             <Text variant={'header'}>Network Selected</Text>
-            <CheckIcon color={'accent.lightBlue.01'} />
+            <CheckIcon color={'pink.01'} />
           </HStack>
         )}
         <SelectNetworkButton
@@ -74,7 +74,7 @@ export function SelectWalletModal({ isOpen, handleClose }: ModalComponentProps):
             ) : (
               <HStack w={'100%'} justifyContent={'space-between'}>
                 <Text variant={'header'}>Wallet Connected</Text>
-                <CheckIcon color={'accent.lightBlue.01'} />
+                <CheckIcon color={'pink.01'} />
               </HStack>
             )}
             {connectors.map(wagmiConnector => (

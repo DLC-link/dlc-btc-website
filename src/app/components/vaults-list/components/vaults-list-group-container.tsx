@@ -26,14 +26,14 @@ export function VaultsListGroupContainer({
       {label && (
         <HStack pt={'15px'} justifyContent={'space-between'} w={'100%'}>
           <HStack>
-            {['Pending'].includes(label) && <Spinner color={'accent.lightBlue.01'} size={'md'} />}
+            {['Pending'].includes(label) && <Spinner color={'pink.01'} size={'md'} />}
             <Text color={'white'}>{label}</Text>
           </HStack>
           {label === 'Minted dlcBTC' && (
             <Button
               variant={'ghost'}
               size={'xs'}
-              _hover={{ backgroundColor: 'accent.lightBlue.01' }}
+              _hover={{ backgroundColor: 'pink.01' }}
               onClick={async () => await addToken()}
             >
               <HStack>

@@ -30,7 +30,7 @@ export function TransactionFormFieldInput({
           value={formField.state.value}
           onBlur={formField.handleBlur}
           borderColor={'white.01'}
-          focusBorderColor={'rgba(50, 201, 247, 1)'} // accent.lightBlue.01
+          focusBorderColor={'rgba(188, 143, 249, 1)'} // pink.01
           isInvalid={formField.state.meta.errors.length > 0}
           onChange={e => formField.handleChange(e)}
         >

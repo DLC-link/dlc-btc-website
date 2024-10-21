@@ -50,7 +50,7 @@ export function MerchantDetails(): React.JSX.Element {
         {'Dashboard'}
       </Text>
       <Link
-        color="accent.lightBlue.01"
+        color={'pink.01'}
         fontSize="lg"
         fontWeight="regular"
         textDecoration="underline"

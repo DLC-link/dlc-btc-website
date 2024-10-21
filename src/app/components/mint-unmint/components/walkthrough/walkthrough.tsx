@@ -27,7 +27,7 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
               <Text color={'white.01'} fontSize={'md'}>
                 Initiate a Vault on the blockchain and confirm it in your{' '}
                 <Link
-                  color={'accent.lightBlue.01'}
+                  color={'pink.01'}
                   href="https://metamask.io/"
                   isExternal
                   textDecoration={'underline'}
@@ -51,7 +51,7 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
                 Enter the Bitcoin amount you wish to deposit into the vault, then verify the
                 transaction through your{' '}
                 <Link
-                  color={'accent.lightBlue.01'}
+                  color={'pink.01'}
                   href="https://leather.io/"
                   isExternal
                   textDecoration={'underline'}
@@ -73,7 +73,7 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
               <Text color={'white.01'} fontSize={'sm'}>
                 Wait for Bitcoin to get locked on chain{' '}
                 <Link
-                  color={'accent.lightBlue.01'}
+                  color={'pink.01'}
                   href="https://ethereum.org/"
                   isExternal
                   textDecoration={'underline'}
@@ -149,9 +149,8 @@ export function Walkthrough({ flow, currentStep }: WalkthroughProps): React.JSX.
                 blockchain={'bitcoin'}
               />
               <Text color={'white.01'} fontSize={'md'}>
-                After a successful withdraw (
-                <span style={{ color: 'accent.lightBlue.01' }}>~1 hour</span>) your will receive BTC
-                in your bitcoin wallet.
+                After a successful withdraw (<span style={{ color: 'pink.01' }}>~1 hour</span>) your
+                will receive BTC in your bitcoin wallet.
               </Text>
             </WalkthroughLayout>
           );

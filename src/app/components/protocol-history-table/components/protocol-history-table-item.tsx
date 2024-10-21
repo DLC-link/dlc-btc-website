@@ -46,7 +46,7 @@ export function ProtocolHistoryTableItem(
           </HStack>
           <HStack w={'50%'}>
             <Text
-              color={'accent.lightBlue.01'}
+              color={'pink.01'}
               fontSize={'sm'}
               onClick={() =>
                 window.open(`${ethereumNetwork.blockExplorers?.default.url}/tx/${txHash}`, '_blank')
@@ -73,7 +73,7 @@ export function ProtocolHistoryTableItem(
           </HStack>
           <HStack w={'25%'}>
             <Text
-              color={'accent.lightBlue.01'}
+              color={'pink.01'}
               fontSize={'sm'}
               onClick={() =>
                 window.open(`${ethereumNetwork.blockExplorers?.default.url}/tx/${txHash}`, '_blank')

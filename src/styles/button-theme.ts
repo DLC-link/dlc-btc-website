@@ -14,9 +14,9 @@ const vault = defineStyle({
   fontWeight: 'normal',
   bg: 'none',
   border: '1px solid',
-  borderColor: 'accent.lightBlue.01',
+  borderColor: 'pink.01',
   _hover: {
-    bg: 'accent.lightBlue.01',
+    bg: 'pink.01',
   },
 });
 
@@ -31,7 +31,7 @@ const navigate = defineStyle({
   border: '1px solid',
   borderColor: 'white.03',
   _hover: {
-    bg: 'accent.lightBlue.01',
+    bg: 'pink.01',
   },
 });
 
@@ -44,9 +44,9 @@ const merchantHistory = defineStyle({
   fontWeight: 400,
   bg: 'none',
   border: '1px solid',
-  borderColor: 'accent.lightBlue.01',
+  borderColor: 'pink.01',
   _hover: {
-    bg: 'accent.lightBlue.01',
+    bg: 'pink.01',
   },
 });
 
@@ -77,7 +77,7 @@ const tab = defineStyle({
   bgColor: 'none',
   borderBottom: '3.5px solid',
   borderRadius: 'none',
-  borderColor: 'accent.lightBlue.01',
+  borderColor: 'pink.01',
 });
 
 const company = defineStyle({

@@ -11,7 +11,7 @@ export function TabButton({ title, isActive, handleClick }: TabButtonProps): Rea
     <Button
       variant={'tab'}
       opacity={isActive ? '100%' : '50%'}
-      borderColor={isActive ? 'accent.lightBlue.01' : 'white.03'}
+      borderColor={isActive ? 'white' : 'white.03'}
       onClick={handleClick}
     >
       {title}

@@ -24,7 +24,7 @@ export function MintUnmint(): React.JSX.Element {
           <Tab>Mint</Tab>
           <Tab>Withdraw</Tab>
         </TabList>
-        <TabIndicator mt="5px" h="3.5px" bg={'accent.lightBlue.01'} />
+        <TabIndicator mt="5px" h="3.5px" bg={'pink.01'} />
         <Spacer />
         <TabPanels>
           <TabPanel>

@@ -29,9 +29,9 @@ export function VaultCopyButton({
           onClick={onCopyUUID}
           icon={
             hasCopiedUUID ? (
-              <CheckCircleIcon color={'accent.lightBlue.01'} boxSize={'10px'} />
+              <CheckCircleIcon color={'pink.01'} boxSize={'10px'} />
             ) : (
-              <CopyIcon color={'accent.lightBlue.01'} boxSize={'10px'} />
+              <CopyIcon color={'pink.01'} boxSize={'10px'} />
             )
           }
         />

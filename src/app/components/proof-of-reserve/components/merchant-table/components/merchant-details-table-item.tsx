@@ -47,7 +47,7 @@ export function MerchantDetailsTableItem(merchantFocusTableItem: DetailedEvent):
           </HStack>
           <HStack w={'30%'}>
             <Text
-              color={'accent.lightBlue.01'}
+              color={'pink.01'}
               fontSize={'sm'}
               onClick={() =>
                 window.open(`${ethereumNetwork.blockExplorers?.default.url}/tx/${txHash}`, '_blank')
@@ -78,7 +78,7 @@ export function MerchantDetailsTableItem(merchantFocusTableItem: DetailedEvent):
       </Text> */}
           <HStack w={'15%'}>
             <Text
-              color={'accent.lightBlue.01'}
+              color={'pink.01'}
               fontSize={'sm'}
               onClick={() =>
                 window.open(`${ethereumNetwork.blockExplorers?.default.url}/tx/${txHash}`, '_blank')

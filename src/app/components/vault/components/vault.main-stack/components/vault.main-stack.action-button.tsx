@@ -16,8 +16,8 @@ export function VaultActionButton({
     <Button
       w={'100%'}
       variant={'outline'}
-      borderColor={'accent.lightBlue.01'}
-      _hover={{ bg: 'accent.lightBlue.01', color: 'white.01' }}
+      borderColor={'pink.01'}
+      _hover={{ bg: 'pink.01', color: 'white.01' }}
       onClick={() => handleClick()}
       p={'15px'}
     >

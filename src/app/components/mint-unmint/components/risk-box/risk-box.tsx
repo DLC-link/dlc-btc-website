@@ -13,7 +13,7 @@ export function RiskBox({ risk }: RiskBoxProps): React.JSX.Element | false {
   return (
     <RiskBoxLayout>
       <HStack w={'100%'}>
-        <Text color={'accent.lightBlue.01'} fontSize={'sm'} fontWeight={200}>
+        <Text color={'pink.01'} fontSize={'sm'} fontWeight={200}>
           Address Risk Level:
         </Text>
         <Text color={'error.01'} fontSize={'md'} fontWeight={800}>
@@ -29,7 +29,7 @@ export function RiskBox({ risk }: RiskBoxProps): React.JSX.Element | false {
         <HStack w={'100%'}>
           <Text color={'white.01'} fontSize={'sm'}>
             <Link
-              color={'accent.lightBlue.01'}
+              color={'pink.01'}
               href="mailto:support@dlc.link"
               isExternal
               textDecoration={'underline'}

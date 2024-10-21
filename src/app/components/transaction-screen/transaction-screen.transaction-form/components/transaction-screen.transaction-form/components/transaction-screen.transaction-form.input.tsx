@@ -62,7 +62,7 @@ export function TransactionFormInputField({
           borderColor={'white.03'}
           borderRadius={'md'}
         >
-          <Text w={'100%'} fontSize={'sm'} fontWeight={'bold'} color={'accent.lightBlue.01'}>
+          <Text w={'100%'} fontSize={'sm'} fontWeight={'bold'} color={'pink.01'}>
             {formProperties.label}
           </Text>
           <TransactionFormFieldInput

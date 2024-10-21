@@ -12,7 +12,7 @@ const baseStyle = definePartsStyle({
     color: 'white',
   },
   icon: {
-    color: 'accent.lightBlue.01',
+    color: 'pink.01',
   },
 });
 

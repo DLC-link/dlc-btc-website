@@ -32,7 +32,7 @@ export function WalletInfo({ src, coinName, content }: WalletInfoProps): React.J
           <Button variant={'vault'}>Download</Button>
         </Link>
       </Box>
-      <Text color={'accent.lightBlue.01'} fontStyle={'bold'}>
+      <Text color={'pink.01'} fontStyle={'bold'}>
         {coinName}
       </Text>
       <Box h={'140px'}>{content}</Box>

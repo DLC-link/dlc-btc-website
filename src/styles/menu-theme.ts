@@ -20,7 +20,7 @@ const account = defineStyle({
     borderRadius: 'md',
     borderColor: 'white.03',
     _hover: {
-      bg: 'accent.lightBlue.01',
+      bg: 'pink.01',
     },
   },
   list: {
@@ -60,7 +60,7 @@ const networkChange = defineStyle({
     borderRadius: 'md',
     borderColor: 'white.03',
     _hover: {
-      bg: 'accent.lightBlue.01',
+      bg: 'pink.01',
     },
   },
   list: {

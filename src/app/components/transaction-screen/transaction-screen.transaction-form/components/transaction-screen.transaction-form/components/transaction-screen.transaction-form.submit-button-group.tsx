@@ -61,7 +61,7 @@ export function TransactionFormSubmitButtonGroup({
             fontSize={'md'}
             color={'white.01'}
             bgColor={formProperties.color}
-            _hover={{ bgColor: 'accent.lightBlue.01' }}
+            _hover={{ bgColor: 'pink.01' }}
             type="submit"
             isDisabled={
               userEthereumAddressRiskLevel

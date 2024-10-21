@@ -18,7 +18,7 @@ interface StepProps {
 
 function getIconForStep(currentStep: number, stepIndex: number): React.JSX.Element {
   const properties = {
-    fill: currentStep >= stepIndex ? 'rgba(50, 201, 247, 1)' : 'rgba(255,255,255,1)',
+    fill: currentStep >= stepIndex ? 'rgba(255,255,255,1)' : 'rgba(255,255,255,0.5)',
     opacity: currentStep > stepIndex ? '50%' : '100%',
     height: '15px',
   };
@@ -46,7 +46,7 @@ export function StepGraphics({
       {!isLastStep && (
         <Divider
           orientation="horizontal"
-          borderColor={currentStep > stepIndex ? 'accent.lightBlue.01' : 'white.03'}
+          borderColor={currentStep > stepIndex ? 'pink.01' : 'white.03'}
           variant={currentStep > stepIndex ? 'thick' : 'thickDotted'}
           opacity={currentStep > stepIndex ? '50%' : '100%'}
         />
@@ -67,7 +67,7 @@ export function StepText({
     <Stack h={'25px'} w={width}>
       <Text
         textAlign={isFirstStep ? 'left' : isLastStep ? 'right' : 'center'}
-        color={currentStep >= stepIndex ? 'accent.lightBlue.01' : 'white.01'}
+        color={currentStep >= stepIndex ? 'white' : 'white.03'}
         fontSize={'xs'}
         fontWeight={currentStep === stepIndex ? 800 : 400}
         opacity={currentStep > stepIndex ? '50%' : '100%'}

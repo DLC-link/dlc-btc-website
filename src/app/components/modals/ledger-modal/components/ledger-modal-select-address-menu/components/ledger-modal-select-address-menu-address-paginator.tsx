@@ -16,7 +16,7 @@ export function LedgerModalSelectAddressMenuAddressPaginator({
         aria-label={'previous'}
         isDisabled={displayedAddressesStartIndex === 0}
         variant={'ghost'}
-        color={'accent.lightBlue.01'}
+        color={'pink.01'}
         icon={<ArrowBackIcon />}
         onClick={() => setDisplayedAddressesStartIndex(displayedAddressesStartIndex - 5)}
       />
@@ -26,7 +26,7 @@ export function LedgerModalSelectAddressMenuAddressPaginator({
       <IconButton
         aria-label={'next'}
         variant={'ghost'}
-        color={'accent.lightBlue.01'}
+        color={'pink.01'}
         icon={<ArrowForwardIcon />}
         onClick={() => setDisplayedAddressesStartIndex(displayedAddressesStartIndex + 5)}
       />

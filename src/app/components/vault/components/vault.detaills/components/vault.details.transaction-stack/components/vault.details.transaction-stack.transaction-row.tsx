@@ -21,7 +21,7 @@ export function VaultTransactionRow({
       <HStack w={'50%'} justifyContent={'flex-end'}>
         <Text
           fontSize={'xs'}
-          color={'accent.lightBlue.01'}
+          color={'pink.01'}
           textDecoration={'underline'}
           onClick={() =>
             window.open(`${appConfiguration.bitcoinBlockchainExplorerURL}/tx/${value}`, '_blank')

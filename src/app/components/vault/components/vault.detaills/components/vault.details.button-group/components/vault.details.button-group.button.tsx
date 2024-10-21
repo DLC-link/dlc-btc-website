@@ -19,7 +19,7 @@ export function VaultExpandedInformationButton({
       color={'white.01'}
       fontSize={'sm'}
       fontWeight={'bold'}
-      _hover={{ bg: 'accent.lightBlue.01', color: 'white.01' }}
+      _hover={{ bg: 'pink.01', color: 'white.01' }}
       isDisabled={isDisabled}
       onClick={onClick}
     >

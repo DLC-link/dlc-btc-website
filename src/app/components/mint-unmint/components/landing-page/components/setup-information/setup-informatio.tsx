@@ -11,14 +11,14 @@ export function SetupInformation(): React.JSX.Element {
         </Text>
         <SetupInformationWalletRequirement
           logo={'/images/logos/ethereum-logo.svg'}
-          color={'accent.lightBlue.01'}
+          color={'pink.01'}
           walletName={'Metamask Wallet'}
           requirement={'+ETH (for fee)'}
           url={'https://metamask.io/'}
         />
         <SetupInformationWalletRequirement
           logo={'/images/logos/bitcoin-logo.svg'}
-          color={'accent.lightBlue.01'}
+          color={'pink.01'}
           walletName={'Leather Wallet'}
           requirement={'+BTC (for lock)'}
           url={'https://leather.io/'}

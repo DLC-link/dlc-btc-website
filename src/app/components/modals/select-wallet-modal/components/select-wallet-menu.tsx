@@ -22,9 +22,7 @@ export function SelectWalletMenu({
 
   return (
     <Button
-      borderColor={
-        isConnectWalletSuccess && isThisWalletSelected ? 'accent.lightBlue.01' : 'border.white.01'
-      }
+      borderColor={isConnectWalletSuccess && isThisWalletSelected ? 'pink.01' : 'border.white.01'}
       variant={'wallet'}
       onClick={() => handleConnectWallet(wagmiConnector)}
     >
@@ -42,7 +40,7 @@ export function SelectWalletMenu({
           <Text w={'150px'}>{name}</Text>
         </HStack>
         {isConnectWalletPending && isThisWalletSelected && (
-          <Spinner size={'md'} color={'accent.lightBlue.01'} position={'absolute'} />
+          <Spinner size={'md'} color={'pink.01'} position={'absolute'} />
         )}
       </Box>
     </Button>

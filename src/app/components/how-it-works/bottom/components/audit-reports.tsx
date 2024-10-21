@@ -9,14 +9,14 @@ export function AuditReports(): React.JSX.Element {
         <>
           <Text variant={'title'}>Audit Reports</Text>
           <HStack align={'start'} spacing={'15px'}>
-            <AuditReportIcon fill={'rgba(50, 201, 247, 1)'} />
+            <AuditReportIcon fill={'rgba(188, 143, 249, 1'} />
             <Text color={'white'}>
               The following is a security audit report, completed by the team at CoinFabrik on
               November 29, 2023.{' '}
               <Link
                 href={'https://docs.dlc.link/resources#security-audit-reports'}
                 isExternal
-                color={'accent.lightBlue.01'}
+                color={'pink.01'}
               >
                 Read the report...
               </Link>
