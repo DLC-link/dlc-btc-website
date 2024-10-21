@@ -112,14 +112,22 @@ export function useXRPLLedger(): useXRPLLedgerReturnType {
     try {
       const { xrpHandler: currentXRPHandler } = await connectLedgerWallet("44'/144'/0'/0/0");
 
-      setIsLoading([true, 'Sign Check on your Ledger Device']);
+      setIsLoading([true, 'Creating Check']);
 
       const formattedWithdrawAmount = BigInt(shiftValue(withdrawAmount));
 
-      return await currentXRPHandler.createCheck(
+      const createCheckRequest = await currentXRPHandler.createCheck(
         formattedWithdrawAmount.toString(),
         vault.uuid.slice(2)
       );
+
+      setIsLoading([true, 'Sign Check on your Ledger Device']);
+
+      const txHash = await currentXRPHandler.signAndSubmitCheck(createCheckRequest);
+
+      setIsLoading([true, 'Waiting for Check to be processed']);
+
+      return await currentXRPHandler.sendCheckTXHash(appConfiguration.coordinatorURL, txHash);
     } catch (error) {
       throw new LedgerError(`Error creating Check: ${error}`);
     } finally {

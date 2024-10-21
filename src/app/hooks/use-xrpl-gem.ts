@@ -58,11 +58,22 @@ export function useGemWallet(): useXRPLGemReturnType {
     withdrawAmount: number
   ) {
     try {
-      setIsLoading([true, 'Sign Check in your Gem Wallet']);
+      setIsLoading([true, 'Creating Check']);
 
       const formattedWithdrawAmount = BigInt(shiftValue(withdrawAmount));
 
-      return await xrpHandler.createCheck(formattedWithdrawAmount.toString(), vault.uuid.slice(2));
+      const createCheckRequest = await xrpHandler.createCheck(
+        formattedWithdrawAmount.toString(),
+        vault.uuid.slice(2)
+      );
+
+      setIsLoading([true, 'Sign Check in your Gem Wallet']);
+
+      const txHash = await xrpHandler.signAndSubmitCheck(createCheckRequest);
+
+      setIsLoading([true, 'Waiting for Check to be processed']);
+
+      return await xrpHandler.sendCheckTXHash(appConfiguration.coordinatorURL, txHash);
     } catch (error) {
       throw new GemError(`Error creating Check: ${error}`);
     } finally {
