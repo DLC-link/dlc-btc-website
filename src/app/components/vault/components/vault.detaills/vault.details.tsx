@@ -19,6 +19,7 @@ interface VaultDetailsProps {
   vaultFundingTX?: string;
   vaultWithdrawDepositTX?: string;
   variant?: 'select' | 'selected';
+  handleClose?: () => void;
 }
 
 export function VaultDetails({
@@ -30,6 +31,7 @@ export function VaultDetails({
   vaultTotalMintedValue,
   isVaultExpanded,
   variant,
+  handleClose,
 }: VaultDetailsProps): React.JSX.Element {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -40,6 +42,9 @@ export function VaultDetails({
   function handleDepositClick() {
     navigate('/mint-withdraw');
     dispatch(mintUnmintActions.setMintStep([1, vaultUUID, vault]));
+    if (handleClose) {
+      handleClose();
+    }
   }
 
   function handleWithdrawClick() {
@@ -48,6 +53,9 @@ export function VaultDetails({
       dispatch(mintUnmintActions.setUnmintStep([0, vaultUUID, vault]));
     } else {
       dispatch(mintUnmintActions.setUnmintStep([1, vaultUUID, vault]));
+    }
+    if (handleClose) {
+      handleClose();
     }
   }
 

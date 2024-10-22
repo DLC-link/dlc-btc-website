@@ -8,10 +8,12 @@ import { TransactionFormNavigateButton } from './transaction-screen.transaction-
 
 interface TransactionFormNavigateButtonGroupProps {
   flow: 'mint' | 'burn';
+  handleClose?: () => void;
 }
 
 export function TransactionFormNavigateButtonGroup({
   flow,
+  handleClose,
 }: TransactionFormNavigateButtonGroupProps): React.JSX.Element {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -24,6 +26,17 @@ export function TransactionFormNavigateButtonGroup({
       dispatch(mintUnmintActions.setActiveTab(1));
       dispatch(mintUnmintActions.setUnmintStep([0, '']));
     }
+    navigate('/mint-withdraw');
+    if (handleClose) {
+      handleClose();
+    }
+  }
+
+  function handleNavigateToMyVaults() {
+    navigate('/my-vaults');
+    if (handleClose) {
+      handleClose();
+    }
   }
 
   return (
@@ -34,7 +47,7 @@ export function TransactionFormNavigateButtonGroup({
       />
       <TransactionFormNavigateButton
         label={'Show All Vaults'}
-        onClick={() => navigate('/my-vaults')}
+        onClick={() => handleNavigateToMyVaults()}
       />
     </ButtonGroup>
   );

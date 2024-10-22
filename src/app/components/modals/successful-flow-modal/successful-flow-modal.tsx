@@ -36,8 +36,8 @@ export function SuccessfulFlowModal({
             {getModalText(flow, assetAmount)}
           </Text>
         </HStack>
-        <Vault vault={vault} />
-        <TransactionFormNavigateButtonGroup flow={flow} />
+        <Vault vault={vault} handleClose={handleClose} />
+        <TransactionFormNavigateButtonGroup flow={flow} handleClose={handleClose} />
       </VStack>
     </ModalVaultLayout>
   );

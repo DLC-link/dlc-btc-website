@@ -5195,10 +5195,10 @@ dir-glob@^3.0.1:
   dependencies:
     path-type "^4.0.0"
 
-dlc-btc-lib@2.4.6:
-  version "2.4.6"
-  resolved "https://registry.yarnpkg.com/dlc-btc-lib/-/dlc-btc-lib-2.4.6.tgz#cea146d13cbb2ebb2df528287537df5deccab50d"
-  integrity sha512-eVbXNF2QZVDY2U9ZX/gVZAP9TqQafNdWsrP3O28P7AQlgdZGXibjND5xsN+6mOQZm6ywdsCI8ah531Yzt8haZg==
+dlc-btc-lib@2.4.7:
+  version "2.4.7"
+  resolved "https://registry.yarnpkg.com/dlc-btc-lib/-/dlc-btc-lib-2.4.7.tgz#9b40484ebe6529bf89e43b721b8fb8380946bf3d"
+  integrity sha512-X+OLDd13tZFC4/PTos9ozFaW7PGRDEP9zWA6TnLGyyi5TeorBioI5X5yOx9OV709pFjbmti+4qqJ08d/oHIjtQ==
   dependencies:
     "@gemwallet/api" "3.8.0"
     "@ledgerhq/hw-app-btc" "10.4.1"

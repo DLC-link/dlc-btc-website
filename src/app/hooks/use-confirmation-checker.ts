@@ -34,7 +34,12 @@ export function useConfirmationChecker(): [string, number][] {
     try {
       const bitcoinTransactionBlockHeight = await fetchBitcoinTransactionBlockHeight(vault);
 
-      return blockHeight - bitcoinTransactionBlockHeight;
+      const difference = blockHeight - bitcoinTransactionBlockHeight;
+      if (difference < 0) {
+        return 0;
+      } else {
+        return difference;
+      }
     } catch (error) {
       return 0;
     }

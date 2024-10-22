@@ -14,9 +14,10 @@ import { VaultProgressBar } from './components/vault.progress-bar';
 interface VaultProps {
   vault: VaultModel;
   variant?: 'select' | 'selected';
+  handleClose?: () => void;
 }
 
-export function Vault({ vault, variant }: VaultProps): React.JSX.Element {
+export function Vault({ vault, variant, handleClose }: VaultProps): React.JSX.Element {
   const dispatch = useDispatch();
   const [isVaultExpanded, setIsVaultExpanded] = useState(false);
 
@@ -53,6 +54,7 @@ export function Vault({ vault, variant }: VaultProps): React.JSX.Element {
         isVaultExpanded={isVaultExpanded}
         vaultFundingTX={vault.fundingTX}
         vaultWithdrawDepositTX={vault.withdrawDepositTX}
+        handleClose={handleClose}
       />
       <VaultProgressBar
         bitcoinTransactionConfirmations={confirmations}
