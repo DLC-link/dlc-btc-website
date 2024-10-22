@@ -9,6 +9,7 @@ import { BitcoinWalletType, bitcoinWallets } from '@models/wallet';
 import { modalActions } from '@store/slices/modal/modal.actions';
 
 import { SelectBitcoinWalletMenu } from './components/select-bitcoin-wallet-modal-menu';
+import { UpdateBitcoinWalletMessage } from './components/update-bitcoin-wallet-message';
 
 export function SelectBitcoinWalletModal({
   isOpen,
@@ -79,6 +80,7 @@ export function SelectBitcoinWalletModal({
             handleClick={() => handleLogin(wallet.id)}
           />
         ))}
+        <UpdateBitcoinWalletMessage />
       </VStack>
     </ModalLayout>
   );

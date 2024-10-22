@@ -5,7 +5,7 @@ const { definePartsStyle, defineMultiStyleConfig } = createMultiStyleConfigHelpe
 
 const baseStyle = definePartsStyle({
   dialogContainer: {
-    top: '19.5%',
+    top: '10.5%',
   },
   dialog: {
     padding: '15px',
