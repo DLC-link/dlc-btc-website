@@ -1,6 +1,6 @@
 {
   "appEnvironment": "devnet",
-  "coordinatorURL": "https://devnet-ripple.dlc.link/attestor-1",
+  "coordinatorURL": "https://devnet.dlc.link/attestor-1",
   "enabledEthereumNetworkIDs": ["421614", "84532", "11155111"],
   "enabledRippleNetworkIDs": ["1"],
   "bitcoinNetwork": "regtest",
@@ -9,7 +9,7 @@
   "bitcoinBlockchainURL": "https://devnet.dlc.link/electrs",
   "bitcoinBlockchainExplorerURL": "https://devnet.dlc.link/electrs",
   "bitcoinBlockchainFeeEstimateURL": "https://devnet.dlc.link/electrs/fee-estimates",
-  "rippleIssuerAddress": "ra3oyRVfy4yD4NJPrVcewvDtisZ3FhkcYL",
+  "rippleIssuerAddress": "rLTBw1MEy45uE5qmkWseinbj7h4zmdQuR8",
   "xrplWebsocket": "wss://s.altnet.rippletest.net:51233",
   "ledgerApp": "Bitcoin Test",
   "merchants": [
