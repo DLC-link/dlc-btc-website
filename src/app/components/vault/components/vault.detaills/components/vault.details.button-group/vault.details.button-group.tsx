@@ -1,4 +1,4 @@
-import { Divider, HStack, VStack } from '@chakra-ui/react';
+import { HStack, VStack } from '@chakra-ui/react';
 import { VaultState } from 'dlc-btc-lib/models';
 
 import { VaultExpandedInformationButton } from './components/vault.details.button-group.button';
@@ -36,8 +36,7 @@ export function VaultExpandedInformationButtonGroup({
 
   return (
     <VStack w={'100%'}>
-      <Divider w={'100%'} borderColor={'grey.01'} borderStyle={'dashed'} />
-      <HStack w={'100%'} justifyContent={'space-between'}>
+      <HStack w={'100%'} justifyContent={'space-between'} pt={'10px'}>
         <VaultExpandedInformationButton
           label={'Mint dlcBTC'}
           onClick={handleDepositClick}

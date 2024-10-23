@@ -1,4 +1,4 @@
-import { Skeleton } from '@chakra-ui/react';
+import { Skeleton, useBreakpointValue } from '@chakra-ui/react';
 import { GenericTableBody } from '@components/generic-table/components/generic-table-body';
 import { GenericTableHeader } from '@components/generic-table/components/generic-table-header';
 import { GenericTableHeaderText } from '@components/generic-table/components/generic-table-header-text';
@@ -11,14 +11,24 @@ interface PointsTableProps {
 }
 
 export function PointsTable({ items }: PointsTableProps): React.JSX.Element {
-  const dynamicHeight = items ? items.length * 65 + 20 : 20;
+  const dynamicHeight = items ? items.length * 59 + 20 : 20;
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
   return (
-    <GenericTableLayout height={`${dynamicHeight}px`} width={'50%'}>
+    <GenericTableLayout height={`${dynamicHeight}px`} width={'50%'} isMobile={isMobile}>
       <GenericTableHeader>
-        <GenericTableHeaderText w={'25%'}>dlcBTC Used</GenericTableHeaderText>
-        <GenericTableHeaderText w={'50%'}>Points Earned</GenericTableHeaderText>
-        <GenericTableHeaderText w={'25%'}>DeFi Protocol</GenericTableHeaderText>
+        {isMobile ? (
+          <>
+            <GenericTableHeaderText w={'50%'}>DeFi Protocol</GenericTableHeaderText>
+            <GenericTableHeaderText w={'50%'}>Points Earned</GenericTableHeaderText>
+          </>
+        ) : (
+          <>
+            <GenericTableHeaderText w={'25%'}>dlcBTC Used</GenericTableHeaderText>
+            <GenericTableHeaderText w={'50%'}>Points Earned</GenericTableHeaderText>
+            <GenericTableHeaderText w={'25%'}>DeFi Protocol</GenericTableHeaderText>
+          </>
+        )}
       </GenericTableHeader>
       <Skeleton isLoaded={items !== undefined} height={'50px'} w={'100%'}>
         <GenericTableBody>

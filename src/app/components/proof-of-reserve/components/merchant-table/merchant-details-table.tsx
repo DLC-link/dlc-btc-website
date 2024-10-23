@@ -1,4 +1,4 @@
-import { Skeleton, Text } from '@chakra-ui/react';
+import { Skeleton, Text, useBreakpointValue } from '@chakra-ui/react';
 import { GenericTableBody } from '@components/generic-table/components/generic-table-body';
 import { GenericTableHeader } from '@components/generic-table/components/generic-table-header';
 import { GenericTableHeaderText } from '@components/generic-table/components/generic-table-header-text';
@@ -11,17 +11,27 @@ interface MerchantDetailsTableProps {
 }
 
 export function MerchantDetailsTable({ items }: MerchantDetailsTableProps): React.JSX.Element {
-  const dynamicHeight = items ? items.length * 65 + 20 : 20;
+  const dynamicHeight = items ? items.length * 59 + 20 : 20;
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
   return (
-    <GenericTableLayout height={`${dynamicHeight}px`}>
+    <GenericTableLayout height={`${dynamicHeight}px`} isMobile={isMobile}>
       <GenericTableHeader>
-        <GenericTableHeaderText w={'15%'}>Order Book</GenericTableHeaderText>
-        <GenericTableHeaderText w={'15%'}>Amount</GenericTableHeaderText>
-        {/* <GenericTableHeaderText>in USD</GenericTableHeaderText> */}
-        <GenericTableHeaderText w={'15%'}>Transaction</GenericTableHeaderText>
-        <GenericTableHeaderText w={'15%'}>Chain</GenericTableHeaderText>
-        <GenericTableHeaderText w={'15%'}>Date</GenericTableHeaderText>
+        {isMobile ? (
+          <>
+            <GenericTableHeaderText w={'30%'}>Order Book</GenericTableHeaderText>
+            <GenericTableHeaderText w={'25%'}>Amount</GenericTableHeaderText>
+            <GenericTableHeaderText w={'30%'}>Transaction</GenericTableHeaderText>
+          </>
+        ) : (
+          <>
+            <GenericTableHeaderText w={'15%'}>Order Book</GenericTableHeaderText>
+            <GenericTableHeaderText w={'15%'}>Amount</GenericTableHeaderText>
+            <GenericTableHeaderText w={'15%'}>Transaction</GenericTableHeaderText>
+            <GenericTableHeaderText w={'15%'}>Chain</GenericTableHeaderText>
+            <GenericTableHeaderText w={'15%'}>Date</GenericTableHeaderText>
+          </>
+        )}
       </GenericTableHeader>
       <Skeleton isLoaded={items !== undefined} height={'50px'} w={'100%'}>
         {items?.length === 0 && (

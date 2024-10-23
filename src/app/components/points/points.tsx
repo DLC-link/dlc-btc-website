@@ -1,11 +1,22 @@
 import { useDispatch } from 'react-redux';
 
-import { Button, Divider, HStack, Image, Text, VStack } from '@chakra-ui/react';
+import {
+  Button,
+  Divider,
+  HStack,
+  Image,
+  Stack,
+  Text,
+  VStack,
+  useBreakpointValue,
+} from '@chakra-ui/react';
 import { TokenStatsBoardLayout } from '@components/proof-of-reserve/components/token-stats-board/token-stats-board.layout';
 import { usePoints } from '@hooks/use-points';
 import { dlcBTC } from '@models/token';
 import { modalActions } from '@store/slices/modal/modal.actions';
 import { useAccount } from 'wagmi';
+
+import { titleTextSize } from '@shared/utils';
 
 import { TokenStatsBoardTotalPoints } from './components/point-stats-board-total-points';
 import { PointsLayout } from './components/points-layout';
@@ -17,6 +28,8 @@ export function Points(): React.JSX.Element {
   const { userPoints } = usePoints();
   const { address } = useAccount();
 
+  const isMobile = useBreakpointValue({ base: true, md: false });
+
   function onConnectWalletClick(): void {
     dispatch(modalActions.toggleSelectWalletModalVisibility());
   }
@@ -24,7 +37,7 @@ export function Points(): React.JSX.Element {
   return (
     <PointsLayout>
       <>
-        <Text w={'100%'} color={'white'} fontSize={'6xl'} fontWeight={500}>
+        <Text w={'100%'} color={'white'} fontSize={titleTextSize} fontWeight={500}>
           Use dlcBTC -{' '}
           <Text as="span" fontWeight={700}>
             Earn Points
@@ -32,14 +45,20 @@ export function Points(): React.JSX.Element {
         </Text>
         {!address && (
           <TokenStatsBoardLayout>
-            <VStack w={'100%'} h={'100%'} p={'25px'} alignItems={'center'} spacing={'45px'}>
-              <Text color={'white.01'} fontSize={'2xl'}>
+            <VStack
+              w={'100%'}
+              h={'100%'}
+              p={['10px', '25px']}
+              alignItems={'center'}
+              spacing={['20px', '45px']}
+            >
+              <Text color={'white.01'} fontSize={['xl', '2xl']} align={'center'}>
                 Connect your Wallet to view your Points
               </Text>
               <Button
                 bgGradient={`linear(to-r, #AC50EF, #7059FB, #2ECFF6)`}
-                w={'30%'}
                 variant={'points'}
+                width={['100%', '100%', '50%', '30%']}
                 onClick={() => onConnectWalletClick()}
               >
                 <Text color={'white.01'}>Connect Wallet</Text>
@@ -49,19 +68,29 @@ export function Points(): React.JSX.Element {
         )}
         {address && (
           <TokenStatsBoardLayout>
-            <HStack w={'100%'} alignItems={'flex-start'}>
-              <VStack w={'50%'} alignItems={'flex-start'}>
+            <Stack
+              w={'100%'}
+              alignItems={'flex-start'}
+              direction={isMobile ? 'column' : 'row'}
+              p={isMobile ? '15px' : '0px'}
+              gap={isMobile ? '10px' : '0px'}
+            >
+              <VStack w={isMobile ? '100%' : '50%'} alignItems={'flex-start'}>
                 <TokenStatsBoardTotalPoints totalPoints={userPoints?.total} />
-                <HStack w={'100%'} pl={'25px'}>
+                <Stack
+                  w={'100%'}
+                  pl={isMobile ? '0px' : '25px'}
+                  direction={isMobile ? 'column' : 'row'}
+                >
                   <PointsStatsBoardAction
                     token={dlcBTC}
                     totalSupply={userPoints?.useTotal}
                     tokenSuffix={'Use'}
                   />
                   <Divider
-                    orientation={'vertical'}
-                    px={'15px'}
-                    height={'125px'}
+                    orientation={isMobile ? 'horizontal' : 'vertical'}
+                    px={isMobile ? '0px' : '15px'}
+                    height={isMobile ? '1px' : '125px'}
                     variant={'thick'}
                   />
                   <PointsStatsBoardAction
@@ -69,25 +98,45 @@ export function Points(): React.JSX.Element {
                     totalSupply={userPoints?.protocols.find(p => p.name == 'dlcBTC')?.points}
                     tokenSuffix={'Hold'}
                   />
-                </HStack>
+                </Stack>
               </VStack>
-              <Divider orientation={'vertical'} px={'5px'} height={'300px'} variant={'thick'} />
+              <Divider
+                orientation={isMobile ? 'horizontal' : 'vertical'}
+                px={isMobile ? '0px' : '5px'}
+                height={isMobile ? '1px' : '300px'}
+                variant={'thick'}
+              />
               <PointsTable items={userPoints?.protocols} />
-            </HStack>
+            </Stack>
           </TokenStatsBoardLayout>
         )}
         {!address && (
           <TokenStatsBoardLayout>
-            <HStack w={'100%'} p={'25px'}>
-              <VStack w={'50%'} h={'100%'} pr={'25px'} alignItems={'start'} spacing={'45px'}>
-                <VStack w={'100%'} h={'85px'} alignItems={'start'} spacing={'25px'}>
+            <Stack
+              w={'100%'}
+              p={isMobile ? '15px' : '25px'}
+              direction={isMobile ? 'column' : 'row'}
+              spacing={isMobile ? '35px' : '0px'}
+            >
+              <VStack
+                w={isMobile ? '100%' : '50%'}
+                h={'100%'}
+                pr={isMobile ? '0px' : '25px'}
+                alignItems={'start'}
+                spacing={isMobile ? '25px' : '45px'}
+              >
+                <VStack w={'100%'} h={'100%'} alignItems={'start'} spacing={'25px'}>
                   <HStack h={'25px'} spacing={'25px'}>
                     <Image
                       src={'./images/logos/dlc-btc-logo.svg'}
                       alt={'dlcBTC Logo'}
                       boxSize={'35px'}
                     />
-                    <Text color={'white'} fontWeight={200} fontSize={'4xl'}>
+                    <Text
+                      color={'white'}
+                      fontWeight={200}
+                      fontSize={['xl', '2xl', '2xl', '4xl', '4xl']}
+                    >
                       Use dlcBTC
                     </Text>
                   </HStack>
@@ -107,16 +156,31 @@ export function Points(): React.JSX.Element {
                   <Text color={'white.01'}>Earn Points</Text>
                 </Button>
               </VStack>
-              <Divider orientation={'vertical'} px={'15px'} height={'185px'} variant={'thick'} />
-              <VStack w={'50%'} h={'100%'} pr={'25px'} alignItems={'start'} spacing={'45px'}>
-                <VStack w={'100%'} h={'85px'} alignItems={'start'} spacing={'25px'}>
+              <Divider
+                orientation={isMobile ? 'horizontal' : 'vertical'}
+                px={isMobile ? '0px' : '15px'}
+                height={isMobile ? '1px' : '200px'}
+                variant={'thick'}
+                w={isMobile ? '100%' : '1px'}
+              />
+              <VStack
+                w={isMobile ? '100%' : '50%'}
+                h={'100%'}
+                alignItems={'start'}
+                spacing={isMobile ? '25px' : '45px'}
+              >
+                <VStack w={'100%'} h={'100%'} alignItems={'start'} spacing={'25px'}>
                   <HStack h={'25px'} spacing={'25px'}>
                     <Image
                       src={'./images/logos/bitcoin-logo.svg'}
                       alt={'dlcBTC Logo'}
                       boxSize={'35px'}
                     />
-                    <Text color={'white'} fontWeight={200} fontSize={'4xl'}>
+                    <Text
+                      color={'white'}
+                      fontWeight={200}
+                      fontSize={['xl', '2xl', '2xl', '4xl', '4xl']}
+                    >
                       Provide Bitcoin
                     </Text>
                   </HStack>
@@ -137,7 +201,7 @@ export function Points(): React.JSX.Element {
                   </Text>
                 </Button>
               </VStack>
-            </HStack>
+            </Stack>
           </TokenStatsBoardLayout>
         )}
 

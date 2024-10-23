@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
+import { VStack } from '@chakra-ui/react';
 import { Vault as VaultModel } from '@models/vault';
 import { BitcoinTransactionConfirmationsContext } from '@providers/bitcoin-query-provider';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
@@ -37,25 +38,28 @@ export function Vault({ vault, variant, handleClose }: VaultProps): React.JSX.El
   return (
     <VaultLayout>
       <VaultHeader vaultUUID={vault.uuid} vaultCreationTimestamp={vault.timestamp} />
-      <VaultMainStack
-        vaultState={vault.state}
-        vaultTotalLockedValue={vault.valueLocked}
-        vaultTotalMintedValue={vault.valueMinted}
-        isVaultExpanded={isVaultExpanded}
-        variant={variant}
-        handleButtonClick={handleMainButtonClick}
-      />
-      <VaultDetails
-        variant={variant}
-        vaultUUID={vault.uuid}
-        vaultState={vault.state}
-        vaultTotalLockedValue={vault.valueLocked}
-        vaultTotalMintedValue={vault.valueMinted}
-        isVaultExpanded={isVaultExpanded}
-        vaultFundingTX={vault.fundingTX}
-        vaultWithdrawDepositTX={vault.withdrawDepositTX}
-        handleClose={handleClose}
-      />
+      <VStack width={'100%'} gap={'0px'}>
+        <VaultMainStack
+          vaultState={vault.state}
+          vaultTotalLockedValue={vault.valueLocked}
+          vaultTotalMintedValue={vault.valueMinted}
+          isVaultExpanded={isVaultExpanded}
+          variant={variant}
+          handleButtonClick={handleMainButtonClick}
+        />
+        <VaultDetails
+          variant={variant}
+          vaultUUID={vault.uuid}
+          vaultState={vault.state}
+          vaultTotalLockedValue={vault.valueLocked}
+          vaultTotalMintedValue={vault.valueMinted}
+          isVaultExpanded={isVaultExpanded}
+          vaultFundingTX={vault.fundingTX}
+          vaultWithdrawDepositTX={vault.withdrawDepositTX}
+          handleClose={handleClose}
+        />
+      </VStack>
+
       <VaultProgressBar
         bitcoinTransactionConfirmations={confirmations}
         vaultState={vault.state}

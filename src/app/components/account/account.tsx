@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { Button, HStack } from '@chakra-ui/react';
+import { Button, HStack, useBreakpointValue } from '@chakra-ui/react';
 import { AccountMenu } from '@components/account/components/account-menu';
 import { useNetworkConnection } from '@hooks/use-connected';
 import { XRPWallet, xrpWallets } from '@models/wallet';
@@ -17,6 +17,7 @@ export function Account(): React.JSX.Element {
   const { isConnected } = useNetworkConnection();
   const { networkType } = useContext(NetworkConfigurationContext);
 
+  const isMobile = useBreakpointValue({ base: true, md: false });
   const { address: ethereumUserAddress, connector: ethereumWallet } = useAccount();
   const { disconnect: disconnectEthereumWallet } = useDisconnect();
   const {
@@ -60,7 +61,7 @@ export function Account(): React.JSX.Element {
   }
 
   return (
-    <HStack w={'275px'}>
+    <HStack h={isMobile ? '40px' : '50px'}>
       {isConnected ? (
         <AccountMenu
           address={getWalletInformation()?.address}
@@ -68,7 +69,13 @@ export function Account(): React.JSX.Element {
           handleDisconnectWallet={() => onDisconnectWalletClick()}
         />
       ) : (
-        <Button variant={'account'} onClick={() => onConnectWalletClick()}>
+        <Button
+          variant={'account'}
+          onClick={() => onConnectWalletClick()}
+          h={isMobile ? '40px' : '50px'}
+          w={isMobile ? '150px' : '275px'}
+          fontSize={isMobile ? 'md' : 'lg'}
+        >
           Connect Wallet
         </Button>
       )}

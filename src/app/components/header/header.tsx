@@ -1,21 +1,17 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-import { HStack, VStack } from '@chakra-ui/react';
-import { Account } from '@components/account/account';
-import { CompanyWebsiteButton } from '@components/company-website-button/company-website-button';
-import { HeaderLayout } from '@components/header/components/header.layout';
-import { NetworkBox } from '@components/network/network';
+import { VStack, useBreakpointValue } from '@chakra-ui/react';
 import { useNetworkConnection } from '@hooks/use-connected';
 import { NetworkConfigurationContext } from '@providers/network-configuration.provider';
 import { useAccount } from 'wagmi';
 
 import { Banner } from './components/banner';
-import { NavigationTabs } from './components/tabs';
+import DesktopHeader from './components/desktop-header';
+import MobileHeader from './components/mobile-header';
 
 export function Header(): React.JSX.Element {
   const navigate = useNavigate();
-  const location = useLocation();
   const { isConnected } = useNetworkConnection();
 
   const { networkType } = useContext(NetworkConfigurationContext);
@@ -27,6 +23,8 @@ export function Header(): React.JSX.Element {
   const handleTabClick = (route: string) => {
     navigate(route);
   };
+
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
   useEffect(() => {
     if (networkType === 'evm' && isConnected && !ethereumNetwork) {
@@ -46,16 +44,18 @@ export function Header(): React.JSX.Element {
           }}
         />
       )}
-      <HeaderLayout>
-        <HStack gap={'50px'}>
-          <CompanyWebsiteButton />
-          <NavigationTabs activeTab={location.pathname} handleTabClick={handleTabClick} />
-        </HStack>
-        <HStack>
-          <NetworkBox isMenuOpen={isNetworkMenuOpen} setIsMenuOpen={setIsNetworkMenuOpen} />
-          <Account />
-        </HStack>
-      </HeaderLayout>
+      {isMobile ? (
+        <MobileHeader
+          isNetworkMenuOpen={isNetworkMenuOpen}
+          setIsNetworkMenuOpen={setIsNetworkMenuOpen}
+        />
+      ) : (
+        <DesktopHeader
+          isNetworkMenuOpen={isNetworkMenuOpen}
+          setIsNetworkMenuOpen={setIsNetworkMenuOpen}
+          handleTabClick={handleTabClick}
+        />
+      )}
     </VStack>
   );
 }
