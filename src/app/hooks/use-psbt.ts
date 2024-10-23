@@ -36,7 +36,10 @@ export function usePSBT(): UsePSBTReturnType {
   } = useContext(EthereumNetworkConfigurationContext);
   const { address: ethereumUserAddress } = useAccount();
   const { userAddress: rippleUserAddress } = useContext(XRPWalletContext);
-  const { rippleClient } = useContext(RippleNetworkConfigurationContext);
+  const {
+    rippleClient,
+    rippleNetworkConfiguration: { rippleAttestorChainID },
+  } = useContext(RippleNetworkConfigurationContext);
 
   const { bitcoinWalletType, dlcHandler, resetBitcoinWalletContext } =
     useContext(BitcoinWalletContext);
@@ -96,7 +99,7 @@ export function usePSBT(): UsePSBTReturnType {
     if (networkType === 'evm') {
       return ethereumAttestorChainID;
     } else if (networkType === 'xrpl') {
-      return 'ripple-xrpl-testnet';
+      return rippleAttestorChainID;
     } else {
       throw new Error('Network Type is not setup');
     }

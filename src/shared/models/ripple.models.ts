@@ -1,3 +1,5 @@
+import { AttestorChainID } from 'dlc-btc-lib/models';
+
 export interface RippleNetwork {
   id: RippleNetworkID;
   name: string;
@@ -11,5 +13,5 @@ export enum RippleNetworkID {
 export interface RippleNetworkConfiguration {
   rippleExplorerAPIURL: string;
   websocketURL: string;
-  ripplemAttestorChainID: 'xrpl-ripple-mainnet' | 'xrpl-ripple-testnet';
+  rippleAttestorChainID: AttestorChainID;
 }

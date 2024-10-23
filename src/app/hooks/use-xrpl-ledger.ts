@@ -21,7 +21,10 @@ interface useXRPLLedgerReturnType {
 type TransportInstance = Awaited<ReturnType<typeof Transport.create>>;
 
 export function useXRPLLedger(): useXRPLLedgerReturnType {
-  const { rippleClient } = useContext(RippleNetworkConfigurationContext);
+  const {
+    rippleClient,
+    rippleNetworkConfiguration: { rippleAttestorChainID },
+  } = useContext(RippleNetworkConfigurationContext);
 
   const [isLoading, setIsLoading] = useState<[boolean, string]>([false, '']);
 
@@ -127,7 +130,11 @@ export function useXRPLLedger(): useXRPLLedgerReturnType {
 
       setIsLoading([true, 'Waiting for Check to be processed']);
 
-      return await currentXRPHandler.sendCheckTXHash(appConfiguration.coordinatorURL, txHash);
+      return await currentXRPHandler.sendCheckTXHash(
+        appConfiguration.coordinatorURL,
+        txHash,
+        rippleAttestorChainID
+      );
     } catch (error) {
       throw new LedgerError(`Error creating Check: ${error}`);
     } finally {

@@ -32,13 +32,13 @@ function getRippleNetworkConfiguration(
       return {
         rippleExplorerAPIURL: 'https://livenet.xrpl.org/',
         websocketURL: 'wss://s1.ripple.com/',
-        ripplemAttestorChainID: 'xrpl-ripple-mainnet',
+        rippleAttestorChainID: 'ripple-xrpl-mainnet',
       };
     case RippleNetworkID.Testnet:
       return {
         rippleExplorerAPIURL: 'https://testnet.xrpl.org/',
         websocketURL: 'wss://s.altnet.rippletest.net:51233',
-        ripplemAttestorChainID: 'xrpl-ripple-testnet',
+        rippleAttestorChainID: 'ripple-xrpl-testnet',
       };
 
     default:

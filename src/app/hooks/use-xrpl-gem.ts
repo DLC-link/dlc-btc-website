@@ -19,7 +19,10 @@ interface useXRPLGemReturnType {
 }
 
 export function useGemWallet(): useXRPLGemReturnType {
-  const { rippleClient } = useContext(RippleNetworkConfigurationContext);
+  const {
+    rippleClient,
+    rippleNetworkConfiguration: { rippleAttestorChainID },
+  } = useContext(RippleNetworkConfigurationContext);
 
   const [isLoading, setIsLoading] = useState<[boolean, string]>([false, '']);
 
@@ -73,7 +76,11 @@ export function useGemWallet(): useXRPLGemReturnType {
 
       setIsLoading([true, 'Waiting for Check to be processed']);
 
-      return await xrpHandler.sendCheckTXHash(appConfiguration.coordinatorURL, txHash);
+      return await xrpHandler.sendCheckTXHash(
+        appConfiguration.coordinatorURL,
+        txHash,
+        rippleAttestorChainID
+      );
     } catch (error) {
       throw new GemError(`Error creating Check: ${error}`);
     } finally {
