@@ -37,11 +37,14 @@ export function findEthereumNetworkByName(ethereumNetworkName: string): Chain {
 
 export function formatEvent(event: DetailedEvent): FormattedEvent {
   const isMint = event.eventType === 'mint';
+  const date = new Date(event.timestamp * 1000);
   return {
     dlcBTCAmount: isMint ? event.value : -event.value,
     merchant: isMint ? event.to : event.from,
     txHash: event.txHash,
-    date: new Date(event.timestamp * 1000).toDateString(),
+    date: date
+      .toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+      .replace(',', ''),
     isMint,
     chain: event.chain,
     isCCIP: event.isCCIP,
