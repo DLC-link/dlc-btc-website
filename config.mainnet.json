@@ -33,6 +33,11 @@
       "name": "Waterdrip Capital",
       "addresses": ["0x2816f3528AD324E6089714DA8E89455f58739e68"],
       "logo": "/images/logos/waterdrip-capital-logo.svg"
+    },
+    {
+      "name": "Pattern Research",
+      "addresses": ["0x707A141c5c19c25E2e6D50b214e39A4293B63234"],
+      "logo": "/images/logos/pattern-research-logo.svg"
     }
   ],
   "protocols": [
