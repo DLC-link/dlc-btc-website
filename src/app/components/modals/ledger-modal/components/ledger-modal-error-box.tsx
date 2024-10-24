@@ -5,13 +5,19 @@ interface LedgerModalErrorBoxProps {
 }
 
 function formatErrorMessage(error: string): string {
-  if (error.includes('0x6985')) {
-    return 'Action Rejected by User';
-  } else if (error.includes('0x5515')) {
-    return 'Locked Device';
-  } else {
-    return error;
+  const errorMessages: Record<string, string> = {
+    '0x6985': 'Action Rejected by User',
+    '0x5515': 'Locked Device',
+    '0x6a80':
+      "Invalid data received. Please ensure your Ledger hardware's firmware and Bitcoin app are up to date",
+  };
+
+  for (const [code, message] of Object.entries(errorMessages)) {
+    if (error.includes(code)) {
+      return message;
+    }
   }
+  return error;
 }
 
 export function LedgerModalErrorBox({

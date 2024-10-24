@@ -28,6 +28,16 @@
       "name": "Smart Bitcoin Labs",
       "addresses": ["0x46166fA874AAEDEA8d98b15F9A72C84e22Abe2A1"],
       "logo": "/images/logos/sbl-logotype.svg"
+    },
+    {
+      "name": "Waterdrip Capital",
+      "addresses": ["0x2816f3528AD324E6089714DA8E89455f58739e68"],
+      "logo": "/images/logos/waterdrip-capital-logo.svg"
+    },
+    {
+      "name": "Pattern Research",
+      "addresses": ["0x707A141c5c19c25E2e6D50b214e39A4293B63234"],
+      "logo": "/images/logos/pattern-research-logo.svg"
     }
   ],
   "protocols": [
