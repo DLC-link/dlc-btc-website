@@ -1,7 +1,7 @@
 import { HStack, Image, Text } from '@chakra-ui/react';
 
 const blockchainTagPropertyMap = {
-  ethereum: {
+  evm: {
     logo: '/images/logos/ethereum-logo.svg',
     text: 'ON ETHEREUM',
   },
@@ -9,10 +9,14 @@ const blockchainTagPropertyMap = {
     logo: '/images/logos/bitcoin-logo.svg',
     text: 'ON BITCOIN',
   },
+  xrpl: {
+    logo: '/images/logos/xrp-logo.svg',
+    text: 'ON XRPL',
+  },
 };
 
 interface WalkthroughBlockchainTagProps {
-  blockchain: 'ethereum' | 'bitcoin';
+  blockchain: 'evm' | 'bitcoin' | 'xrpl';
 }
 
 export function WalkthroughBlockchainTag({

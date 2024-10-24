@@ -49,6 +49,7 @@ export function TransactionFormSubmitButtonGroup({
   handleCancelButtonClick,
   isSubmitting,
 }: TransactionFormSubmitButtonGroupProps): React.JSX.Element {
+  console.log('userEthereumAddressRiskLevel', userEthereumAddressRiskLevel);
   const formProperties = getFormProperties(flow, currentStep);
   return (
     <VStack w={'100%'} spacing={'15px'}>
@@ -63,11 +64,7 @@ export function TransactionFormSubmitButtonGroup({
             bgColor={formProperties.color}
             _hover={{ bgColor: 'accent.lightBlue.01' }}
             type="submit"
-            isDisabled={
-              userEthereumAddressRiskLevel
-                ? ['High', 'Severe'].includes(userEthereumAddressRiskLevel) || !canSubmit
-                : !canSubmit || isSubmitting
-            }
+            isDisabled={!canSubmit || isSubmitting}
           >
             {getButtonLabel(flow, currentStep, isSubmitting, bitcoinWalletContextState)}
           </Button>

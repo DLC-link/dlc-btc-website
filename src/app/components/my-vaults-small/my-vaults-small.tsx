@@ -11,25 +11,13 @@ import { MyVaultsSmallLayout } from './components/my-vaults-small.layout';
 export function MyVaultsSmall(): React.JSX.Element {
   const navigate = useNavigate();
 
-  const vaultContext = useContext(VaultContext);
-  const {
-    readyVaults,
-    pendingVaults,
-    fundedVaults,
-    closingVaults,
-    closedVaults,
-    isLoading,
-    allVaults,
-  } = vaultContext;
+  const { readyVaults, pendingVaults, fundedVaults, closingVaults, closedVaults, allVaults } =
+    useContext(VaultContext);
 
   return (
     <MyVaultsSmallLayout>
-      <VaultsList
-        title={'My Vaults'}
-        height={'825'}
-        isScrollable={!isLoading && allVaults.length > 0}
-      >
-        <Skeleton isLoaded={!isLoading} w={'100%'}>
+      <VaultsList title={'My Vaults'} height={'825'} isScrollable={allVaults.length > 0}>
+        <Skeleton isLoaded={true} w={'100%'}>
           <VaultsListGroupContainer label="Pending" vaults={pendingVaults} />
           <VaultsListGroupContainer label="Unlocking BTC in Progress" vaults={closingVaults} />
           <VaultsListGroupContainer label="Empty Vaults" vaults={readyVaults} />
