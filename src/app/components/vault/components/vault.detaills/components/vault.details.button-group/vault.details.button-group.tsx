@@ -36,7 +36,7 @@ export function VaultExpandedInformationButtonGroup({
 
   return (
     <VStack w={'100%'}>
-      <HStack w={'100%'} justifyContent={'space-between'}>
+      <HStack w={'100%'} justifyContent={'space-between'} pt={'10px'}>
         <VaultExpandedInformationButton
           label={'Mint dlcBTC'}
           onClick={handleDepositClick}

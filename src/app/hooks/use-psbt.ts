@@ -232,6 +232,7 @@ export function usePSBT(): UsePSBTReturnType {
     [BitcoinWalletType.Ledger]: isLedgerLoading,
     [BitcoinWalletType.Leather]: isLeatherLoading,
     [BitcoinWalletType.Unisat]: isUnisatLoading,
+    [BitcoinWalletType.Fordefi]: isUnisatLoading,
   };
 
   return {

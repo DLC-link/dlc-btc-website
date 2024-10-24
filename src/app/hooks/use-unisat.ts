@@ -21,7 +21,7 @@ import { shiftValue } from 'dlc-btc-lib/utilities';
 import { BITCOIN_NETWORK_MAP } from '@shared/constants/bitcoin.constants';
 
 interface UseUnisatReturnType {
-  connectUnisatWallet: () => Promise<void>;
+  connectUnisatWallet: (isFordefi?: boolean) => Promise<void>;
   handleFundingTransaction: (
     dlcHandler: SoftwareWalletDLCHandler,
     vault: RawVault,
@@ -131,10 +131,16 @@ export function useUnisat(): UseUnisatReturnType {
    *
    * @returns A promise that resolves to the user's taproot address.
    */
-  async function getBitcoinAddresses(): Promise<BitcoinTaprootAccount> {
+  async function getBitcoinAddresses(isFordefi: boolean = false): Promise<BitcoinTaprootAccount> {
     try {
       if (!window.unisat) {
-        throw new UnisatError('Unisat Wallet is not installed');
+        throw new UnisatError(
+          isFordefi ? 'Fordefi Wallet is Not Installed' : 'Unisat Wallet is Not Installed'
+        );
+      } else if (isFordefi && !window?.unisat?.is_fordefi) {
+        throw new UnisatError('Please disable Unisat Wallet and enable Fordefi Wallet');
+      } else if (!isFordefi && window?.unisat?.is_fordefi) {
+        throw new UnisatError('Please disable Fordefi Wallet and enable Unisat Wallet');
       }
 
       const userAddresses: string[] = await window.unisat.requestAccounts();
@@ -159,11 +165,11 @@ export function useUnisat(): UseUnisatReturnType {
    *
    * @returns A promise that resolves to the User's Taproot Address.
    */
-  async function connectUnisatWallet(): Promise<void> {
+  async function connectUnisatWallet(isFordefi: boolean = false): Promise<void> {
     try {
       setIsLoading([true, 'Connecting To Unisat Wallet']);
 
-      const taprootAccount = await getBitcoinAddresses();
+      const taprootAccount = await getBitcoinAddresses(isFordefi);
 
       const unisatDLCHandler = new SoftwareWalletDLCHandler(
         taprootAccount.publicKey,

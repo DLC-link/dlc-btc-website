@@ -8,6 +8,7 @@ import { BitcoinTransactionConfirmationsContext } from '@providers/bitcoin-query
 import { BitcoinWalletContextState } from '@providers/bitcoin-wallet-context-provider';
 import { useForm } from '@tanstack/react-form';
 import Decimal from 'decimal.js';
+import { isEmpty } from 'ramda';
 
 import { TransactionFormNavigateButtonGroup } from './components/transaction-screen.transaction-form.navigate-button-group';
 import { TransactionFormProgressStack } from './components/transaction-screen.transaction-form.progress-stack/components/transaction-screen.transaction-form.progress-stack';
@@ -140,7 +141,8 @@ export function VaultTransactionForm({
     },
     validators: {
       onChange: ({ value }) => {
-        setCurrentFieldValue(new Decimal(value.assetAmount).toNumber());
+        const assetAmount = value.assetAmount;
+        setCurrentFieldValue(isEmpty(assetAmount) ? 0 : new Decimal(value.assetAmount).toNumber());
         return {
           fields: {
             assetAmount: validateFormAmount(
