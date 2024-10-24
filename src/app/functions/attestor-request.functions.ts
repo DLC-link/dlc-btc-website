@@ -1,3 +1,5 @@
+import { AttestorChainID } from 'dlc-btc-lib/models';
+
 export async function getAttestorExtendedGroupPublicKey(): Promise<string> {
   try {
     const netlifyFunctionEndpoint = `/.netlify/functions/fetch-attestor-group-public-key?coordinatorURL=${appConfiguration.coordinatorURL}`;
@@ -15,9 +17,12 @@ export async function getAttestorExtendedGroupPublicKey(): Promise<string> {
   }
 }
 
-export async function submitSetupXRPLVaultRequest(userAddress: string): Promise<void> {
+export async function submitSetupXRPLVaultRequest(
+  userAddress: string,
+  attestorChainID: AttestorChainID
+): Promise<void> {
   try {
-    const netlifyFunctionEndpoint = `/.netlify/functions/submit-xrpl-vault-request?coordinatorURL=${appConfiguration.coordinatorURL}&userXRPLAddress=${userAddress}`;
+    const netlifyFunctionEndpoint = `/.netlify/functions/submit-xrpl-vault-request?coordinatorURL=${appConfiguration.coordinatorURL}&userXRPLAddress=${userAddress}&attestorChainID=${attestorChainID}`;
 
     const response = await fetch(netlifyFunctionEndpoint);
 

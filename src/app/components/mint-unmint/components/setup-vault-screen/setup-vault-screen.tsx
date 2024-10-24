@@ -7,6 +7,7 @@ import { useEthersSigner } from '@functions/configuration.functions';
 import { useXRPWallet } from '@hooks/use-xrp-wallet';
 import { EthereumNetworkConfigurationContext } from '@providers/ethereum-network-configuration.provider';
 import { NetworkConfigurationContext } from '@providers/network-configuration.provider';
+import { RippleNetworkConfigurationContext } from '@providers/ripple-network-configuration.provider';
 import { XRPWalletContext } from '@providers/xrp-wallet-context-provider';
 import { setupVault } from 'dlc-btc-lib/ethereum-functions';
 
@@ -19,6 +20,7 @@ export function SetupVaultScreen(): React.JSX.Element {
   const { handleSetTrustLine, isLoading } = useXRPWallet();
 
   const { ethereumNetworkConfiguration } = useContext(EthereumNetworkConfigurationContext);
+  const { rippleNetworkConfiguration } = useContext(RippleNetworkConfigurationContext);
 
   const signer = useEthersSigner();
 
@@ -29,7 +31,10 @@ export function SetupVaultScreen(): React.JSX.Element {
       setIsSubmitting(true);
       if (networkType === 'xrpl') {
         await handleSetTrustLine();
-        await submitSetupXRPLVaultRequest(rippleUserAddress!);
+        await submitSetupXRPLVaultRequest(
+          rippleUserAddress!,
+          rippleNetworkConfiguration.rippleAttestorChainID
+        );
       } else if (networkType === 'evm') {
         await setupVault(ethereumNetworkConfiguration.dlcManagerContract.connect(signer!));
       } else {
