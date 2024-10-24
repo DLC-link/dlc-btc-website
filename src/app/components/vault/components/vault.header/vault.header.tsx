@@ -19,10 +19,10 @@ export function VaultHeader({
 
   return (
     <HStack w={'100%'} justifyContent={'space-between'}>
-      <HStack width={'75%'}>
+      <HStack width={'77%'}>
         <Stack w={'45%'}>
           <Text fontSize={'xs'} fontWeight={'bold'} color={'white.01'}>
-            Vault UUID
+            Vault UUID:
           </Text>
         </Stack>
         <Stack w={'45%'}>
