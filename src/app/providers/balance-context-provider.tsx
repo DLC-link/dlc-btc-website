@@ -1,6 +1,5 @@
 import { createContext, useContext } from 'react';
 
-import { useNetworkConnection } from '@hooks/use-connected';
 import { HasChildren } from '@models/has-children';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -12,6 +11,7 @@ import { useAccount } from 'wagmi';
 
 import { EthereumNetworkConfigurationContext } from './ethereum-network-configuration.provider';
 import { NetworkConfigurationContext } from './network-configuration.provider';
+import { NetworkConnectionContext } from './network-connection.provider';
 import { XRPWalletContext } from './xrp-wallet-context-provider';
 
 interface VaultContextType {
@@ -29,7 +29,7 @@ export function BalanceContextProvider({ children }: HasChildren): React.JSX.Ele
     ethereumNetworkConfiguration: { dlcBTCContract, dlcManagerContract },
   } = useContext(EthereumNetworkConfigurationContext);
   const { networkType } = useContext(NetworkConfigurationContext);
-  const { isConnected } = useNetworkConnection();
+  const { isConnected } = useContext(NetworkConnectionContext);
   const { userAddress } = useContext(XRPWalletContext);
   const { xrpHandler } = useContext(XRPWalletContext);
 

@@ -2,8 +2,8 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { VStack, useBreakpointValue } from '@chakra-ui/react';
-import { useNetworkConnection } from '@hooks/use-connected';
 import { NetworkConfigurationContext } from '@providers/network-configuration.provider';
+import { NetworkConnectionContext } from '@providers/network-connection.provider';
 import { useAccount } from 'wagmi';
 
 import { Banner } from './components/banner';
@@ -12,7 +12,7 @@ import MobileHeader from './components/mobile-header';
 
 export function Header(): React.JSX.Element {
   const navigate = useNavigate();
-  const { isConnected } = useNetworkConnection();
+  const { isConnected } = useContext(NetworkConnectionContext);
 
   const { networkType } = useContext(NetworkConfigurationContext);
   const { chain: ethereumNetwork } = useAccount();

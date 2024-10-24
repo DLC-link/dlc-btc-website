@@ -3,9 +3,9 @@ import { useDispatch } from 'react-redux';
 
 import { Button, HStack, useBreakpointValue } from '@chakra-ui/react';
 import { AccountMenu } from '@components/account/components/account-menu';
-import { useNetworkConnection } from '@hooks/use-connected';
 import { XRPWallet, xrpWallets } from '@models/wallet';
 import { NetworkConfigurationContext } from '@providers/network-configuration.provider';
+import { NetworkConnectionContext } from '@providers/network-connection.provider';
 import { XRPWalletContext } from '@providers/xrp-wallet-context-provider';
 import { mintUnmintActions } from '@store/slices/mintunmint/mintunmint.actions';
 import { modalActions } from '@store/slices/modal/modal.actions';
@@ -14,7 +14,7 @@ import { Connector, useAccount, useDisconnect } from 'wagmi';
 export function Account(): React.JSX.Element {
   const dispatch = useDispatch();
 
-  const { isConnected } = useNetworkConnection();
+  const { isConnected } = useContext(NetworkConnectionContext);
   const { networkType } = useContext(NetworkConfigurationContext);
 
   const isMobile = useBreakpointValue({ base: true, md: false });

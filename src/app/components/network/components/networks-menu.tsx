@@ -10,10 +10,9 @@ import {
   Text,
   useBreakpointValue,
 } from '@chakra-ui/react';
-import { useNetworkConnection } from '@hooks/use-connected';
 import { NetworkConfigurationContext } from '@providers/network-configuration.provider';
+import { NetworkConnectionContext } from '@providers/network-connection.provider';
 import { EthereumNetworkID } from 'dlc-btc-lib/models';
-import { chain } from 'ramda';
 import { useAccount, useConfig, useSwitchChain } from 'wagmi';
 
 interface NetworksMenuProps {
@@ -42,7 +41,7 @@ export function NetworksMenu({
   setIsMenuOpen,
 }: NetworksMenuProps): React.JSX.Element | null {
   const { chains } = useConfig();
-  const { isConnected } = useNetworkConnection();
+  const { isConnected } = useContext(NetworkConnectionContext);
   const { chain: ethereumNetwork } = useAccount();
 
   const { networkType } = useContext(NetworkConfigurationContext);
@@ -69,7 +68,7 @@ export function NetworksMenu({
         ) : (
           //TODO: what to display in case of not connected?
           <HStack justifyContent={'space-evenly'}>
-            <Text>{chain ? chain?.name : 'Not Connected'}</Text>
+            <Text>{ethereumNetwork ? ethereumNetwork?.name : 'Not Connected'}</Text>
           </HStack>
         )}
       </MenuButton>

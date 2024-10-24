@@ -4,8 +4,8 @@ import { HStack } from '@chakra-ui/react';
 import { VaultsListGroupBlankContainer } from '@components/vaults-list/components/vaults-list-group-blank-container';
 import { VaultsListGroupContainer } from '@components/vaults-list/components/vaults-list-group-container';
 import { VaultsList } from '@components/vaults-list/vaults-list';
-import { useNetworkConnection } from '@hooks/use-connected';
 import { BalanceContext } from '@providers/balance-context-provider';
+import { NetworkConnectionContext } from '@providers/network-connection.provider';
 import { VaultContext } from '@providers/vault-context-provider';
 
 import { MyVaultsLargeHeader } from './components/my-vaults-header/my-vaults-header';
@@ -13,7 +13,7 @@ import { MyVaultsLargeLayout } from './components/my-vaults-large.layout';
 import { MyVaultsSetupInformationStack } from './components/my-vaults-setup-information-stack';
 
 export function MyVaultsLarge(): React.JSX.Element {
-  const { isConnected } = useNetworkConnection();
+  const { isConnected } = useContext(NetworkConnectionContext);
   const { dlcBTCBalance, lockedBTCBalance } = useContext(BalanceContext);
 
   const { readyVaults, pendingVaults, fundedVaults, closingVaults, closedVaults, allVaults } =
@@ -31,7 +31,7 @@ export function MyVaultsLarge(): React.JSX.Element {
           <VaultsList
             title={'In Process'}
             height={'475px'}
-            isScrollable={!isConnected && allVaults.length > 0}
+            isScrollable={isConnected && allVaults.length > 0}
           >
             <VaultsListGroupContainer label="Empty Vaults" vaults={readyVaults} />
             <VaultsListGroupContainer label="Pending" vaults={pendingVaults} />
@@ -43,7 +43,7 @@ export function MyVaultsLarge(): React.JSX.Element {
         <VaultsList
           title={'Minted dlcBTC'}
           height={'475px'}
-          isScrollable={!isConnected && fundedVaults.length > 0}
+          isScrollable={isConnected && fundedVaults.length > 0}
         >
           {isConnected ? (
             <VaultsListGroupContainer vaults={fundedVaults} />
@@ -54,7 +54,7 @@ export function MyVaultsLarge(): React.JSX.Element {
         <VaultsList
           title={'Closed Vaults'}
           height={'475px'}
-          isScrollable={!isConnected && closedVaults.length > 0}
+          isScrollable={isConnected && closedVaults.length > 0}
         >
           {isConnected ? (
             <VaultsListGroupContainer vaults={closedVaults} />
