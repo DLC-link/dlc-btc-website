@@ -1,6 +1,5 @@
 import { useContext, useState } from 'react';
 
-import { getAttestorExtendedGroupPublicKey } from '@functions/attestor-request.functions';
 import { BitcoinError } from '@models/error-types';
 import { BitcoinWalletType } from '@models/wallet';
 import { bytesToHex } from '@noble/hashes/utils';
@@ -11,6 +10,7 @@ import { RippleNetworkConfigurationContext } from '@providers/ripple-network-con
 import { XRPWalletContext } from '@providers/xrp-wallet-context-provider';
 import { LedgerDLCHandler, SoftwareWalletDLCHandler } from 'dlc-btc-lib';
 import {
+  getAttestorExtendedGroupPublicKey,
   submitFundingPSBT,
   submitWithdrawDepositPSBT,
 } from 'dlc-btc-lib/attestor-request-functions';
@@ -84,7 +84,9 @@ export function usePSBT(): UsePSBTReturnType {
         appConfiguration.rippleIssuerAddress,
         vaultUUID
       );
-      const attestorGroupPublicKey = await getAttestorExtendedGroupPublicKey();
+      const attestorGroupPublicKey = await getAttestorExtendedGroupPublicKey(
+        appConfiguration.coordinatorURL
+      );
       return {
         userAddress: rippleUserAddress,
         vault,
