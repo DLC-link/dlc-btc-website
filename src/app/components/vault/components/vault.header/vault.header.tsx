@@ -19,19 +19,13 @@ export function VaultHeader({
 
   return (
     <HStack w={'100%'} justifyContent={'space-between'}>
-      <HStack
-        w={'67.5%'}
-        pl={'15px'}
-        bg={'white.04'}
-        borderRadius={'full'}
-        justifyContent={'space-between'}
-      >
-        <Stack w={'25%'}>
+      <HStack width={'75%'}>
+        <Stack w={'45%'}>
           <Text fontSize={'xs'} fontWeight={'bold'} color={'white.01'}>
-            Vault
+            Vault UUID
           </Text>
         </Stack>
-        <Stack w={'50%'}>
+        <Stack w={'45%'}>
           <Text fontSize={'xs'} fontWeight={'bold'} color={'white.01'}>
             {vaultTruncatedUUID}
           </Text>
